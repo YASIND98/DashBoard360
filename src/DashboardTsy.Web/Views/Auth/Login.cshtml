@@ -1,0 +1,250 @@
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DenizBank Rapor Platformu</title>
+
+    <!------ Sol navbar ve dashboard cssler ----->
+    <link href="~/assets/site.css" rel="stylesheet" />
+
+    <!-- BOOTSTRAP -->
+    <link href="~/assets/lib/bootstrap/bootstrap.css" rel="stylesheet" />
+    <link href="~/assets/lib/bootstrap/bootstrap-grid.css" rel="stylesheet" />
+    <link href="~/assets/lib/bootstrap/bootstrap-reboot.css" rel="stylesheet" />
+
+    <!-- ANIMATE -->
+    <link href="~/assets/lib/animate/animate.css" rel="stylesheet" />
+
+    <link href="~/assets/icon/material-icons.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/lib/loadingjs/loading.css" rel="stylesheet" />
+    <link href="~/assets/lib/jqueryconfirm/jquery-confirm.css" rel="stylesheet" />
+    <link href="~/assets/style.css" rel="stylesheet" />
+    <link href="~/assets/responsive.css" rel="stylesheet" />
+
+    <style>
+        .button {
+            border-radius: 4px;
+            background-color: #5e32e4;
+            border: none;
+            color: #FFFFFF;
+            text-align: center;
+            font-size: 14px;
+            padding: 10px;
+            width: 133px;
+            transition: all 0.5s;
+            cursor: pointer;
+            margin-top: 10px;
+            float: right
+        }
+
+            .button span {
+                cursor: pointer;
+                display: inline-block;
+                position: relative;
+                transition: 0.5s;
+            }
+
+                .button span:after {
+                    content: '\00bb';
+                    position: absolute;
+                    opacity: 0;
+                    top: 0;
+                    right: -20px;
+                    transition: 0.5s;
+                }
+
+            .button:hover span {
+                padding-right: 25px;
+            }
+
+                .button:hover span:after {
+                    opacity: 1;
+                    right: 0;
+                }
+
+        .overlay {
+            background-color: rgba(0,0,0,0.28);
+            position: absolute;
+            left: 0;
+            height: 370px;
+            z-index: 10;
+            border-radius: 15px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="centeredDiv">
+        <div class="indexHeader">
+            <div>
+                <img style="width:35px" src="~/assets/img/dumen.png" />
+            </div>
+            <div>
+                <h2 style="text-align:center;left:75px">DenizBank Rapor Platformu</h2>
+            </div>
+        </div>
+        <div style="background: white;border-radius: 15px;box-shadow: 14px 21px 20px 14px rgba(146,146,210,0.10);">
+            <div class="col-md-7 p-0" style="display: inline-block">
+                <div class="overlay">
+
+                </div>
+                <img src="~/assets/img/reportbg.jpg" style="width:100%;height:370px;border-radius: 15px;" />
+            </div>
+            <div class="col-md-5" style="min-width:200px;display: inline-block;float: right;padding:20px">
+                <h3 style="margin-top:50px;margin-bottom: 20px;">Giriş Yap</h3>
+                <div class="tableTitle">
+                    <div>
+                        <input type="text" id="username" placeholder="Email / Kullanıcı Adı" style="background:none;width:100%" autocomplete="new-password">
+                    </div>
+                    <div>
+                        <input type="password" id="password" placeholder="Şifre" style="background:none;width:100%;margin-top:10px" autocomplete="new-password">
+                    </div>
+                    <div>
+                        <div class="custom-control custom-checkbox pt-2">
+                            <input type="checkbox" class="custom-control-input" id="customCheck1">
+                            <label class="custom-control-label" for="customCheck1">Oturumumu açık tut</label>
+                        </div>
+                        <div>
+                            <button class="button" onclick="Login();"><span>Giriş Yap </span></button>
+
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 40px;">
+                    Hesabınız yoksa <a href="#" onclick="RegisterTab();"> buradan </a> kayıt olun.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="~/assets/lib/jquery/jquery-3.5.1.min.js"></script>
+    <script src="~/assets/lib/jquery/jquery.cookie.min.js"></script>
+    <script src="~/assets/lib/jqueryconfirm/jquery-confirm.js"></script>
+    <script src="~/assets/lib/bootstrap/bootstrap.js"></script>
+    <script src="~/assets/lib/bootstrap/bootstrap.bundle.js"></script>
+    <script src="~/assets/lib/bootstrap/bootstrap.popper.js"></script>
+    <script src="~/assets/lib/chartjs/Chart.js"></script>
+    <script src="~/assets/lib/chartjs/Utils.js"></script>
+    <script src="~/assets/lib/loadingjs/loading.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $(function () {
+                $.ajax({
+                    type: "GET",
+                    url: './LoginDomain',
+                    cache: false,
+                    success: function (res) {
+                        if (!res || !res.Result || res.Result.UserId <= 0) {
+                            LocalLogin();
+                        }
+                        else {
+                            $('body').loading({
+                                stoppable: false,
+                                message: '<div><img src="../assets/img/loader.gif" style="width: 60px;" /><p style="font-family: GTR !important;">Oturumunuz açılıyor...</p></div>'
+                            });
+                            setInterval(function () {
+                                $("body").loading('destroy');
+                                window.location.href = "../Home/Index";
+                            }, 2000);
+                        }
+                    }
+                });
+            });
+        });
+
+        function LocalLogin() {
+            if (localStorage.getItem("loginCheck") == "true") {
+                $("#customCheck1").prop('checked', true);
+                if (localStorage.userName && localStorage.password) {
+                    $("#username").val(localStorage.getItem("userName"));
+
+                    $.ajax({
+                        type: "POST",
+                        url: './LoginUser',
+                        cache: false,
+                        data: { "Email": localStorage.getItem("userName"), "Pass": localStorage.getItem("password") },
+                        success: function (res) {
+                            if (!res || !res.Result || res.Result.UserId <= 0) {
+                                $.confirm({
+                                    title: res?.Message?.message ?? "Hata",
+                                    content: res?.Message?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
+                                    buttons: {
+                                        TAMAM: function () { }
+                                    }
+                                });
+                            }
+                            else {
+                                $('body').loading({
+                                    stoppable: false,
+                                    message: '<div><img src="../assets/img/loader.gif" style="width: 60px;" /><p style="font-family: GTR !important;">Oturumunuz açılıyor...</p></div>'
+                                });
+                                setInterval(function () {
+                                    $("body").loading('destroy');
+                                    window.location.href = "../Home/Index";
+                                }, 2000);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        function Login() {
+            $.ajax({
+                type: "POST",
+                url: './LoginUser',
+                cache: false,
+                data: { "Email": $("#username").val(), "Pass": $("#password").val() },
+                success: function (res) {
+                    if (!res || !res.Result || res.Result.UserId <= 0) {
+                        $.confirm({
+                            title: res?.Message?.message ?? "Hata",
+                            content: res?.Message?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
+                            buttons: {
+                                TAMAM: function () { }
+                            }
+                        });
+                    }
+                    else {
+                        localStorage.setItem("userName", $("#username").val());
+                        localStorage.setItem("password", $("#password").val());
+                        var check = $("#customCheck1").is(':checked') ? "true" : "false";
+                        localStorage.setItem("loginCheck", check);
+
+                        $('body').loading({
+                            stoppable: false,
+                            message: '<div><img src="../assets/img/loader.gif" style="width: 60px;" /></div>'
+                        });
+                        setInterval(function () {
+                            $("body").loading('destroy');
+                            window.location.href = "../Home/Index";
+                        }, 2000);
+                    }
+                }
+            });
+        }
+
+        function RegisterTab() {
+            $.confirm({
+                title: 'Uyarı',
+                content: 'Kayıt için yöneticinizle iletişime geçiniz.',
+                buttons: {
+                    TAMAM: function () { }
+                }
+            });
+        }
+    </script>
+
+</body>
+
+</html>
+
