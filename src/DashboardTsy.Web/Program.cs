@@ -1,6 +1,35 @@
+using System.Globalization;
+using Microsoft.AspNetCore.Authentication.Negotiate;
+
 var builder = WebApplication.CreateBuilder(args);
 
+var cultureInfo = new CultureInfo("tr-TR")
+{
+    NumberFormat =
+    {
+        NumberDecimalSeparator = ".",
+        NumberGroupSeparator = ","
+    },
+    DateTimeFormat = { ShortDatePattern = "dd.MM.yyyy" }
+};
+CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
+CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+
 // Add services to the container.
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromHours(6);
+    options.Cookie.IsEssential = true;
+});
+
+// Windows Authentication (Negotiate works for Kestrel / IIS)
+builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+    .AddNegotiate();
+
+builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddHttpClient();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -9,7 +38,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -18,10 +46,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Auth}/{action=Login}/{id?}");
 
 app.Run();
