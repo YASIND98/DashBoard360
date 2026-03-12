@@ -19,6 +19,12 @@ namespace DashboardTsy.Web.Controllers
             return View(model);
         }
 
+        public IActionResult YieldReports()
+        {
+            var model = YieldReportDataHelper.GetSampleData();
+            return View(model);
+        }
+
         public IActionResult Privacy()
         {
             return View();
