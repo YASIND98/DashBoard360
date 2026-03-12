@@ -1,5 +1,6 @@
 using System.Globalization;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using DashboardTsy.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +30,9 @@ builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
+builder.Services.Configure<DashboardApiOptions>(builder.Configuration.GetSection(DashboardApiOptions.SectionName));
 builder.Services.AddHttpClient();
+builder.Services.AddHttpClient<ITargetReportApiClient, TargetReportApiClient>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -50,6 +53,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 
+app.MapControllers();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");

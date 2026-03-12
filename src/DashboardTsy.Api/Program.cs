@@ -1,5 +1,6 @@
 using System.Globalization;
 using DashboardTsy.Api.Data;
+using DashboardTsy.Api.DataLayer;
 using DashboardTsy.Api.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,11 @@ var referansConn = builder.Configuration["DbConnectionStrings:Referans"] ?? buil
 builder.Services.AddDbContext<DashboardTsyDbContext>(o => o.UseSqlServer(mainConn));
 builder.Services.AddScoped<IWindowsAuthService, WindowsAuthService>();
 builder.Services.AddSingleton(new ReferansDbOptions { ConnectionString = referansConn });
+
+// Stored procedure / DataLayer (DBRapor-style)
+builder.Services.AddSingleton<IConnectionStringProvider, ConnectionStringProvider>();
+builder.Services.AddScoped<IStoredProcedureExecutor, StoredProcedureExecutor>();
+builder.Services.AddScoped<IReportDataProvider, ReportDataProvider>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
