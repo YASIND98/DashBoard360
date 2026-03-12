@@ -2,6 +2,7 @@ using System.Data;
 using System.Linq;
 using DashboardTsy.Api.Models.TargetReport;
 using DashboardTsy.Api.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace DashboardTsy.Api.DataLayer;
 
@@ -12,11 +13,15 @@ namespace DashboardTsy.Api.DataLayer;
 public class ReportDataProvider : IReportDataProvider
 {
     private readonly IStoredProcedureExecutor _spExecutor;
+    private readonly IConfiguration _configuration;
 
-    public ReportDataProvider(IStoredProcedureExecutor spExecutor)
+    public ReportDataProvider(IStoredProcedureExecutor spExecutor, IConfiguration configuration)
     {
         _spExecutor = spExecutor;
+        _configuration = configuration;
     }
+
+    private bool MockEnabled => _configuration.GetValue<bool>("ReportMock:Enabled");
 
     /// <summary>
     /// Example: execute sp_GetRaporTarihi on Main (or SubeDashboard if you use that DB).
@@ -45,6 +50,9 @@ public class ReportDataProvider : IReportDataProvider
     /// </summary>
     public GetTargetReportMenuTextsResponse? GetTargetReportMenuTexts(string sessionId)
     {
+        if (MockEnabled)
+            return MockTargetReportData.GetMenuTexts();
+
         var parameters = new Dictionary<string, object?>
         {
             ["@SessionId"] = sessionId ?? string.Empty
@@ -60,6 +68,9 @@ public class ReportDataProvider : IReportDataProvider
     /// </summary>
     public IReadOnlyList<GetTargetReportFiltersItem> GetTargetReportFilters(string sessionId, int filterId, List<string>? filterCode)
     {
+        if (MockEnabled)
+            return MockTargetReportData.GetFilters(filterId);
+
         var filterCodeStr = filterCode != null && filterCode.Count > 0 ? string.Join(",", filterCode) : null;
         var parameters = new Dictionary<string, object?>
         {
@@ -76,6 +87,9 @@ public class ReportDataProvider : IReportDataProvider
     public GetDailyTargetReportResponse GetDailyTargetReport(GetDailyTargetReportRequest request)
     {
         request ??= new GetDailyTargetReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetDailyReport(request);
 
         var parameters = new Dictionary<string, object?>
         {
@@ -117,6 +131,9 @@ public class ReportDataProvider : IReportDataProvider
 
     public GetDailyTargetReportTableHeadersResponse? GetDailyTargetReportTableHeaders(string sessionId)
     {
+        if (MockEnabled)
+            return MockTargetReportData.GetDailyHeaders(DateTime.Today);
+
         var parameters = new Dictionary<string, object?>
         {
             ["@SessionId"] = sessionId ?? string.Empty
@@ -132,6 +149,9 @@ public class ReportDataProvider : IReportDataProvider
     public GetMonthlyTargetReportResponse? GetMonthlyTargetReport(GetMonthlyTargetReportRequest request)
     {
         request ??= new GetMonthlyTargetReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetMonthlyReport(request);
 
         var parameters = new Dictionary<string, object?>
         {
@@ -167,6 +187,9 @@ public class ReportDataProvider : IReportDataProvider
     public GetMonthlyTargetReportTableHeadersResponse? GetMonthlyTargetReportTableHeaders(GetMonthlyTargetReportTableHeadersRequest request)
     {
         request ??= new GetMonthlyTargetReportTableHeadersRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetMonthlyHeaders(request.ReportDate);
 
         var parameters = new Dictionary<string, object?>
         {

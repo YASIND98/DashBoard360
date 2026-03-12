@@ -28,7 +28,11 @@ builder.Services.AddScoped<IReportDataProvider, ReportDataProvider>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // Avoid schemaId collisions for nested classes like GetDailyTargetReportResponse.Product vs GetMonthlyTargetReportResponse.Product
+    c.CustomSchemaIds(t => t.FullName);
+});
 
 var app = builder.Build();
 
