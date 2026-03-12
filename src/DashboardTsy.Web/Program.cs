@@ -49,7 +49,9 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Development'ta HTTP ile çalıştırıyorsan (örn. http profile) HTTPS yönlendirme kapalı; sertifika hatası olmaz.
+if (!app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
