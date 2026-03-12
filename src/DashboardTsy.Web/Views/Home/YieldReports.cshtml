@@ -1,0 +1,165 @@
+@model YieldReportViewModel
+
+<!-- Page Title & Date -->
+<div class="page-header">
+    <h1 class="page-title">Verim Performans Raporları</h1>
+    <div class="page-date">
+        <span class="date-text">@Model.Tarih</span>
+        <span class="date-badge">Bugün</span>
+    </div>
+    <div class="page-icons">
+      <img src="~/images/notification.svg" alt="Bildirimler" />
+      <img src="~/images/help.svg" alt="Yardım" />
+      <div class="avatar">
+          <img src="https://ui-avatars.com/api/?name=AD&background=c44&color=fff&size=36&rounded=true" alt="Avatar" />
+      </div>
+    </div>
+</div>
+
+<!-- Breadcrumb & Skor Kartı -->
+<div class="breadcrumb-bar">
+    <div class="breadcrumb">
+        <span class="breadcrumb-item active">Tüm Bölgeler</span>
+        <span class="breadcrumb-separator">›</span>
+        <span class="breadcrumb-item">Akdeniz Bölgesi</span>
+    </div>
+    <div class="scorecard">
+        <button class="scorecard-btn">
+            <i class="fas fa-chevron-left"></i>
+            <span>Bölge Skor Kartı & NPS</span>
+        </button>
+        <div class="scorecard-panel" id="scorecardPanel">
+            <div class="scorecard-header">
+                <span>Şube Skor Kartı & NPS</span>
+                <button class="scorecard-close" id="scorecardClose"><i class="fas fa-times-circle"></i></button>
+            </div>
+            <div class="scorecard-section">
+                <div class="scorecard-section-title">Şube Müdürü Skor Kartı</div>
+                <table class="scorecard-table">
+                    <tr><td>Adı Soyadı:</td><td class="scorecard-value">Nil Sezgin</td></tr>
+                    <tr><td>Mart 2026:</td><td class="scorecard-value col-ratio ratio-green">78</td></tr>
+                    <tr><td>Şubat 2026:</td><td class="scorecard-value col-ratio ratio-red">34</td></tr>
+                    <tr><td>Ocak 2026:</td><td class="scorecard-value col-ratio ratio-green">89</td></tr>
+                </table>
+            </div>
+            <div class="scorecard-section">
+                <div class="scorecard-section-title">Şube Rolleri Skor Kartı</div>
+                <table class="scorecard-table">
+                    <tr><td>Kurumsal:</td><td class="scorecard-value">-</td></tr>
+                    <tr><td>Ticari:</td><td class="scorecard-value col-ratio ratio-red">32</td></tr>
+                    <tr><td>KBİ:</td><td class="scorecard-value col-ratio ratio-green">80.<small>6</small></td></tr>
+                    <tr><td>OBİ:</td><td class="scorecard-value col-ratio ratio-blue">100.<small>5</small></td></tr>
+                    <tr><td>Tarım:</td><td class="scorecard-value col-ratio ratio-green">88.<small>0</small></td></tr>
+                    <tr><td>Kitle:</td><td class="scorecard-value col-ratio ratio-red">40.<small>4</small></td></tr>
+                    <tr><td>Afili:</td><td class="scorecard-value col-ratio ratio-red">35.<small>1</small></td></tr>
+                    <tr><td>ÖB:</td><td class="scorecard-value col-ratio ratio-green">56.<small>8</small></td></tr>
+                </table>
+            </div>
+            <div class="scorecard-section">
+                <div class="scorecard-section-title">NPS</div>
+                <table class="scorecard-table">
+                    <tr><td>Şube:</td><td class="scorecard-value col-ratio ratio-green">78</td></tr>
+                    <tr><td>Banka:</td><td class="scorecard-value col-ratio ratio-green">91</td></tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" data-dropdown="yield-bolge">
+                <span class="filter-label">Bölge</span>
+                <span class="filter-badge" style="display:none;">0</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" data-dropdown="yield-sube">
+                <span class="filter-label">Şube</span>
+                <span class="filter-badge" style="display:none;">0</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Yield Table -->
+<div class="table-container">
+    <table class="data-table yield-table">
+        <thead>
+            <tr>
+                <th rowspan="2" class="col-text valign-bottom">Bölge Adı</th>
+                <th colspan="@Model.MonthColumns.Count" class="col-group-header">3 Aylık Gerçekleşen %</th>
+                <th rowspan="2" class="valign-bottom">Kurumsal %</th>
+                <th rowspan="2" class="valign-bottom">Ticari %</th>
+                <th colspan="2" class="col-group-header">KOBİ</th>
+                <th rowspan="2" class="valign-bottom">Tarım %</th>
+                <th colspan="3" class="col-group-header">Bireysel</th>
+            </tr>
+            <tr>
+                @foreach (var col in Model.MonthColumns)
+                {
+                    <th class="month-col">@col.Label</th>
+                }
+                <th>KBİ %</th>
+                <th>OBİ %</th>
+                <th>Kitle %</th>
+                <th>Afili %</th>
+                <th>ÖB %</th>
+            </tr>
+        </thead>
+        <tbody>
+            @{ var rowIndex = 0; }
+            @foreach (var row in Model.Rows)
+            {
+                rowIndex++;
+                <tr class="table-row @(rowIndex % 2 == 1 ? "stripe-odd" : "stripe-even")">
+                    <td class="col-text">@row.BolgeAdi</td>
+                    @foreach (var pct in row.MonthlyPercents)
+                    {
+                        <td class="col-ratio @RatioClass(pct)">@pct%</td>
+                    }
+                    <td class="col-ratio @RatioClass(row.KurumsalPercent)">@row.KurumsalPercent%</td>
+                    <td class="col-ratio @RatioClass(row.TicariPercent)">@row.TicariPercent%</td>
+                    <td class="col-ratio @RatioClass(row.KobiKbiPercent)">@row.KobiKbiPercent%</td>
+                    <td class="col-ratio @RatioClass(row.KobiObiPercent)">@row.KobiObiPercent%</td>
+                    <td class="col-ratio @RatioClass(row.TarimPercent)">@row.TarimPercent%</td>
+                    <td class="col-ratio @RatioClass(row.BireyselKitlePercent)">@row.BireyselKitlePercent%</td>
+                    <td class="col-ratio @RatioClass(row.BireyselAfiliPercent)">@row.BireyselAfiliPercent%</td>
+                    <td class="col-ratio @RatioClass(row.BireyselObPercent)">@row.BireyselObPercent%</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@functions {
+    string RatioClass(double pct)
+    {
+        if (pct <= 49) return "ratio-red";
+        if (pct <= 100) return "ratio-green";
+        return "ratio-blue";
+    }
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.scorecard-btn').on('click', function (e) {
+                e.stopPropagation();
+                $('#scorecardPanel').toggleClass('open');
+            });
+            $('#scorecardClose').on('click', function () {
+                $('#scorecardPanel').removeClass('open');
+            });
+            $(document).on('click', function (e) {
+                if (!$(e.target).closest('.scorecard').length) {
+                    $('#scorecardPanel').removeClass('open');
+                }
+            });
+        });
+    </script>
+}

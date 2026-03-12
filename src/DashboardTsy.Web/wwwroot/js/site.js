@@ -1,4 +1,14 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
+function formatPercent(ratio) {
+  return Math.round(ratio * 100) + '%';
+}
 
-// Write your JavaScript code.
+function ratioClass(ratio) {
+  var pct = ratio * 100;
+  if (pct <= 49) return 'ratio-red';
+  if (pct <= 100) return 'ratio-green';
+  return 'ratio-blue';
+}
+
+function formatNumber(value) {
+  return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
+}
