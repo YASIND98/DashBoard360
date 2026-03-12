@@ -15,7 +15,8 @@ namespace DashboardTsy.Web.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var model = new ReportViewModel();
+            return View(model);
         }
 
         public IActionResult Privacy()
