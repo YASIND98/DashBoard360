@@ -147,7 +147,8 @@
                     url: loginDomainUrl,
                     cache: false,
                     success: function (res) {
-                        if (!res || !res.Result || res.Result.UserId <= 0) {
+                        const result = res?.Result ?? res?.result;
+                        if (!res || !result || result.UserId <= 0) {
                             LocalLogin();
                         }
                         else {
@@ -177,10 +178,12 @@
                         cache: false,
                         data: { "Email": localStorage.getItem("userName"), "Pass": localStorage.getItem("password") },
                         success: function (res) {
-                            if (!res || !res.Result || res.Result.UserId <= 0) {
+                            const result = res?.Result ?? res?.result;
+                            const msg = res?.Message ?? res?.message;
+                            if (!res || !result || result.UserId <= 0) {
                                 $.confirm({
-                                    title: res?.Message?.message ?? "Hata",
-                                    content: res?.Message?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
+                                    title: msg?.message ?? "Hata",
+                                    content: msg?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
                                     buttons: {
                                         TAMAM: function () { }
                                     }
@@ -209,10 +212,12 @@
                 cache: false,
                 data: { "Email": $("#username").val(), "Pass": $("#password").val() },
                 success: function (res) {
-                    if (!res || !res.Result || res.Result.UserId <= 0) {
+                    const result = res?.Result ?? res?.result;
+                    const msg = res?.Message ?? res?.message;
+                    if (!res || !result || result.UserId <= 0) {
                         $.confirm({
-                            title: res?.Message?.message ?? "Hata",
-                            content: res?.Message?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
+                            title: msg?.message ?? "Hata",
+                            content: msg?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
                             buttons: {
                                 TAMAM: function () { }
                             }

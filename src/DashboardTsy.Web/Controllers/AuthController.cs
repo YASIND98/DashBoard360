@@ -18,12 +18,55 @@ public class AuthController : Controller
         _configuration = configuration;
     }
 
+    private bool AuthMockEnabled => _configuration.GetValue<bool>("AuthMock:Enabled");
+
+    private static ApiResponse<UsersDto> MockOkUser(string? userNameOrEmail)
+    {
+        var user = new UsersDto
+        {
+            UserId = 999,
+            NameSurname = "Mock Kullanıcı",
+            Email = userNameOrEmail,
+            DomainName = userNameOrEmail,
+            Department = "Mock Departman",
+            BranchCode = 1001,
+            BranchName = "Mock Şube",
+            RegionCode = 1,
+            Authority = "Admin",
+            Password = "mock-token",
+            IsBlock = false,
+            UpdateSeen = true,
+            CreatedDate = DateTime.Now
+        };
+
+        return new ApiResponse<UsersDto>
+        {
+            Result = user,
+            Message = new MessageResult { message = "OK", message2 = "Mock login başarılı." }
+        };
+    }
+
+    private static ApiResponse<UsersDto> MockNotLoggedIn(string message2)
+    {
+        return new ApiResponse<UsersDto>
+        {
+            Result = new UsersDto { UserId = 0 },
+            Message = new MessageResult { message = "Mock", message2 = message2 }
+        };
+    }
+
     [HttpGet]
     public async Task<IActionResult> Login(CancellationToken cancellationToken)
     {
         var userName = User?.Identity?.Name;
         if (string.IsNullOrEmpty(userName))
             return View();
+
+        if (AuthMockEnabled)
+        {
+            // In mock mode, do NOT auto-login. Keep showing the login screen so UI can be tested.
+            return View();
+        }
 
         var baseUrl = _configuration["DashboardApi:BaseUrl"]?.TrimEnd('/') + "/";
         var url = $"{baseUrl}Public/WindowsLogin?username={WebUtility.UrlEncode(userName)}";
@@ -59,6 +102,12 @@ public class AuthController : Controller
     {
         var userName = User?.Identity?.Name ?? string.Empty;
 
+        if (AuthMockEnabled)
+        {
+            // Login page calls this on load; return "not logged in" so it falls back to local login UI.
+            return Json(MockNotLoggedIn("Mock mod aktif: otomatik domain login kapalı."));
+        }
+
         var baseUrl = _configuration["DashboardApi:BaseUrl"]?.TrimEnd('/') + "/";
         var url = $"{baseUrl}Public/DomainLogin?domainName={WebUtility.UrlEncode(userName)}";
 
@@ -91,6 +140,14 @@ public class AuthController : Controller
     [HttpPost]
     public async Task<JsonResult> LoginUser([FromForm] LoginModel model, CancellationToken cancellationToken)
     {
+        if (AuthMockEnabled)
+        {
+            var mock = MockOkUser(model.Email);
+            if (mock.Result != null)
+                SetSession(mock.Result);
+            return Json(mock);
+        }
+
         var baseUrl = _configuration["DashboardApi:BaseUrl"]?.TrimEnd('/') + "/";
         var url = $"{baseUrl}Public/Login?username={WebUtility.UrlEncode(model.Email ?? string.Empty)}&password={WebUtility.UrlEncode(model.Pass ?? string.Empty)}";
 

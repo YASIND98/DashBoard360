@@ -33,7 +33,12 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<DashboardApiOptions>(builder.Configuration.GetSection(DashboardApiOptions.SectionName));
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<ITargetReportApiClient, TargetReportApiClient>();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(o =>
+    {
+        // Login page JS expects "Result"/"Message" (PascalCase), not "result"/"message".
+        o.JsonSerializerOptions.PropertyNamingPolicy = null;
+    });
 
 var app = builder.Build();
 

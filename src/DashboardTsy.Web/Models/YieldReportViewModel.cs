@@ -1,4 +1,4 @@
-namespace DenizBank360.Models;
+namespace DashboardTsy.Web.Models;
 
 public class YieldReportViewModel
 {
