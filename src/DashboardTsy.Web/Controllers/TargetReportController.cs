@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DashboardTsy.Web.Controllers;
 
 [Authorize]
-[Route("api/[controller]")]
+[Route("[controller]")]
 [ApiController]
 public class TargetReportController : ControllerBase
 {

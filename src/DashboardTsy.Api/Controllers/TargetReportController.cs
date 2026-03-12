@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DashboardTsy.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("[controller]")]
 public class TargetReportController : ControllerBase
 {
     private readonly IReportDataProvider _reportDataProvider;

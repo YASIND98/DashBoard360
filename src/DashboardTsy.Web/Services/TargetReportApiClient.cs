@@ -20,7 +20,7 @@ public class TargetReportApiClient : ITargetReportApiClient
 
     public async Task<GetTargetReportMenuTextsResponse?> GetTargetReportMenuTextsAsync(string sessionId, CancellationToken cancellationToken = default)
     {
-        var url = $"api/TargetReport/GetTargetReportMenuTexts?sessionId={WebUtility.UrlEncode(sessionId)}";
+        var url = $"TargetReport/GetTargetReportMenuTexts?sessionId={WebUtility.UrlEncode(sessionId)}";
         var response = await _httpClient.GetAsync(url, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             return null;
@@ -30,7 +30,7 @@ public class TargetReportApiClient : ITargetReportApiClient
 
     public async Task<IReadOnlyList<GetTargetReportFiltersItem>> GetTargetReportFiltersAsync(GetTargetReportFiltersRequest request, CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/TargetReport/GetTargetReportFilters", request, cancellationToken).ConfigureAwait(false);
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetTargetReportFilters", request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             return Array.Empty<GetTargetReportFiltersItem>();
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -40,7 +40,7 @@ public class TargetReportApiClient : ITargetReportApiClient
 
     public async Task<GetDailyTargetReportResponse?> GetDailyTargetReportAsync(GetDailyTargetReportRequest request, CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/TargetReport/GetDailyTargetReport", request, cancellationToken).ConfigureAwait(false);
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetDailyTargetReport", request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
@@ -51,7 +51,7 @@ public class TargetReportApiClient : ITargetReportApiClient
         GetDailyTargetReportTableHeadersRequest request,
         CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/TargetReport/GetDailyTargetReportTableHeaders", request, cancellationToken)
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetDailyTargetReportTableHeaders", request, cancellationToken)
             .ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             return null;
@@ -63,7 +63,7 @@ public class TargetReportApiClient : ITargetReportApiClient
         GetMonthlyTargetReportRequest request,
         CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/TargetReport/GetMonthlyTargetReport", request, cancellationToken)
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetMonthlyTargetReport", request, cancellationToken)
             .ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             return null;
@@ -75,7 +75,7 @@ public class TargetReportApiClient : ITargetReportApiClient
         GetMonthlyTargetReportTableHeadersRequest request,
         CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/TargetReport/GetMonthlyTargetReportTableHeaders", request, cancellationToken)
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetMonthlyTargetReportTableHeaders", request, cancellationToken)
             .ConfigureAwait(false);
         if (!response.IsSuccessStatusCode)
             return null;
