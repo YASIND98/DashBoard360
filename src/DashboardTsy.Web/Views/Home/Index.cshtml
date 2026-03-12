@@ -16,7 +16,7 @@
 
 <!-- Page Title & Date -->
 <div class="page-header">
-    <h1 class="page-title" data-menu="screenTitle"></h1>
+    <h1 class="page-title" data-menu="ScreenTitle"></h1>
     <div class="page-date">
       <span class="date-text">@Model.Tarih</span>
       <span class="date-badge">Bugün</span>
@@ -74,30 +74,6 @@
             </div>
         </div>
 
-        <div class="filter-dropdown-wrapper">
-            <div class="filter-dropdown" data-dropdown="portfoy">
-                <span class="filter-label">Segment</span>
-                <span class="filter-badge" style="display:none;">0</span>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="dropdown-panel" data-panel="portfoy">
-                <div class="dropdown-header">
-                    <span class="dropdown-title">Segment Seçimi</span>
-                    <button class="dropdown-save" data-panel="portfoy">Kaydet</button>
-                </div>
-                <div class="dropdown-search">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Ara..." class="dropdown-search-input" />
-                </div>
-                <div class="dropdown-list">
-                    <label class="dropdown-item select-all">
-                        <img src="~/images/checkbox.svg" class="cb-icon cb-off" alt="" /><img src="~/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />
-                        <span>Tümünü Seç</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
         <button class="filter-apply-btn" disabled>Uygula</button>
         <button class="filter-clear-btn" style="display:none;">Temizle</button>
 
@@ -116,12 +92,12 @@
 <!-- Tabs -->
 <div class="tab-bar">
     <div class="tab-list">
-        <button class="tab active" data-tab="tumu" data-menu="tabAllTitle"></button>
-        <button class="tab" data-tab="kurumsal" data-menu="tabCorporateTitle"></button>
-        <button class="tab" data-tab="ticari" data-menu="tabCommercialTitle"></button>
-        <button class="tab has-subtabs" data-tab="kobi" data-menu="tabSmeTitle"></button>
-        <button class="tab" data-tab="tarim" data-menu="tabAgricultureTitle"></button>
-        <button class="tab has-subtabs" data-tab="bireysel" data-menu="tabRetailTitle"></button>
+        <button class="tab active" data-tab="tumu" data-menu="TabAllTitle"></button>
+        <button class="tab" data-tab="kurumsal" data-menu="TabCorporateTitle"></button>
+        <button class="tab" data-tab="ticari" data-menu="TabCommercialTitle"></button>
+        <button class="tab has-subtabs" data-tab="kobi" data-menu="TabSmeTitle"></button>
+        <button class="tab" data-tab="tarim" data-menu="TabAgricultureTitle"></button>
+        <button class="tab has-subtabs" data-tab="bireysel" data-menu="TabRetailTitle"></button>
     </div>
     <div class="diff-toggle" id="diffToggle">
         <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
@@ -133,19 +109,19 @@
 <!-- Sub Tabs - KOBİ -->
 <div class="sub-tab-bar" data-parent-tab="kobi" style="display:none;">
     <div class="tab-list">
-        <button class="sub-tab active" data-subtab="kobi-tumu" data-menu="smeSubTabAllTitle"></button>
-        <button class="sub-tab" data-subtab="kobi-kbi" data-menu="smeSubTabKbiTitle"></button>
-        <button class="sub-tab" data-subtab="kobi-obi" data-menu="smeSubTabObiTitle"></button>
+        <button class="sub-tab active" data-subtab="kobi-tumu" data-menu="SmeSubTabAllTitle"></button>
+        <button class="sub-tab" data-subtab="kobi-kbi" data-menu="SmeSubTabKbiTitle"></button>
+        <button class="sub-tab" data-subtab="kobi-obi" data-menu="SmeSubTabObiTitle"></button>
     </div>
 </div>
 
 <!-- Sub Tabs - Bireysel -->
 <div class="sub-tab-bar" data-parent-tab="bireysel" style="display:none;">
     <div class="tab-list">
-        <button class="sub-tab active" data-subtab="bireysel-tumu" data-menu="retailSubTabAllTitle"></button>
-        <button class="sub-tab" data-subtab="bireysel-genel" data-menu="retailSubTabGeneralTitle"></button>
-        <button class="sub-tab" data-subtab="bireysel-afili" data-menu="retailSubTabAffiliateTitle"></button>
-        <button class="sub-tab" data-subtab="bireysel-ozel" data-menu="retailSubTabPrivateTitle"></button>
+        <button class="sub-tab active" data-subtab="bireysel-tumu" data-menu="RetailSubTabAllTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-genel" data-menu="RetailSubTabGeneralTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-afili" data-menu="RetailSubTabAffiliateTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-ozel" data-menu="RetailSubTabPrivateTitle"></button>
     </div>
 </div>
 
@@ -157,28 +133,28 @@
                 <th class="col-index"></th>
                 <th class="col-expand"></th>
                 <th class="col-text">
-                    <span data-daily-header="productNameTitle"></span>
+                    <span data-daily-header="ProductNameTitle"></span>
                     <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                 </th>
                 <th>
-                    <span data-daily-header="lastYearTitle"></span>
+                    <span data-daily-header="LastYearTitle"></span>
                     <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="lastYearDate"></small>
+                    <small data-daily-header="LastYearDate"></small>
                 </th>
                 <th>
-                    <span data-daily-header="lastWeekTitle"></span>
+                    <span data-daily-header="LastWeekTitle"></span>
                     <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="lastWeekDate"></small>
+                    <small data-daily-header="LastWeekDate"></small>
                 </th>
                 <th>
-                    <span data-daily-header="prevDayTitle"></span>
+                    <span data-daily-header="PrevDayTitle"></span>
                     <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="prevDayDate"></small>
+                    <small data-daily-header="PrevDayDate"></small>
                 </th>
                 <th>
-                    <span data-daily-header="yesterdayTitle"></span>
+                    <span data-daily-header="YesterdayTitle"></span>
                     <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="yesterdayDate"></small>
+                    <small data-daily-header="YesterdayDate"></small>
                 </th>
             </tr>
         </thead>
@@ -195,20 +171,20 @@
                 <th class="col-index" rowspan="2"></th>
                 <th class="col-expand" rowspan="2"></th>
                 <th class="col-text valign-bottom" rowspan="2">
-                    <span data-monthly-header="productNameTitle"></span>
+                    <span data-monthly-header="ProductNameTitle"></span>
                     <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                 </th>
-                <th colspan="3" class="col-group-header selected" data-monthly-header="monthGroupTitle"></th>
+                <th colspan="3" class="col-group-header selected" data-monthly-header="MonthGroupTitle"></th>
                 <th class="col-group-spacer" rowspan="2"></th>
-                <th colspan="3" class="col-group-header" data-monthly-header="yearGroupTitle"></th>
+                <th colspan="3" class="col-group-header" data-monthly-header="YearGroupTitle"></th>
             </tr>
             <tr>
-                <th class="month-col month-col-first"><span data-monthly-header="monthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="month-col"><span data-monthly-header="monthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="month-col month-col-last" data-monthly-header="monthHGTitle"></th>
+                <th class="month-col month-col-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="month-col"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="month-col month-col-last" data-monthly-header="MonthHGTitle"></th>
                 <th><span data-monthly-header="yearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
                 <th><span data-monthly-header="yearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th data-monthly-header="yearHGTitle"></th>
+                <th data-monthly-header="YearHGTitle"></th>
             </tr>
         </thead>
         <tbody id="monthlyTableBody">
