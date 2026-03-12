@@ -655,41 +655,6 @@ $(document).ready(function () {
       return tabMap[$('.tab.active').data('tab')] || 0;
   }
 
-  function getSelectedCodes(panelId) {
-      var codes = [];
-      $('.dropdown-panel[data-panel="' + panelId + '"] .dropdown-item:not(.select-all).checked').each(function () {
-          codes.push($(this).data('code'));
-      });
-      return codes;
-  }
-
-  function clearFilterPanel(panelId) {
-      var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
-      $panel.find('.dropdown-list .dropdown-item:not(.select-all)').remove();
-      $panel.find('.select-all').removeClass('checked');
-      var $dropdown = $('.filter-dropdown[data-dropdown="' + panelId + '"]');
-      $dropdown.find('.filter-badge').text('0').hide();
-  }
-
-  // Filtre item'larını panele render et (mock ve servis için ortak)
-  function renderFilterItems($panel, data) {
-      var $list = $panel.find('.dropdown-list');
-      $list.find('.dropdown-item:not(.select-all)').remove();
-      $panel.find('.select-all').removeClass('checked');
-
-      data.forEach(function (item) {
-          var $item = $('<label class="dropdown-item" data-code="' + item.code + '">' +
-              '<img src="/images/checkbox.svg" class="cb-icon cb-off" alt="" />' +
-              '<img src="/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />' +
-              '<span>' + item.name + '</span></label>');
-          $list.append($item);
-      });
-
-      var panelId = $panel.data('panel');
-      var $dropdown = $('.filter-dropdown[data-dropdown="' + panelId + '"]');
-      $dropdown.find('.filter-badge').text('0').hide();
-  }
-
   function loadFilterOptions(panelId, filterCode) {
       var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
 
@@ -718,117 +683,22 @@ $(document).ready(function () {
   clearFilterPanel('sube');
   clearFilterPanel('portfoy');
 
-  // Open/close dropdown
-  $('.filter-dropdown').on('click', function (e) {
-      e.stopPropagation();
-      var panelId = $(this).data('dropdown');
-      var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
-      var wasOpen = $panel.hasClass('open');
-
-      $('.dropdown-panel').removeClass('open');
-
-      if (!wasOpen) {
-          $panel.addClass('open');
-      }
-  });
-
-  $(document).on('click', '.dropdown-panel', function (e) {
-      if (!$(e.target).closest('.dropdown-item').length) {
-          e.stopPropagation();
-      }
-  });
-
-  $(document).on('click', function (e) {
-      if (!$(e.target).closest('.dropdown-panel, .filter-dropdown').length) {
-          $('.dropdown-panel').removeClass('open');
-      }
-  });
-
-  function updateCheckboxIcon($item) {
-      if ($item.hasClass('checked')) {
-          $item.find('.cb-off').hide();
-          $item.find('.cb-on').show();
-      } else {
-          $item.find('.cb-off').show();
-          $item.find('.cb-on').hide();
-      }
-  }
-
-  $(document).on('click', '.dropdown-item:not(.select-all)', function (e) {
-      e.preventDefault();
-      $(this).toggleClass('checked');
-      updateCheckboxIcon($(this));
-      var $panel = $(this).closest('.dropdown-panel');
-      var $items = $panel.find('.dropdown-item:not(.select-all)');
-      var $selectAll = $panel.find('.select-all');
-      if ($items.length === $items.filter('.checked').length) {
-          $selectAll.addClass('checked');
-          updateCheckboxIcon($selectAll);
-      } else {
-          $selectAll.removeClass('checked');
-          updateCheckboxIcon($selectAll);
-      }
-  });
-
-  $(document).on('click', '.dropdown-item.select-all', function (e) {
-      e.preventDefault();
-      var $this = $(this);
-      var $panel = $this.closest('.dropdown-panel');
-      var $items = $panel.find('.dropdown-item:not(.select-all)');
-
-      if ($this.hasClass('checked')) {
-          $this.removeClass('checked');
-          $items.removeClass('checked');
-      } else {
-          $this.addClass('checked');
-          $items.addClass('checked');
-      }
-      updateCheckboxIcon($this);
-      $items.each(function () { updateCheckboxIcon($(this)); });
-  });
-
-  $('.dropdown-search-input').on('keyup', function () {
-      var query = $(this).val().toLowerCase();
-      var $items = $(this).closest('.dropdown-panel').find('.dropdown-item:not(.select-all)');
-      $items.each(function () {
-          var text = $(this).find('span').text().toLowerCase();
-          $(this).toggle(text.indexOf(query) > -1);
-      });
-  });
-
-  // Kaydet — cascade
-  $('.dropdown-save').on('click', function () {
-      var panelId = $(this).data('panel');
-      var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
-      var $dropdown = $('.filter-dropdown[data-dropdown="' + panelId + '"]');
-      var count = $panel.find('.dropdown-item:not(.select-all).checked').length;
-      var $badge = $dropdown.find('.filter-badge');
-
-      if (count > 0) {
-          $badge.text(count).show();
-      } else {
-          $badge.hide();
-      }
-
-      $panel.removeClass('open');
-
+  // Kaydet cascade — dropdown:saved eventi dropdown.js'den gelir
+  $(document).on('dropdown:saved', function (_e, panelId, codes) {
       if (panelId === 'bolge') {
-          var regionCodes = getSelectedCodes('bolge');
-          if (regionCodes.length > 0) {
-              loadFilterOptions('sube', regionCodes);
+          if (codes.length > 0) {
+              loadFilterOptions('sube', codes);
           } else {
               clearFilterPanel('sube');
           }
           clearFilterPanel('portfoy');
       } else if (panelId === 'sube') {
-          var branchCodes = getSelectedCodes('sube');
-          if (branchCodes.length > 0) {
-              loadFilterOptions('portfoy', branchCodes);
+          if (codes.length > 0) {
+              loadFilterOptions('portfoy', codes);
           } else {
               clearFilterPanel('portfoy');
           }
       }
-
       updateFilterButtons();
   });
 });

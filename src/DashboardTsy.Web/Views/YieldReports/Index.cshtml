@@ -75,12 +75,54 @@
                 <span class="filter-badge" style="display:none;">0</span>
                 <i class="fas fa-chevron-down"></i>
             </div>
+            <div class="dropdown-panel" data-panel="yield-bolge">
+                <div class="dropdown-header">
+                    <span class="dropdown-title">Bölge Seçimi</span>
+                    <button class="dropdown-save" data-panel="yield-bolge">Kaydet</button>
+                </div>
+                <div class="dropdown-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Ara..." class="dropdown-search-input" />
+                </div>
+                <div class="dropdown-list">
+                    <label class="dropdown-item select-all">
+                        <img src="~/images/checkbox.svg" class="cb-icon cb-off" alt="" />
+                        <img src="~/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />
+                        <span>Tümünü Seç</span>
+                    </label>
+                    @foreach (var row in Model.Rows)
+                    {
+                        <label class="dropdown-item" data-code="@row.BolgeAdi">
+                            <img src="~/images/checkbox.svg" class="cb-icon cb-off" alt="" />
+                            <img src="~/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />
+                            <span>@row.BolgeAdi</span>
+                        </label>
+                    }
+                </div>
+            </div>
         </div>
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" data-dropdown="yield-sube">
                 <span class="filter-label">Şube</span>
                 <span class="filter-badge" style="display:none;">0</span>
                 <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-panel" data-panel="yield-sube">
+                <div class="dropdown-header">
+                    <span class="dropdown-title">Şube Seçimi</span>
+                    <button class="dropdown-save" data-panel="yield-sube">Kaydet</button>
+                </div>
+                <div class="dropdown-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Ara..." class="dropdown-search-input" />
+                </div>
+                <div class="dropdown-list">
+                    <label class="dropdown-item select-all">
+                        <img src="~/images/checkbox.svg" class="cb-icon cb-off" alt="" />
+                        <img src="~/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />
+                        <span>Tümünü Seç</span>
+                    </label>
+                </div>
             </div>
         </div>
     </div>
