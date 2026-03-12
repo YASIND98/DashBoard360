@@ -9,6 +9,8 @@ public class GetMonthlyTargetReportResponse
         public long ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
 
+        public long? ParentProductId { get; set; }
+
         public double MonthActualAmount { get; set; }
         public double MonthTargetAmount { get; set; }
         public double MonthRatio { get; set; }

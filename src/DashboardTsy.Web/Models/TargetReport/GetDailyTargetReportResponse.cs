@@ -9,6 +9,8 @@ public class GetDailyTargetReportResponse
         public long ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
 
+        public long? ParentProductId { get; set; }
+
         public double LastYearAmount { get; set; }
         public DateTime LastYearDate { get; set; }
 

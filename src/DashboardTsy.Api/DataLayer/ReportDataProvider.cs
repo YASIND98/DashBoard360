@@ -281,6 +281,7 @@ public class ReportDataProvider : IReportDataProvider
         {
             ProductId = r.ProductId,
             ProductName = r.ProductName ?? string.Empty,
+            ParentProductId = r.ParentProductId,
             MonthActualAmount = r.MonthActualAmount,
             MonthTargetAmount = r.MonthTargetAmount,
             MonthRatio = r.MonthRatio,
@@ -443,6 +444,7 @@ public class ReportDataProvider : IReportDataProvider
         {
             ProductId = r.ProductId,
             ProductName = r.ProductName ?? string.Empty,
+            ParentProductId = r.ParentProductId,
             LastYearAmount = r.LastYearAmount,
             LastYearDate = r.LastYearDate,
             LastWeekAmount = r.LastWeekAmount,
