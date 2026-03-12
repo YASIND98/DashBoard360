@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Web.Controllers;
 
-[Authorize]
+//[Authorize]
 public class AuthController : Controller
 {
     private readonly IHttpClientFactory _httpClientFactory;
