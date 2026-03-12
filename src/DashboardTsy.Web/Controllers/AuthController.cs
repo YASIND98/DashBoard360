@@ -6,6 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Web.Controllers;
 
+/// <summary>
+/// [Authorize] açıkken: IIS Express + Windows Auth ile çalıştırıldığında ilk istekte tarayıcı Windows login popup'ı açılır (DBRapor gibi).
+/// Kestrel (dotnet run) ile çalıştırıyorsan popup çıkmaz; Login sayfası doğrudan açılır.
+/// </summary>
 //[Authorize]
 public class AuthController : Controller
 {
