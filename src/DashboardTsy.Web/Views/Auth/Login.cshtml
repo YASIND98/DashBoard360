@@ -136,11 +136,15 @@
     <script src="~/assets/lib/loadingjs/loading.js"></script>
 
     <script>
+        const loginDomainUrl = '@Url.Action("LoginDomain", "Auth")';
+        const loginUserUrl = '@Url.Action("LoginUser", "Auth")';
+        const homeIndexUrl = '@Url.Action("Index", "Home")';
+
         $(document).ready(function () {
             $(function () {
                 $.ajax({
                     type: "GET",
-                    url: './LoginDomain',
+                    url: loginDomainUrl,
                     cache: false,
                     success: function (res) {
                         if (!res || !res.Result || res.Result.UserId <= 0) {
@@ -153,7 +157,7 @@
                             });
                             setInterval(function () {
                                 $("body").loading('destroy');
-                                window.location.href = "../Home/Index";
+                                window.location.href = homeIndexUrl;
                             }, 2000);
                         }
                     }
@@ -169,7 +173,7 @@
 
                     $.ajax({
                         type: "POST",
-                        url: './LoginUser',
+                        url: loginUserUrl,
                         cache: false,
                         data: { "Email": localStorage.getItem("userName"), "Pass": localStorage.getItem("password") },
                         success: function (res) {
@@ -189,7 +193,7 @@
                                 });
                                 setInterval(function () {
                                     $("body").loading('destroy');
-                                    window.location.href = "../Home/Index";
+                                    window.location.href = homeIndexUrl;
                                 }, 2000);
                             }
                         }
@@ -201,7 +205,7 @@
         function Login() {
             $.ajax({
                 type: "POST",
-                url: './LoginUser',
+                url: loginUserUrl,
                 cache: false,
                 data: { "Email": $("#username").val(), "Pass": $("#password").val() },
                 success: function (res) {
@@ -226,7 +230,7 @@
                         });
                         setInterval(function () {
                             $("body").loading('destroy');
-                            window.location.href = "../Home/Index";
+                            window.location.href = homeIndexUrl;
                         }, 2000);
                     }
                 }
