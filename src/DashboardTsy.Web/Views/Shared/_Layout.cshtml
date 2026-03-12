@@ -16,12 +16,12 @@
                 <img src="~/images/denizbank-logo.svg" alt="Logo" />
             </div>
             @{
-                var action = ViewContext.RouteData.Values["action"]?.ToString() ?? "Index";
+                var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
             }
-            <a href="/" class="sidebar-nav @(action == "Index" ? "active" : "")">
+            <a href="/" class="sidebar-nav @(currentController == "Home" ? "active" : "")">
                 <img src="~/images/homepage.svg" alt="Ana Sayfa" />
             </a>
-            <a href="/Home/YieldReports" class="sidebar-nav @(action == "YieldReports" ? "active" : "")">
+            <a href="/verim-raporlari" class="sidebar-nav @(currentController == "YieldReports" ? "active" : "")">
                 <img src="~/images/magic-star.svg" alt="Verim Raporları" />
             </a>
         </aside>

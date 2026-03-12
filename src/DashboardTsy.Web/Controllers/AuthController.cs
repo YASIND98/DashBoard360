@@ -55,7 +55,7 @@ public class AuthController : Controller
         };
     }
 
-    [HttpGet]
+    [HttpGet("/login")]
     public async Task<IActionResult> Login(CancellationToken cancellationToken)
     {
         var userName = User?.Identity?.Name;

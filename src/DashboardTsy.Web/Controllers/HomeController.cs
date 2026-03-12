@@ -13,15 +13,10 @@ namespace DashboardTsy.Web.Controllers
             _logger = logger;
         }
 
+        [Route("/")]
         public IActionResult Index()
         {
             var model = new ReportViewModel();
-            return View(model);
-        }
-
-        public IActionResult YieldReports()
-        {
-            var model = YieldReportDataHelper.GetSampleData();
             return View(model);
         }
 
