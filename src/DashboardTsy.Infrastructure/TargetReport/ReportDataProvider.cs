@@ -181,6 +181,536 @@ public class ReportDataProvider : IReportDataProvider
         return DataTableHelper.ToObject<GetMonthlyTargetReportTableHeadersResponse>(ds.Tables[0].Rows[0]);
     }
 
+    public IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
+    {
+        request ??= new GetProductivityReportTabsRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityReportTabs(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası aktif edilecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@FilterType"] = request.FilterType
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityReportTabs", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityReportTabItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityReportTabItem>(ds.Tables[0]);
+
+        // Şimdilik her durumda mock veri dönmeye devam ediyoruz.
+        return MockTargetReportData.GetProductivityReportTabs(request);
+    }
+
+    public IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)
+    {
+        // SP henüz belli değil; şu an sadece mock veriyi döndürüyoruz.
+        request ??= new GetProductivityReportTableHeadersRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityReportTableHeaders(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak:
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@MainTabId"] = request.MainTabId,
+        //     ["@MidTabId"] = request.MidTabId ?? (object)DBNull.Value,
+        //     ["@SubTabId"] = request.SubTabId ?? (object)DBNull.Value,
+        //     ["@FilterType"] = request.FilterType,
+        //     ["@ReportDate"] = request.ReportDate
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityReportTableHeaders", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityReportTableHeaderItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityReportTableHeaderItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityReportTableHeaders(request);
+    }
+
+    public IReadOnlyList<GetReportRegionFilterItem> GetReportRegionFilters(GetReportRegionFiltersRequest request)
+    {
+        request ??= new GetReportRegionFiltersRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetReportRegionFilters();
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetReportRegionFilters", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetReportRegionFilterItem>();
+        //
+        // return DataTableHelper.ToList<GetReportRegionFilterItem>(ds.Tables[0]);
+
+        // Şimdilik SP tarafı hazır değilken de mock veri dön.
+        return MockTargetReportData.GetReportRegionFilters();
+    }
+
+    public IReadOnlyList<GetReportBranchFilterItem> GetReportBranchFilters(GetReportBranchFiltersRequest request)
+    {
+        request ??= new GetReportBranchFiltersRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetReportBranchFilters();
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetReportBranchFilters", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetReportBranchFilterItem>();
+        //
+        // return DataTableHelper.ToList<GetReportBranchFilterItem>(ds.Tables[0]);
+
+        // Şimdilik SP tarafı hazır değilken de mock veri dön.
+        return MockTargetReportData.GetReportBranchFilters();
+    }
+
+    public IReadOnlyList<GetProductivityGeneralRegionReportItem> GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request)
+    {
+        request ??= new GetProductivityGeneralRegionReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityGeneralRegionReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = string.IsNullOrWhiteSpace(request.RegionCode) ? (object)DBNull.Value : request.RegionCode,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityGeneralRegionReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityGeneralRegionReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityGeneralRegionReportItem>(ds.Tables[0]);
+
+        // Şimdilik SP tarafı hazır değilken de mock veri dön.
+        return MockTargetReportData.GetProductivityGeneralRegionReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityCountCardPosRegionReportItem> GetProductivityCountCardPosRegionReport(GetProductivityCountCardPosRegionReportRequest request)
+    {
+        request ??= new GetProductivityCountCardPosRegionReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityCountCardPosRegionReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = request.RegionCode,
+        //     ["@TabId"] = request.TabId,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityCountCardPosRegionReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityCountCardPosRegionReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityCountCardPosRegionReportItem>(ds.Tables[0]);
+
+        // Şimdilik SP tarafı hazır değilken de mock veri dön.
+        return MockTargetReportData.GetProductivityCountCardPosRegionReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityCountCustomerRegionReportItem> GetProductivityCountCustomerRegionReport(GetProductivityCountCustomerRegionReportRequest request)
+    {
+        request ??= new GetProductivityCountCustomerRegionReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityCountCustomerRegionReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = request.RegionCode,
+        //     ["@SubTabId"] = request.SubTabId,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityCountCustomerRegionReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityCountCustomerRegionReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityCountCustomerRegionReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityCountCustomerRegionReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityVolumeRegionReportItem> GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request)
+    {
+        request ??= new GetProductivityVolumeRegionReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityVolumeRegionReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = request.RegionCode,
+        //     ["@SubTabId"] = request.SubTabId,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityVolumeRegionReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityVolumeRegionReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityVolumeRegionReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityVolumeRegionReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityProfitRatioRegionReportItem> GetProductivityProfitRatioRegionReport(GetProductivityProfitRatioRegionReportRequest request)
+    {
+        request ??= new GetProductivityProfitRatioRegionReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityProfitRatioRegionReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = request.RegionCode,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityProfitRatioRegionReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityProfitRatioRegionReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityProfitRatioRegionReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityProfitRatioRegionReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityProfitTotalRegionReportItem> GetProductivityProfitTotalRegionReport(GetProductivityProfitTotalRegionReportRequest request)
+    {
+        request ??= new GetProductivityProfitTotalRegionReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityProfitTotalRegionReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = request.RegionCode,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityProfitTotalRegionReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityProfitTotalRegionReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityProfitTotalRegionReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityProfitTotalRegionReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityProfitSpreadManagementRegionReportItem> GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request)
+    {
+        request ??= new GetProductivityProfitSpreadManagementRegionReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityProfitSpreadManagementRegionReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = request.RegionCode,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityProfitSpreadManagementRegionReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityProfitSpreadManagementRegionReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityProfitSpreadManagementRegionReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityProfitSpreadManagementRegionReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityProfitSpreadManagementBranchReportItem> GetProductivityProfitSpreadManagementBranchReport(GetProductivityProfitSpreadManagementBranchReportRequest request)
+    {
+        request ??= new GetProductivityProfitSpreadManagementBranchReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityProfitSpreadManagementBranchReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityProfitSpreadManagementBranchReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityProfitSpreadManagementBranchReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityProfitSpreadManagementBranchReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityProfitSpreadManagementBranchReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityCountCardPosBranchReportItem> GetProductivityCountCardPosBranchReport(GetProductivityCountCardPosBranchReportRequest request)
+    {
+        request ??= new GetProductivityCountCardPosBranchReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityCountCardPosBranchReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@TabId"] = request.TabId,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityCountCardPosBranchReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityCountCardPosBranchReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityCountCardPosBranchReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityCountCardPosBranchReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityProfitRatioBranchReportItem> GetProductivityProfitRatioBranchReport(GetProductivityProfitRatioBranchReportRequest request)
+    {
+        request ??= new GetProductivityProfitRatioBranchReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityProfitRatioBranchReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityProfitRatioBranchReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityProfitRatioBranchReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityProfitRatioBranchReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityProfitRatioBranchReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityProfitTotalBranchReportItem> GetProductivityProfitTotalBranchReport(GetProductivityProfitTotalBranchReportRequest request)
+    {
+        request ??= new GetProductivityProfitTotalBranchReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityProfitTotalBranchReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityProfitTotalBranchReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityProfitTotalBranchReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityProfitTotalBranchReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityProfitTotalBranchReport(request);
+    }
+
+    public GetProductivityBranchScoreCardReportItem GetProductivityBranchScoreCardReport(GetProductivityBranchScoreCardReportRequest request)
+    {
+        request ??= new GetProductivityBranchScoreCardReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityBranchScoreCardReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek, tek satır döner):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@ReportDate"] = request.ReportDate
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityBranchScoreCardReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return new GetProductivityBranchScoreCardReportItem();
+        //
+        // return DataTableHelper.ToList<GetProductivityBranchScoreCardReportItem>(ds.Tables[0])[0];
+
+        return MockTargetReportData.GetProductivityBranchScoreCardReport(request);
+    }
+
+    public GetProductivityRegionScoreCardReportItem GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request)
+    {
+        request ??= new GetProductivityRegionScoreCardReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityRegionScoreCardReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek, tek satır döner):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@RegionCode"] = request.RegionCode,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@ReportDate"] = request.ReportDate
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityRegionScoreCardReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return new GetProductivityRegionScoreCardReportItem();
+        //
+        // return DataTableHelper.ToList<GetProductivityRegionScoreCardReportItem>(ds.Tables[0])[0];
+
+        return MockTargetReportData.GetProductivityRegionScoreCardReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityCountCustomerBranchReportItem> GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request)
+    {
+        request ??= new GetProductivityCountCustomerBranchReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityCountCustomerBranchReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@SubTabId"] = request.SubTabId,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityCountCustomerBranchReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityCountCustomerBranchReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityCountCustomerBranchReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityCountCustomerBranchReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityVolumeBranchReportItem> GetProductivityVolumeBranchReport(GetProductivityVolumeBranchReportRequest request)
+    {
+        request ??= new GetProductivityVolumeBranchReportRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetProductivityVolumeBranchReport(request);
+
+        // Gerçek SP ismi ve parametreleri netleştiğinde burası güncellenecek.
+        // Örnek taslak (SP adı sadece örnek):
+        //
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@BranchCode"] = request.BranchCode,
+        //     ["@SubTabId"] = request.SubTabId,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        //
+        // var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityVolumeBranchReport", parameters);
+        // if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+        //     return Array.Empty<GetProductivityVolumeBranchReportItem>();
+        //
+        // return DataTableHelper.ToList<GetProductivityVolumeBranchReportItem>(ds.Tables[0]);
+
+        return MockTargetReportData.GetProductivityVolumeBranchReport(request);
+    }
+
     private static string? ToCsv(List<int>? list)
         => list != null && list.Count > 0 ? string.Join(",", list) : null;
 

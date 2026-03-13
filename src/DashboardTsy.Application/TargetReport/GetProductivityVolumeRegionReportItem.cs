@@ -1,0 +1,20 @@
+namespace DashboardTsy.Application.TargetReport;
+
+public class GetProductivityVolumeRegionReportItem
+{
+    public int Id { get; set; }
+    public int? ParentId { get; set; }
+    public int LevelNo { get; set; }
+    public int SortOrder { get; set; }
+    public string ProductName { get; set; } = string.Empty;
+    public decimal RealizationRegionValue { get; set; }
+    public decimal RealizationBankAverageValue { get; set; }
+    public decimal TargetValue { get; set; }
+    public decimal HgRate { get; set; }
+    public decimal NetGrowthRegionValue { get; set; }
+    public decimal NetGrowthBankAverageValue { get; set; }
+    public decimal YtdRegionValue { get; set; }
+    public decimal YtdBankAverageValue { get; set; }
+    public decimal QtdRegionValue { get; set; }
+    public decimal QtdBankAverageValue { get; set; }
+}

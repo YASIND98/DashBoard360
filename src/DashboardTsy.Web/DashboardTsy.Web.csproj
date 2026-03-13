@@ -10,4 +10,8 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.12" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DashboardTsy.Application\DashboardTsy.Application.csproj" />
+  </ItemGroup>
+
 </Project>

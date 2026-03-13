@@ -33,6 +33,7 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<DashboardApiOptions>(builder.Configuration.GetSection(DashboardApiOptions.SectionName));
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<ITargetReportApiClient, TargetReportApiClient>();
+builder.Services.AddHttpClient<IProductivityReportApiClient, ProductivityReportApiClient>();
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>
     {
