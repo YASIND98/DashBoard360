@@ -1,8 +1,7 @@
-namespace DashboardTsy.Api.Services;
+using Microsoft.Extensions.Configuration;
 
-/// <summary>
-/// Reads connection strings from configuration (DbConnectionStrings:Key or ConnectionStrings:Key).
-/// </summary>
+namespace DashboardTsy.Infrastructure.Data;
+
 public class ConnectionStringProvider : IConnectionStringProvider
 {
     private readonly IConfiguration _configuration;
@@ -18,3 +17,4 @@ public class ConnectionStringProvider : IConnectionStringProvider
                ?? _configuration.GetConnectionString(key);
     }
 }
+

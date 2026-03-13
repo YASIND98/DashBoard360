@@ -1,11 +1,8 @@
 using System.Data;
 using Microsoft.Data.SqlClient;
 
-namespace DashboardTsy.Api.Services;
+namespace DashboardTsy.Infrastructure.Data;
 
-/// <summary>
-/// Executes stored procedures using SqlConnection + SqlCommand(CommandType.StoredProcedure) + SqlDataAdapter.Fill (DBRapor pattern).
-/// </summary>
 public class StoredProcedureExecutor : IStoredProcedureExecutor
 {
     private readonly IConnectionStringProvider _connectionStrings;
@@ -46,3 +43,4 @@ public class StoredProcedureExecutor : IStoredProcedureExecutor
         return ds;
     }
 }
+

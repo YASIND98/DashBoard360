@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -10,6 +10,17 @@
     <Folder Include="Context\" />
     <Folder Include="Repository\Abstract\" />
     <Folder Include="Repository\Concrete\" />
+    <Folder Include="Data\" />
+    <Folder Include="TargetReport\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DashboardTsy.Application\DashboardTsy.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,4 @@
-using DashboardTsy.Api.DataLayer;
-using DashboardTsy.Api.Models.TargetReport;
+using DashboardTsy.Application.TargetReport;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Api.Controllers;
@@ -8,9 +7,9 @@ namespace DashboardTsy.Api.Controllers;
 [Route("[controller]")]
 public class TargetReportController : ControllerBase
 {
-    private readonly IReportDataProvider _reportDataProvider;
+    private readonly DashboardTsy.Application.TargetReport.IReportDataProvider _reportDataProvider;
 
-    public TargetReportController(IReportDataProvider reportDataProvider)
+    public TargetReportController(DashboardTsy.Application.TargetReport.IReportDataProvider reportDataProvider)
     {
         _reportDataProvider = reportDataProvider;
     }

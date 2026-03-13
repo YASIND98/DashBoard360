@@ -1,12 +1,8 @@
 using System.Data;
 using System.Reflection;
 
-namespace DashboardTsy.Api.DataLayer;
+namespace DashboardTsy.Infrastructure.TargetReport;
 
-/// <summary>
-/// Maps DataTable rows to strongly-typed lists (DBRapor Workers.DatatableToList pattern).
-/// Column names are matched to property names (case-insensitive); optional [Column("DbColumnName")] can be added later.
-/// </summary>
 public static class DataTableHelper
 {
     public static List<T> ToList<T>(DataTable table) where T : new()
@@ -57,18 +53,12 @@ public static class DataTableHelper
         return list;
     }
 
-    /// <summary>
-    /// Returns first row as T, or null if no rows.
-    /// </summary>
     public static T? ToObject<T>(DataTable table) where T : class, new()
     {
         var list = ToList<T>(table);
         return list.Count > 0 ? list[0] : null;
     }
 
-    /// <summary>
-    /// Returns first row as T, or null if no rows (single row from DataTable).
-    /// </summary>
     public static T? ToObject<T>(DataRow row) where T : class, new()
     {
         if (row == null) return null;
@@ -107,3 +97,4 @@ public static class DataTableHelper
         return item;
     }
 }
+

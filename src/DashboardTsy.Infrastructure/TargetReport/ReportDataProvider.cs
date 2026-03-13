@@ -1,10 +1,10 @@
 using System.Data;
 using System.Linq;
-using DashboardTsy.Api.Models.TargetReport;
-using DashboardTsy.Api.Services;
+using DashboardTsy.Application.TargetReport;
+using DashboardTsy.Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 
-namespace DashboardTsy.Api.DataLayer;
+namespace DashboardTsy.Infrastructure.TargetReport;
 
 /// <summary>
 /// DataLayer pattern from DBRapor: calls stored procedures via IStoredProcedureExecutor.
@@ -21,33 +21,13 @@ public class ReportDataProvider : IReportDataProvider
         _configuration = configuration;
     }
 
-    private bool MockEnabled => _configuration.GetValue<bool>("ReportMock:Enabled");
+    private bool MockEnabled => _configuration["ReportMock:Enabled"] is string v && bool.TryParse(v, out var b) && b;
 
-    /// <summary>
-    /// Example: execute sp_GetRaporTarihi on Main (or SubeDashboard if you use that DB).
-    /// Configure DbConnectionStrings in appsettings and ensure the SP exists in that database.
-    /// </summary>
     public DataSet GetRaporTarihi()
     {
         return _spExecutor.ExecuteDataSet("Main", "sp_GetRaporTarihi");
     }
 
-    /// <summary>
-    /// Example with parameters (mirrors DBRapor SubeDataProvider.GetNavBarNPSGelisimi).
-    /// Uncomment and adjust SP name + connection key when you have the procedure.
-    /// </summary>
-    // public DataSet GetNavBarNPSGelisimi(int? sube, int? bolge, int? iskolu)
-    // {
-    //     var parameters = new Dictionary<string, object?>();
-    //     if (sube.HasValue && sube != 0) parameters["@SUBE_KODU"] = sube;
-    //     if (bolge.HasValue && bolge != 0) parameters["@BOLGE_KODU"] = bolge;
-    //     if (iskolu.HasValue && iskolu != 0) parameters["@IS_KOLU"] = iskolu;
-    //     return _spExecutor.ExecuteDataSet("SubeDashboard", "sp_GetNavBarNPSGelisimi", parameters);
-    // }
-
-    /// <summary>
-    /// EXEC [dbo].[SP_RP_GetTargetReportMenuTexts] @SessionId = ''
-    /// </summary>
     public GetTargetReportMenuTextsResponse? GetTargetReportMenuTexts(string sessionId)
     {
         if (MockEnabled)
@@ -63,9 +43,6 @@ public class ReportDataProvider : IReportDataProvider
         return DataTableHelper.ToObject<GetTargetReportMenuTextsResponse>(ds.Tables[0].Rows[0]);
     }
 
-    /// <summary>
-    /// EXEC dbo.SP_RP_GetTargetReportFilters @SessionId='', @FilterId=0, @FilterCode=NULL
-    /// </summary>
     public IReadOnlyList<GetTargetReportFiltersItem> GetTargetReportFilters(string sessionId, int filterId, List<string>? filterCode)
     {
         if (MockEnabled)
@@ -292,60 +269,6 @@ public class ReportDataProvider : IReportDataProvider
         };
     }
 
-    private static List<GetMonthlyTargetReportResponse.Product> FilterMonthlyTreeByName(
-        List<GetMonthlyTargetReportResponse.Product> nodes,
-        string searchText)
-    {
-        bool Matches(GetMonthlyTargetReportResponse.Product p)
-            => (p.ProductName ?? string.Empty).Contains(searchText, StringComparison.OrdinalIgnoreCase);
-
-        List<GetMonthlyTargetReportResponse.Product> Recurse(IEnumerable<GetMonthlyTargetReportResponse.Product> list)
-        {
-            var result = new List<GetMonthlyTargetReportResponse.Product>();
-            foreach (var n in list)
-            {
-                var filteredChildren = Recurse(n.SubProducts ?? new List<GetMonthlyTargetReportResponse.Product>());
-                if (Matches(n) || filteredChildren.Count > 0)
-                {
-                    n.SubProducts = filteredChildren;
-                    result.Add(n);
-                }
-            }
-
-            return result;
-        }
-
-        return Recurse(nodes);
-    }
-
-    private static List<GetMonthlyTargetReportResponse.Product> SortMonthlyTree(
-        List<GetMonthlyTargetReportResponse.Product> nodes,
-        int? sortBy,
-        bool isAscending)
-    {
-        Func<GetMonthlyTargetReportResponse.Product, object> keySelector = sortBy switch
-        {
-            1 => p => p.ProductName ?? string.Empty,
-            2 => p => p.MonthActualAmount,
-            3 => p => p.MonthTargetAmount,
-            4 => p => p.MonthRatio,
-            5 => p => p.YearActualAmount,
-            6 => p => p.YearTargetAmount,
-            7 => p => p.YearRatio,
-            _ => p => p.ProductId
-        };
-
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
-
-        foreach (var n in ordered)
-        {
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortMonthlyTree(n.SubProducts, sortBy, isAscending);
-        }
-
-        return ordered;
-    }
-
     private sealed class DailyTargetRow
     {
         public long ProductId { get; set; }
@@ -373,9 +296,6 @@ public class ReportDataProvider : IReportDataProvider
 
     private static List<GetDailyTargetReportResponse.Product> BuildProductTree(DataSet ds, DateTime reportDate)
     {
-        // Strategy:
-        // - Prefer a single table with ParentProductId (hierarchical in one result set)
-        // - Otherwise, if 2 tables exist and table[1] has ParentProductId, treat table[0]=roots, table[1]=children.
         var t0 = ds.Tables[0];
         var hasParentInT0 = t0.Columns.Contains("ParentProductId");
 
@@ -394,14 +314,12 @@ public class ReportDataProvider : IReportDataProvider
             foreach (var r in roots.Concat(children))
                 if (r.TodayDate == default) r.TodayDate = reportDate;
 
-            // Ensure roots have null parent, children have parent set (SP responsibility).
             var all = new List<DailyTargetRow>(roots.Count + children.Count);
             all.AddRange(roots);
             all.AddRange(children);
             return TreeFromRows(all);
         }
 
-        // Flat list fallback (no nesting info).
         var flat = DataTableHelper.ToList<DailyTargetRow>(t0);
         foreach (var r in flat)
             if (r.TodayDate == default) r.TodayDate = reportDate;
@@ -414,7 +332,6 @@ public class ReportDataProvider : IReportDataProvider
             .GroupBy(r => r.ProductId)
             .ToDictionary(g => g.Key, g => MapProduct(g.First()));
 
-        // Ensure all nodes exist even if duplicated rows happen.
         foreach (var r in rows)
         {
             if (!byId.TryGetValue(r.ProductId, out var node))
@@ -428,7 +345,6 @@ public class ReportDataProvider : IReportDataProvider
                 parent.SubProducts.Add(node);
         }
 
-        // Roots are those without a resolvable parent.
         var rootIds = rows
             .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
             .Select(r => r.ProductId)
@@ -461,9 +377,7 @@ public class ReportDataProvider : IReportDataProvider
         };
     }
 
-    private static List<GetDailyTargetReportResponse.Product> FilterTreeByName(
-        List<GetDailyTargetReportResponse.Product> nodes,
-        string searchText)
+    private static List<GetDailyTargetReportResponse.Product> FilterTreeByName(List<GetDailyTargetReportResponse.Product> nodes, string searchText)
     {
         bool Matches(GetDailyTargetReportResponse.Product p)
             => (p.ProductName ?? string.Empty).Contains(searchText, StringComparison.OrdinalIgnoreCase);
@@ -499,10 +413,7 @@ public class ReportDataProvider : IReportDataProvider
         }
     }
 
-    private static List<GetDailyTargetReportResponse.Product> SortTree(
-        List<GetDailyTargetReportResponse.Product> nodes,
-        int? sortBy,
-        bool isAscending)
+    private static List<GetDailyTargetReportResponse.Product> SortTree(List<GetDailyTargetReportResponse.Product> nodes, int? sortBy, bool isAscending)
     {
         Func<GetDailyTargetReportResponse.Product, object> keySelector = sortBy switch
         {
@@ -514,10 +425,7 @@ public class ReportDataProvider : IReportDataProvider
             _ => p => p.ProductId
         };
 
-        var ordered = (isAscending
-                ? nodes.OrderBy(keySelector)
-                : nodes.OrderByDescending(keySelector))
-            .ToList();
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
 
         foreach (var n in ordered)
         {
@@ -527,4 +435,53 @@ public class ReportDataProvider : IReportDataProvider
 
         return ordered;
     }
+
+    private static List<GetMonthlyTargetReportResponse.Product> FilterMonthlyTreeByName(List<GetMonthlyTargetReportResponse.Product> nodes, string searchText)
+    {
+        bool Matches(GetMonthlyTargetReportResponse.Product p)
+            => (p.ProductName ?? string.Empty).Contains(searchText, StringComparison.OrdinalIgnoreCase);
+
+        List<GetMonthlyTargetReportResponse.Product> Recurse(IEnumerable<GetMonthlyTargetReportResponse.Product> list)
+        {
+            var result = new List<GetMonthlyTargetReportResponse.Product>();
+            foreach (var n in list)
+            {
+                var filteredChildren = Recurse(n.SubProducts ?? new List<GetMonthlyTargetReportResponse.Product>());
+                if (Matches(n) || filteredChildren.Count > 0)
+                {
+                    n.SubProducts = filteredChildren;
+                    result.Add(n);
+                }
+            }
+            return result;
+        }
+
+        return Recurse(nodes);
+    }
+
+    private static List<GetMonthlyTargetReportResponse.Product> SortMonthlyTree(List<GetMonthlyTargetReportResponse.Product> nodes, int? sortBy, bool isAscending)
+    {
+        Func<GetMonthlyTargetReportResponse.Product, object> keySelector = sortBy switch
+        {
+            1 => p => p.ProductName ?? string.Empty,
+            2 => p => p.MonthActualAmount,
+            3 => p => p.MonthTargetAmount,
+            4 => p => p.MonthRatio,
+            5 => p => p.YearActualAmount,
+            6 => p => p.YearTargetAmount,
+            7 => p => p.YearRatio,
+            _ => p => p.ProductId
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortMonthlyTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
 }
+

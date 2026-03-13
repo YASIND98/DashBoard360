@@ -1,6 +1,6 @@
-using DashboardTsy.Api.Models.TargetReport;
+using DashboardTsy.Application.TargetReport;
 
-namespace DashboardTsy.Api.DataLayer;
+namespace DashboardTsy.Infrastructure.TargetReport;
 
 public static class MockTargetReportData
 {
@@ -234,7 +234,6 @@ public static class MockTargetReportData
 
     private static void SetDailyTodayAndDiffs(GetDailyTargetReportResponse.Product p, double todayAmount)
     {
-        // We don't have TodayAmount field; diffs are based on the "todayAmount" we simulate.
         p.DiffByPrevDayAmount = todayAmount - p.PrevDayAmount;
         p.DiffByLastYearAmount = todayAmount - p.LastYearAmount;
         p.DiffByLastWeekAmount = todayAmount - p.LastWeekAmount;

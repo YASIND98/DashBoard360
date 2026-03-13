@@ -20,4 +20,9 @@
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DashboardTsy.Application\DashboardTsy.Application.csproj" />
+    <ProjectReference Include="..\DashboardTsy.Infrastructure\DashboardTsy.Infrastructure.csproj" />
+  </ItemGroup>
+
 </Project>
