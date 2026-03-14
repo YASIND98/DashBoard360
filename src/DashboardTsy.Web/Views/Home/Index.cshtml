@@ -1,19 +1,5 @@
 ﻿@model ReportViewModel
 
-<!-- Top Header Bar -->
-<div class="top-header">
-    <div class="top-header-left">
-        <h2 class="greeting">Hoşgeldin, <span class="greeting-name">@Model.KullaniciAdi</span></h2>
-    </div>
-    <div class="page-icons">
-        <img src="~/images/notification.svg" alt="Bildirimler" />
-        <img src="~/images/help.svg" alt="Yardım" />
-        <div class="avatar">
-            <img src="https://ui-avatars.com/api/?name=AD&background=c44&color=fff&size=36&rounded=true" alt="Avatar" />
-        </div>
-    </div>
-</div>
-
 <!-- Page Title & Date -->
 <div class="page-header">
     <h1 class="page-title" data-menu="ScreenTitle"></h1>
@@ -21,61 +7,45 @@
       <span class="date-text">@Model.Tarih</span>
       <span class="date-badge">Bugün</span>
     </div>
+    <div class="page-icons">
+      <img src="~/images/notification.svg" alt="Bildirimler" />
+      <img src="~/images/help.svg" alt="Yardım" />
+      <div class="avatar">
+          <img src="https://ui-avatars.com/api/?name=AD&background=c44&color=fff&size=36&rounded=true" alt="Avatar" />
+      </div>
+    </div>
 </div>
 
 <!-- Filters -->
 <div class="filters-row">
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
-            <div class="filter-dropdown" data-dropdown="bolge">
-                <span class="filter-label">Bölge</span>
-                <span class="filter-badge" style="display:none;">0</span>
+            <div class="filter-dropdown" id="indexBolgeSelect">
+                <span class="filter-label" id="indexBolgeLabel">Bölge</span>
                 <i class="fas fa-chevron-down"></i>
             </div>
-            <div class="dropdown-panel" data-panel="bolge">
-                <div class="dropdown-header">
-                    <span class="dropdown-title">Bölge Seçimi</span>
-                    <button class="dropdown-save" data-panel="bolge">Kaydet</button>
-                </div>
+            <div class="dropdown-panel" id="indexBolgePanel">
                 <div class="dropdown-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Ara..." class="dropdown-search-input" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexBolgeSearch" />
                 </div>
-                <div class="dropdown-list">
-                    <label class="dropdown-item select-all">
-                        <img src="~/images/checkbox.svg" class="cb-icon cb-off" alt="" /><img src="~/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />
-                        <span>Tümünü Seç</span>
-                    </label>
-                </div>
+                <div class="dropdown-list" id="indexBolgeList"></div>
             </div>
         </div>
 
         <div class="filter-dropdown-wrapper">
-            <div class="filter-dropdown" data-dropdown="sube">
-                <span class="filter-label">Şube</span>
-                <span class="filter-badge" style="display:none;">0</span>
+            <div class="filter-dropdown" id="indexSubeSelect">
+                <span class="filter-label" id="indexSubeLabel">Şube</span>
                 <i class="fas fa-chevron-down"></i>
             </div>
-            <div class="dropdown-panel" data-panel="sube">
-                <div class="dropdown-header">
-                    <span class="dropdown-title">Şube Seçimi</span>
-                    <button class="dropdown-save" data-panel="sube">Kaydet</button>
-                </div>
+            <div class="dropdown-panel" id="indexSubePanel">
                 <div class="dropdown-search">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Ara..." class="dropdown-search-input" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexSubeSearch" />
                 </div>
-                <div class="dropdown-list">
-                    <label class="dropdown-item select-all">
-                        <img src="~/images/checkbox.svg" class="cb-icon cb-off" alt="" /><img src="~/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />
-                        <span>Tümünü Seç</span>
-                    </label>
-                </div>
+                <div class="dropdown-list" id="indexSubeList"></div>
             </div>
         </div>
-
-        <button class="filter-apply-btn" disabled>Uygula</button>
-        <button class="filter-clear-btn" style="display:none;">Temizle</button>
 
         <div class="filter-search">
             <i class="fas fa-search"></i>
@@ -132,26 +102,26 @@
             <tr>
                 <th class="col-index"></th>
                 <th class="col-expand"></th>
-                <th class="col-text">
+                <th class="col-text valign-top">
                     <span data-daily-header="ProductNameTitle"></span>
                     <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                 </th>
-                <th>
+                <th class="text-center">
                     <span data-daily-header="LastYearTitle"></span>
                     <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="LastYearDate"></small>
                 </th>
-                <th>
+                <th class="text-center">
                     <span data-daily-header="LastWeekTitle"></span>
                     <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="LastWeekDate"></small>
                 </th>
-                <th>
+                <th class="text-center">
                     <span data-daily-header="PrevDayTitle"></span>
                     <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="PrevDayDate"></small>
-                </th>
-                <th>
+                </th class="text-center">
+                <th class="text-center">
                     <span data-daily-header="YesterdayTitle"></span>
                     <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="YesterdayDate"></small>
@@ -175,16 +145,15 @@
                     <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                 </th>
                 <th colspan="3" class="col-group-header selected" data-monthly-header="MonthGroupTitle"></th>
-                <th class="col-group-spacer" rowspan="2"></th>
                 <th colspan="3" class="col-group-header" data-monthly-header="YearGroupTitle"></th>
             </tr>
             <tr>
-                <th class="month-col month-col-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="month-col"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="month-col month-col-last" data-monthly-header="MonthHGTitle"></th>
-                <th><span data-monthly-header="yearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th><span data-monthly-header="yearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th data-monthly-header="YearHGTitle"></th>
+                <th class="text-center month-col month-col-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center month-col"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center month-col month-col-last" data-monthly-header="MonthHGTitle"></th>
+                <th class="text-center"><span data-monthly-header="YearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center"><span data-monthly-header="YearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center" data-monthly-header="YearHGTitle"></th>
             </tr>
         </thead>
         <tbody id="monthlyTableBody">

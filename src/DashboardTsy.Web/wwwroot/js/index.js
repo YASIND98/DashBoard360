@@ -1,8 +1,12 @@
 $(document).ready(function () {
 
+  // ===== Filter State =====
+  var selectedBolge = null;
+  var selectedSube = null;
+
   // Load menu texts from API
   $.ajax({
-      url: 'http://localhost:5024/TargetReport/GetTargetReportMenuTexts',
+      url: '/TargetReport/GetTargetReportMenuTexts',
       type: 'GET',
       data: { sessionId: '1' },
       success: function (data) {
@@ -47,17 +51,17 @@ $(document).ready(function () {
               html += p.ProductName;
           }
           html += '</td>';
-          html += '<td>' + formatNumber(p.LastYearAmount) + '</td>';
-          html += '<td>' + formatNumber(p.LastWeekAmount) + '</td>';
-          html += '<td>' + formatNumber(p.PrevDayAmount) + '</td>';
-          html += '<td class="col-diff">';
+          html += '<td class="text-center">' + formatNumber(p.LastYearAmount) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.LastWeekAmount) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.PrevDayAmount) + '</td>';
+          html += '<td class="col-diff text-center">';
           html += '<div class="diff-main">' + formatNumber(p.YesterdayAmount) + '</div>';
           html += '<div class="diff-details">';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByPrevDayTitle"></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="diffByPrevDayTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : 'positive') + '">' + formatNumber(p.DiffByPrevDayAmount || 0) + '</span></span>';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="diffByLastYearTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : 'positive') + '">' + formatNumber(p.DiffByLastYearAmount || 0) + '</span></span>';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastWeekTitle"></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="diffByLastWeekTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastWeekAmount < 0 ? 'negative' : 'positive') + '">' + formatNumber(p.DiffByLastWeekAmount || 0) + '</span></span>';
           html += '</div></td>';
           html += '</tr>';
@@ -90,13 +94,12 @@ $(document).ready(function () {
               html += p.ProductName;
           }
           html += '</td>';
-          html += '<td class="month-col month-col-first">' + formatNumber(p.MonthActualAmount) + '</td>';
-          html += '<td class="month-col">' + formatNumber(p.MonthTargetAmount) + '</td>';
-          html += '<td class="month-col month-col-last col-ratio ' + ratioClass(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '</td>';
-          html += '<td class="col-group-spacer"></td>';
-          html += '<td>' + formatNumber(p.YearActualAmount) + '</td>';
+          html += '<td class="text-center month-col month-col-first">' + formatNumber(p.MonthActualAmount) + '</td>';
+          html += '<td class="text-center month-col">' + formatNumber(p.MonthTargetAmount) + '</td>';
+          html += '<td class="text-center month-col month-col-last col-ratio ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + "%" + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.YearActualAmount) + '</td>';
           html += '<td>' + formatNumber(p.YearTargetAmount) + '</td>';
-          html += '<td class="col-ratio ' + ratioClass(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '</td>';
+          html += '<td class="text-center col-ratio ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '</td>';
           html += '</tr>';
 
           if (isExpandable) {
@@ -157,8 +160,8 @@ $(document).ready(function () {
           tabId: getActiveTabId(),
           subTabId: getActiveSubTabId(),
           reportDate: new Date().toISOString(),
-          regionId: getSelectedCodes('bolge'),
-          branchId: getSelectedCodes('sube'),
+          regionId: selectedBolge ? [selectedBolge.code] : [],
+          branchId: selectedSube ? [selectedSube.code] : [],
           searchText: $('#searchInput').val() || null,
           showDifferences: showDiff,
           sortBy: currentSortBy,
@@ -166,7 +169,7 @@ $(document).ready(function () {
       };
 
       $.ajax({
-          url: 'http://localhost:5024/TargetReport/GetDailyTargetReport',
+          url: '/TargetReport/GetDailyTargetReport',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(requestBody),
@@ -198,8 +201,8 @@ $(document).ready(function () {
           tabId: getActiveTabId(),
           subTabId: getActiveSubTabId(),
           reportDate: new Date().toISOString(),
-          regionId: getSelectedCodes('bolge'),
-          branchId: getSelectedCodes('sube'),
+          regionId: selectedBolge ? [selectedBolge.code] : [],
+          branchId: selectedSube ? [selectedSube.code] : [],
           searchText: $('#searchInput').val() || null,
           showDifferences: false,
           sortBy: currentSortBy,
@@ -207,7 +210,7 @@ $(document).ready(function () {
       };
 
       $.ajax({
-          url: 'http://localhost:5024/TargetReport/GetMonthlyTargetReport',
+          url: '/TargetReport/GetMonthlyTargetReport',
           type: 'POST',
           contentType: 'application/json',
           data: JSON.stringify(requestBody),
@@ -219,46 +222,10 @@ $(document).ready(function () {
       });
   }
 
-  // Sayfa yüklendiğinde daily report çek
-  loadDailyReport();
-
-  // Filtre seçim durumunu kontrol et — Uygula/Temizle butonlarını güncelle
-  function updateFilterButtons() {
-      var hasSelection = false;
-      ['bolge', 'sube'].forEach(function (panelId) {
-          if (getSelectedCodes(panelId).length > 0) {
-              hasSelection = true;
-          }
-      });
-      if (hasSelection) {
-          $('.filter-apply-btn').prop('disabled', false);
-          $('.filter-clear-btn').show();
-      } else {
-          $('.filter-apply-btn').prop('disabled', true);
-          $('.filter-clear-btn').hide();
-      }
-  }
-
-  // Uygula butonu
-  $('.filter-apply-btn').on('click', function () {
-      if (!$(this).prop('disabled')) {
-          loadActiveReport();
-      }
-  });
-
-  // Temizle butonu — tüm filtreleri sıfırla
-  $('.filter-clear-btn').on('click', function () {
-      clearFilterPanel('bolge');
-      clearFilterPanel('sube');
-      loadFilterOptions('bolge');
-      updateFilterButtons();
-      loadActiveReport();
-  });
-
   // Load daily table headers from API
   window._dailyHeaders = {};
   $.ajax({
-      url: 'http://localhost:5024/TargetReport/GetDailyTargetReportTableHeaders',
+      url: '/TargetReport/GetDailyTargetReportTableHeaders',
       type: 'POST',
       contentType: 'application/json',
       data: JSON.stringify({ sessionId: '1' }),
@@ -316,7 +283,7 @@ $(document).ready(function () {
           if (!monthlyHeadersLoaded) {
               monthlyHeadersLoaded = true;
               $.ajax({
-                  url: 'http://localhost:5024/TargetReport/GetMonthlyTargetReportTableHeaders',
+                  url: '/TargetReport/GetMonthlyTargetReportTableHeaders',
                   type: 'POST',
                   contentType: 'application/json',
                   data: JSON.stringify({ sessionId: '1' }),
@@ -344,16 +311,19 @@ $(document).ready(function () {
   function updateStripes() {
       $('.table-container:visible .data-table').each(function () {
           var visibleIndex = 0;
+          var $lastVisible = null;
           $(this).find('tbody tr').each(function () {
               var $tr = $(this);
-              $tr.removeClass('stripe-odd stripe-even');
+              $tr.removeClass('stripe-odd stripe-even last-visible-row');
               if ($tr.hasClass('sub-row') && !$tr.hasClass('visible')) {
                   return;
               }
               visibleIndex++;
               $tr.addClass(visibleIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
               $tr.find('td:first').text(visibleIndex);
+              $lastVisible = $tr;
           });
+          if ($lastVisible) $lastVisible.addClass('last-visible-row');
       });
   }
 
@@ -422,178 +392,84 @@ $(document).ready(function () {
   $('#diffToggle').attr('data-active', 'false');
   $('.diff-details').hide();
 
-  // ===== Dropdown Panels =====
-
-  var filterMap = { bolge: 0, sube: 1 };
+  // ===== Single-Select Dropdown Filters =====
 
   function getActiveTabId() {
       var tabMap = { tumu: 0, kurumsal: 1, ticari: 2, kobi: 3, tarim: 4, bireysel: 5 };
       return tabMap[$('.tab.active').data('tab')] || 0;
   }
 
-  function getSelectedCodes(panelId) {
-      var codes = [];
-      $('.dropdown-panel[data-panel="' + panelId + '"] .dropdown-item:not(.select-all).checked').each(function () {
-          codes.push($(this).data('code'));
-      });
-      return codes;
+  function renderBolgeList() {
+      renderRegionList('#indexBolgeList', selectedBolge ? selectedBolge.code : null);
   }
 
-  function clearFilterPanel(panelId) {
-      var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
-      $panel.find('.dropdown-list .dropdown-item:not(.select-all)').remove();
-      $panel.find('.select-all').removeClass('checked');
-      var $dropdown = $('.filter-dropdown[data-dropdown="' + panelId + '"]');
-      $dropdown.find('.filter-badge').text('0').hide();
+  function renderSubeList() {
+      renderBranchList('#indexSubeList', selectedSube ? selectedSube.code : null);
   }
 
-  function loadFilterOptions(panelId, filterCode) {
-      var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
-      var $list = $panel.find('.dropdown-list');
+  // Bölge seçimi
+  $(document).on('click', '#indexBolgeList .dropdown-item', function () {
+      var code = $(this).attr('data-code');
+      var name = $(this).text();
 
-      var requestBody = {
-          sessionId: '1',
-          filterId: filterMap[panelId],
-          filterCode: filterCode || []
-      };
-
-      $.ajax({
-          url: 'http://localhost:5024/TargetReport/GetTargetReportFilters',
-          type: 'POST',
-          contentType: 'application/json',
-          data: JSON.stringify(requestBody),
-          success: function (data) {
-              $list.find('.dropdown-item:not(.select-all)').remove();
-              $panel.find('.select-all').removeClass('checked');
-
-              data.forEach(function (item) {
-                  var $item = $('<label class="dropdown-item" data-code="' + item.Code + '">' +
-                      '<img src="/images/checkbox.svg" class="cb-icon cb-off" alt="" />' +
-                      '<img src="/images/checkbox-selected.svg" class="cb-icon cb-on" alt="" />' +
-                      '<span>' + item.Name + '</span></label>');
-                  $list.append($item);
-              });
-
-              var $dropdown = $('.filter-dropdown[data-dropdown="' + panelId + '"]');
-              $dropdown.find('.filter-badge').text('0').hide();
-          }
-      });
-  }
-
-  // Sayfa yüklendiğinde sadece bölgeleri yükle
-  loadFilterOptions('bolge');
-  clearFilterPanel('sube');
-
-  // Open/close dropdown on filter-dropdown click
-  $('.filter-dropdown').on('click', function (e) {
-      e.stopPropagation();
-      var panelId = $(this).data('dropdown');
-      var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
-      var wasOpen = $panel.hasClass('open');
-
-      $('.dropdown-panel').removeClass('open');
-
-      if (!wasOpen) {
-          $panel.addClass('open');
-      }
-  });
-
-  // Prevent panel click from closing (but not dropdown-item clicks)
-  $(document).on('click', '.dropdown-panel', function (e) {
-      if (!$(e.target).closest('.dropdown-item').length) {
-          e.stopPropagation();
-      }
-  });
-
-  // Close panels on outside click
-  $(document).on('click', function (e) {
-      if (!$(e.target).closest('.dropdown-panel, .filter-dropdown').length) {
-          $('.dropdown-panel').removeClass('open');
-      }
-  });
-
-  // Checkbox toggle helper — img'leri swap eder
-  function updateCheckboxIcon($item) {
-      if ($item.hasClass('checked')) {
-          $item.find('.cb-off').hide();
-          $item.find('.cb-on').show();
+      if (!code) {
+          // Tümü seçildi
+          selectedBolge = null;
+          $('#indexBolgeLabel').text('Bölge');
       } else {
-          $item.find('.cb-off').show();
-          $item.find('.cb-on').hide();
+          selectedBolge = { code: code, name: name };
+          $('#indexBolgeLabel').text(name);
       }
-  }
 
-  // Checkbox toggle (delegated — dinamik item'lar için gerekli)
-  $(document).on('click', '.dropdown-item:not(.select-all)', function (e) {
-      e.preventDefault();
-      $(this).toggleClass('checked');
-      updateCheckboxIcon($(this));
-      var $panel = $(this).closest('.dropdown-panel');
-      var $items = $panel.find('.dropdown-item:not(.select-all)');
-      var $selectAll = $panel.find('.select-all');
-      if ($items.length === $items.filter('.checked').length) {
-          $selectAll.addClass('checked');
-          updateCheckboxIcon($selectAll);
-      } else {
-          $selectAll.removeClass('checked');
-          updateCheckboxIcon($selectAll);
-      }
+      // Şube seçimini temizle
+      selectedSube = null;
+      $('#indexSubeLabel').text('Şube');
+
+      $('#indexBolgeList .dropdown-item').removeClass('selected');
+      $(this).addClass('selected');
+      $('#indexBolgePanel').removeClass('open');
+      $('#indexSubePanel').removeClass('open');
+      $('#indexBolgeSearch').val('');
+
+      loadActiveReport();
   });
 
-  // Tümünü Seç toggle (delegated)
-  $(document).on('click', '.dropdown-item.select-all', function (e) {
-      e.preventDefault();
-      var $this = $(this);
-      var $panel = $this.closest('.dropdown-panel');
-      var $items = $panel.find('.dropdown-item:not(.select-all)');
+  // Şube seçimi
+  $(document).on('click', '#indexSubeList .dropdown-item', function () {
+      var code = $(this).attr('data-code');
+      var name = $(this).text();
 
-      if ($this.hasClass('checked')) {
-          $this.removeClass('checked');
-          $items.removeClass('checked');
+      if (!code) {
+          // Tümü seçildi
+          selectedSube = null;
+          $('#indexSubeLabel').text('Şube');
       } else {
-          $this.addClass('checked');
-          $items.addClass('checked');
-      }
-      updateCheckboxIcon($this);
-      $items.each(function () { updateCheckboxIcon($(this)); });
-  });
+          var regionCode = $(this).attr('data-region');
+          selectedSube = { code: code, name: name };
+          $('#indexSubeLabel').text(name);
 
-  // Search inside dropdown
-  $('.dropdown-search-input').on('keyup', function () {
-      var query = $(this).val().toLowerCase();
-      var $items = $(this).closest('.dropdown-panel').find('.dropdown-item:not(.select-all)');
-      $items.each(function () {
-          var text = $(this).find('span').text().toLowerCase();
-          $(this).toggle(text.indexOf(query) > -1);
-      });
-  });
-
-  // Kaydet — cascade: bolge → sube
-  $('.dropdown-save').on('click', function () {
-      var panelId = $(this).data('panel');
-      var $panel = $('.dropdown-panel[data-panel="' + panelId + '"]');
-      var $dropdown = $('.filter-dropdown[data-dropdown="' + panelId + '"]');
-      var count = $panel.find('.dropdown-item:not(.select-all).checked').length;
-      var $badge = $dropdown.find('.filter-badge');
-
-      if (count > 0) {
-          $badge.text(count).show();
-      } else {
-          $badge.hide();
-      }
-
-      $panel.removeClass('open');
-
-      // Cascade dependent filters
-      if (panelId === 'bolge') {
-          var regionCodes = getSelectedCodes('bolge');
-          if (regionCodes.length > 0) {
-              loadFilterOptions('sube', regionCodes);
-          } else {
-              clearFilterPanel('sube');
+          // Bölgeyi otomatik seçili yap
+          var region = findRegion(regionCode);
+          if (region) {
+              selectedBolge = { code: region.Code, name: region.Name };
+              $('#indexBolgeLabel').text(region.Name);
+              $('#indexBolgeList .dropdown-item').removeClass('selected');
+              $('#indexBolgeList .dropdown-item[data-code="' + region.Code + '"]').addClass('selected');
           }
       }
 
-      updateFilterButtons();
+      $('#indexSubeList .dropdown-item').removeClass('selected');
+      $(this).addClass('selected');
+      $('#indexBolgePanel').removeClass('open');
+      $('#indexSubePanel').removeClass('open');
+      $('#indexSubeSearch').val('');
+
+      loadActiveReport();
   });
+
+
+  // ===== Init =====
+  loadRegionFilters(function () { renderBolgeList(); });
+  loadBranchFilters(function () { renderSubeList(); });
+  loadDailyReport();
 });
