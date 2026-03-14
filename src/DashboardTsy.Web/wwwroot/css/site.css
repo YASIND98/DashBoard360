@@ -85,7 +85,9 @@ body {
 /* ===== Sidebar ===== */
 .sidebar {
   min-height: 100vh;
-  background: var(--bg-dark);
+  background: linear-gradient(180deg, rgba(6, 11, 38, 0.94) 0%, rgba(26, 31, 55, 0) 100%);
+  backdrop-filter: blur(120px);
+  -webkit-backdrop-filter: blur(120px);
   border-right: 1px solid var(--border-sidebar);
   display: flex;
   flex-direction: column;
@@ -351,10 +353,26 @@ body {
   border-bottom: none;
 }
 
-.dropdown-item.selected {                                                                                                             
-  background: #196CFC;                                                                                                                
-  font-weight: 600;                                                                                                                   
-  color: #FFFFFF;                                                                                                                     
+.dropdown-item:hover {
+  background: linear-gradient(
+  180deg,
+  rgba(5,108,194,0.15) 0%,
+  rgba(5,108,194,0.75) 100%
+);
+}
+
+.dropdown-item.selected {
+  background: #196CFC;
+  font-weight: 600;
+  color: #FFFFFF;
+}
+
+.dropdown-item.selected:hover {
+  background: linear-gradient(
+    180deg,
+    rgba(18, 55, 92, 0.15) 0%,
+    rgba(18, 55, 92, 0.75) 100%
+  );
 }
 
 .sub-arrow-icon {
@@ -513,6 +531,11 @@ body {
   overflow-x: auto;
 }
 
+#dynamicTableContainer2.table-container {
+  background: linear-gradient(180deg, rgba(16, 32, 115, 0.94) 0%, rgba(16, 32, 115, 0.76) 100%) !important;
+  backdrop-filter: blur(120px);
+}
+
 .data-table {
   width: 100%;
   min-width: 900px;
@@ -569,6 +592,10 @@ body {
 
 .data-table tbody tr.stripe-even {
   background: transparent;
+}
+
+#dynamicTableContainer2 .data-table tbody tr.stripe-even {
+  background: rgba(246, 247, 249, 0.08);
 }
 
 .data-table tbody tr:first-child td:first-child {
@@ -671,12 +698,6 @@ body {
 
 .table-row:hover td {
   background: linear-gradient(180deg, rgba(5, 108, 194, 0.15) 15%, rgba(5, 108, 194, 0.75) 75%);
-}
-
-.sub-value {
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 16px;
 }
 
 .positive {
@@ -786,6 +807,7 @@ body {
   color: #D5D9E2;
   font-size: 14px;
   font-weight: 500;
+  cursor: pointer;
 }
 
 .breadcrumb-item.active {

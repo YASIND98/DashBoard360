@@ -100,86 +100,81 @@
     <script>
     $(document).ready(function () {
 
+        // ===== Helpers =====
         function scoreFormat(val) {
-            if (val) return formatPercent(val/100);
-            return '-';
+            return val ? formatPercent(val / 100) : '-';
         }
 
         function scoreColor(val) {
-            if (val) return  ' ' + percentColor(val/100);
-            return '';
+            return val ? ' ' + percentColor(val / 100) : '';
         }
 
-        function mapRegionScoreCard(d) {
-            return {
-                mudur: { ad: d.ManagerName, aylar: [
-                    { ay: 'Mart 2026', skor: d.FirstMonthScore, cls: scoreColor(d.FirstMonthScore) },
-                    { ay: 'Şubat 2026', skor: d.SecondMonthScore, cls: scoreColor(d.SecondMonthScore) },
-                    { ay: 'Ocak 2026', skor: d.ThirdMonthScore, cls: scoreColor(d.ThirdMonthScore) }
-                ]},
-                roller: [
-                    { rol: 'Kurumsal', skor: scoreFormat(d.CorporateScore), cls: scoreColor(d.CorporateScore) },
-                    { rol: 'Ticari', skor: scoreFormat(d.CommercialScore), cls: scoreColor(d.CommercialScore) },
-                    { rol: 'KBİ', skor: scoreFormat(d.KobiScore), cls: scoreColor(d.KobiScore) },
-                    { rol: 'OBİ', skor: scoreFormat(d.ObiScore), cls: scoreColor(d.ObiScore) },
-                    { rol: 'Tarım', skor: scoreFormat(d.AgricultureScore), cls: scoreColor(d.AgricultureScore) },
-                    { rol: 'Kitle', skor: scoreFormat(d.MassScore), cls: scoreColor(d.MassScore) },
-                    { rol: 'Afili', skor: scoreFormat(d.AffluentScore), cls: scoreColor(d.AffluentScore) },
-                    { rol: 'ÖB', skor: scoreFormat(d.PrivateBankingScore), cls: scoreColor(d.PrivateBankingScore) }
-                ],
-                nps: { bolge: { skor: d.RegionNpsScore, cls: scoreColor(d.RegionNpsScore) }, banka: { skor: d.BankNpsScore, cls: scoreColor(d.BankNpsScore) } }
-            };
-        }
+        function mapScoreCard(d, isBranch) {
+            var months = [
+                { label: 'Mart 2026', value: d.FirstMonthScore },
+                { label: 'Şubat 2026', value: d.SecondMonthScore },
+                { label: 'Ocak 2026', value: d.ThirdMonthScore }
+            ];
 
-        function mapBranchScoreCard(d) {
+            var roles = [
+                { label: 'Kurumsal', value: d.CorporateScore },
+                { label: 'Ticari', value: d.CommercialScore },
+                { label: 'KBİ', value: d.KobiScore },
+                { label: 'OBİ', value: d.ObiScore },
+                { label: 'Tarım', value: d.AgricultureScore },
+                { label: 'Kitle', value: d.MassScore },
+                { label: 'Afili', value: d.AffluentScore },
+                { label: 'ÖB', value: d.PrivateBankingScore }
+            ];
+
+            var nps = { bank: { score: d.BankNpsScore, cls: scoreColor(d.BankNpsScore) } };
+            
+            if (isBranch) {
+                nps.branch = { score: d.BranchNpsScore, cls: scoreColor(d.BranchNpsScore) };
+            } else {
+                nps.region = { score: d.RegionNpsScore, cls: scoreColor(d.RegionNpsScore) };
+            }
+
             return {
-                mudur: { ad: d.ManagerName, aylar: [
-                    { ay: 'Mart 2026', skor: d.FirstMonthScore, cls: scoreColor(d.FirstMonthScore) },
-                    { ay: 'Şubat 2026', skor: d.SecondMonthScore, cls: scoreColor(d.SecondMonthScore) },
-                    { ay: 'Ocak 2026', skor: d.ThirdMonthScore, cls: scoreColor(d.ThirdMonthScore) }
-                ]},
-                roller: [
-                    { rol: 'Kurumsal', skor: scoreFormat(d.CorporateScore), cls: scoreColor(d.CorporateScore) },
-                    { rol: 'Ticari', skor: scoreFormat(d.CommercialScore), cls: scoreColor(d.CommercialScore) },
-                    { rol: 'KBİ', skor: scoreFormat(d.KobiScore), cls: scoreColor(d.KobiScore) },
-                    { rol: 'OBİ', skor: scoreFormat(d.ObiScore), cls: scoreColor(d.ObiScore) },
-                    { rol: 'Tarım', skor: scoreFormat(d.AgricultureScore), cls: scoreColor(d.AgricultureScore) },
-                    { rol: 'Kitle', skor: scoreFormat(d.MassScore), cls: scoreColor(d.MassScore) },
-                    { rol: 'Afili', skor: scoreFormat(d.AffluentScore), cls: scoreColor(d.AffluentScore) },
-                    { rol: 'ÖB', skor: scoreFormat(d.PrivateBankingScore), cls: scoreColor(d.PrivateBankingScore) }
-                ],
-                nps: { sube: { skor: d.BranchNpsScore, cls: scoreColor(d.BranchNpsScore) }, banka: { skor: d.BankNpsScore, cls: scoreColor(d.BankNpsScore) } }
+                manager: {
+                    name: d.ManagerName,
+                    months: months.map(function (m) {
+                        return { label: m.label, score: m.value, cls: scoreColor(m.value) };
+                    })
+                },
+                roles: roles.map(function (r) {
+                    return { label: r.label, score: scoreFormat(r.value), cls: scoreColor(r.value) };
+                }),
+                nps: nps
             };
         }
 
         // ===== State =====
-        var selectedBolge = null;
-        var selectedSube = null;
+        var selectedRegion = null;
+        var selectedBranch = null;
+        var _lastFilterType = null;
 
-        // ===== Populate Lists from service =====
-        function renderYieldBolgeList() {
-            renderRegionList('#yieldBolgeList', selectedBolge ? selectedBolge.code : null);
-        }
-        function renderYieldSubeList() {
-            renderBranchList('#yieldSubeList', selectedSube ? selectedSube.code : null);
+        // ===== Filter Lists =====
+        function renderRegionDropdown() {
+            renderRegionList('#yieldBolgeList', selectedRegion ? selectedRegion.code : null);
         }
 
-        loadRegionFilters(function () { renderYieldBolgeList(); });
-        loadBranchFilters(function () { renderYieldSubeList(); });
+        function renderBranchDropdown() {
+            renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null);
+        }
 
-        // ===== Bölge seçimi =====
+        loadRegionFilters(function () { renderRegionDropdown(); });
+        loadBranchFilters(function () { renderBranchDropdown(); });
+
+        // ===== Region Selection =====
         $(document).on('click', '#yieldBolgeList .dropdown-item', function () {
             var code = $(this).attr('data-code');
             var name = $(this).text();
 
-            if (!code) {
-                selectedBolge = null;
-                $('#yieldBolgeLabel').text('Bölge');
-            } else {
-                selectedBolge = { code: code, name: name };
-                $('#yieldBolgeLabel').text(name);
-            }
-            selectedSube = null;
+            selectedRegion = code ? { code: code, name: name } : null;
+            $('#yieldBolgeLabel').text(code ? name : 'Bölge');
+
+            selectedBranch = null;
             $('#yieldSubeLabel').text('Şube');
 
             $('#yieldBolgeList .dropdown-item').removeClass('selected');
@@ -190,23 +185,22 @@
             updateUI();
         });
 
-        // ===== Şube seçimi =====
+        // ===== Branch Selection =====
         $(document).on('click', '#yieldSubeList .dropdown-item', function () {
             var code = $(this).attr('data-code');
             var name = $(this).text();
 
             if (!code) {
-                selectedSube = null;
+                selectedBranch = null;
                 $('#yieldSubeLabel').text('Şube');
             } else {
-                var regionCode = $(this).data('region');
-                selectedSube = { code: code, name: name };
+                var regionCode = $(this).attr('data-region');
+                selectedBranch = { code: code, name: name };
                 $('#yieldSubeLabel').text(name);
 
-                // Bölgeyi otomatik seçili yap
                 var region = findRegion(regionCode);
                 if (region) {
-                    selectedBolge = { code: region.Code, name: region.Name };
+                    selectedRegion = { code: region.Code, name: region.Name };
                     $('#yieldBolgeLabel').text(region.Name);
                     $('#yieldBolgeList .dropdown-item').removeClass('selected');
                     $('#yieldBolgeList .dropdown-item[data-code="' + region.Code + '"]').addClass('selected');
@@ -221,16 +215,14 @@
             updateUI();
         });
 
-        // ===== UI güncelle =====
-        var _lastFilterType = null;
-
+        // ===== UI Update =====
         function updateUI() {
             updateBreadcrumb();
             updateScorecard();
 
-            var filterType = selectedSube ? 2 : (selectedBolge ? 1 : 1);
+            var filterType = selectedBranch ? 2 : (selectedRegion ? 1 : null);
 
-            if (selectedBolge || selectedSube) {
+            if (selectedRegion || selectedBranch) {
                 if (filterType !== _lastFilterType) {
                     _lastFilterType = filterType;
                     loadProductivityTabs(filterType, function () {
@@ -238,10 +230,13 @@
                         updateYieldTable();
                     });
                 } else {
+                    $('#yieldToggle').show();
                     updateYieldTable();
                 }
             } else {
-                _lastFilterType = null;
+                _activeToggleId = null;
+                _activeTabId = null;
+                _activeSubTabId = null;
                 $('#yieldToggle').hide();
                 $('#tabBar').hide();
                 $('#subTabBar').hide();
@@ -249,30 +244,29 @@
             }
         }
 
-        // ===== Breadcrumb & bar visibility =====
+        // ===== Breadcrumb =====
         function updateBreadcrumb() {
-            if (!selectedBolge && !selectedSube) {
+            if (!selectedRegion && !selectedBranch) {
                 $('#breadcrumbBar').hide();
                 return;
             }
 
             $('#breadcrumbBar').show();
-            var html = '<span class="breadcrumb-item" data-breadcrumb="tumBolgeler">Tüm Bölgeler</span>';
-            if (selectedBolge) {
+            var html = '<span class="breadcrumb-item" data-breadcrumb="allRegions">Tüm Bölgeler</span>';
+            if (selectedRegion) {
                 html += '<span class="breadcrumb-separator">›</span>';
-                html += '<span class="breadcrumb-item" data-breadcrumb="bolge">' + selectedBolge.name + ' Bölgesi</span>';
+                html += '<span class="breadcrumb-item" data-breadcrumb="region">' + selectedRegion.name + ' Bölgesi</span>';
             }
-            if (selectedSube) {
+            if (selectedBranch) {
                 html += '<span class="breadcrumb-separator">›</span>';
-                html += '<span class="breadcrumb-item">' + selectedSube.name + '</span>';
+                html += '<span class="breadcrumb-item">' + selectedBranch.name + '</span>';
             }
             $('#yieldBreadcrumb').html(html);
         }
 
-        // Breadcrumb tıklama: Tüm Bölgeler → bölge + şube sıfırla
-        $(document).on('click', '[data-breadcrumb="tumBolgeler"]', function () {
-            selectedBolge = null;
-            selectedSube = null;
+        $(document).on('click', '[data-breadcrumb="allRegions"]', function () {
+            selectedRegion = null;
+            selectedBranch = null;
             $('#yieldBolgeLabel').text('Bölge');
             $('#yieldBolgeList .dropdown-item').removeClass('selected');
             $('#yieldSubeLabel').text('Şube');
@@ -280,90 +274,80 @@
             updateUI();
         });
 
-        // Breadcrumb tıklama: Bölge → şube sıfırla
-        $(document).on('click', '[data-breadcrumb="bolge"]', function () {
-            selectedSube = null;
+        $(document).on('click', '[data-breadcrumb="region"]', function () {
+            selectedBranch = null;
             $('#yieldSubeLabel').text('Şube');
             $('#yieldSubeList .dropdown-item').removeClass('selected');
             updateUI();
         });
 
-        // ===== Scorecard güncelle =====
+        // ===== Scorecard =====
         function updateScorecard() {
-            var isSube = selectedSube !== null;
-            var label = isSube ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
+            var isBranch = selectedBranch !== null;
+            var label = isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
             $('#scorecardBtnLabel').text(label);
             $('#scorecardTitle').text(label);
 
-            if (!selectedBolge && !selectedSube) {
+            if (!selectedRegion && !selectedBranch) {
                 $('#scorecardContent').html('');
                 return;
             }
 
-            if (isSube) {
-                $.ajax({
-                    url: '/ProductivityReport/GetProductivityBranchScoreCardReport',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ sessionId: '1', branchCode: selectedSube.code, reportDate: new Date().toISOString() }),
-                    success: function (d) {
-                        var data = mapBranchScoreCard(d);
-                        renderScorecardHtml(data, true);
-                    }
-                });
-            } else {
-                $.ajax({
-                    url: '/ProductivityReport/GetProductivityRegionScoreCardReport',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ sessionId: '1', regionCode: selectedBolge.code, reportDate: new Date().toISOString() }),
-                    success: function (d) {
-                        var data = mapRegionScoreCard(d);
-                        renderScorecardHtml(data, false);
-                    }
-                });
-            }
+            var url = isBranch
+                ? '/Home/GetProductivityBranchScoreCardReport'
+                : '/Home/GetProductivityRegionScoreCardReport';
+
+            var payload = isBranch
+                ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: new Date().toISOString() }
+                : { sessionId: '1', regionCode: selectedRegion.code, reportDate: new Date().toISOString() };
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (d) {
+                    renderScorecardHtml(mapScoreCard(d, isBranch), isBranch);
+                }
+            });
         }
 
-        function renderScorecardHtml(data, isSube) {
-            var titlePrefix = isSube ? 'Şube' : 'Bölge';
+        function renderScorecardHtml(data, isBranch) {
+            var prefix = isBranch ? 'Şube' : 'Bölge';
             var html = '';
 
-            // Müdür Skor Kartı
             html += '<div class="scorecard-section">';
-            html += '<div class="scorecard-section-title">' + titlePrefix + ' Müdürü Skor Kartı</div>';
+            html += '<div class="scorecard-section-title">' + prefix + ' Müdürü Skor Kartı %</div>';
             html += '<table class="scorecard-table">';
-            html += '<tr><td>Adı Soyadı:</td><td>' + data.mudur.ad + '</td></tr>';
-            data.mudur.aylar.forEach(function (a) {
-                html += '<tr><td>' + a.ay + ':</td><td class="' + a.cls.trim() + '">' + a.skor + '</td></tr>';
+            html += '<tr><td>Adı Soyadı:</td><td>' + data.manager.name + '</td></tr>';
+            data.manager.months.forEach(function (m) {
+                html += '<tr><td>' + m.label + ':</td><td class="' + m.cls.trim() + '">' + m.score + '</td></tr>';
             });
             html += '</table></div>';
 
-            // Roller Skor Kartı
             html += '<div class="scorecard-section">';
-            html += '<div class="scorecard-section-title">' + titlePrefix + ' Rolleri Skor Kartı</div>';
+            html += '<div class="scorecard-section-title">' + prefix + ' Rolleri Skor Kartı %</div>';
             html += '<table class="scorecard-table">';
-            data.roller.forEach(function (r) {
-                html += '<tr><td>' + r.rol + ':</td><td class="' + r.cls.trim() + '">' + r.skor + '</td></tr>';
+            data.roles.forEach(function (r) {
+                html += '<tr><td>' + r.label + ':</td><td class="' + r.cls.trim() + '">' + r.score + '</td></tr>';
             });
             html += '</table></div>';
 
-            // NPS
             html += '<div class="scorecard-section">';
             html += '<div class="scorecard-section-title">NPS</div>';
             html += '<table class="scorecard-table">';
-            if (isSube) {
-                html += '<tr><td>Şube:</td><td class="' + data.nps.sube.cls.trim() + '">' + data.nps.sube.skor + '</td></tr>';
+            if (isBranch) {
+                html += '<tr><td>Şube:</td><td class="' + data.nps.branch.cls.trim() + '">' + data.nps.branch.score + '</td></tr>';
             } else {
-                html += '<tr><td>Bölge:</td><td class="' + data.nps.bolge.cls.trim() + '">' + data.nps.bolge.skor + '</td></tr>';
+                html += '<tr><td>Bölge:</td><td class="' + data.nps.region.cls.trim() + '">' + data.nps.region.score + '</td></tr>';
             }
-            html += '<tr><td>Banka:</td><td class="' + data.nps.banka.cls.trim() + '">' + data.nps.banka.skor + '</td></tr>';
+            html += '<tr><td>Banka:</td><td class="' + data.nps.bank.cls.trim() + '">' + data.nps.bank.score + '</td></tr>';
             html += '</table></div>';
 
             $('#scorecardContent').html(html);
         }
 
-        // ===== Scorecard panel toggle =====
+        // ===== Scorecard Panel Toggle =====
         $('#scorecardBtn').on('click', function (e) {
             e.stopPropagation();
             $('#scorecardPanel').toggleClass('open');
@@ -377,105 +361,97 @@
             }
         });
 
-        // ===== Tab değişim callback =====
+        // ===== Tab Change Callback =====
         window.onProductivityTabChange = function () {
             updateYieldTable();
         };
 
-        // ===== Tabloları göster/gizle =====
+        // ===== Table Update =====
         function updateYieldTable() {
             var tabIds = getActiveTabIds();
-            var filterType = selectedSube ? 2 : 1;
+            var filterType = selectedBranch ? 2 : 1;
             var toggleId = tabIds.toggleId || 1;
+            var regionCode = selectedRegion ? selectedRegion.code : null;
+            var branchCode = selectedBranch ? selectedBranch.code : null;
 
             $('#dynamicTableBody').empty();
             $('#dynamicTableBody2').empty();
             $('#dynamicTableContainer').show();
             $('#dynamicTableContainer2').hide();
 
-            // Header'ları yükle, sonra data'yı yükle
             loadTableHeaders(toggleId, tabIds.tabId, tabIds.subTabId, filterType, function () {
-                // TabId 1 = Genel
+                // General
                 if (toggleId === 1) {
-                    loadGeneralRegionReport(selectedBolge ? selectedBolge.code : null);
+                    loadGeneralRegionReport(regionCode);
                 }
-                // TabId 3 = Hacim — bölge seçili, şube değil
-                else if (toggleId === 3 && selectedBolge && !selectedSube) {
-                    loadVolumeRegionReport(selectedBolge.code, tabIds.tabId || 0);
+                // Volume - region
+                else if (toggleId === 3 && selectedRegion && !selectedBranch) {
+                    loadVolumeRegionReport(regionCode, tabIds.tabId || 0);
                 }
-                // TabId 3 = Hacim — şube seçili
-                else if (toggleId === 3 && selectedSube) {
-                    loadVolumeBranchReport(selectedSube.code, tabIds.tabId || 0);
+                // Volume - branch
+                else if (toggleId === 3 && selectedBranch) {
+                    loadVolumeBranchReport(branchCode, tabIds.tabId || 0);
                 }
-                // TabId 2 = Adet — şube seçili — Kredi Kartı veya POS
-                else if (toggleId === 2 && selectedSube && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
-                    var cardPosBranchTabId = tabIds.tabId === 11 ? 1 : 2;
-                    loadCountCardPosBranchReport(selectedSube.code, cardPosBranchTabId);
+                // Count - branch - Card/POS
+                else if (toggleId === 2 && selectedBranch && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
+                    loadCountCardPosBranchReport(branchCode, tabIds.tabId === 11 ? 1 : 2);
                 }
-                // TabId 2 = Adet — şube seçili — Müşteri
-                else if (toggleId === 2 && selectedSube) {
-                    loadCountCustomerBranchReport(selectedSube.code, tabIds.subTabId || 0);
+                // Count - branch - Customer
+                else if (toggleId === 2 && selectedBranch) {
+                    loadCountCustomerBranchReport(branchCode, tabIds.subTabId || 0);
                 }
-                // TabId 2 = Adet — bölge seçili, şube değil — Kredi Kartı veya POS
-                else if (toggleId === 2 && selectedBolge && !selectedSube && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
-                    var cardPosTabId = tabIds.tabId === 11 ? 1 : 2;
-                    loadCountCardPosRegionReport(selectedBolge.code, cardPosTabId);
+                // Count - region - Card/POS
+                else if (toggleId === 2 && selectedRegion && !selectedBranch && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
+                    loadCountCardPosRegionReport(regionCode, tabIds.tabId === 11 ? 1 : 2);
                 }
-                // TabId 2 = Adet — bölge seçili, şube değil — Müşteri
-                else if (toggleId === 2 && selectedBolge && !selectedSube) {
-                    loadCountCustomerRegionReport(selectedBolge.code, tabIds.subTabId || 0);
+                // Count - region - Customer
+                else if (toggleId === 2 && selectedRegion && !selectedBranch) {
+                    loadCountCustomerRegionReport(regionCode, tabIds.subTabId || 0);
                 }
-                // TabId 4 = Karlılık — şube seçili — Toplam
-                else if (toggleId === 4 && selectedSube && (tabIds.tabId === 40 || tabIds.tabId === null)) {
-                    loadProfitTotalBranchReport(selectedSube.code);
-                    loadProfitRatioBranchReport(selectedSube.code);
+                // Profit - branch - Total
+                else if (toggleId === 4 && selectedBranch && (tabIds.tabId === 40 || tabIds.tabId === null)) {
+                    loadProfitTotalBranchReport(branchCode);
+                    loadProfitRatioBranchReport(branchCode);
                 }
-                // TabId 4 = Karlılık — şube seçili — Spread Yönetimi
-                else if (toggleId === 4 && selectedSube && tabIds.tabId === 41) {
-                    loadProfitSpreadManagementBranchReport(selectedSube.code);
+                // Profit - branch - Spread
+                else if (toggleId === 4 && selectedBranch && tabIds.tabId === 41) {
+                    loadProfitSpreadManagementBranchReport(branchCode);
                 }
-                // TabId 4 = Karlılık — bölge seçili, şube değil — Spread Yönetimi
-                else if (toggleId === 4 && selectedBolge && !selectedSube && tabIds.tabId === 41) {
-                    loadProfitSpreadManagementRegionReport(selectedBolge.code);
+                // Profit - region - Spread
+                else if (toggleId === 4 && selectedRegion && !selectedBranch && tabIds.tabId === 41) {
+                    loadProfitSpreadManagementRegionReport(regionCode);
                 }
-                // TabId 4 = Karlılık — bölge seçili, şube değil — Toplam
-                else if (toggleId === 4 && selectedBolge && !selectedSube) {
-                    // Üst tablo: ProfitTotal (header servisten loadTableHeaders ile geldi)
-                    loadProfitTotalRegionReport(selectedBolge.code);
-                    // Alt tablo: ProfitRatio (statik header, dynamicTable2)
-                    loadProfitRatioRegionReport(selectedBolge.code);
+                // Profit - region - Total
+                else if (toggleId === 4 && selectedRegion && !selectedBranch) {
+                    loadProfitTotalRegionReport(regionCode);
+                    loadProfitRatioRegionReport(regionCode);
                 }
             });
         }
 
-        // ===== Expandable rows =====
+        // ===== Expandable Rows =====
         $(document).on('click', '.expandable', function () {
             var $row = $(this);
             var parentDepth = getDepth($row);
             var isExpanded = $row.hasClass('expanded');
 
+            $row.toggleClass('expanded');
+
             if (isExpanded) {
-                $row.removeClass('expanded');
-                $row.nextAll('tr').each(function () {
-                    var $tr = $(this);
-                    if (!$tr.hasClass('sub-row')) return false;
-                    var d = getDepth($tr);
+                $row.nextAll('tr.sub-row').each(function () {
+                    var d = getDepth($(this));
                     if (d <= parentDepth) return false;
-                    $tr.removeClass('visible expanded');
+                    $(this).removeClass('visible expanded');
                 });
             } else {
-                $row.addClass('expanded');
                 var childDepth = parentDepth + 1;
-                $row.nextAll('tr').each(function () {
-                    var $tr = $(this);
-                    if (!$tr.hasClass('sub-row')) return false;
-                    var d = getDepth($tr);
+                $row.nextAll('tr.sub-row').each(function () {
+                    var d = getDepth($(this));
                     if (d <= parentDepth) return false;
-                    if (d === childDepth) $tr.addClass('visible');
+                    if (d === childDepth) $(this).addClass('visible');
                 });
             }
 
-            // Hangi tablodaysa o tablonun stripe'ını güncelle
             if ($row.closest('#dynamicTable2').length) {
                 updateProductivityStripes2();
             } else {
@@ -488,7 +464,6 @@
             return match ? parseInt(match[1]) : 0;
         }
 
-        // Sayfa yüklendiğinde tabloyu yükle
         updateYieldTable();
     });
     </script>
