@@ -254,20 +254,31 @@ public static class MockTargetReportData
 
     public static IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
     {
-        // Basit bir örnek hiyerarşi: 2 ana sekme + her birinin altında alt sekmeler.
         var tabs = new List<GetProductivityReportTabItem>
         {
-            new() { TabId = 1, TabName = "Genel Verimlilik", ParentId = 0, TabLevel = 0 },
-            new() { TabId = 2, TabName = "Rol Bazlı Verimlilik", ParentId = 0, TabLevel = 0 },
-
-            new() { TabId = 3, TabName = "Şube Bazlı", ParentId = 1, TabLevel = 1 },
-            new() { TabId = 4, TabName = "Bölge Bazlı", ParentId = 1, TabLevel = 1 },
-
-            new() { TabId = 5, TabName = "Müdür", ParentId = 2, TabLevel = 1 },
-            new() { TabId = 6, TabName = "Portföy Yöneticisi", ParentId = 2, TabLevel = 1 }
+            new() { TabId = 1, TabName = "Genel", ParentId = 0, TabLevel = 1 },
+            new() { TabId = 2, TabName = "Adet", ParentId = 0, TabLevel = 1 },
+            new() { TabId = 3, TabName = "Hacim", ParentId = 0, TabLevel = 1 },
+            new() { TabId = 4, TabName = "Karlılık", ParentId = 0, TabLevel = 1 },
+            new() { TabId = 10, TabName = "Müşteri", ParentId = 2, TabLevel = 2 },
+            new() { TabId = 11, TabName = "Kredi Kartı", ParentId = 2, TabLevel = 2 },
+            new() { TabId = 12, TabName = "POS", ParentId = 2, TabLevel = 2 },
+            new() { TabId = 20, TabName = "Tümü", ParentId = 10, TabLevel = 3 },
+            new() { TabId = 21, TabName = "Kurumsal", ParentId = 10, TabLevel = 3 },
+            new() { TabId = 22, TabName = "Ticari", ParentId = 10, TabLevel = 3 },
+            new() { TabId = 23, TabName = "KOBİ", ParentId = 10, TabLevel = 3 },
+            new() { TabId = 24, TabName = "Tarım", ParentId = 10, TabLevel = 3 },
+            new() { TabId = 25, TabName = "Bireysel", ParentId = 10, TabLevel = 3 },
+            new() { TabId = 30, TabName = "Tümü", ParentId = 3, TabLevel = 2 },
+            new() { TabId = 31, TabName = "Kurumsal", ParentId = 3, TabLevel = 2 },
+            new() { TabId = 32, TabName = "Ticari", ParentId = 3, TabLevel = 2 },
+            new() { TabId = 33, TabName = "KOBİ", ParentId = 3, TabLevel = 2 },
+            new() { TabId = 34, TabName = "Tarım", ParentId = 3, TabLevel = 2 },
+            new() { TabId = 35, TabName = "Bireysel", ParentId = 3, TabLevel = 2 },
+            new() { TabId = 40, TabName = "Toplam", ParentId = 4, TabLevel = 2 },
+            new() { TabId = 41, TabName = "Spread Yönetimi", ParentId = 4, TabLevel = 2 }
         };
 
-        // İleride FilterType'a göre filtrelenebilir.
         return tabs;
     }
 
@@ -359,8 +370,10 @@ public static class MockTargetReportData
                 ProductName = $"{prefix} - Toplam",
                 CurrentMonthRegionValue = 120m,
                 CurrentMonthBankAverage = 100m,
+                CurrentMonthBankAverageDiff = 20m,
                 ThreeMonthHgRegion = 0.90m,
-                ThreeMonthHgBankAverage = 0.85m
+                ThreeMonthHgBankAverage = 0.85m,
+                ThreeMonthHgBankAverageDiff = 0.05m
             },
             new()
             {
@@ -371,8 +384,10 @@ public static class MockTargetReportData
                 ProductName = $"{prefix} - Ürün A",
                 CurrentMonthRegionValue = 60m,
                 CurrentMonthBankAverage = 55m,
+                CurrentMonthBankAverageDiff = 5m,
                 ThreeMonthHgRegion = 0.92m,
-                ThreeMonthHgBankAverage = 0.86m
+                ThreeMonthHgBankAverage = 0.86m,
+                ThreeMonthHgBankAverageDiff = 0.06m
             },
             new()
             {
@@ -383,8 +398,10 @@ public static class MockTargetReportData
                 ProductName = $"{prefix} - Ürün B",
                 CurrentMonthRegionValue = 60m,
                 CurrentMonthBankAverage = 45m,
+                CurrentMonthBankAverageDiff = 15m,
                 ThreeMonthHgRegion = 0.88m,
-                ThreeMonthHgBankAverage = 0.83m
+                ThreeMonthHgBankAverage = 0.83m,
+                ThreeMonthHgBankAverageDiff = 0.05m
             }
         };
 
@@ -408,10 +425,14 @@ public static class MockTargetReportData
                 ProductName = $"{prefix} - Toplam",
                 CurrentPeriodBranchValue = 75m,
                 CurrentPeriodRegionAverageValue = 60m,
+                CurrentPeriodRegionAverageValueDiff = 15m,
                 CurrentPeriodBankAverageValue = 55m,
+                CurrentPeriodBankAverageValueDiff = 0m,
                 ThreeMonthHgBranchValue = 0.91m,
                 ThreeMonthHgRegionAverageValue = 0.88m,
-                ThreeMonthHgBankAverageValue = 0.85m
+                ThreeMonthHgRegionAverageValueDiff = 0.03m,
+                ThreeMonthHgBankAverageValue = 0.85m,
+                ThreeMonthHgBankAverageValueDiff = 0m
             },
             new()
             {
@@ -422,10 +443,14 @@ public static class MockTargetReportData
                 ProductName = $"{prefix} - Ürün A",
                 CurrentPeriodBranchValue = 40m,
                 CurrentPeriodRegionAverageValue = 32m,
+                CurrentPeriodRegionAverageValueDiff = 8m,
                 CurrentPeriodBankAverageValue = 28m,
+                CurrentPeriodBankAverageValueDiff = 0m,
                 ThreeMonthHgBranchValue = 0.93m,
                 ThreeMonthHgRegionAverageValue = 0.89m,
-                ThreeMonthHgBankAverageValue = 0.86m
+                ThreeMonthHgRegionAverageValueDiff = 0.04m,
+                ThreeMonthHgBankAverageValue = 0.86m,
+                ThreeMonthHgBankAverageValueDiff = 0m
             },
             new()
             {
@@ -436,10 +461,14 @@ public static class MockTargetReportData
                 ProductName = $"{prefix} - Ürün B",
                 CurrentPeriodBranchValue = 35m,
                 CurrentPeriodRegionAverageValue = 28m,
+                CurrentPeriodRegionAverageValueDiff = 7m,
                 CurrentPeriodBankAverageValue = 27m,
+                CurrentPeriodBankAverageValueDiff = 0m,
                 ThreeMonthHgBranchValue = 0.89m,
                 ThreeMonthHgRegionAverageValue = 0.87m,
-                ThreeMonthHgBankAverageValue = 0.84m
+                ThreeMonthHgRegionAverageValueDiff = 0.02m,
+                ThreeMonthHgBankAverageValue = 0.84m,
+                ThreeMonthHgBankAverageValueDiff = 0m
             }
         };
 
@@ -464,11 +493,17 @@ public static class MockTargetReportData
                 SortOrder = 1,
                 ProductName = $"{segmentName} - Toplam",
                 RealizationRegion = 0.88m,
+                RealizationRegionDiff = 0.06m,
                 RealizationBankAverage = 0.82m,
+                RealizationBankAverageDiff = 0.00m,
                 YtdChangeRegion = 0.05m,
+                YtdChangeRegionDiff = 0.02m,
                 YtdChangeBankAverage = 0.03m,
+                YtdChangeBankAverageDiff = 0.00m,
                 QtdChangeRegion = 0.02m,
-                QtdChangeBankAverage = 0.01m
+                QtdChangeRegionDiff = 0.01m,
+                QtdChangeBankAverage = 0.01m,
+                QtdChangeBankAverageDiff = 0.00m
             },
             new()
             {
@@ -478,11 +513,17 @@ public static class MockTargetReportData
                 SortOrder = 1,
                 ProductName = $"{segmentName} - Ürün A",
                 RealizationRegion = 0.90m,
+                RealizationRegionDiff = 0.05m,
                 RealizationBankAverage = 0.85m,
+                RealizationBankAverageDiff = 0.00m,
                 YtdChangeRegion = 0.06m,
+                YtdChangeRegionDiff = 0.02m,
                 YtdChangeBankAverage = 0.04m,
+                YtdChangeBankAverageDiff = 0.00m,
                 QtdChangeRegion = 0.03m,
-                QtdChangeBankAverage = 0.02m
+                QtdChangeRegionDiff = 0.01m,
+                QtdChangeBankAverage = 0.02m,
+                QtdChangeBankAverageDiff = 0.00m
             },
             new()
             {
@@ -492,11 +533,17 @@ public static class MockTargetReportData
                 SortOrder = 2,
                 ProductName = $"{segmentName} - Ürün B",
                 RealizationRegion = 0.86m,
+                RealizationRegionDiff = 0.06m,
                 RealizationBankAverage = 0.80m,
+                RealizationBankAverageDiff = 0.00m,
                 YtdChangeRegion = 0.04m,
+                YtdChangeRegionDiff = 0.02m,
                 YtdChangeBankAverage = 0.02m,
+                YtdChangeBankAverageDiff = 0.00m,
                 QtdChangeRegion = 0.01m,
-                QtdChangeBankAverage = 0.00m
+                QtdChangeRegionDiff = 0.01m,
+                QtdChangeBankAverage = 0.00m,
+                QtdChangeBankAverageDiff = 0.00m
             }
         };
 
@@ -520,15 +567,23 @@ public static class MockTargetReportData
                 SortOrder = 1,
                 ProductName = $"{segmentName} - Hacim Toplam",
                 RealizationRegionValue = 1250m,
+                RealizationRegionDiff = 150m,
                 RealizationBankAverageValue = 1100m,
+                RealizationBankAverageDiff = 0m,
                 TargetValue = 1200m,
                 HgRate = 0.92m,
                 NetGrowthRegionValue = 85m,
+                NetGrowthRegionDiff = 15m,
                 NetGrowthBankAverageValue = 70m,
+                NetGrowthBankAverageDiff = 0m,
                 YtdRegionValue = 14200m,
+                YtdRegionDiff = 1400m,
                 YtdBankAverageValue = 12800m,
+                YtdBankAverageDiff = 0m,
                 QtdRegionValue = 3800m,
-                QtdBankAverageValue = 3400m
+                QtdRegionDiff = 400m,
+                QtdBankAverageValue = 3400m,
+                QtdBankAverageDiff = 0m
             },
             new()
             {
@@ -538,15 +593,23 @@ public static class MockTargetReportData
                 SortOrder = 1,
                 ProductName = $"{segmentName} - Ürün A",
                 RealizationRegionValue = 650m,
+                RealizationRegionDiff = 70m,
                 RealizationBankAverageValue = 580m,
+                RealizationBankAverageDiff = 0m,
                 TargetValue = 600m,
                 HgRate = 0.93m,
                 NetGrowthRegionValue = 45m,
+                NetGrowthRegionDiff = 7m,
                 NetGrowthBankAverageValue = 38m,
+                NetGrowthBankAverageDiff = 0m,
                 YtdRegionValue = 7200m,
+                YtdRegionDiff = 700m,
                 YtdBankAverageValue = 6500m,
+                YtdBankAverageDiff = 0m,
                 QtdRegionValue = 1950m,
-                QtdBankAverageValue = 1750m
+                QtdRegionDiff = 200m,
+                QtdBankAverageValue = 1750m,
+                QtdBankAverageDiff = 0m
             },
             new()
             {
@@ -556,15 +619,23 @@ public static class MockTargetReportData
                 SortOrder = 2,
                 ProductName = $"{segmentName} - Ürün B",
                 RealizationRegionValue = 600m,
+                RealizationRegionDiff = 80m,
                 RealizationBankAverageValue = 520m,
+                RealizationBankAverageDiff = 0m,
                 TargetValue = 600m,
                 HgRate = 0.90m,
                 NetGrowthRegionValue = 40m,
+                NetGrowthRegionDiff = 8m,
                 NetGrowthBankAverageValue = 32m,
+                NetGrowthBankAverageDiff = 0m,
                 YtdRegionValue = 7000m,
+                YtdRegionDiff = 700m,
                 YtdBankAverageValue = 6300m,
+                YtdBankAverageDiff = 0m,
                 QtdRegionValue = 1850m,
-                QtdBankAverageValue = 1650m
+                QtdRegionDiff = 200m,
+                QtdBankAverageValue = 1650m,
+                QtdBankAverageDiff = 0m
             }
         };
 
@@ -584,11 +655,15 @@ public static class MockTargetReportData
                 RatioName = "Karlılık Oranı - Toplam",
                 TargetValue = 0.25m,
                 RegionValue = 0.24m,
+                RegionValueDiff = 0.01m,
                 BankValue = 0.23m,
+                BankValueDiff = 0m,
                 RetailValue = 0.22m,
                 KobiValue = 0.26m,
                 AgricultureValue = 0.20m,
-                CommercialValue = 0.28m
+                AgricultureValueDiff = 0.03m,
+                CommercialValue = 0.28m,
+                CommercialValueDiff = 0.05m
             },
             new()
             {
@@ -599,11 +674,15 @@ public static class MockTargetReportData
                 RatioName = "Net Faiz Marjı",
                 TargetValue = 0.12m,
                 RegionValue = 0.115m,
+                RegionValueDiff = 0.005m,
                 BankValue = 0.11m,
+                BankValueDiff = 0m,
                 RetailValue = 0.10m,
                 KobiValue = 0.13m,
                 AgricultureValue = 0.09m,
-                CommercialValue = 0.14m
+                AgricultureValueDiff = 0.02m,
+                CommercialValue = 0.14m,
+                CommercialValueDiff = 0.03m
             },
             new()
             {
@@ -614,11 +693,15 @@ public static class MockTargetReportData
                 RatioName = "Komisyon Geliri Oranı",
                 TargetValue = 0.08m,
                 RegionValue = 0.078m,
+                RegionValueDiff = 0.003m,
                 BankValue = 0.075m,
+                BankValueDiff = 0m,
                 RetailValue = 0.082m,
                 KobiValue = 0.07m,
                 AgricultureValue = 0.06m,
-                CommercialValue = 0.09m
+                AgricultureValueDiff = 0.01m,
+                CommercialValue = 0.09m,
+                CommercialValueDiff = 0.015m
             }
         };
 
@@ -638,11 +721,15 @@ public static class MockTargetReportData
                 RatioName = "Şube Karlılık Oranı - Toplam",
                 TargetValue = 0.24m,
                 RegionValue = 0.235m,
+                RegionValueDiff = 0.005m,
                 BankValue = 0.23m,
+                BankValueDiff = 0m,
                 RetailValue = 0.22m,
                 KobiValue = 0.25m,
                 AgricultureValue = 0.19m,
-                CommercialValue = 0.27m
+                AgricultureValueDiff = 0.04m,
+                CommercialValue = 0.27m,
+                CommercialValueDiff = 0.04m
             },
             new()
             {
@@ -653,11 +740,15 @@ public static class MockTargetReportData
                 RatioName = "Net Faiz Marjı (Şube)",
                 TargetValue = 0.11m,
                 RegionValue = 0.108m,
+                RegionValueDiff = 0.001m,
                 BankValue = 0.107m,
+                BankValueDiff = 0m,
                 RetailValue = 0.10m,
                 KobiValue = 0.115m,
                 AgricultureValue = 0.09m,
-                CommercialValue = 0.12m
+                AgricultureValueDiff = 0.017m,
+                CommercialValue = 0.12m,
+                CommercialValueDiff = 0.013m
             },
             new()
             {
@@ -668,11 +759,15 @@ public static class MockTargetReportData
                 RatioName = "Komisyon Geliri Oranı (Şube)",
                 TargetValue = 0.07m,
                 RegionValue = 0.069m,
+                RegionValueDiff = 0.001m,
                 BankValue = 0.068m,
+                BankValueDiff = 0m,
                 RetailValue = 0.072m,
                 KobiValue = 0.065m,
                 AgricultureValue = 0.055m,
-                CommercialValue = 0.08m
+                AgricultureValueDiff = 0.013m,
+                CommercialValue = 0.08m,
+                CommercialValueDiff = 0.012m
             }
         };
 
@@ -693,14 +788,19 @@ public static class MockTargetReportData
                 TargetValue = 4200m,
                 RealizationBranchValue = 3980m,
                 RealizationRegionAverageValue = 3850m,
+                RealizationRegionAverageValueDiff = 250m,
                 RealizationBankAverageValue = 3600m,
+                RealizationBankAverageValueDiff = 0m,
                 HgBranchValue = 0.948m,
                 HgRegionAverageValue = 0.917m,
+                HgRegionAverageValueDiff = 0.06m,
                 HgBankAverageValue = 0.857m,
+                HgBankAverageValueDiff = 0m,
                 RetailValue = 1800m,
                 KobiValue = 1200m,
                 AgricultureValue = 450m,
                 CommercialValue = 380m,
+                CommercialValueDiff = 30m,
                 PartnerValue = 150m
             },
             new()
@@ -713,14 +813,19 @@ public static class MockTargetReportData
                 TargetValue = 2200m,
                 RealizationBranchValue = 2080m,
                 RealizationRegionAverageValue = 2000m,
+                RealizationRegionAverageValueDiff = 100m,
                 RealizationBankAverageValue = 1900m,
+                RealizationBankAverageValueDiff = 0m,
                 HgBranchValue = 0.945m,
                 HgRegionAverageValue = 0.909m,
+                HgRegionAverageValueDiff = 0.045m,
                 HgBankAverageValue = 0.864m,
+                HgBankAverageValueDiff = 0m,
                 RetailValue = 950m,
                 KobiValue = 620m,
                 AgricultureValue = 240m,
                 CommercialValue = 200m,
+                CommercialValueDiff = 15m,
                 PartnerValue = 70m
             },
             new()
@@ -733,14 +838,19 @@ public static class MockTargetReportData
                 TargetValue = 800m,
                 RealizationBranchValue = 760m,
                 RealizationRegionAverageValue = 720m,
+                RealizationRegionAverageValueDiff = 40m,
                 RealizationBankAverageValue = 680m,
+                RealizationBankAverageValueDiff = 0m,
                 HgBranchValue = 0.95m,
                 HgRegionAverageValue = 0.90m,
+                HgRegionAverageValueDiff = 0.05m,
                 HgBankAverageValue = 0.85m,
+                HgBankAverageValueDiff = 0m,
                 RetailValue = 350m,
                 KobiValue = 250m,
                 AgricultureValue = 80m,
                 CommercialValue = 60m,
+                CommercialValueDiff = 5m,
                 PartnerValue = 20m
             }
         };
@@ -803,13 +913,19 @@ public static class MockTargetReportData
                 ProductName = "Müşteri Sayısı - Toplam",
                 RealizationBranchValue = 1250m,
                 RealizationRegionAverageValue = 1180m,
+                RealizationRegionAverageValueDiff = 80m,
                 RealizationBankAverageValue = 1100m,
+                RealizationBankAverageValueDiff = 0m,
                 YtdNominalChangeBranchValue = 85m,
                 YtdNominalChangeRegionAverageValue = 72m,
+                YtdNominalChangeRegionAverageValueDiff = 13m,
                 YtdNominalChangeBankAverageValue = 65m,
+                YtdNominalChangeBankAverageValueDiff = 0m,
                 QtdNominalChangeBranchValue = 22m,
                 QtdNominalChangeRegionAverageValue = 18m,
-                QtdNominalChangeBankAverageValue = 15m
+                QtdNominalChangeRegionAverageValueDiff = 4m,
+                QtdNominalChangeBankAverageValue = 15m,
+                QtdNominalChangeBankAverageValueDiff = 0m
             },
             new()
             {
@@ -820,13 +936,19 @@ public static class MockTargetReportData
                 ProductName = "Bireysel Müşteri",
                 RealizationBranchValue = 980m,
                 RealizationRegionAverageValue = 920m,
+                RealizationRegionAverageValueDiff = 60m,
                 RealizationBankAverageValue = 860m,
+                RealizationBankAverageValueDiff = 0m,
                 YtdNominalChangeBranchValue = 62m,
                 YtdNominalChangeRegionAverageValue = 55m,
+                YtdNominalChangeRegionAverageValueDiff = 10m,
                 YtdNominalChangeBankAverageValue = 48m,
+                YtdNominalChangeBankAverageValueDiff = 0m,
                 QtdNominalChangeBranchValue = 18m,
                 QtdNominalChangeRegionAverageValue = 14m,
-                QtdNominalChangeBankAverageValue = 12m
+                QtdNominalChangeRegionAverageValueDiff = 3m,
+                QtdNominalChangeBankAverageValue = 12m,
+                QtdNominalChangeBankAverageValueDiff = 0m
             },
             new()
             {
@@ -837,13 +959,19 @@ public static class MockTargetReportData
                 ProductName = "Kurumsal Müşteri",
                 RealizationBranchValue = 270m,
                 RealizationRegionAverageValue = 260m,
+                RealizationRegionAverageValueDiff = 20m,
                 RealizationBankAverageValue = 240m,
+                RealizationBankAverageValueDiff = 0m,
                 YtdNominalChangeBranchValue = 23m,
                 YtdNominalChangeRegionAverageValue = 17m,
+                YtdNominalChangeRegionAverageValueDiff = 3m,
                 YtdNominalChangeBankAverageValue = 17m,
+                YtdNominalChangeBankAverageValueDiff = 0m,
                 QtdNominalChangeBranchValue = 4m,
                 QtdNominalChangeRegionAverageValue = 4m,
-                QtdNominalChangeBankAverageValue = 3m
+                QtdNominalChangeRegionAverageValueDiff = 1m,
+                QtdNominalChangeBankAverageValue = 3m,
+                QtdNominalChangeBankAverageValueDiff = 0m
             }
         };
 
@@ -863,18 +991,26 @@ public static class MockTargetReportData
                 ProductName = "Hacim - Toplam",
                 RealizationBranchValue = 125_000_000m,
                 RealizationRegionAverageValue = 118_000_000m,
+                RealizationRegionAverageValueDiff = 15_000_000m,
                 RealizationBankAverageValue = 110_000_000m,
+                RealizationBankAverageValueDiff = 0m,
                 TargetValue = 120_000_000m,
                 HgRate = 1.042m,
                 NetGrowthBranchValue = 8_500_000m,
                 NetGrowthRegionAverageValue = 7_200_000m,
+                NetGrowthRegionAverageValueDiff = 1_300_000m,
                 NetGrowthBankAverageValue = 6_500_000m,
+                NetGrowthBankAverageValueDiff = 0m,
                 YtdBranchValue = 1_250_000_000m,
                 YtdRegionValue = 1_180_000_000m,
+                YtdRegionValueDiff = 150_000_000m,
                 YtdBankValue = 1_100_000_000m,
+                YtdBankValueDiff = 0m,
                 QtdBranchValue = 380_000_000m,
                 QtdRegionValue = 355_000_000m,
-                QtdBankValue = 330_000_000m
+                QtdRegionValueDiff = 50_000_000m,
+                QtdBankValue = 330_000_000m,
+                QtdBankValueDiff = 0m
             },
             new()
             {
@@ -885,18 +1021,26 @@ public static class MockTargetReportData
                 ProductName = "Mevduat",
                 RealizationBranchValue = 85_000_000m,
                 RealizationRegionAverageValue = 80_000_000m,
+                RealizationRegionAverageValueDiff = 10_000_000m,
                 RealizationBankAverageValue = 75_000_000m,
+                RealizationBankAverageValueDiff = 0m,
                 TargetValue = 82_000_000m,
                 HgRate = 1.037m,
                 NetGrowthBranchValue = 5_200_000m,
                 NetGrowthRegionAverageValue = 4_500_000m,
+                NetGrowthRegionAverageValueDiff = 700_000m,
                 NetGrowthBankAverageValue = 4_000_000m,
+                NetGrowthBankAverageValueDiff = 0m,
                 YtdBranchValue = 850_000_000m,
                 YtdRegionValue = 800_000_000m,
+                YtdRegionValueDiff = 100_000_000m,
                 YtdBankValue = 750_000_000m,
+                YtdBankValueDiff = 0m,
                 QtdBranchValue = 258_000_000m,
                 QtdRegionValue = 242_000_000m,
-                QtdBankValue = 228_000_000m
+                QtdRegionValueDiff = 30_000_000m,
+                QtdBankValue = 228_000_000m,
+                QtdBankValueDiff = 0m
             },
             new()
             {
@@ -907,18 +1051,26 @@ public static class MockTargetReportData
                 ProductName = "Kredi",
                 RealizationBranchValue = 40_000_000m,
                 RealizationRegionAverageValue = 38_000_000m,
+                RealizationRegionAverageValueDiff = 5_000_000m,
                 RealizationBankAverageValue = 35_000_000m,
+                RealizationBankAverageValueDiff = 0m,
                 TargetValue = 38_000_000m,
                 HgRate = 1.053m,
                 NetGrowthBranchValue = 3_300_000m,
                 NetGrowthRegionAverageValue = 2_700_000m,
+                NetGrowthRegionAverageValueDiff = 600_000m,
                 NetGrowthBankAverageValue = 2_500_000m,
+                NetGrowthBankAverageValueDiff = 0m,
                 YtdBranchValue = 400_000_000m,
                 YtdRegionValue = 380_000_000m,
+                YtdRegionValueDiff = 50_000_000m,
                 YtdBankValue = 350_000_000m,
+                YtdBankValueDiff = 0m,
                 QtdBranchValue = 122_000_000m,
                 QtdRegionValue = 113_000_000m,
-                QtdBankValue = 102_000_000m
+                QtdRegionValueDiff = 20_000_000m,
+                QtdBankValue = 102_000_000m,
+                QtdBankValueDiff = 0m
             }
         };
 
@@ -938,13 +1090,18 @@ public static class MockTargetReportData
                 Description = "Toplam Karlılık",
                 TargetValue = 5000m,
                 RealizationRegionValue = 4800m,
+                RealizationRegionValueDiff = 200m,
                 RealizationBankAverageValue = 4600m,
+                RealizationBankAverageValueDiff = 0m,
                 HgRegionValue = 0.96m,
+                HgRegionValueDiff = 0.04m,
                 HgBankAverageValue = 0.92m,
+                HgBankAverageValueDiff = 0m,
                 RetailValue = 2200m,
                 KobiValue = 1200m,
                 AgricultureValue = 400m,
                 CommercialValue = 800m,
+                CommercialValueDiff = 50m,
                 PartnerValue = 200m
             },
             new()
@@ -956,13 +1113,18 @@ public static class MockTargetReportData
                 Description = "Net Faiz Geliri",
                 TargetValue = 2800m,
                 RealizationRegionValue = 2700m,
+                RealizationRegionValueDiff = 100m,
                 RealizationBankAverageValue = 2600m,
+                RealizationBankAverageValueDiff = 0m,
                 HgRegionValue = 0.96m,
+                HgRegionValueDiff = 0.03m,
                 HgBankAverageValue = 0.93m,
+                HgBankAverageValueDiff = 0m,
                 RetailValue = 1300m,
                 KobiValue = 700m,
                 AgricultureValue = 250m,
                 CommercialValue = 400m,
+                CommercialValueDiff = 25m,
                 PartnerValue = 50m
             },
             new()
@@ -974,13 +1136,18 @@ public static class MockTargetReportData
                 Description = "Komisyon Geliri",
                 TargetValue = 1200m,
                 RealizationRegionValue = 1150m,
+                RealizationRegionValueDiff = 50m,
                 RealizationBankAverageValue = 1100m,
+                RealizationBankAverageValueDiff = 0m,
                 HgRegionValue = 0.96m,
+                HgRegionValueDiff = 0.04m,
                 HgBankAverageValue = 0.92m,
+                HgBankAverageValueDiff = 0m,
                 RetailValue = 600m,
                 KobiValue = 300m,
                 AgricultureValue = 100m,
                 CommercialValue = 250m,
+                CommercialValueDiff = 15m,
                 PartnerValue = 100m
             }
         };
@@ -1001,11 +1168,17 @@ public static class MockTargetReportData
                 Description = "Spread Yönetimi - Toplam",
                 SpreadValue = 0.035m,
                 RatioRegionValue = 0.034m,
+                RatioRegionValueDiff = 0.002m,
                 RatioBankAverageValue = 0.032m,
+                RatioBankAverageValueDiff = 0m,
                 NetReturnRegionValue = 420m,
+                NetReturnRegionValueDiff = 40m,
                 NetReturnBankAverageValue = 380m,
+                NetReturnBankAverageValueDiff = 0m,
                 NetReturnHgRegionValue = 0.97m,
-                NetReturnHgBankAverageValue = 0.92m
+                NetReturnHgRegionValueDiff = 0.05m,
+                NetReturnHgBankAverageValue = 0.92m,
+                NetReturnHgBankAverageValueDiff = 0m
             },
             new()
             {
@@ -1016,11 +1189,17 @@ public static class MockTargetReportData
                 Description = "Mevduat Spread",
                 SpreadValue = 0.018m,
                 RatioRegionValue = 0.0175m,
+                RatioRegionValueDiff = 0.001m,
                 RatioBankAverageValue = 0.0165m,
+                RatioBankAverageValueDiff = 0m,
                 NetReturnRegionValue = 210m,
+                NetReturnRegionValueDiff = 15m,
                 NetReturnBankAverageValue = 195m,
+                NetReturnBankAverageValueDiff = 0m,
                 NetReturnHgRegionValue = 0.97m,
-                NetReturnHgBankAverageValue = 0.92m
+                NetReturnHgRegionValueDiff = 0.05m,
+                NetReturnHgBankAverageValue = 0.92m,
+                NetReturnHgBankAverageValueDiff = 0m
             },
             new()
             {
@@ -1031,11 +1210,17 @@ public static class MockTargetReportData
                 Description = "Kredi Spread",
                 SpreadValue = 0.017m,
                 RatioRegionValue = 0.0165m,
+                RatioRegionValueDiff = 0.001m,
                 RatioBankAverageValue = 0.0155m,
+                RatioBankAverageValueDiff = 0m,
                 NetReturnRegionValue = 210m,
+                NetReturnRegionValueDiff = 25m,
                 NetReturnBankAverageValue = 185m,
+                NetReturnBankAverageValueDiff = 0m,
                 NetReturnHgRegionValue = 0.97m,
-                NetReturnHgBankAverageValue = 0.91m
+                NetReturnHgRegionValueDiff = 0.06m,
+                NetReturnHgBankAverageValue = 0.91m,
+                NetReturnHgBankAverageValueDiff = 0m
             }
         };
 
@@ -1056,13 +1241,19 @@ public static class MockTargetReportData
                 SpreadValue = 0.036m,
                 RatioBranchValue = 0.035m,
                 RatioRegionAverageValue = 0.034m,
+                RatioRegionAverageValueDiff = 0.002m,
                 RatioBankAverageValue = 0.032m,
+                RatioBankAverageValueDiff = 0m,
                 NetReturnBranchValue = 435m,
                 NetReturnRegionAverageValue = 420m,
+                NetReturnRegionAverageValueDiff = 55m,
                 NetReturnBankAverageValue = 380m,
+                NetReturnBankAverageValueDiff = 0m,
                 NetReturnHgBranchValue = 0.98m,
                 NetReturnHgRegionAverageValue = 0.97m,
-                NetReturnHgBankAverageValue = 0.92m
+                NetReturnHgRegionAverageValueDiff = 0.06m,
+                NetReturnHgBankAverageValue = 0.92m,
+                NetReturnHgBankAverageValueDiff = 0m
             },
             new()
             {
@@ -1074,13 +1265,19 @@ public static class MockTargetReportData
                 SpreadValue = 0.019m,
                 RatioBranchValue = 0.0185m,
                 RatioRegionAverageValue = 0.0175m,
+                RatioRegionAverageValueDiff = 0.001m,
                 RatioBankAverageValue = 0.0165m,
+                RatioBankAverageValueDiff = 0m,
                 NetReturnBranchValue = 220m,
                 NetReturnRegionAverageValue = 210m,
+                NetReturnRegionAverageValueDiff = 25m,
                 NetReturnBankAverageValue = 195m,
+                NetReturnBankAverageValueDiff = 0m,
                 NetReturnHgBranchValue = 0.98m,
                 NetReturnHgRegionAverageValue = 0.97m,
-                NetReturnHgBankAverageValue = 0.92m
+                NetReturnHgRegionAverageValueDiff = 0.06m,
+                NetReturnHgBankAverageValue = 0.92m,
+                NetReturnHgBankAverageValueDiff = 0m
             },
             new()
             {
@@ -1092,13 +1289,19 @@ public static class MockTargetReportData
                 SpreadValue = 0.017m,
                 RatioBranchValue = 0.0165m,
                 RatioRegionAverageValue = 0.0165m,
+                RatioRegionAverageValueDiff = 0.001m,
                 RatioBankAverageValue = 0.0155m,
+                RatioBankAverageValueDiff = 0m,
                 NetReturnBranchValue = 215m,
                 NetReturnRegionAverageValue = 210m,
+                NetReturnRegionAverageValueDiff = 30m,
                 NetReturnBankAverageValue = 185m,
+                NetReturnBankAverageValueDiff = 0m,
                 NetReturnHgBranchValue = 0.98m,
                 NetReturnHgRegionAverageValue = 0.97m,
-                NetReturnHgBankAverageValue = 0.91m
+                NetReturnHgRegionAverageValueDiff = 0.06m,
+                NetReturnHgBankAverageValue = 0.91m,
+                NetReturnHgBankAverageValueDiff = 0m
             }
         };
 
