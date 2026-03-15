@@ -17,12 +17,15 @@ function formatNumber(value) {
   return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(value);
 }
 
-// ===== Filter Data (shared across pages) =====
-var _regionFilters = [];
-var _branchFilters = [];
+// ===== Filter Data (shared across pages, cached in sessionStorage) =====
+var _regionFilters = JSON.parse(sessionStorage.getItem('_regionFilters') || '[]');
+var _branchFilters = JSON.parse(sessionStorage.getItem('_branchFilters') || '[]');
 
 function loadRegionFilters(callback) {
   if (_regionFilters.length > 0) {
+      if (_regionFilters.length === 1) {
+          applySingleFilter('.filter-dropdown-wrapper', 'region', _regionFilters[0]);
+      }
       if (callback) callback(_regionFilters);
       return;
   }
@@ -33,6 +36,12 @@ function loadRegionFilters(callback) {
       data: JSON.stringify({ sessionId: '1' }),
       success: function (data) {
           _regionFilters = data;
+          console.log("gel buraya");
+          
+          sessionStorage.setItem('_regionFilters', JSON.stringify(data));
+          if (data.length === 1) {
+              applySingleFilter('.filter-dropdown-wrapper', 'region', data[0]);
+          }
           if (callback) callback(data);
       }
   });
@@ -40,6 +49,9 @@ function loadRegionFilters(callback) {
 
 function loadBranchFilters(callback) {
   if (_branchFilters.length > 0) {
+      if (_branchFilters.length === 1) {
+          applySingleFilter('.filter-dropdown-wrapper', 'branch', _branchFilters[0]);
+      }
       if (callback) callback(_branchFilters);
       return;
   }
@@ -50,8 +62,27 @@ function loadBranchFilters(callback) {
       data: JSON.stringify({ sessionId: '1' }),
       success: function (data) {
           _branchFilters = data;
+          sessionStorage.setItem('_branchFilters', JSON.stringify(data));
+          if (data.length === 1) {
+              applySingleFilter('.filter-dropdown-wrapper', 'branch', data[0]);
+          }
           if (callback) callback(data);
       }
+  });
+}
+
+function applySingleFilter(wrapperSelector, type, item) {
+  $(wrapperSelector).each(function () {
+      var $wrapper = $(this);
+      var $list = $wrapper.find('.dropdown-list');
+      var listId = $list.attr('id') || '';
+      var isRegion = type === 'region' && (listId.indexOf('Bolge') > -1 || listId.indexOf('Region') > -1);
+      var isBranch = type === 'branch' && (listId.indexOf('Sube') > -1 || listId.indexOf('Branch') > -1);
+
+      if (!isRegion && !isBranch) return;
+
+      $wrapper.find('.filter-label').text(item.Name);
+      $wrapper.find('.filter-dropdown').addClass('disabled');
   });
 }
 
@@ -64,24 +95,32 @@ function findRegion(code) {
 
 function renderRegionList(listSelector, selectedCode) {
   var $list = $(listSelector);
+  var isSingle = _regionFilters.length === 1;
   $list.empty();
-  var tumuClass = !selectedCode ? ' selected' : '';
-  $list.append('<div class="dropdown-item tumu-item' + tumuClass + '" data-code="">Tümü</div>');
+  if (!isSingle) {
+      var tumuClass = !selectedCode ? ' selected' : '';
+      $list.append('<div class="dropdown-item tumu-item' + tumuClass + '" data-code="">Tümü</div>');
+  }
   _regionFilters.forEach(function (r) {
-      var cls = (selectedCode && selectedCode === r.Code) ? ' selected' : '';
+      var cls = (isSingle || (selectedCode && selectedCode === r.Code)) ? ' selected' : '';
       $list.append('<div class="dropdown-item' + cls + '" data-code="' + r.Code + '">' + r.Name + '</div>');
   });
+  return isSingle ? _regionFilters[0] : null;
 }
 
 function renderBranchList(listSelector, selectedCode) {
   var $list = $(listSelector);
+  var isSingle = _branchFilters.length === 1;
   $list.empty();
-  var tumuClass = !selectedCode ? ' selected' : '';
-  $list.append('<div class="dropdown-item tumu-item' + tumuClass + '" data-code="">Tümü</div>');
+  if (!isSingle) {
+      var tumuClass = !selectedCode ? ' selected' : '';
+      $list.append('<div class="dropdown-item tumu-item' + tumuClass + '" data-code="">Tümü</div>');
+  }
   _branchFilters.forEach(function (b) {
-      var cls = (selectedCode && selectedCode === b.Code) ? ' selected' : '';
+      var cls = (isSingle || (selectedCode && selectedCode === b.Code)) ? ' selected' : '';
       $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.Code + '" data-region="' + b.RegionCode + '">' + b.Name + '</div>');
   });
+  return isSingle ? _branchFilters[0] : null;
 }
 
 // ===== Dropdown Panel =====
@@ -91,6 +130,7 @@ $(document).ready(function () {
   // Dropdown open/close
   $(document).on('click', '.filter-dropdown', function (e) {
       e.stopPropagation();
+      if ($(this).hasClass('disabled')) return;
       var $panel = $(this).siblings('.dropdown-panel');
       var wasOpen = $panel.hasClass('open');
       $('.dropdown-panel').removeClass('open');
