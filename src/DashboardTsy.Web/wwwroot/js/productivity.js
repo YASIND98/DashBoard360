@@ -354,16 +354,16 @@ function renderVolumeRegionTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.RealizationRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
+        html += '<td>' + item.RealizationRegionValue + formatDiff(item.RealizationRegionDiff) + '</td>';
+        html += '<td>' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageDiff) + '</td>';
+        html += '<td>' + item.TargetValue + '</td>';
         html += '<td>' + item.HgRate + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthBankAverageValue) + '</td>';
-        html += '<td>' + item.YtdRegionValue + '</td>';
-        html += '<td>' + item.YtdBankAverageValue + '</td>';
-        html += '<td>' + item.QtdRegionValue + '</td>';
-        html += '<td>' + item.QtdBankAverageValue + '</td>';
+        html += '<td>' + item.NetGrowthRegionValue + formatDiff(item.NetGrowthRegionDiff) + '</td>';
+        html += '<td>' + item.NetGrowthBankAverageValue + formatDiff(item.NetGrowthBankAverageDiff) + '</td>';
+        html += '<td>' + item.YtdRegionValue + formatDiff(item.YtdRegionDiff) + '</td>';
+        html += '<td>' + item.YtdBankAverageValue + formatDiff(item.YtdBankAverageDiff) + '</td>';
+        html += '<td>' + item.QtdRegionValue + formatDiff(item.QtdRegionDiff) + '</td>';
+        html += '<td>' + item.QtdBankAverageValue + formatDiff(item.QtdBankAverageDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -425,20 +425,20 @@ function renderVolumeBranchTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
+        html += '<td>' + item.RealizationBranchValue + '</td>';
+        html += '<td>' + item.RealizationRegionAverageValue + formatDiff(item.RealizationRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.TargetValue + '</td>';
         html += '<td>' + item.HgRate + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthBankAverageValue) + '</td>';
+        html += '<td>' + item.NetGrowthBranchValue + '</td>';
+        html += '<td>' + item.NetGrowthRegionAverageValue + formatDiff(item.NetGrowthRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.NetGrowthBankAverageValue + formatDiff(item.NetGrowthBankAverageValueDiff) + '</td>';
         html += '<td>' + item.YtdBranchValue + '</td>';
-        html += '<td>' + item.YtdRegionValue + '</td>';
-        html += '<td>' + item.YtdBankValue + '</td>';
+        html += '<td>' + item.YtdRegionValue + formatDiff(item.YtdRegionValueDiff) + '</td>';
+        html += '<td>' + item.YtdBankValue + formatDiff(item.YtdBankValueDiff) + '</td>';
         html += '<td>' + item.QtdBranchValue + '</td>';
-        html += '<td>' + item.QtdRegionValue + '</td>';
-        html += '<td>' + item.QtdBankValue + '</td>';
+        html += '<td>' + item.QtdRegionValue + formatDiff(item.QtdRegionValueDiff) + '</td>';
+        html += '<td>' + item.QtdBankValue + formatDiff(item.QtdBankValueDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -500,12 +500,12 @@ function renderCountCustomerRegionTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.RealizationRegion) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankAverage) + '</td>';
-        html += '<td>' + item.YtdChangeRegion + '</td>';
-        html += '<td>' + item.YtdChangeBankAverage + '</td>';
-        html += '<td>' + item.QtdChangeRegion + '</td>';
-        html += '<td>' + item.QtdChangeBankAverage + '</td>';
+        html += '<td>' + item.RealizationRegion + formatDiff(item.RealizationRegionDiff) + '</td>';
+        html += '<td>' + item.RealizationBankAverage + formatDiff(item.RealizationBankAverageDiff) + '</td>';
+        html += '<td>' + item.YtdChangeRegion + formatDiff(item.YtdChangeRegionDiff) + '</td>';
+        html += '<td>' + item.YtdChangeBankAverage + formatDiff(item.YtdChangeBankAverageDiff) + '</td>';
+        html += '<td>' + item.QtdChangeRegion + formatDiff(item.QtdChangeRegionDiff) + '</td>';
+        html += '<td>' + item.QtdChangeBankAverage + formatDiff(item.QtdChangeBankAverageDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -567,15 +567,15 @@ function renderCountCustomerBranchTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankAverageValue) + '</td>';
+        html += '<td>' + item.RealizationBranchValue + '</td>';
+        html += '<td>' + item.RealizationRegionAverageValue + formatDiff(item.RealizationRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
         html += '<td>' + item.YtdNominalChangeBranchValue + '</td>';
-        html += '<td>' + item.YtdNominalChangeRegionAverageValue + '</td>';
-        html += '<td>' + item.YtdNominalChangeBankAverageValue + '</td>';
+        html += '<td>' + item.YtdNominalChangeRegionAverageValue + formatDiff(item.YtdNominalChangeRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.YtdNominalChangeBankAverageValue + formatDiff(item.YtdNominalChangeBankAverageValueDiff) + '</td>';
         html += '<td>' + item.QtdNominalChangeBranchValue + '</td>';
-        html += '<td>' + item.QtdNominalChangeRegionAverageValue + '</td>';
-        html += '<td>' + item.QtdNominalChangeBankAverageValue + '</td>';
+        html += '<td>' + item.QtdNominalChangeRegionAverageValue + formatDiff(item.QtdNominalChangeRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.QtdNominalChangeBankAverageValue + formatDiff(item.QtdNominalChangeBankAverageValueDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -637,12 +637,12 @@ function renderCountCardPosBranchTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.CurrentMonthBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.CurrentMonthRegionAverage) + '</td>';
-        html += '<td>' + formatNumber(item.CurrentMonthBankAverage) + '</td>';
-        html += '<td>' + item.ThreeMonthHgBranch + '</td>';
-        html += '<td>' + item.ThreeMonthHgRegionAverage + '</td>';
-        html += '<td>' + item.ThreeMonthHgBankAverage + '</td>';
+        html += '<td>' + item.CurrentPeriodBranchValue + '</td>';
+        html += '<td>' + item.CurrentPeriodRegionAverageValue + formatDiff(item.CurrentPeriodRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.CurrentPeriodBankAverageValue + formatDiff(item.CurrentPeriodBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.ThreeMonthHgBranchValue + '</td>';
+        html += '<td>' + item.ThreeMonthHgRegionAverageValue + formatDiff(item.ThreeMonthHgRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.ThreeMonthHgBankAverageValue + formatDiff(item.ThreeMonthHgBankAverageValueDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -704,10 +704,10 @@ function renderCountCardPosRegionTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.CurrentMonthRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.CurrentMonthBankAverage) + '</td>';
+        html += '<td>' + item.CurrentMonthRegionValue + '</td>';
+        html += '<td>' + item.CurrentMonthBankAverage + formatDiff(item.CurrentMonthBankAverageDiff) + '</td>';
         html += '<td>' + item.ThreeMonthHgRegion + '</td>';
-        html += '<td>' + item.ThreeMonthHgBankAverage + '</td>';
+        html += '<td>' + item.ThreeMonthHgBankAverage + formatDiff(item.ThreeMonthHgBankAverageDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -769,16 +769,16 @@ function renderProfitTotalRegionTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.HgRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.HgBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.RetailValue) + '</td>';
-        html += '<td>' + formatNumber(item.KobiValue) + '</td>';
-        html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
-        html += '<td>' + formatNumber(item.CommercialValue) + '</td>';
-        html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
+        html += '<td>' + item.TargetValue + '</td>';
+        html += '<td>' + item.RealizationRegionValue + formatDiff(item.RealizationRegionValueDiff) + '</td>';
+        html += '<td>' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.HgRegionValue + formatDiff(item.HgRegionValueDiff) + '</td>';
+        html += '<td>' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.RetailValue + '</td>';
+        html += '<td>' + item.KobiValue + '</td>';
+        html += '<td>' + item.AgricultureValue + '</td>';
+        html += '<td>' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
+        html += '<td>' + item.PartnerValue + '</td>';
         html += '</tr>';
     });
 
@@ -863,13 +863,13 @@ function renderProfitRatioRegionTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + formatNumber(item.RegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.BankValue) + '</td>';
-        html += '<td>' + formatNumber(item.RetailValue) + '</td>';
-        html += '<td>' + formatNumber(item.KobiValue) + '</td>';
-        html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
-        html += '<td>' + formatNumber(item.CommercialValue) + '</td>';
+        html += '<td>' + item.TargetValue + '</td>';
+        html += '<td>' + item.RegionValue + formatDiff(item.RegionValueDiff) + '</td>';
+        html += '<td>' + item.BankValue + formatDiff(item.BankValueDiff) + '</td>';
+        html += '<td>' + item.RetailValue + '</td>';
+        html += '<td>' + item.KobiValue + '</td>';
+        html += '<td>' + item.AgricultureValue + formatDiff(item.AgricultureValueDiff) + '</td>';
+        html += '<td>' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -931,13 +931,13 @@ function renderProfitRatioBranchTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + formatNumber(item.RegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.BankValue) + '</td>';
-        html += '<td>' + formatNumber(item.RetailValue) + '</td>';
-        html += '<td>' + formatNumber(item.KobiValue) + '</td>';
-        html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
-        html += '<td>' + formatNumber(item.CommercialValue) + '</td>';
+        html += '<td>' + item.TargetValue + '</td>';
+        html += '<td>' + item.RegionValue + formatDiff(item.RegionValueDiff) + '</td>';
+        html += '<td>' + item.BankValue + formatDiff(item.BankValueDiff) + '</td>';
+        html += '<td>' + item.RetailValue + '</td>';
+        html += '<td>' + item.KobiValue + '</td>';
+        html += '<td>' + item.AgricultureValue + formatDiff(item.AgricultureValueDiff) + '</td>';
+        html += '<td>' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -998,18 +998,18 @@ function renderProfitTotalBranchTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.HgBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.HgRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.HgBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.RetailValue) + '</td>';
-        html += '<td>' + formatNumber(item.KobiValue) + '</td>';
-        html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
-        html += '<td>' + formatNumber(item.CommercialValue) + '</td>';
-        html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
+        html += '<td>' + item.TargetValue + '</td>';
+        html += '<td>' + item.RealizationBranchValue + '</td>';
+        html += '<td>' + item.RealizationRegionAverageValue + formatDiff(item.RealizationRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.HgBranchValue + formatDiff(item.HgBranchValueDiff) + '</td>';
+        html += '<td>' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.RetailValue + '</td>';
+        html += '<td>' + item.KobiValue + '</td>';
+        html += '<td>' + item.AgricultureValue + '</td>';
+        html += '<td>' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
+        html += '<td>' + item.PartnerValue + '</td>';
         html += '</tr>';
     });
 
@@ -1070,13 +1070,13 @@ function renderProfitSpreadManagementRegionTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.SpreadValue) + '</td>';
-        html += '<td>' + formatNumber(item.RatioRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.RatioBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnHgRegionValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnHgBankAverageValue) + '</td>';
+        html += '<td>' + item.SpreadValue + '</td>';
+        html += '<td>' + item.RatioRegionValue + '</td>';
+        html += '<td>' + item.RatioBankAverageValue + '</td>';
+        html += '<td>' + item.NetReturnRegionValue + '</td>';
+        html += '<td>' + item.NetReturnBankAverageValue + '</td>';
+        html += '<td>' + item.NetReturnHgRegionValue + '</td>';
+        html += '<td>' + item.NetReturnHgBankAverageValue + '</td>';
         html += '</tr>';
     });
 
@@ -1137,16 +1137,16 @@ function renderProfitSpreadManagementBranchTable(items) {
         var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.SpreadValue) + '</td>';
-        html += '<td>' + formatNumber(item.RatioBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.RatioRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.RatioBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnBankAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnHgBranchValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnHgRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetReturnHgBankAverageValue) + '</td>';
+        html += '<td>' + item.SpreadValue + '</td>';
+        html += '<td>' + item.RatioBranchValue + '</td>';
+        html += '<td>' + item.RatioRegionAverageValue + formatDiff(item.RatioRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.RatioBankAverageValue + formatDiff(item.RatioBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.NetReturnBranchValue + '</td>';
+        html += '<td>' + item.NetReturnRegionAverageValue + formatDiff(item.NetReturnRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.NetReturnBankAverageValue + formatDiff(item.NetReturnBankAverageValueDiff) + '</td>';
+        html += '<td>' + item.NetReturnHgBranchValue + '</td>';
+        html += '<td>' + item.NetReturnHgRegionAverageValue + formatDiff(item.NetReturnHgRegionAverageValueDiff) + '</td>';
+        html += '<td>' + item.NetReturnHgBankAverageValue + formatDiff(item.NetReturnHgBankAverageValueDiff) + '</td>';
         html += '</tr>';
     });
 
@@ -1186,4 +1186,11 @@ function updateProductivityStripes() {
         $lastVisible = $tr;
     });
     if ($lastVisible) $lastVisible.addClass('last-visible-row');
+}
+
+function formatDiff(val) {
+    if (val == null) return '';
+    var cls = val < 0 ? 'negative' : 'positive';
+    var prefix = val > 0 ? '+' : '';
+    return '<div class="diff-value ' + cls + '">' + prefix + val + '</div>';
 }

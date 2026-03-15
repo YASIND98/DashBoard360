@@ -156,15 +156,30 @@
 
         // ===== Filter Lists =====
         function renderRegionDropdown() {
-            renderRegionList('#yieldBolgeList', selectedRegion ? selectedRegion.code : null);
+            return renderRegionList('#yieldBolgeList', selectedRegion ? selectedRegion.code : null);
         }
 
         function renderBranchDropdown() {
-            renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null);
+            return renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null);
         }
 
-        loadRegionFilters(function () { renderRegionDropdown(); });
-        loadBranchFilters(function () { renderBranchDropdown(); });
+        loadRegionFilters(function () {
+            var single = renderRegionDropdown();
+            if (single) {
+                selectedRegion = { code: single.Code, name: single.Name };
+            }
+            loadBranchFilters(function () {
+                var singleBranch = renderBranchDropdown();
+                if (singleBranch) {
+                    selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+                }
+                if (selectedRegion || selectedBranch) {
+                    updateUI();
+                } else {
+                    updateYieldTable();
+                }
+            });
+        });
 
         // ===== Region Selection =====
         $(document).on('click', '#yieldBolgeList .dropdown-item', function () {
@@ -245,6 +260,12 @@
         }
 
         // ===== Breadcrumb =====
+        function crumb(text, action, isSingle) {
+            var cls = isSingle ? ' disabled' : '';
+            var attr = !isSingle && action ? ' data-breadcrumb="' + action + '"' : '';
+            return '<span class="breadcrumb-item' + cls + '"' + attr + '>' + text + '</span>';
+        }
+
         function updateBreadcrumb() {
             if (!selectedRegion && !selectedBranch) {
                 $('#breadcrumbBar').hide();
@@ -252,16 +273,17 @@
             }
 
             $('#breadcrumbBar').show();
-            var html = '<span class="breadcrumb-item" data-breadcrumb="allRegions">Tüm Bölgeler</span>';
+            var singleRegion = _regionFilters.length === 1;
+            var parts = [crumb('Tüm Bölgeler', 'allRegions', singleRegion)];
+
             if (selectedRegion) {
-                html += '<span class="breadcrumb-separator">›</span>';
-                html += '<span class="breadcrumb-item" data-breadcrumb="region">' + selectedRegion.name + ' Bölgesi</span>';
+                parts.push(crumb(selectedRegion.name + ' Bölgesi', 'region', singleRegion));
             }
             if (selectedBranch) {
-                html += '<span class="breadcrumb-separator">›</span>';
-                html += '<span class="breadcrumb-item">' + selectedBranch.name + '</span>';
+                parts.push(crumb(selectedBranch.name + ' Şubesi', null, true));
             }
-            $('#yieldBreadcrumb').html(html);
+
+            $('#yieldBreadcrumb').html(parts.join('<span class="breadcrumb-separator">›</span>'));
         }
 
         $(document).on('click', '[data-breadcrumb="allRegions"]', function () {
@@ -294,8 +316,8 @@
             }
 
             var url = isBranch
-                ? '/Home/GetProductivityBranchScoreCardReport'
-                : '/Home/GetProductivityRegionScoreCardReport';
+                ? '/ProductivityReport/GetProductivityBranchScoreCardReport'
+                : '/ProductivityReport/GetProductivityRegionScoreCardReport';
 
             var payload = isBranch
                 ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: new Date().toISOString() }
@@ -463,8 +485,6 @@
             var match = $tr.attr('class').match(/depth-(\d+)/);
             return match ? parseInt(match[1]) : 0;
         }
-
-        updateYieldTable();
     });
     </script>
 }
