@@ -1,3 +1,4 @@
+using System.Globalization;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
 
@@ -24,6 +25,49 @@ public static class MockProductivityReportData
             new() { Code = "1004", Name = "Antalya - Merkez", RegionCode = "4" },
             new() { Code = "1005", Name = "Trabzon - Merkez", RegionCode = "5" }
         };
+
+    public static IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request)
+    {
+        var culture = CultureInfo.GetCultureInfo("tr-TR");
+        var baseDate = request.ReportDate == default ? DateTime.Today : request.ReportDate.Date;
+
+        // Son üç ay: ReportDate, -1 ay, -2 ay
+        string MonthLabel(DateTime d) => d.ToString("MMMM yyyy", culture);
+
+        var month1 = MonthLabel(baseDate);
+        var month2 = MonthLabel(baseDate.AddMonths(-1));
+        var month3 = MonthLabel(baseDate.AddMonths(-2));
+
+        // FilterType'a göre ana başlığın Region/Branch olması dışında yapı aynı
+        var isBranch = request.FilterType == 2;
+        var mainTitle = isBranch ? "Şube Müdürü Skor Kartı" : "Bölge Müdürü Skor Kartı";
+        var rolesTitle = isBranch ? "Şube Rolleri Skor Kartı" : "Bölge Rolleri Skor Kartı";
+
+        var headers = new List<GetProductivityScoreCardReportHeaderItem>
+        {
+            new() { Id = 1,  HeaderName = mainTitle,      ParentId = 0,  OrderNo = 1 },
+            new() { Id = 2,  HeaderName = "Adı Soyadı",   ParentId = 1,  OrderNo = 2 },
+            new() { Id = 3,  HeaderName = month1,         ParentId = 1,  OrderNo = 3 },
+            new() { Id = 4,  HeaderName = month2,         ParentId = 1,  OrderNo = 4 },
+            new() { Id = 5,  HeaderName = month3,         ParentId = 1,  OrderNo = 5 },
+
+            new() { Id = 6,  HeaderName = rolesTitle,     ParentId = 0,  OrderNo = 6 },
+            new() { Id = 7,  HeaderName = "Kurumsal",     ParentId = 6,  OrderNo = 7 },
+            new() { Id = 8,  HeaderName = "Ticari",       ParentId = 6,  OrderNo = 8 },
+            new() { Id = 9,  HeaderName = "KBİ",          ParentId = 6,  OrderNo = 9 },
+            new() { Id = 10, HeaderName = "OBİ",          ParentId = 6,  OrderNo = 10 },
+            new() { Id = 11, HeaderName = "Tarım",        ParentId = 6,  OrderNo = 11 },
+            new() { Id = 12, HeaderName = "Kitle",        ParentId = 6,  OrderNo = 12 },
+            new() { Id = 13, HeaderName = "Afili",        ParentId = 6,  OrderNo = 13 },
+            new() { Id = 14, HeaderName = "ÖB",           ParentId = 6,  OrderNo = 14 },
+
+            new() { Id = 15, HeaderName = "NPS",          ParentId = 0,  OrderNo = 15 },
+            new() { Id = 16, HeaderName = isBranch ? "Şube" : "Bölge", ParentId = 15, OrderNo = 16 },
+            new() { Id = 17, HeaderName = "Banka",        ParentId = 15, OrderNo = 17 }
+        };
+
+        return headers;
+    }
     public static IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
     {
         var tabs = new List<GetProductivityReportTabItem>
@@ -1083,24 +1127,24 @@ public static class MockProductivityReportData
     public static IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)
     {
         // Çok basit, 2 seviyeli örnek header yapısı:
-        // [Genel Bilgiler] - parent
-        //   [Müşteri Adı]
-        //   [Şube Adı]
-        // [Performans] - parent
-        //   [Adet]
-        //   [Hacim]
-        //   [Karlılık]
+        // [Genel Bilgiler] - parent (sortable = false)
+        //   [Müşteri Adı]  (sortable = true)
+        //   [Şube Adı]     (sortable = true)
+        // [Performans] - parent (sortable = false)
+        //   [Adet]         (sortable = true)
+        //   [Hacim]        (sortable = true)
+        //   [Karlılık]     (sortable = true)
 
         var headers = new List<GetProductivityReportTableHeaderItem>
         {
-            new() { Id = 1, HeaderName = "Genel Bilgiler", ParentId = 0, OrderNo = 1 },
-            new() { Id = 2, HeaderName = "Müşteri Adı", ParentId = 1, OrderNo = 1 },
-            new() { Id = 3, HeaderName = "Şube Adı", ParentId = 1, OrderNo = 2 },
+            new() { Id = 1, HeaderName = "Genel Bilgiler", ParentId = 0, OrderNo = 1, Sortable = false },
+            new() { Id = 2, HeaderName = "Müşteri Adı",    ParentId = 1, OrderNo = 1, Sortable = true },
+            new() { Id = 3, HeaderName = "Şube Adı",       ParentId = 1, OrderNo = 2, Sortable = true },
 
-            new() { Id = 4, HeaderName = "Performans", ParentId = 0, OrderNo = 2 },
-            new() { Id = 5, HeaderName = "Adet", ParentId = 4, OrderNo = 1 },
-            new() { Id = 6, HeaderName = "Hacim", ParentId = 4, OrderNo = 2 },
-            new() { Id = 7, HeaderName = "Karlılık", ParentId = 4, OrderNo = 3 }
+            new() { Id = 4, HeaderName = "Performans",     ParentId = 0, OrderNo = 2, Sortable = false },
+            new() { Id = 5, HeaderName = "Adet",           ParentId = 4, OrderNo = 1, Sortable = true },
+            new() { Id = 6, HeaderName = "Hacim",          ParentId = 4, OrderNo = 2, Sortable = true },
+            new() { Id = 7, HeaderName = "Karlılık",       ParentId = 4, OrderNo = 3, Sortable = true }
         };
 
         // İleride MainTabId / MidTabId / SubTabId / FilterType'a göre filtrelenebilir.

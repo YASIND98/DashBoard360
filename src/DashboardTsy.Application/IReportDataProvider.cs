@@ -139,4 +139,10 @@ public interface IReportDataProvider
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
     IReadOnlyList<GetProductivityVolumeBranchReportItem> GetProductivityVolumeBranchReport(GetProductivityVolumeBranchReportRequest request);
+
+    /// <summary>
+    /// Skor kartı ekranı için header hiyerarşisini döner (bölge/şube, roller, NPS).
+    /// Şu an SP tanımlı olmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request);
 }

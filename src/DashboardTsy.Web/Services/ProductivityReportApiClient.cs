@@ -36,6 +36,15 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return list ?? (IReadOnlyList<GetProductivityReportTableHeaderItem>)Array.Empty<GetProductivityReportTableHeaderItem>();
     }
 
+    public async Task<IReadOnlyList<GetProductivityScoreCardReportHeaderItem>> GetProductivityScoreCardReportHeadersAsync(GetProductivityScoreCardReportHeadersRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityScoreCardReportHeaders", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityScoreCardReportHeaderItem>();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var list = JsonSerializer.Deserialize<List<GetProductivityScoreCardReportHeaderItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<GetProductivityScoreCardReportHeaderItem>)Array.Empty<GetProductivityScoreCardReportHeaderItem>();
+    }
+
     public async Task<IReadOnlyList<GetReportRegionFilterItem>> GetReportRegionFiltersAsync(GetReportRegionFiltersRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetReportRegionFilters", request, cancellationToken).ConfigureAwait(false);

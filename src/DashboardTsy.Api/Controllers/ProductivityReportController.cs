@@ -49,6 +49,22 @@ public class ProductivityReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /ProductivityReport/GetProductivityScoreCardReportHeaders
+    /// Skor kartı ekranı için header hiyerarşisini döner (bölge/şube, roller, NPS).
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    [HttpPost("GetProductivityScoreCardReportHeaders")]
+    public ActionResult<IReadOnlyList<GetProductivityScoreCardReportHeaderItem>> GetProductivityScoreCardReportHeaders(
+        [FromBody] GetProductivityScoreCardReportHeadersRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityScoreCardReportHeaders(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /ProductivityReport/GetReportRegionFilters
     /// Verimlilik raporu ekranı için bölge filtre seçeneklerini döner.
     /// Şu an SP adı/parametreleri belli olmadığı için mock veri üzerinden çalışır.

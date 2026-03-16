@@ -207,6 +207,17 @@ public class ReportDataProvider : IReportDataProvider
         return MockProductivityReportData.GetProductivityReportTableHeaders(request);
     }
 
+    public IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request)
+    {
+        request ??= new GetProductivityScoreCardReportHeadersRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityScoreCardReportHeaders(request);
+
+        // SP taslağı hazır olana kadar mock üzerinden dönüyoruz.
+        return MockProductivityReportData.GetProductivityScoreCardReportHeaders(request);
+    }
+
     public IReadOnlyList<GetReportRegionFilterItem> GetReportRegionFilters(GetReportRegionFiltersRequest request)
     {
         request ??= new GetReportRegionFiltersRequest();
