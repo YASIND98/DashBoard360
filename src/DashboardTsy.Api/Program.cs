@@ -1,9 +1,8 @@
 using System.Globalization;
 using DashboardTsy.Api.Data;
 using DashboardTsy.Api.Services;
-using DashboardTsy.Application.TargetReport;
 using DashboardTsy.Infrastructure.Data;
-using DashboardTsy.Infrastructure.TargetReport;
+using DashboardTsy.Infrastructure.Reports;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,7 +25,7 @@ builder.Services.AddSingleton(new ReferansDbOptions { ConnectionString = referan
 // Stored procedure / DataLayer (DBRapor-style)
 builder.Services.AddSingleton<DashboardTsy.Infrastructure.Data.IConnectionStringProvider, ConnectionStringProvider>();
 builder.Services.AddScoped<DashboardTsy.Infrastructure.Data.IStoredProcedureExecutor, StoredProcedureExecutor>();
-builder.Services.AddScoped<DashboardTsy.Application.TargetReport.IReportDataProvider, ReportDataProvider>();
+builder.Services.AddScoped<DashboardTsy.Application.IReportDataProvider, ReportDataProvider>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

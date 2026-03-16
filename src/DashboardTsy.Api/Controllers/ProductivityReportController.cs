@@ -1,4 +1,6 @@
-using DashboardTsy.Application.TargetReport;
+using DashboardTsy.Application;
+using DashboardTsy.Application.ProductivityReport.Requests;
+using DashboardTsy.Application.ProductivityReport.Responses;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Api.Controllers;

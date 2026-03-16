@@ -1,5 +1,6 @@
 using System.Text.Json;
-using DashboardTsy.Application.TargetReport;
+using DashboardTsy.Application.ProductivityReport.Requests;
+using DashboardTsy.Application.ProductivityReport.Responses;
 using Microsoft.Extensions.Options;
 
 namespace DashboardTsy.Web.Services;

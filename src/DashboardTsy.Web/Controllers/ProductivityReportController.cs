@@ -1,4 +1,5 @@
-using DashboardTsy.Application.TargetReport;
+using DashboardTsy.Application.ProductivityReport.Requests;
+using DashboardTsy.Application.ProductivityReport.Responses;
 using DashboardTsy.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 
