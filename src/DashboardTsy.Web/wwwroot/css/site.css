@@ -733,6 +733,7 @@ body {
   position: relative;
   border-bottom: none;
   text-align: center !important;
+  cursor: pointer;
 }
 
 .col-group-header::after {
@@ -783,6 +784,48 @@ body {
   color: var(--ratio-blue) !important;
   font-weight: 600 !important;
 }
+
+/* Table Legend */
+.table-legend {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 16px 0;
+}
+
+.legend-note {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.legend-colors {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-value {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.legend-bar {
+  width: 30px;
+  height: 8px;
+  border-radius: 10px;
+}
+
+
+.legend-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.ratio-red-bg { background: var(--ratio-red); }
+.ratio-orange-bg { background: var(--ratio-orange); }
+.ratio-green-bg { background: var(--ratio-green); }
+.ratio-blue-bg { background: var(--ratio-blue); }
 
 /* Expandable Rows */
 .expandable {

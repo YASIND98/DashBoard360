@@ -92,6 +92,7 @@
         <thead id="dynamicTableHead"></thead>
         <tbody id="dynamicTableBody"></tbody>
     </table>
+    <div class="table-legend" id="tableLegend"></div>
 </div>
 
 
@@ -100,53 +101,18 @@
     <script>
     $(document).ready(function () {
 
-        // ===== Helpers =====
-        function scoreFormat(val) {
-            return val ? formatPercent(val / 100) : '-';
-        }
+        // Data field mapping per section (by section index in OrderNo)
+        var _sectionFields = [
+            // Section 0: Manager scorecard
+            ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
+            // Section 1: Role scorecard
+            ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
+            // Section 2: NPS
+            null // handled dynamically based on isBranch
+        ];
 
-        function scoreColor(val) {
-            return val ? ' ' + percentColor(val / 100) : '';
-        }
-
-        function mapScoreCard(d, isBranch) {
-            var months = [
-                { label: 'Mart 2026', value: d.FirstMonthScore },
-                { label: 'Şubat 2026', value: d.SecondMonthScore },
-                { label: 'Ocak 2026', value: d.ThirdMonthScore }
-            ];
-
-            var roles = [
-                { label: 'Kurumsal', value: d.CorporateScore },
-                { label: 'Ticari', value: d.CommercialScore },
-                { label: 'KBİ', value: d.KobiScore },
-                { label: 'OBİ', value: d.ObiScore },
-                { label: 'Tarım', value: d.AgricultureScore },
-                { label: 'Kitle', value: d.MassScore },
-                { label: 'Afili', value: d.AffluentScore },
-                { label: 'ÖB', value: d.PrivateBankingScore }
-            ];
-
-            var nps = { bank: { score: d.BankNpsScore, cls: scoreColor(d.BankNpsScore) } };
-            
-            if (isBranch) {
-                nps.branch = { score: d.BranchNpsScore, cls: scoreColor(d.BranchNpsScore) };
-            } else {
-                nps.region = { score: d.RegionNpsScore, cls: scoreColor(d.RegionNpsScore) };
-            }
-
-            return {
-                manager: {
-                    name: d.ManagerName,
-                    months: months.map(function (m) {
-                        return { label: m.label, score: m.value, cls: scoreColor(m.value) };
-                    })
-                },
-                roles: roles.map(function (r) {
-                    return { label: r.label, score: scoreFormat(r.value), cls: scoreColor(r.value) };
-                }),
-                nps: nps
-            };
+        function getNpsFields(isBranch) {
+            return isBranch ? ['BranchNpsScore', 'BankNpsScore'] : ['RegionNpsScore', 'BankNpsScore'];
         }
 
         // ===== State =====
@@ -306,6 +272,7 @@
         // ===== Scorecard =====
         function updateScorecard() {
             var isBranch = selectedBranch !== null;
+            var filterType = isBranch ? 2 : 1;
             var label = isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
             $('#scorecardBtnLabel').text(label);
             $('#scorecardTitle').text(label);
@@ -323,48 +290,55 @@
                 ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: new Date().toISOString() }
                 : { sessionId: '1', regionCode: selectedRegion.code, reportDate: new Date().toISOString() };
 
-            $.ajax({
-                url: url,
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(payload),
-                success: function (d) {
-                    renderScorecardHtml(mapScoreCard(d, isBranch), isBranch);
-                }
+            loadScoreCardHeaders(filterType, function (headers) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function (d) {
+                        renderScorecardHtml(headers, d, isBranch);
+                    }
+                });
             });
         }
 
-        function renderScorecardHtml(data, isBranch) {
-            var prefix = isBranch ? 'Şube' : 'Bölge';
+        function renderScorecardHtml(headers, d, isBranch) {
+            // Group: sections (ParentId=0) and their children
+            var sections = headers
+                .filter(function (h) { return h.ParentId === 0; })
+                .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
+
             var html = '';
 
-            html += '<div class="scorecard-section">';
-            html += '<div class="scorecard-section-title">' + prefix + ' Müdürü Skor Kartı %</div>';
-            html += '<table class="scorecard-table">';
-            html += '<tr><td>Adı Soyadı:</td><td>' + data.manager.name + '</td></tr>';
-            data.manager.months.forEach(function (m) {
-                html += '<tr><td>' + m.label + ':</td><td class="' + m.cls.trim() + '">' + m.score + '</td></tr>';
-            });
-            html += '</table></div>';
+            sections.forEach(function (section, sIdx) {
+                var children = headers
+                    .filter(function (h) { return h.ParentId === section.Id; })
+                    .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
 
-            html += '<div class="scorecard-section">';
-            html += '<div class="scorecard-section-title">' + prefix + ' Rolleri Skor Kartı %</div>';
-            html += '<table class="scorecard-table">';
-            data.roles.forEach(function (r) {
-                html += '<tr><td>' + r.label + ':</td><td class="' + r.cls.trim() + '">' + r.score + '</td></tr>';
-            });
-            html += '</table></div>';
+                var fields = (sIdx < _sectionFields.length && _sectionFields[sIdx])
+                    ? _sectionFields[sIdx]
+                    : getNpsFields(isBranch);
 
-            html += '<div class="scorecard-section">';
-            html += '<div class="scorecard-section-title">NPS</div>';
-            html += '<table class="scorecard-table">';
-            if (isBranch) {
-                html += '<tr><td>Şube:</td><td class="' + data.nps.branch.cls.trim() + '">' + data.nps.branch.score + '</td></tr>';
-            } else {
-                html += '<tr><td>Bölge:</td><td class="' + data.nps.region.cls.trim() + '">' + data.nps.region.score + '</td></tr>';
-            }
-            html += '<tr><td>Banka:</td><td class="' + data.nps.bank.cls.trim() + '">' + data.nps.bank.score + '</td></tr>';
-            html += '</table></div>';
+                html += '<div class="scorecard-section">';
+                html += '<div class="scorecard-section-title">' + section.HeaderName + ' %</div>';
+                html += '<table class="scorecard-table">';
+
+                children.forEach(function (child, cIdx) {
+                    var fieldName = cIdx < fields.length ? fields[cIdx] : null;
+                    var value = fieldName ? d[fieldName] : null;
+
+                    if (fieldName === 'ManagerName') {
+                        html += '<tr><td>' + child.HeaderName + ':</td><td>' + (value || '-') + '</td></tr>';
+                    } else {
+                        var score = value != null ? formatPercent(value) : '-';
+                        var cls = value != null ? ' ' + percentColor(value) : '';
+                        html += '<tr><td>' + child.HeaderName + ':</td><td class="' + cls.trim() + '">' + score + '</td></tr>';
+                    }
+                });
+
+                html += '</table></div>';
+            });
 
             $('#scorecardContent').html(html);
         }
@@ -396,10 +370,25 @@
             var regionCode = selectedRegion ? selectedRegion.code : null;
             var branchCode = selectedBranch ? selectedBranch.code : null;
 
-            $('#dynamicTableBody').empty();
-            $('#dynamicTableBody2').empty();
             $('#dynamicTableContainer').show();
             $('#dynamicTableContainer2').hide();
+
+            // Update legend based on active tab
+            var isBranch = selectedBranch !== null;
+            var diffLabel = isBranch ? 'Şube ile Bölge ve Bankanın Farkı' : 'Bölge ile Bankanın Farkı';
+            var note = 'Tablodaki değerler x1000 olarak verilmektedir.';
+
+            if (toggleId === 1) {
+                renderTableLegend('#tableLegend', { note: note, ratio: true });
+            } else if (toggleId === 2) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
+            } else if (toggleId === 3) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
+            } else if (toggleId === 4 && tabIds.tabId === 41) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
+            } else if (toggleId === 4 ) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel, ratio: isBranch });
+            }
 
             loadTableHeaders(toggleId, tabIds.tabId, tabIds.subTabId, filterType, function () {
                 // General

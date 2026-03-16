@@ -4,6 +4,10 @@ var _activeToggleId = null;
 var _activeTabId = null;
 var _activeSubTabId = null;
 
+// ===== Sort State =====
+var _yieldSortBy = null;
+var _yieldSortAsc = true;
+
 // ===== Load Tabs =====
 function loadProductivityTabs(filterType, callback) {
     $.ajax({
@@ -110,6 +114,7 @@ $(document).on('click', '#yieldToggle .toggle-btn', function () {
     $('#yieldToggle .toggle-btn').removeClass('active');
     $(this).addClass('active');
     _activeToggleId = parseInt($(this).data('tab-id'));
+    _yieldSortBy = null; _yieldSortAsc = true;
     renderTabBar();
     if (typeof onProductivityTabChange === 'function') {
         onProductivityTabChange();
@@ -137,6 +142,31 @@ $(document).on('click', '#subTabBarList .sub-tab', function () {
     }
 });
 
+// ===== Sort Click Handler =====
+$(document).on('click', '#dynamicTable thead th, #dynamicTable2 thead th', function () {
+    var $icon = $(this).find('.sort-icon[data-sort-id]');
+    if (!$icon.length) return;
+
+    var sortId = parseInt($icon.data('sort-id'));
+
+    if (_yieldSortBy === sortId) {
+        if (_yieldSortAsc) {
+            _yieldSortAsc = false;
+        } else {
+            _yieldSortBy = null;
+            _yieldSortAsc = true;
+        }
+    } else {
+        _yieldSortBy = sortId;
+        _yieldSortAsc = true;
+    }
+
+    // Reload table
+    if (typeof onProductivityTabChange === 'function') {
+        onProductivityTabChange();
+    }
+});
+
 // ===== General Region Report =====
 function loadGeneralRegionReport(regionCode) {
     $.ajax({
@@ -147,8 +177,8 @@ function loadGeneralRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode || null,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             data.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
@@ -209,7 +239,6 @@ function loadTableHeaders(toggleId, tabId, subTabId, filterType, callback) {
     var paramKey = toggleId + '-' + (tabId || 0) + '-' + (subTabId || 0) + '-' + filterType;
 
     if (paramKey === _lastHeaderParams && _cachedHeaders.length > 0) {
-        renderDynamicHeaders(_cachedHeaders, false);
         if (callback) callback();
         return;
     }
@@ -236,6 +265,11 @@ function loadTableHeaders(toggleId, tabId, subTabId, filterType, callback) {
 }
 
 // hasExpandable: data'da parentId olan satır varsa true
+function sortIcon(h) {
+    if (!h.Sortable) return '';
+    return ' <i class="sort-icon" data-sort-id="' + h.Id + '"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>';
+}
+
 function renderDynamicHeaders(headers, hasExpandable) {
     var $thead = $('#dynamicTableHead');
     $thead.empty();
@@ -268,7 +302,7 @@ function renderDynamicHeaders(headers, hasExpandable) {
     if (!hasGroupHeaders) {
         var row = '<tr>';
         topHeaders.forEach(function (h, i) {
-            row += '<th' + getClasses(h, false) + '>' + h.HeaderName + '</th>';
+            row += '<th' + getClasses(h, false) + '>' + h.HeaderName + sortIcon(h) + '</th>';
             if (i === 0) row += expandTh;
         });
         row += '</tr>';
@@ -282,10 +316,10 @@ function renderDynamicHeaders(headers, hasExpandable) {
             if (children && children.length > 0) {
                 row1 += '<th colspan="' + children.length + '" class="col-group-header">' + h.HeaderName + '</th>';
                 children.forEach(function (c) {
-                    row2 += '<th>' + c.HeaderName + '</th>';
+                    row2 += '<th>' + c.HeaderName + sortIcon(c) + '</th>';
                 });
             } else {
-                row1 += '<th rowspan="2"' + getClasses(h, true) + '>' + h.HeaderName + '</th>';
+                row1 += '<th rowspan="2"' + getClasses(h, true) + '>' + h.HeaderName + sortIcon(h) + '</th>';
             }
             if (i === 0) row1 += expandTh;
         });
@@ -300,7 +334,7 @@ function renderDynamicHeaders(headers, hasExpandable) {
 // ===== Volume Region Report (Hacim — Bölge) =====
 function loadVolumeRegionReport(regionCode, subTabId) {
     $.ajax({
-        url: '/ProductivityReport/GetProductivityVolumeRegionReport',
+        url: '/Home/GetProductivityVolumeRegionReport',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
@@ -308,8 +342,8 @@ function loadVolumeRegionReport(regionCode, subTabId) {
             regionCode: regionCode,
             subTabId: subTabId || 0,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             // Data'da parentId olan satır var mı?
@@ -382,8 +416,8 @@ function loadVolumeBranchReport(branchCode, subTabId) {
             branchCode: branchCode,
             subTabId: subTabId || 0,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -457,8 +491,8 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             regionCode: regionCode,
             subTabId: subTabId || 0,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -524,8 +558,8 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             branchCode: branchCode,
             subTabId: subTabId || 0,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -594,8 +628,8 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             branchCode: branchCode,
             tabId: tabId,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -661,8 +695,8 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             regionCode: regionCode,
             tabId: tabId,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -726,8 +760,8 @@ function loadProfitTotalRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -797,8 +831,8 @@ function loadProfitRatioRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -887,8 +921,8 @@ function loadProfitRatioBranchReport(branchCode) {
             sessionId: '1',
             branchCode: branchCode,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -955,8 +989,8 @@ function loadProfitTotalBranchReport(branchCode) {
             sessionId: '1',
             branchCode: branchCode,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -1027,8 +1061,8 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -1094,8 +1128,8 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
             sessionId: '1',
             branchCode: branchCode,
             reportDate: new Date().toISOString(),
-            sortBy: null,
-            isAscending: false
+            sortBy: _yieldSortBy,
+            isAscending: _yieldSortAsc
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -1169,6 +1203,7 @@ function updateProductivityStripes2() {
         $lastVisible = $tr;
     });
     if ($lastVisible) $lastVisible.addClass('last-visible-row');
+    reapplySortVisual($('#dynamicTable2'));
 }
 
 function updateProductivityStripes() {
@@ -1186,6 +1221,14 @@ function updateProductivityStripes() {
         $lastVisible = $tr;
     });
     if ($lastVisible) $lastVisible.addClass('last-visible-row');
+    reapplySortVisual($('#dynamicTable'));
+}
+
+function reapplySortVisual($table) {
+    $table.find('.sort-icon').removeClass('asc desc');
+    if (_yieldSortBy !== null) {
+        $table.find('.sort-icon[data-sort-id="' + _yieldSortBy + '"]').addClass(_yieldSortAsc ? 'asc' : 'desc');
+    }
 }
 
 function formatDiff(val) {

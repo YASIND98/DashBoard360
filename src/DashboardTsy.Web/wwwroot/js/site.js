@@ -1,20 +1,34 @@
 function formatPercent(ratio) {
-  var pct = ratio * 100;
-  var rounded = Math.round(pct * 10) / 10;
+  var rounded = Math.round(ratio * 10) / 10;
   if (rounded % 1 === 0) return rounded;
   return rounded.toFixed(1).replace('.', '.<small>') + '</small>';
 }
 
 function percentColor(ratio) {
-  var pct = ratio * 100;
-  if (pct < 75) return 'ratio-red';
-  if (pct < 100) return 'ratio-orange';
-  if (pct < 120) return 'ratio-green';
+  if (ratio < 75) return 'ratio-red';
+  if (ratio < 100) return 'ratio-orange';
+  if (ratio < 120) return 'ratio-green';
   return 'ratio-blue';
 }
 
 function formatNumber(value) {
   return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(value);
+}
+
+// ===== Table Legend Helpers =====
+var LEGEND_RATIO = '<span class="legend-value">0</span><span class="legend-bar ratio-red-bg"></span><span class="legend-value">75</span><span class="legend-bar ratio-orange-bg"></span><span class="legend-value">100</span><span class="legend-bar ratio-green-bg"></span><span class="legend-value">120</span><span class="legend-bar ratio-blue-bg"></span>';
+
+function buildDiffLegend(label) {
+  return '<span class="legend-label">' + label + ':&nbsp; -</span><span class="legend-bar ratio-red-bg"></span><span class="legend-value">0</span><span class="legend-bar ratio-green-bg"></span><span class="legend-label">+</span>';
+}
+
+function renderTableLegend(containerId, options) {
+  var $el = $(containerId);
+  var note = options.note || '';
+  var html = '<span class="legend-note">' + note + '</span>';
+  if (options.diff) html += '<div class="legend-colors">' + buildDiffLegend(options.diff) + '</div>';
+  if (options.ratio) html += '<div class="legend-colors">' + LEGEND_RATIO + '</div>';
+  $el.html(html);
 }
 
 // ===== Filter Data (shared across pages, cached in sessionStorage) =====
@@ -36,8 +50,6 @@ function loadRegionFilters(callback) {
       data: JSON.stringify({ sessionId: '1' }),
       success: function (data) {
           _regionFilters = data;
-          console.log("gel buraya");
-          
           sessionStorage.setItem('_regionFilters', JSON.stringify(data));
           if (data.length === 1) {
               applySingleFilter('.filter-dropdown-wrapper', 'region', data[0]);
@@ -121,6 +133,26 @@ function renderBranchList(listSelector, selectedCode) {
       $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.Code + '" data-region="' + b.RegionCode + '">' + b.Name + '</div>');
   });
   return isSingle ? _branchFilters[0] : null;
+}
+
+// ===== Scorecard Headers (cached per filterType in sessionStorage) =====
+function loadScoreCardHeaders(filterType, callback) {
+  var key = '_scoreCardHeaders_' + filterType;
+  var cached = sessionStorage.getItem(key);
+  if (cached) {
+      if (callback) callback(JSON.parse(cached));
+      return;
+  }
+  $.ajax({
+      url: '/ProductivityReport/GetProductivityScoreCardReportHeaders',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ sessionId: '1', filterType: filterType, reportDate: new Date().toISOString() }),
+      success: function (data) {
+          sessionStorage.setItem(key, JSON.stringify(data));
+          if (callback) callback(data);
+      }
+  });
 }
 
 // ===== Dropdown Panel =====
