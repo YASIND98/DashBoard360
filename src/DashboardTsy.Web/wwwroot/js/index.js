@@ -121,11 +121,11 @@ $(document).ready(function () {
           html += '<td class="col-diff text-center">';
           html += '<div class="diff-main">' + formatNumber(p.YesterdayAmount) + '</div>';
           html += '<div class="diff-details">';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="diffByPrevDayTitle"></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByPrevDayTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : 'positive') + '">' + formatNumber(p.DiffByPrevDayAmount || 0) + '</span></span>';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="diffByLastYearTitle"></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : 'positive') + '">' + formatNumber(p.DiffByLastYearAmount || 0) + '</span></span>';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="diffByLastWeekTitle"></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastWeekTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastWeekAmount < 0 ? 'negative' : 'positive') + '">' + formatNumber(p.DiffByLastWeekAmount || 0) + '</span></span>';
           html += '</div></td></tr>';
 
@@ -145,7 +145,7 @@ $(document).ready(function () {
           html += '<td class="text-center month-col month-col-last col-ratio ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
           html += '<td class="text-center">' + formatNumber(p.YearActualAmount) + '</td>';
           html += '<td>' + formatNumber(p.YearTargetAmount) + '</td>';
-          html += '<td class="text-center col-ratio ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '</td>';
+          html += '<td class="text-center col-ratio ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
