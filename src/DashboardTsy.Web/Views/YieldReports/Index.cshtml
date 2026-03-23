@@ -449,14 +449,14 @@
             $row.toggleClass('expanded');
 
             if (isExpanded) {
-                $row.nextAll('tr.sub-row').each(function () {
+                $row.nextAll('tr').each(function () {
                     var d = getDepth($(this));
                     if (d <= parentDepth) return false;
                     $(this).removeClass('visible expanded');
                 });
             } else {
                 var childDepth = parentDepth + 1;
-                $row.nextAll('tr.sub-row').each(function () {
+                $row.nextAll('tr').each(function () {
                     var d = getDepth($(this));
                     if (d <= parentDepth) return false;
                     if (d === childDepth) $(this).addClass('visible');

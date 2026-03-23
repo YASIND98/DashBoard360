@@ -313,13 +313,13 @@ $(document).ready(function () {
 
       if ($row.hasClass('expanded')) {
           var childDepth = parentDepth + 1;
-          $row.nextAll('tr.sub-row').each(function () {
+          $row.nextAll('tr').each(function () {
               var d = getDepth($(this));
               if (d <= parentDepth) return false;
               if (d === childDepth) $(this).addClass('visible');
           });
       } else {
-          $row.nextAll('tr.sub-row').each(function () {
+          $row.nextAll('tr').each(function () {
               var d = getDepth($(this));
               if (d <= parentDepth) return false;
               $(this).removeClass('visible expanded');
