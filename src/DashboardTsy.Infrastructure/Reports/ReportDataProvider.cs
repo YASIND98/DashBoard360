@@ -194,7 +194,17 @@ public class ReportDataProvider : IReportDataProvider
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityReportTabs(request);
 
-        return MockProductivityReportData.GetProductivityReportTabs(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@FilterType"] = request.FilterType
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("Main", "GetProductivityReportTabs", parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetProductivityReportTabItem>();
+
+        return DataTableHelper.ToList<GetProductivityReportTabItem>(ds.Tables[0]);
     }
 
     public IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)
@@ -204,7 +214,21 @@ public class ReportDataProvider : IReportDataProvider
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityReportTableHeaders(request);
 
-        return MockProductivityReportData.GetProductivityReportTableHeaders(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@MainTabId"] = request.MainTabId,
+            ["@MidTabId"] = request.MidTabId ?? (object)DBNull.Value,
+            ["@SubTabId"] = request.SubTabId ?? (object)DBNull.Value,
+            ["@FilterType"] = request.FilterType,
+            ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("Main", "SP_GetProductivityReportTableHeaders", parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetProductivityReportTableHeaderItem>();
+
+        return DataTableHelper.ToList<GetProductivityReportTableHeaderItem>(ds.Tables[0]);
     }
 
     public IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request)
@@ -214,8 +238,18 @@ public class ReportDataProvider : IReportDataProvider
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityScoreCardReportHeaders(request);
 
-        // SP taslağı hazır olana kadar mock üzerinden dönüyoruz.
-        return MockProductivityReportData.GetProductivityScoreCardReportHeaders(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@FilterType"] = request.FilterType,
+            ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityScoreCardReportHeaders", parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetProductivityScoreCardReportHeaderItem>();
+
+        return DataTableHelper.ToList<GetProductivityScoreCardReportHeaderItem>(ds.Tables[0]);
     }
 
     public IReadOnlyList<GetReportRegionFilterItem> GetReportRegionFilters(GetReportRegionFiltersRequest request)
