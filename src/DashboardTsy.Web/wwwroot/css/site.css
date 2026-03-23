@@ -7,6 +7,39 @@
   box-sizing: border-box;
 }
 
+/* ===== Global Scrollbar ===== */
+* {
+  scrollbar-width: none;
+}
+
+*:hover {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+  display: none;
+}
+
+*:hover::-webkit-scrollbar {
+  display: block;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
 :root {
   /* Background */
   --bg-dark: linear-gradient(180deg, #1a1f37 0%, #060b26 94%);
@@ -360,7 +393,7 @@ body {
 }
 
 .dropdown-list {
-  max-height: 250px;
+  max-height: 252px;
   overflow-y: auto;
 }
 
@@ -551,7 +584,6 @@ body {
   overflow-x: auto;
   user-select: none;
 }
-
 #dynamicTableContainer2.table-container {
   background: var(--bg-table2) !important;
   backdrop-filter: blur(120px);
@@ -559,7 +591,6 @@ body {
 
 .data-table {
   width: 100%;
-  min-width: 900px;
   border-spacing: 0;
   border-collapse: separate;
 }
@@ -717,6 +748,11 @@ body {
   font-weight: 500;
 }
 
+/* Has-diff cells: main value + diff stacked */
+.has-diff {
+  padding: 18px 16px 4px !important;
+}
+
 .table-row:hover td {
   background: var(--bg-hover);
 }
@@ -827,6 +863,12 @@ body {
 .ratio-green-bg { background: var(--ratio-green); }
 .ratio-blue-bg { background: var(--ratio-blue); }
 
+/* Profit Total Last Row */
+.profit-total-last td {
+  background: linear-gradient(180deg, #0070CB 30%, #0062B2 60%, #00467F 100%) !important;
+  font-size: 20px !important;
+}
+
 /* Expandable Rows */
 .expandable {
   cursor: pointer;
@@ -863,7 +905,7 @@ body {
 .breadcrumb {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
 }
 
 .breadcrumb-item {

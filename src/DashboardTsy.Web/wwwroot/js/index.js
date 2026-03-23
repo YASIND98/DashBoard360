@@ -288,9 +288,10 @@ $(document).ready(function () {
   // ===== Striping =====
   function updateStripes() {
       $('.table-container:visible .data-table').each(function () {
+          var $table = $(this);
           var visibleIndex = 0;
           var $lastVisible = null;
-          $(this).find('tbody tr').each(function () {
+          $table.find('tbody tr').each(function () {
               var $tr = $(this);
               $tr.removeClass('stripe-odd stripe-even last-visible-row');
               if ($tr.hasClass('sub-row') && !$tr.hasClass('visible')) return;
