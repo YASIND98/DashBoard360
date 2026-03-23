@@ -584,6 +584,7 @@ body {
   overflow-x: auto;
   user-select: none;
 }
+
 #dynamicTableContainer2.table-container {
   background: var(--bg-table2) !important;
   backdrop-filter: blur(120px);
@@ -687,10 +688,12 @@ body {
 .col-index {
   width: 60px;
   font-size: 14px !important;
+  padding: 12px 24px !important;
 }
 
 .col-expand {
   width: 36px;
+  padding: 12px 0 !important;
 }
 
 .col-text {
