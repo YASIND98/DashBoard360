@@ -1,0 +1,166 @@
+﻿@model ReportViewModel
+
+<!-- Page Title & Date -->
+<div class="page-header">
+    <h1 class="page-title" data-menu="ScreenTitle"></h1>
+    <div class="page-date">
+      <span class="date-text">@Model.Tarih</span>
+      <span class="date-badge">Bugün</span>
+    </div>
+    <div class="page-icons">
+      <img src="~/images/notification.svg" alt="Bildirimler" />
+      <img src="~/images/help.svg" alt="Yardım" />
+      <div class="avatar">
+          <img src="https://ui-avatars.com/api/?name=AD&background=c44&color=fff&size=36&rounded=true" alt="Avatar" />
+      </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="indexRegionSelect">
+                <span class="filter-label" id="indexRegionLabel">Bölge</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-panel" id="indexRegionPanel">
+                <div class="dropdown-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexRegionSearch" />
+                </div>
+                <div class="dropdown-list" id="indexRegionList"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="indexBranchSelect">
+                <span class="filter-label" id="indexBranchLabel">Şube</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-panel" id="indexBranchPanel">
+                <div class="dropdown-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexBranchSearch" />
+                </div>
+                <div class="dropdown-list" id="indexBranchList"></div>
+            </div>
+        </div>
+
+        <div class="filter-search">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Ara" id="searchInput" />
+        </div>
+    </div>
+    <div class="period-toggle">
+      <button class="toggle-btn active" data-period="daily">Günlük</button>
+      <div class="divider"></div>
+      <button class="toggle-btn" data-period="monthly">Aylık</button>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+    <div class="tab-list">
+        <button class="tab active" data-tab="tumu" data-menu="TabAllTitle"></button>
+        <button class="tab" data-tab="kurumsal" data-menu="TabCorporateTitle"></button>
+        <button class="tab" data-tab="ticari" data-menu="TabCommercialTitle"></button>
+        <button class="tab has-subtabs" data-tab="kobi" data-menu="TabSmeTitle"></button>
+        <button class="tab" data-tab="tarim" data-menu="TabAgricultureTitle"></button>
+        <button class="tab has-subtabs" data-tab="bireysel" data-menu="TabRetailTitle"></button>
+    </div>
+    <div class="diff-toggle" id="diffToggle">
+        <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+        <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+        <span>Farkları Göster</span>
+    </div>
+</div>
+
+<!-- Sub Tabs - KOBİ -->
+<div class="sub-tab-bar" data-parent-tab="kobi" style="display:none;">
+    <div class="tab-list">
+        <button class="sub-tab active" data-subtab="kobi-tumu" data-menu="SmeSubTabAllTitle"></button>
+        <button class="sub-tab" data-subtab="kobi-kbi" data-menu="SmeSubTabKbiTitle"></button>
+        <button class="sub-tab" data-subtab="kobi-obi" data-menu="SmeSubTabObiTitle"></button>
+    </div>
+</div>
+
+<!-- Sub Tabs - Bireysel -->
+<div class="sub-tab-bar" data-parent-tab="bireysel" style="display:none;">
+    <div class="tab-list">
+        <button class="sub-tab active" data-subtab="bireysel-tumu" data-menu="RetailSubTabAllTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-genel" data-menu="RetailSubTabGeneralTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-afili" data-menu="RetailSubTabAffiliateTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-ozel" data-menu="RetailSubTabPrivateTitle"></button>
+    </div>
+</div>
+
+<!-- Daily Table -->
+<div class="table-container" id="dailyTable">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="col-index"></th>
+                <th class="col-expand"></th>
+                <th class="col-text valign-top">
+                    <span data-daily-header="ProductNameTitle"></span>
+                    <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                </th>
+                <th class="text-center">
+                    <span data-daily-header="LastYearTitle"></span>
+                    <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="LastYearDate"></small>
+                </th>
+                <th class="text-center">
+                    <span data-daily-header="LastWeekTitle"></span>
+                    <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="LastWeekDate"></small>
+                </th>
+                <th class="text-center">
+                    <span data-daily-header="PrevDayTitle"></span>
+                    <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="PrevDayDate"></small>
+                </th class="text-center">
+                <th class="text-center">
+                    <span data-daily-header="YesterdayTitle"></span>
+                    <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="YesterdayDate"></small>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="dailyTableBody">
+        </tbody>
+    </table>
+</div>
+
+<!-- Monthly Table -->
+<div class="table-container" id="monthlyTable" style="display:none;">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="col-index" rowspan="2"></th>
+                <th class="col-expand" rowspan="2"></th>
+                <th class="col-text valign-bottom" rowspan="2">
+                    <span data-monthly-header="ProductNameTitle"></span>
+                    <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                </th>
+                <th colspan="3" class="col-group-header selected" data-monthly-header="MonthGroupTitle"></th>
+                <th colspan="3" class="col-group-header" data-monthly-header="YearGroupTitle"></th>
+            </tr>
+            <tr>
+                <th class="text-center month-col month-col-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center month-col"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center month-col month-col-last" data-monthly-header="MonthHGTitle"></th>
+                <th class="text-center"><span data-monthly-header="YearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center"><span data-monthly-header="YearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                <th class="text-center" data-monthly-header="YearHGTitle"></th>
+            </tr>
+        </thead>
+        <tbody id="monthlyTableBody">
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/index.js"></script>
+}

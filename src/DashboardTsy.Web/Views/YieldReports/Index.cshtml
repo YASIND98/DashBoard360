@@ -1,0 +1,479 @@
+@model ReportViewModel
+
+<!-- Page Title & Date -->
+<div class="page-header">
+    <h1 class="page-title">Verim Performans Raporları</h1>
+    <div class="page-date">
+        <span class="date-text">@Model.Tarih</span>
+        <span class="date-badge">Bugün</span>
+    </div>
+    <div class="page-icons">
+      <img src="~/images/notification.svg" alt="Bildirimler" />
+      <img src="~/images/help.svg" alt="Yardım" />
+      <div class="avatar">
+          <img src="https://ui-avatars.com/api/?name=AD&background=c44&color=fff&size=36&rounded=true" alt="Avatar" />
+      </div>
+    </div>
+</div>
+
+<!-- Breadcrumb & Skor Kartı -->
+<div class="breadcrumb-bar" id="breadcrumbBar" style="display:none;">
+    <div class="breadcrumb" id="yieldBreadcrumb"></div>
+    <div class="scorecard">
+        <button class="scorecard-btn" id="scorecardBtn">
+            <i class="fas fa-chevron-left"></i>
+            <span id="scorecardBtnLabel">Bölge Skor Kartı & NPS</span>
+        </button>
+        <div class="scorecard-panel" id="scorecardPanel">
+            <div class="scorecard-header">
+                <span id="scorecardTitle">Bölge Skor Kartı & NPS</span>
+                <button class="scorecard-close" id="scorecardClose"><i class="fas fa-times-circle"></i></button>
+            </div>
+            <div class="scorecard-content" id="scorecardContent"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="yieldBolgeSelect">
+                <span class="filter-label" id="yieldBolgeLabel">Bölge</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-panel" id="yieldBolgePanel">
+                <div class="dropdown-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="yieldBolgeSearch" />
+                </div>
+                <div class="dropdown-list" id="yieldBolgeList"></div>
+            </div>
+        </div>
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="yieldSubeSelect">
+                <span class="filter-label" id="yieldSubeLabel">Şube</span>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+            <div class="dropdown-panel" id="yieldSubePanel">
+                <div class="dropdown-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="yieldSubeSearch" />
+                </div>
+                <div class="dropdown-list" id="yieldSubeList"></div>
+            </div>
+        </div>
+    </div>
+    <div class="period-toggle" id="yieldToggle" style="display:none;"></div>
+</div>
+
+<!-- Tab Bar (Level 2) -->
+<div class="tab-bar" id="tabBar" style="display:none;">
+  <div class="tab-list" id="tabBarList"></div>
+  <div></div>
+</div>
+
+<!-- Sub Tab Bar (Level 3) -->
+<div class="sub-tab-bar" id="subTabBar" style="display:none;">
+  <div class="tab-list" id="subTabBarList"></div>
+</div>
+
+<!-- Second Dynamic Table (for Karlılık) -->
+<div class="table-container" id="dynamicTableContainer2" style="display:none; margin-bottom:16px;">
+    <table class="data-table yield-table" id="dynamicTable2">
+        <thead id="dynamicTableHead2"></thead>
+        <tbody id="dynamicTableBody2"></tbody>
+    </table>
+</div>
+
+<!-- Dynamic Table (headers from service) -->
+<div class="table-container" id="dynamicTableContainer">
+    <table class="data-table yield-table" id="dynamicTable">
+        <thead id="dynamicTableHead"></thead>
+        <tbody id="dynamicTableBody"></tbody>
+    </table>
+    <div class="table-legend" id="tableLegend"></div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/productivity.js"></script>
+    <script>
+    $(document).ready(function () {
+
+        // Data field mapping per section (by section index in OrderNo)
+        var _sectionFields = [
+            // Section 0: Manager scorecard
+            ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
+            // Section 1: Role scorecard
+            ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
+            // Section 2: NPS
+            null // handled dynamically based on isBranch
+        ];
+
+        function getNpsFields(isBranch) {
+            return isBranch ? ['BranchNpsScore', 'BankNpsScore'] : ['RegionNpsScore', 'BankNpsScore'];
+        }
+
+        // ===== State =====
+        var selectedRegion = null;
+        var selectedBranch = null;
+        var _lastFilterType = null;
+
+        // ===== Filter Lists =====
+        function renderRegionDropdown() {
+            return renderRegionList('#yieldBolgeList', selectedRegion ? selectedRegion.code : null);
+        }
+
+        function renderBranchDropdown() {
+            return renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null);
+        }
+
+        loadRegionFilters(function () {
+            var single = renderRegionDropdown();
+            if (single) {
+                selectedRegion = { code: single.Code, name: single.Name };
+            }
+            loadBranchFilters(function () {
+                var singleBranch = renderBranchDropdown();
+                if (singleBranch) {
+                    selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+                }
+                if (selectedRegion || selectedBranch) {
+                    updateUI();
+                } else {
+                    updateYieldTable();
+                }
+            });
+        });
+
+        // ===== Region Selection =====
+        $(document).on('click', '#yieldBolgeList .dropdown-item', function () {
+            var code = $(this).attr('data-code');
+            var name = $(this).text();
+
+            selectedRegion = code ? { code: code, name: name } : null;
+            $('#yieldBolgeLabel').text(code ? name : 'Bölge');
+
+            selectedBranch = null;
+            $('#yieldSubeLabel').text('Şube');
+
+            $('#yieldBolgeList .dropdown-item').removeClass('selected');
+            $(this).addClass('selected');
+            $('#yieldBolgePanel').removeClass('open');
+            $('#yieldBolgeSearch').val('');
+
+            updateUI();
+        });
+
+        // ===== Branch Selection =====
+        $(document).on('click', '#yieldSubeList .dropdown-item', function () {
+            var code = $(this).attr('data-code');
+            var name = $(this).text();
+
+            if (!code) {
+                selectedBranch = null;
+                $('#yieldSubeLabel').text('Şube');
+            } else {
+                var regionCode = $(this).attr('data-region');
+                selectedBranch = { code: code, name: name };
+                $('#yieldSubeLabel').text(name);
+
+                var region = findRegion(regionCode);
+                if (region) {
+                    selectedRegion = { code: region.Code, name: region.Name };
+                    $('#yieldBolgeLabel').text(region.Name);
+                    $('#yieldBolgeList .dropdown-item').removeClass('selected');
+                    $('#yieldBolgeList .dropdown-item[data-code="' + region.Code + '"]').addClass('selected');
+                }
+            }
+
+            $('#yieldSubeList .dropdown-item').removeClass('selected');
+            $(this).addClass('selected');
+            $('#yieldSubePanel').removeClass('open');
+            $('#yieldSubeSearch').val('');
+
+            updateUI();
+        });
+
+        // ===== UI Update =====
+        function updateUI() {
+            updateBreadcrumb();
+            updateScorecard();
+
+            var filterType = selectedBranch ? 2 : (selectedRegion ? 1 : null);
+
+            if (selectedRegion || selectedBranch) {
+                if (filterType !== _lastFilterType) {
+                    _lastFilterType = filterType;
+                    loadProductivityTabs(filterType, function () {
+                        $('#yieldToggle').show();
+                        updateYieldTable();
+                    });
+                } else {
+                    $('#yieldToggle').show();
+                    updateYieldTable();
+                }
+            } else {
+                _activeToggleId = null;
+                _activeTabId = null;
+                _activeSubTabId = null;
+                $('#yieldToggle').hide();
+                $('#tabBar').hide();
+                $('#subTabBar').hide();
+                updateYieldTable();
+            }
+        }
+
+        // ===== Breadcrumb =====
+        function crumb(text, action, isSingle) {
+            var cls = isSingle ? ' disabled' : '';
+            var attr = !isSingle && action ? ' data-breadcrumb="' + action + '"' : '';
+            return '<span class="breadcrumb-item' + cls + '"' + attr + '>' + text + '</span>';
+        }
+
+        function updateBreadcrumb() {
+            if (!selectedRegion && !selectedBranch) {
+                $('#breadcrumbBar').hide();
+                return;
+            }
+
+            $('#breadcrumbBar').show();
+            var singleRegion = _regionFilters.length === 1;
+            var parts = [crumb('Tüm Bölgeler', 'allRegions', singleRegion)];
+
+            if (selectedRegion) {
+                parts.push(crumb(selectedRegion.name + ' Bölgesi', 'region', singleRegion));
+            }
+            if (selectedBranch) {
+                parts.push(crumb(selectedBranch.name + ' Şubesi', null, true));
+            }
+
+            $('#yieldBreadcrumb').html(parts.join('<span class="breadcrumb-separator">/</span>'));
+        }
+
+        $(document).on('click', '[data-breadcrumb="allRegions"]', function () {
+            selectedRegion = null;
+            selectedBranch = null;
+            $('#yieldBolgeLabel').text('Bölge');
+            $('#yieldBolgeList .dropdown-item').removeClass('selected');
+            $('#yieldSubeLabel').text('Şube');
+            $('#yieldSubeList .dropdown-item').removeClass('selected');
+            updateUI();
+        });
+
+        $(document).on('click', '[data-breadcrumb="region"]', function () {
+            selectedBranch = null;
+            $('#yieldSubeLabel').text('Şube');
+            $('#yieldSubeList .dropdown-item').removeClass('selected');
+            updateUI();
+        });
+
+        // ===== Scorecard =====
+        function updateScorecard() {
+            var isBranch = selectedBranch !== null;
+            var filterType = isBranch ? 2 : 1;
+            var label = isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
+            $('#scorecardBtnLabel').text(label);
+            $('#scorecardTitle').text(label);
+
+            if (!selectedRegion && !selectedBranch) {
+                $('#scorecardContent').html('');
+                return;
+            }
+
+            var url = isBranch
+                ? '/ProductivityReport/GetProductivityBranchScoreCardReport'
+                : '/ProductivityReport/GetProductivityRegionScoreCardReport';
+
+            var payload = isBranch
+                ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: _reportDate }
+                : { sessionId: '1', regionCode: selectedRegion.code, reportDate: _reportDate };
+
+            loadScoreCardHeaders(filterType, function (headers) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(payload),
+                    success: function (d) {
+                        renderScorecardHtml(headers, d, isBranch);
+                    }
+                });
+            });
+        }
+
+        function renderScorecardHtml(headers, d, isBranch) {
+            // Group: sections (ParentId=0) and their children
+            var sections = headers
+                .filter(function (h) { return h.ParentId === 0; })
+                .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
+
+            var html = '';
+
+            sections.forEach(function (section, sIdx) {
+                var children = headers
+                    .filter(function (h) { return h.ParentId === section.Id; })
+                    .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
+
+                var fields = (sIdx < _sectionFields.length && _sectionFields[sIdx])
+                    ? _sectionFields[sIdx]
+                    : getNpsFields(isBranch);
+
+                html += '<div class="scorecard-section">';
+                html += '<div class="scorecard-section-title">' + section.HeaderName + ' %</div>';
+                html += '<table class="scorecard-table">';
+
+                children.forEach(function (child, cIdx) {
+                    var fieldName = cIdx < fields.length ? fields[cIdx] : null;
+                    var value = fieldName ? d[fieldName] : null;
+
+                    if (fieldName === 'ManagerName') {
+                        html += '<tr><td>' + child.HeaderName + ':</td><td>' + (value || '-') + '</td></tr>';
+                    } else {
+                        var score = value != null ? formatPercent(value) : '-';
+                        var cls = value != null ? ' ' + percentColor(value) : '';
+                        html += '<tr><td>' + child.HeaderName + ':</td><td class="' + cls.trim() + '">' + score + '</td></tr>';
+                    }
+                });
+
+                html += '</table></div>';
+            });
+
+            $('#scorecardContent').html(html);
+        }
+
+        // ===== Scorecard Panel Toggle =====
+        $('#scorecardBtn').on('click', function (e) {
+            e.stopPropagation();
+            $('#scorecardPanel').toggleClass('open');
+        });
+        $('#scorecardClose').on('click', function () {
+            $('#scorecardPanel').removeClass('open');
+        });
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('.scorecard').length) {
+                $('#scorecardPanel').removeClass('open');
+            }
+        });
+
+        // ===== Tab Change Callback =====
+        window.onProductivityTabChange = function () {
+            updateYieldTable();
+        };
+
+        // ===== Table Update =====
+        function updateYieldTable() {
+            var tabIds = getActiveTabIds();
+            var filterType = selectedBranch ? 2 : 1;
+            var toggleId = tabIds.toggleId || 1;
+            var regionCode = selectedRegion ? selectedRegion.code : null;
+            var branchCode = selectedBranch ? selectedBranch.code : null;
+
+            $('#dynamicTableContainer').show();
+            $('#dynamicTableContainer2').hide();
+
+            // Update legend based on active tab
+            var isBranch = selectedBranch !== null;
+            var diffLabel = isBranch ? 'Şube ile Bölge ve Bankanın Farkı' : 'Bölge ile Bankanın Farkı';
+            var note = 'Tablodaki değerler x1000 olarak verilmektedir.';
+
+            if (toggleId === 1) {
+                renderTableLegend('#tableLegend', { note: note, ratio: true });
+            } else if (toggleId === 2) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
+            } else if (toggleId === 3) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
+            } else if (toggleId === 4 && tabIds.tabId === 41) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
+            } else if (toggleId === 4 ) {
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel, ratio: isBranch });
+            }
+
+            loadTableHeaders(toggleId, tabIds.tabId, tabIds.subTabId, filterType, function () {
+                // General
+                if (toggleId === 1) {
+                    loadGeneralRegionReport(regionCode);
+                }
+                // Volume - region
+                else if (toggleId === 3 && selectedRegion && !selectedBranch) {
+                    loadVolumeRegionReport(regionCode, tabIds.tabId || 0);
+                }
+                // Volume - branch
+                else if (toggleId === 3 && selectedBranch) {
+                    loadVolumeBranchReport(branchCode, tabIds.tabId || 0);
+                }
+                // Count - branch - Card/POS
+                else if (toggleId === 2 && selectedBranch && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
+                    loadCountCardPosBranchReport(branchCode, tabIds.tabId === 11 ? 1 : 2);
+                }
+                // Count - branch - Customer
+                else if (toggleId === 2 && selectedBranch) {
+                    loadCountCustomerBranchReport(branchCode, tabIds.subTabId || 0);
+                }
+                // Count - region - Card/POS
+                else if (toggleId === 2 && selectedRegion && !selectedBranch && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
+                    loadCountCardPosRegionReport(regionCode, tabIds.tabId === 11 ? 1 : 2);
+                }
+                // Count - region - Customer
+                else if (toggleId === 2 && selectedRegion && !selectedBranch) {
+                    loadCountCustomerRegionReport(regionCode, tabIds.subTabId || 0);
+                }
+                // Profit - branch - Total
+                else if (toggleId === 4 && selectedBranch && (tabIds.tabId === 40 || tabIds.tabId === null)) {
+                    loadProfitTotalBranchReport(branchCode);
+                    loadProfitRatioBranchReport(branchCode);
+                }
+                // Profit - branch - Spread
+                else if (toggleId === 4 && selectedBranch && tabIds.tabId === 41) {
+                    loadProfitSpreadManagementBranchReport(branchCode);
+                }
+                // Profit - region - Spread
+                else if (toggleId === 4 && selectedRegion && !selectedBranch && tabIds.tabId === 41) {
+                    loadProfitSpreadManagementRegionReport(regionCode);
+                }
+                // Profit - region - Total
+                else if (toggleId === 4 && selectedRegion && !selectedBranch) {
+                    loadProfitTotalRegionReport(regionCode);
+                    loadProfitRatioRegionReport(regionCode);
+                }
+            });
+        }
+
+        // ===== Expandable Rows =====
+        $(document).on('click', '.expandable', function () {
+            var $row = $(this);
+            var parentDepth = getDepth($row);
+            var isExpanded = $row.hasClass('expanded');
+
+            $row.toggleClass('expanded');
+
+            if (isExpanded) {
+                $row.nextAll('tr').each(function () {
+                    var d = getDepth($(this));
+                    if (d <= parentDepth) return false;
+                    $(this).removeClass('visible expanded');
+                });
+            } else {
+                var childDepth = parentDepth + 1;
+                $row.nextAll('tr').each(function () {
+                    var d = getDepth($(this));
+                    if (d <= parentDepth) return false;
+                    if (d === childDepth) $(this).addClass('visible');
+                });
+            }
+
+            if ($row.closest('#dynamicTable2').length) {
+                updateProductivityStripes2();
+            } else {
+                updateProductivityStripes();
+            }
+        });
+
+        function getDepth($tr) {
+            var match = $tr.attr('class').match(/depth-(\d+)/);
+            return match ? parseInt(match[1]) : 0;
+        }
+    });
+    </script>
+}

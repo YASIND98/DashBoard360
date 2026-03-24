@@ -1,0 +1,289 @@
+﻿* {
+    scrollbar-width: thin;
+    scrollbar-color: #44546a transparent;
+}
+
+::-webkit-scrollbar {
+    height: 6px;
+    width: 6px;
+    background: #fff;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #44546a;
+    -webkit-border-radius: 0ex;
+}
+
+::-webkit-scrollbar-corner {
+    background: #fff;
+}
+
+tbody.tableContent td {
+    height: 30px;
+    font-size: 13px;
+}
+
+.tableHeader tr:nth-child(1) td {
+    font-size: 14px;
+}
+
+tbody.tableContent a,
+.performanceBox li h2 a {
+    color: #44546a
+}
+
+
+tbody.tableContent tr:hover td.blank_col,
+tbody.tableContent tr.dark:hover td.blank_col {
+    background-color: #fff !important;
+}
+
+thead.tableHeader tr,
+tbody.tableContent tr.dark {
+    background-color: #44546a !important;
+    color: white;
+    /* background-color: #EDE3FD !important; */
+    /*background-clip: content-box;*/
+}
+
+.skill {
+    background-color: #44546a;
+    padding: 0.7% 1% !important;
+    text-align: left;
+    border-radius: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.tablefix {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.tableBody {
+    overflow-y: scroll;
+    max-height: 270px
+}
+
+.tableBodyExtend {
+    overflow-y: scroll;
+    /* max-height: 800px */
+}
+
+
+
+tbody.tableContent tr:hover td {
+    background-color: #44546a8f !important;
+    /* background-color: #1A2C90 !important; */
+    color: #fff;
+}
+
+
+tbody.tableContent tr.dark:hover td {
+    background-color: #44546a8f !important;
+    /* background-color: #1A2C90 !important; */
+    /* background-color: #792FFF !important; */
+    color: #fff;
+}
+
+tbody.tableContent tr.blank_row:hover td {
+    background-color: #fff !important;
+    color: #fff;
+}
+
+tbody.tableContent tr:nth-child(2n+1) td {
+    background-color: #44546a21
+}
+
+.tdWithBorder {
+    border-bottom: 1px solid #fff;
+    border-right: 1px solid #fff;
+    border-left: 1px solid #fff;
+    background-clip: content-box;
+    padding: 0 !important;
+}
+
+.tdWithBorderLeft {
+    border-left: 1px solid #fff;
+}
+
+.stokDetail td:first-child {
+    padding-left: 25px !important
+}
+
+div#kaynakDagilimiProjelerDiv table tbody.tableContent td:nth-child(2),
+div#kaynakDagilimiProjelerDiv table tbody.tableContent td:nth-child(4) {
+    text-align: start !important;
+}
+
+thead.tableHeader tr td {
+    height: 30px
+}
+
+.showWhenExtend {
+    display: none;
+}
+
+.varactivedot {
+    width: 8px;
+    height: 8px !important;
+    text-align: center;
+    margin: 0 7px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.continuesColor {
+    background-color: #75daad
+}
+
+.completedColor {
+    background-color: #4D96D5
+}
+
+.canceledColor {
+    background-color: #FF6961
+}
+
+.homeTableTitle {
+    display: flex;
+    align-items: center;
+    font-size: 17px;
+}
+
+.tableHeader tr:nth-child(2) td {
+    font-size: 13px;
+    text-align: center;
+}
+
+.projectInfoCard,
+.projectSearchCard {
+    display: flex;
+    align-items: center;
+    padding: 0 0.25rem;
+    border: 1px solid #EDE3FD;
+    height: 20px;
+    border-radius: 5px;
+}
+
+.tooltiptext {
+    right: 0;
+    color: #fff;
+}
+
+.tooltipx {
+    overflow: hidden;
+    width: 90%;
+    text-overflow: ellipsis;
+}
+
+thead.tableHeader tr.infoRow td {
+    height: 20px;
+}
+
+table tr td {
+    padding: 0 2px;
+}
+
+
+.homeTableTitle, .tableTitle {
+    color: #44546a !important;
+}
+
+.sb-sidenav .sb-sidenav-menu {
+    flex-grow: 1;
+    background: #44546a !important
+}
+
+.sidebarDiv {
+    background: #44546a !important
+}
+
+
+.blank_row {
+    height: 10px !important;
+    background-color: #FFFFFF;
+}
+
+    .blank_row td {
+        height: 10px !important;
+    }
+
+.blank_col {
+    background-color: #fff !important;
+}
+
+.performanceBoxB i,
+.performanceBoxTransformation i,
+.performanceBoxBacklog i {
+    background-color: #44546a;
+}
+
+.tt4 input,
+.delButton,
+.searchButton {
+    color: #44546a;
+}
+
+#stokTableContent tr:not(.stokDetail) td {
+    background-color: #fff;
+    height:35px;
+}
+
+tr.stokDetail td {
+    background-color: #44546a21;
+}
+
+.cfSelectbox span.active p, .cfSelectbox2 span.active p {
+    background-color: #44546a;
+    background-size: auto;
+    background-size: 12px auto;
+    border: 2px solid #44546a;
+}
+
+.cfSelectbox span.active, .cfSelectbox2 span.active {
+    color: #44546a;
+}
+
+.bigFont{
+    font-size:14px!important;
+}
+
+.performanceBox li i {
+    left: 4px!important;
+}
+.performanceBox li h2,
+.performanceBox li h5 {
+    left: 40px;
+}
+
+.performanceBox li h4.kullanim {
+    float: left;
+    height: 20px;
+    line-height: 20px;
+    padding-right: 0px;
+    font-weight: normal !important;
+    font-family: "GTM" !important;
+    position: absolute;
+    right: 5px;
+    bottom: 4px;
+    top: auto;
+}
+
+
+@media screen and (max-width: 1600px) {
+    .performanceBox li h2,
+    .performanceBox li h5 {
+        left: 45px !important;
+    }
+}
+@media screen and (max-width: 1440px) {
+    .performanceBox li h2,
+    .performanceBox li h5 {
+        left: 35px !important;
+    }
+    .performanceBox li h4.kullanim {
+        margin-bottom: 0px !important;
+    }
+}
