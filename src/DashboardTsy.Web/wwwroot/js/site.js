@@ -31,6 +31,9 @@ function renderTableLegend(containerId, options) {
   $el.html(html);
 }
 
+// ===== Shared Report Date =====
+var _reportDate = new Date().toISOString();
+
 // ===== Filter Data (shared across pages, cached in sessionStorage) =====
 var _regionFilters = JSON.parse(sessionStorage.getItem('_regionFilters') || '[]');
 var _branchFilters = JSON.parse(sessionStorage.getItem('_branchFilters') || '[]');
@@ -147,7 +150,7 @@ function loadScoreCardHeaders(filterType, callback) {
       url: '/ProductivityReport/GetProductivityScoreCardReportHeaders',
       type: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify({ sessionId: '1', filterType: filterType, reportDate: new Date().toISOString() }),
+      data: JSON.stringify({ sessionId: '1', filterType: filterType, reportDate: _reportDate }),
       success: function (data) {
           sessionStorage.setItem(key, JSON.stringify(data));
           if (callback) callback(data);

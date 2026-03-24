@@ -8,7 +8,7 @@ namespace DashboardTsy.Web.Controllers
         [Route("/verim-raporlari")]
         public IActionResult Index()
         {
-            var model = YieldReportDataHelper.GetSampleData();
+            var model = new ReportViewModel();
             return View("~/Views/YieldReports/Index.cshtml", model);
         }
     }
