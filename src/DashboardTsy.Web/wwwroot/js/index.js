@@ -78,7 +78,7 @@ $(document).ready(function () {
           sessionId: '1',
           tabId: getActiveTabId(),
           subTabId: getActiveSubTabId(),
-          reportDate: new Date().toISOString(),
+          reportDate: _reportDate,
           regionId: selectedRegion ? [selectedRegion.code] : [],
           branchId: selectedBranch ? [selectedBranch.code] : [],
           searchText: $('#searchInput').val() || null,
@@ -246,7 +246,11 @@ $(document).ready(function () {
       $(this).addClass('active');
 
       var period = $(this).data('period');
+      var now = new Date();
+      var trMonths = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
       if (period === 'monthly') {
+          $('.date-text').text(trMonths[now.getMonth()] + ' ' + now.getFullYear());
+          $('.date-badge').text('Bu Ay');
           $('#dailyTable').hide();
           $('#monthlyTable').show();
           $('#diffToggle').hide();
@@ -267,6 +271,9 @@ $(document).ready(function () {
           }
           loadMonthlyReport();
       } else {
+          var dd = String(now.getDate()).padStart(2, '0');
+          $('.date-text').text(dd + ' ' + trMonths[now.getMonth()] + ' ' + now.getFullYear());
+          $('.date-badge').text('Bugün');
           $('#monthlyTable').hide();
           $('#dailyTable').show();
           $('#diffToggle').show();

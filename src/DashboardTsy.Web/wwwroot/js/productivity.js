@@ -176,7 +176,7 @@ function loadGeneralRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode || null,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -253,7 +253,7 @@ function loadTableHeaders(toggleId, tabId, subTabId, filterType, callback) {
             midTabId: tabId || null,
             subTabId: subTabId || null,
             filterType: filterType,
-            reportDate: new Date().toISOString()
+            reportDate: _reportDate
         }),
         success: function (data) {
             _cachedHeaders = data;
@@ -341,7 +341,7 @@ function loadVolumeRegionReport(regionCode, subTabId) {
             sessionId: '1',
             regionCode: regionCode,
             subTabId: subTabId || 0,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -415,7 +415,7 @@ function loadVolumeBranchReport(branchCode, subTabId) {
             sessionId: '1',
             branchCode: branchCode,
             subTabId: subTabId || 0,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -490,7 +490,7 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             sessionId: '1',
             regionCode: regionCode,
             subTabId: subTabId || 0,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -557,7 +557,7 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             sessionId: '1',
             branchCode: branchCode,
             subTabId: subTabId || 0,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -627,7 +627,7 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             sessionId: '1',
             branchCode: branchCode,
             tabId: tabId,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -694,7 +694,7 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             sessionId: '1',
             regionCode: regionCode,
             tabId: tabId,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -759,7 +759,7 @@ function loadProfitTotalRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -835,7 +835,7 @@ function loadProfitRatioRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -925,7 +925,7 @@ function loadProfitRatioBranchReport(branchCode) {
         data: JSON.stringify({
             sessionId: '1',
             branchCode: branchCode,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -993,7 +993,7 @@ function loadProfitTotalBranchReport(branchCode) {
         data: JSON.stringify({
             sessionId: '1',
             branchCode: branchCode,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -1069,7 +1069,7 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
@@ -1136,7 +1136,7 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
         data: JSON.stringify({
             sessionId: '1',
             branchCode: branchCode,
-            reportDate: new Date().toISOString(),
+            reportDate: _reportDate,
             sortBy: _yieldSortBy,
             isAscending: _yieldSortAsc
         }),
