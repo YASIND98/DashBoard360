@@ -29,10 +29,6 @@ public class ReportDataProvider : IReportDataProvider
 
     private bool MockEnabled => _configuration["ReportMock:Enabled"] is string v && bool.TryParse(v, out var b) && b;
 
-    public DataSet GetRaporTarihi()
-    {
-        return _spExecutor.ExecuteDataSet("Main", "sp_GetRaporTarihi");
-    }
 
     public GetTargetReportMenuTextsResponse? GetTargetReportMenuTexts(string sessionId)
     {
@@ -43,7 +39,7 @@ public class ReportDataProvider : IReportDataProvider
         {
             ["@SessionId"] = sessionId ?? string.Empty
         };
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetTargetReportMenuTexts", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetTargetReportMenuTexts", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return null;
         return DataTableHelper.ToObject<GetTargetReportMenuTextsResponse>(ds.Tables[0].Rows[0]);
@@ -61,7 +57,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@FilterId"] = filterId,
             ["@FilterCode"] = filterCodeStr ?? (object)DBNull.Value
         };
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetTargetReportFilters", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetTargetReportFilters", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return Array.Empty<GetTargetReportFiltersItem>();
         return DataTableHelper.ToList<GetTargetReportFiltersItem>(ds.Tables[0]);
@@ -89,7 +85,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@IsAscending"] = request.IsAscending
         };
 
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetDailyTargetReport", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyTargetReport", parameters);
         var response = new GetDailyTargetReportResponse();
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
@@ -122,7 +118,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SessionId"] = sessionId ?? string.Empty
         };
 
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetDailyTargetReportTableHeaders", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyTargetReportTableHeaders", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return null;
 
@@ -150,7 +146,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@IsAscending"] = request.IsAscending
         };
 
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetMonthlyTargetReport", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetMonthlyTargetReport", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return null;
 
@@ -180,7 +176,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@ReportDate"] = request.ReportDate
         };
 
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetMonthlyTargetReportTableHeaders", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetMonthlyTargetReportTableHeaders", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return null;
 
@@ -200,7 +196,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@FilterType"] = request.FilterType
         };
 
-        var ds = _spExecutor.ExecuteDataSet("Main", "GetProductivityReportTabs", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "GetProductivityReportTabs", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return Array.Empty<GetProductivityReportTabItem>();
 
@@ -224,7 +220,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
         };
 
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_GetProductivityReportTableHeaders", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_GetProductivityReportTableHeaders", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return Array.Empty<GetProductivityReportTableHeaderItem>();
 
@@ -245,7 +241,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
         };
 
-        var ds = _spExecutor.ExecuteDataSet("Main", "SP_RP_GetProductivityScoreCardReportHeaders", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductivityScoreCardReportHeaders", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return Array.Empty<GetProductivityScoreCardReportHeaderItem>();
 

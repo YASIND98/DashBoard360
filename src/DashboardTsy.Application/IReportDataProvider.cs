@@ -12,7 +12,6 @@ namespace DashboardTsy.Application;
 /// </summary>
 public interface IReportDataProvider
 {
-    DataSet GetRaporTarihi();
 
     GetTargetReportMenuTextsResponse? GetTargetReportMenuTexts(string sessionId);
 
