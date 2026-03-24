@@ -1,4 +1,4 @@
-@model YieldReportViewModel
+@model ReportViewModel
 
 <!-- Page Title & Date -->
 <div class="page-header">
@@ -287,8 +287,8 @@
                 : '/ProductivityReport/GetProductivityRegionScoreCardReport';
 
             var payload = isBranch
-                ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: new Date().toISOString() }
-                : { sessionId: '1', regionCode: selectedRegion.code, reportDate: new Date().toISOString() };
+                ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: _reportDate }
+                : { sessionId: '1', regionCode: selectedRegion.code, reportDate: _reportDate };
 
             loadScoreCardHeaders(filterType, function (headers) {
                 $.ajax({
