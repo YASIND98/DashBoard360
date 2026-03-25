@@ -1,5 +1,21 @@
 @model ReportViewModel
 
+@{
+    var nameSurname = Context?.Session?.GetString("NameSurname") ?? string.Empty;
+    var parts = nameSurname
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    var initials = parts.Length switch
+    {
+        >= 2 => $"{parts[0][0]}{parts[1][0]}",
+        1 => $"{parts[0][0]}",
+        _ => "AD"
+    };
+
+    initials = initials.ToUpperInvariant();
+    var initialsEncoded = System.Net.WebUtility.UrlEncode(initials);
+}
+
 <!-- Page Title & Date -->
 <div class="page-header">
     <h1 class="page-title">Verim Performans Raporları</h1>
@@ -11,7 +27,7 @@
       <img src="~/images/notification.svg" alt="Bildirimler" />
       <img src="~/images/help.svg" alt="Yardım" />
       <div class="avatar">
-          <img src="https://ui-avatars.com/api/?name=AD&background=c44&color=fff&size=36&rounded=true" alt="Avatar" />
+          <img src="https://ui-avatars.com/api/?name=@initialsEncoded&background=c44&color=fff&size=36&rounded=true" alt="Avatar" />
       </div>
     </div>
 </div>
