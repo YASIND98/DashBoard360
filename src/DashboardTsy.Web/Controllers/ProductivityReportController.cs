@@ -22,12 +22,15 @@ public class ProductivityReportController : ControllerBase
         return session.GetString("UserId") ?? string.Empty;
     }
 
+    private bool HasSession() => (HttpContext.Session.GetInt32("UserId") ?? 0) > 0;
+
     [HttpPost("GetProductivityReportTabs")]
     public async Task<ActionResult<IReadOnlyList<GetProductivityReportTabItem>>> GetProductivityReportTabs(
         [FromBody] GetProductivityReportTabsRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityReportTabsAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
@@ -39,6 +42,7 @@ public class ProductivityReportController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityReportTableHeadersAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
@@ -50,6 +54,7 @@ public class ProductivityReportController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityScoreCardReportHeadersAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
@@ -61,6 +66,7 @@ public class ProductivityReportController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetReportRegionFiltersAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);

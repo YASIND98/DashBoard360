@@ -1,7 +1,6 @@
 using System.Net;
 using System.Text.Json;
 using DashboardTsy.Web.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Web.Controllers;
@@ -10,7 +9,6 @@ namespace DashboardTsy.Web.Controllers;
 /// [Authorize] açıkken: IIS Express + Windows Auth ile çalıştırıldığında ilk istekte tarayıcı Windows login popup'ı açılır (DBRapor gibi).
 /// Kestrel (dotnet run) ile çalıştırıyorsan popup çıkmaz; Login sayfası doğrudan açılır.
 /// </summary>
-//[Authorize]
 public class AuthController : Controller
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -59,7 +57,7 @@ public class AuthController : Controller
         };
     }
 
-    [HttpGet("/login")]
+    [HttpGet]
     public async Task<IActionResult> Login(CancellationToken cancellationToken)
     {
         var userName = User?.Identity?.Name;

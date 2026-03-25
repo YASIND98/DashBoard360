@@ -1,10 +1,8 @@
 using DashboardTsy.Web.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Web.Controllers;
 
-//[Authorize]
 [Route("[controller]")]
 [ApiController]
 public class TargetReportController : ControllerBase
@@ -16,6 +14,8 @@ public class TargetReportController : ControllerBase
         _apiClient = apiClient;
     }
 
+    private bool HasSession() => (HttpContext.Session.GetInt32("UserId") ?? 0) > 0;
+
     /// <summary>
     /// GET /api/TargetReport/GetTargetReportMenuTexts?sessionId=...
     /// Proxies to Dashboard API SP_RP_GetTargetReportMenuTexts. SessionId can come from query or current session.
@@ -25,6 +25,7 @@ public class TargetReportController : ControllerBase
         [FromQuery] string? sessionId,
         CancellationToken cancellationToken)
     {
+        if (!HasSession()) return Unauthorized();
         var sid = sessionId ?? HttpContext.Session.GetString("UserId")?.ToString() ?? string.Empty;
         var result = await _apiClient.GetTargetReportMenuTextsAsync(sid, cancellationToken).ConfigureAwait(false);
         if (result == null)
@@ -42,6 +43,7 @@ public class TargetReportController : ControllerBase
     {
         if (request == null)
             return BadRequest();
+        if (!HasSession()) return Unauthorized();
         var sid = request.SessionId;
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;

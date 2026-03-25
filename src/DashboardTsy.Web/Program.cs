@@ -63,6 +63,10 @@ app.UseSession();
 
 app.MapControllers();
 app.MapControllerRoute(
+    name: "login",
+    pattern: "login",
+    defaults: new { controller = "Auth", action = "Login" });
+app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Auth}/{action=Login}/{id?}");
 

@@ -16,6 +16,10 @@ namespace DashboardTsy.Web.Controllers
         [Route("/")]
         public IActionResult Index()
         {
+            var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId <= 0)
+                return RedirectToAction("Login", "Auth");
+
             var model = new ReportViewModel();
             return View(model);
         }

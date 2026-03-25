@@ -30,7 +30,24 @@ public class StoredProcedureExecutor : IStoredProcedureExecutor
             foreach (var p in parameters)
             {
                 var name = p.Key.StartsWith("@") ? p.Key : "@" + p.Key;
-                var value = p.Value ?? DBNull.Value;
+                object? value = p.Value;
+
+                if (value == null)
+                {
+
+                    value = DBNull.Value;
+                }
+                else if (value is string s && s.Trim().ToUpper() == "NULL")
+                {
+
+                    value = DBNull.Value;
+                }
+                else if (value is DateTime dt)
+                {
+                    if (dt <= (DateTime)System.Data.SqlTypes.SqlDateTime.MinValue || dt >= (DateTime)System.Data.SqlTypes.SqlDateTime.MaxValue)
+                        value = DBNull.Value;
+                }
+
                 cmd.Parameters.AddWithValue(name, value);
             }
         }
