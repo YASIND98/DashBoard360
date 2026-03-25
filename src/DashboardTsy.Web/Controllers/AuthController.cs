@@ -13,6 +13,7 @@ public class AuthController : Controller
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
+    private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
     public AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
@@ -81,7 +82,7 @@ public class AuthController : Controller
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                result = JsonSerializer.Deserialize<ApiResponse<UsersDto>>(json);
+                result = JsonSerializer.Deserialize<ApiResponse<UsersDto>>(json, JsonOptions);
             }
         }
         catch
@@ -121,7 +122,7 @@ public class AuthController : Controller
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                result = JsonSerializer.Deserialize<ApiResponse<UsersDto>>(json);
+                result = JsonSerializer.Deserialize<ApiResponse<UsersDto>>(json, JsonOptions);
             }
         }
         catch
@@ -161,7 +162,7 @@ public class AuthController : Controller
             if (response.IsSuccessStatusCode)
             {
                 var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-                result = JsonSerializer.Deserialize<ApiResponse<UsersDto>>(json);
+                result = JsonSerializer.Deserialize<ApiResponse<UsersDto>>(json, JsonOptions);
             }
         }
         catch
