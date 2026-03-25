@@ -1,4 +1,6 @@
 using System.Data;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using DashboardTsy.Application;
 using DashboardTsy.Application.TargetReport.Requests;
@@ -255,7 +257,23 @@ public class ReportDataProvider : IReportDataProvider
         if (MockEnabled)
             return MockProductivityReportData.GetReportRegionFilters();
 
-        return MockProductivityReportData.GetReportRegionFilters();
+        const string sql = @"
+SELECT DISTINCT BOLGE_KODU, BOLGE
+FROM DW_BOLGELER
+ORDER BY BOLGE;";
+
+        var ds = _spExecutor.ExecuteQueryDataSet("Referans", sql);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetReportRegionFilterItem>();
+
+        return ds.Tables[0].AsEnumerable()
+            .Select(r => new GetReportRegionFilterItem
+            {
+                Code = (r["BOLGE_KODU"]?.ToString() ?? string.Empty).Trim(),
+                Name = (r["BOLGE"]?.ToString() ?? string.Empty).Trim()
+            })
+            .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+            .ToList();
     }
 
     public IReadOnlyList<GetReportBranchFilterItem> GetReportBranchFilters(GetReportBranchFiltersRequest request)
@@ -265,7 +283,24 @@ public class ReportDataProvider : IReportDataProvider
         if (MockEnabled)
             return MockProductivityReportData.GetReportBranchFilters();
 
-        return MockProductivityReportData.GetReportBranchFilters();
+        const string sql = @"
+SELECT SUBE_KODU, SUBE_ADI, BOLGE_KODU
+FROM DW_BOLGELER
+ORDER BY SUBE_ADI;";
+
+        var ds = _spExecutor.ExecuteQueryDataSet("Referans", sql);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetReportBranchFilterItem>();
+
+        return ds.Tables[0].AsEnumerable()
+            .Select(r => new GetReportBranchFilterItem
+            {
+                Code = (r["SUBE_KODU"]?.ToString() ?? string.Empty).Trim(),
+                Name = (r["SUBE_ADI"]?.ToString() ?? string.Empty).Trim(),
+                RegionCode = (r["BOLGE_KODU"]?.ToString() ?? string.Empty).Trim()
+            })
+            .Where(x => !string.IsNullOrWhiteSpace(x.Code))
+            .ToList();
     }
 
     public IReadOnlyList<GetProductivityGeneralRegionReportItem> GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request)
