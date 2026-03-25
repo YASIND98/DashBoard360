@@ -1045,7 +1045,7 @@ function renderProfitTotalBranchTable(items) {
         html += '<td>' + item.RealizationBranchValue + '</td>';
         html += '<td class="has-diff">' + item.RealizationRegionAverageValue + formatDiff(item.RealizationRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.HgBranchValue + formatDiff(item.HgBranchValueDiff) + '</td>';
+        html += '<td class="has-diff ' + percentColor(item.HgBranchValue) + '">' + formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
         html += '<td>' + item.RetailValue + '</td>';
