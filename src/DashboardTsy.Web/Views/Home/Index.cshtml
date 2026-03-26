@@ -30,14 +30,6 @@
         <div class="skeleton-bar" style="width:140px;height:32px;border-radius:6px"></div>
         <div class="skeleton-bar" style="width:180px;height:32px;border-radius:6px;margin-left:10px"></div>
     </div>
-    <div class="skeleton-tabs">
-        <div class="skeleton-bar"></div>
-        <div class="skeleton-bar"></div>
-        <div class="skeleton-bar"></div>
-        <div class="skeleton-bar"></div>
-        <div class="skeleton-bar"></div>
-        <div class="skeleton-bar"></div>
-    </div>
     <div class="skeleton-table">
         @for (int i = 0; i < 12; i++)
         {
@@ -153,6 +145,7 @@
 
 <!-- Daily Table -->
 <div class="table-container" id="dailyTable">
+  <div class="table-wrapper">
     <table class="data-table">
         <thead>
             <tr>
@@ -187,34 +180,52 @@
         <tbody id="dailyTableBody">
         </tbody>
     </table>
+  </div>
 </div>
 
 <!-- Monthly Table -->
 <div class="table-container" id="monthlyTable" style="display:none;">
-    <table class="data-table">
-        <thead>
-            <tr>
-                <th class="col-index" rowspan="2"></th>
-                <th class="col-expand" rowspan="2"></th>
-                <th class="col-text valign-bottom" rowspan="2">
-                    <span data-monthly-header="ProductNameTitle"></span>
-                    <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                </th>
-                <th colspan="3" class="col-group-header selected" data-monthly-header="MonthGroupTitle"></th>
-                <th colspan="3" class="col-group-header" data-monthly-header="YearGroupTitle"></th>
-            </tr>
-            <tr>
-                <th class="text-center month-col month-col-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="text-center month-col"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="text-center month-col month-col-last" data-monthly-header="MonthHGTitle"></th>
-                <th class="text-center"><span data-monthly-header="YearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="text-center"><span data-monthly-header="YearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                <th class="text-center" data-monthly-header="YearHGTitle"></th>
-            </tr>
-        </thead>
-        <tbody id="monthlyTableBody">
-        </tbody>
-    </table>
+    <div class="table-skeleton" id="monthlyTableSkeleton" style="display:none;">
+        @for (int i = 0; i < 12; i++)
+        {
+            <div class="skeleton-table-row">
+                <div class="skeleton-bar" style="width:30px;height:16px"></div>
+                <div class="skeleton-bar" style="width:55%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:15%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:15%;height:16px"></div>
+            </div>
+        }
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table" id="monthlyDataTable">
+          <thead>
+              <tr>
+                  <th class="col-index" rowspan="2"></th>
+                  <th class="col-expand" rowspan="2"></th>
+                  <th class="col-text valign-bottom" rowspan="2">
+                      <span data-monthly-header="ProductNameTitle"></span>
+                      <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                  </th>
+                  <th colspan="3" class="col-group-header selected" data-monthly-header="MonthGroupTitle"></th>
+                  <th colspan="3" class="col-group-header" data-monthly-header="YearGroupTitle"></th>
+              </tr>
+              <tr>
+                  <th class="text-center month-col month-col-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="text-center month-col"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="text-center month-col month-col-last" data-monthly-header="MonthHGTitle"></th>
+                  <th class="text-center"><span data-monthly-header="YearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="text-center"><span data-monthly-header="YearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="text-center" data-monthly-header="YearHGTitle"></th>
+              </tr>
+          </thead>
+          <tbody id="monthlyTableBody">
+          </tbody>
+      </table>
+    </div>
 </div>
 
 @section Scripts {

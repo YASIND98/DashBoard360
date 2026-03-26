@@ -1242,7 +1242,7 @@ function reapplySortVisual($table) {
 
 function formatDiff(val) {
     if (val == null) return '<div class="diff-value">&nbsp;</div>';
-    var cls = val < 0 ? 'negative' : 'positive';
+    var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
     var prefix = val > 0 ? '+' : '';
     return '<div class="diff-value ' + cls + '">' + prefix + val + '</div>';
 }
