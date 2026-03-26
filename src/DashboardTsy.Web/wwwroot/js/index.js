@@ -190,7 +190,14 @@ $(document).ready(function () {
       });
   }
 
+  var monthlyFirstLoad = true;
+
   function loadMonthlyReport() {
+      if (monthlyFirstLoad) {
+          $('#monthlyDataTable').hide();
+          $('#monthlyTableSkeleton').show();
+      }
+
       $.ajax({
           url: '/TargetReport/GetMonthlyTargetReport',
           type: 'POST',
@@ -198,6 +205,11 @@ $(document).ready(function () {
           data: JSON.stringify(buildRequest(false)),
           success: function (data) {
               $('#monthlyTableBody').html(buildMonthlyRows(data.Products, 0, false));
+              if (monthlyFirstLoad) {
+                  monthlyFirstLoad = false;
+                  $('#monthlyTableSkeleton').hide();
+                  $('#monthlyDataTable').show();
+              }
               updateStripes();
               hideSkeleton();
           }

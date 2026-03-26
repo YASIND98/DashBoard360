@@ -1203,3 +1203,7 @@ body {
   background: rgba(255,255,255,0.03);
   border-radius: 12px;
 }
+
+.table-skeleton {
+  padding: 16px;
+}

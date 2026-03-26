@@ -191,7 +191,22 @@
 
 <!-- Monthly Table -->
 <div class="table-container" id="monthlyTable" style="display:none;">
-    <table class="data-table">
+    <div class="table-skeleton" id="monthlyTableSkeleton" style="display:none;">
+        @for (int i = 0; i < 12; i++)
+        {
+            <div class="skeleton-table-row">
+                <div class="skeleton-bar" style="width:30px;height:16px"></div>
+                <div class="skeleton-bar" style="width:55%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:15%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:15%;height:16px"></div>
+            </div>
+        }
+    </div>
+    <table class="data-table" id="monthlyDataTable">
         <thead>
             <tr>
                 <th class="col-index" rowspan="2"></th>
