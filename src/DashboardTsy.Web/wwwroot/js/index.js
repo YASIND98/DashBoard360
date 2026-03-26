@@ -3,7 +3,7 @@ $(document).ready(function () {
   // ===== State =====
   var selectedRegion = null;
   var selectedBranch = null;
-  var currentSortBy = undefined;
+  var currentSortBy = 0;
   var currentSortState = null;
   var monthlyHeadersLoaded = false;
 
@@ -51,13 +51,13 @@ $(document).ready(function () {
 
   function getActiveSubTabId() {
       var $active = $('.sub-tab-bar:visible .sub-tab.active');
-      if (!$active.length) return null;
+      if (!$active.length) return 0;
       var subTabMap = {
           'kobi-tumu': 0, 'kobi-kbi': 1, 'kobi-obi': 2,
           'bireysel-tumu': 0, 'bireysel-genel': 1, 'bireysel-afili': 2, 'bireysel-ozel': 3
       };
       var key = $active.data('subtab') || '';
-      return subTabMap[key] !== undefined ? subTabMap[key] : null;
+      return subTabMap[key] !== undefined ? subTabMap[key] : 0;
   }
 
   function getActivePeriod() {
@@ -144,7 +144,7 @@ $(document).ready(function () {
           html += '<td class="text-center month-col">' + formatNumber(p.MonthTargetAmount) + '</td>';
           html += '<td class="text-center month-col month-col-last col-ratio ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
           html += '<td class="text-center">' + formatNumber(p.YearActualAmount) + '</td>';
-          html += '<td>' + formatNumber(p.YearTargetAmount) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.YearTargetAmount) + '</td>';
           html += '<td class="text-center col-ratio ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';
           html += '</tr>';
 
@@ -153,6 +153,15 @@ $(document).ready(function () {
           }
       });
       return html;
+  }
+
+  // ===== Skeleton =====
+  function hideSkeleton() {
+    $('#pageSkeleton').fadeOut(200, function () {
+        $('#pageContent').fadeIn(200, function () {
+            updateStripes();
+        });
+    });
   }
 
   // ===== Report Loaders =====
@@ -176,6 +185,7 @@ $(document).ready(function () {
 
               if (!showDiff) $('#dailyTableBody .diff-details').hide();
               updateStripes();
+              hideSkeleton();
           }
       });
   }
@@ -189,6 +199,7 @@ $(document).ready(function () {
           success: function (data) {
               $('#monthlyTableBody').html(buildMonthlyRows(data.Products, 0, false));
               updateStripes();
+              hideSkeleton();
           }
       });
   }
@@ -341,10 +352,10 @@ $(document).ready(function () {
   }
 
   // ===== Search =====
-  $('#searchInput').on('keydown', function (e) {
-      if (e.key === 'Enter') {
-          e.preventDefault();
-          if ($(this).val().trim().length >= 1) loadActiveReport();
+  $('#searchInput').on('input', function () {
+      var len = $(this).val().trim().length;
+      if (len >= 3 || len === 0) {
+          loadActiveReport();
       }
   });
 

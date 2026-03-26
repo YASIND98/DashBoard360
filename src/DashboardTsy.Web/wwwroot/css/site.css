@@ -1145,3 +1145,61 @@ body {
     font-size: 14px;
   }
 }
+
+/* ===== Skeleton Loading ===== */
+@keyframes skeleton-shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton-bar {
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.5s infinite ease-in-out;
+}
+
+.page-skeleton {
+  padding: 24px;
+}
+
+.skeleton-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.skeleton-filters {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.skeleton-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 20px;
+  padding: 0 16px;
+}
+
+.skeleton-table {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+}
+
+.skeleton-table-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 8px;
+}
+
+.skeleton-table-row:nth-child(odd) {
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+}
