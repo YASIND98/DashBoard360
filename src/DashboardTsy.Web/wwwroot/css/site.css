@@ -1178,14 +1178,6 @@ body {
   margin-bottom: 24px;
 }
 
-.skeleton-tabs {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  margin-bottom: 20px;
-  padding: 0 16px;
-}
-
 .skeleton-table {
   background: var(--bg-card);
   border-radius: var(--radius-xl);
