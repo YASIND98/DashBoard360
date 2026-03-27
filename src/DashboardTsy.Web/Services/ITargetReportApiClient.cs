@@ -8,6 +8,7 @@ public interface ITargetReportApiClient
     Task<IReadOnlyList<GetTargetReportFiltersItem>> GetTargetReportFiltersAsync(GetTargetReportFiltersRequest request, CancellationToken cancellationToken = default);
     Task<GetDailyTargetReportResponse?> GetDailyTargetReportAsync(GetDailyTargetReportRequest request, CancellationToken cancellationToken = default);
     Task<GetDailyQuantityTargetReportResponse?> GetDailyQuantityTargetReportAsync(GetDailyQuantityTargetReportRequest request, CancellationToken cancellationToken = default);
+    Task<ProductTop10DifferencesResponse?> GetProductTop10DailyAndWeeklyDifferencesAsync(GetProductTop10DailyAndWeeklyDifferencesRequest request, CancellationToken cancellationToken = default);
     Task<GetDailyTargetReportTableHeadersResponse?> GetDailyTargetReportTableHeadersAsync(GetDailyTargetReportTableHeadersRequest request, CancellationToken cancellationToken = default);
     Task<GetMonthlyTargetReportResponse?> GetMonthlyTargetReportAsync(GetMonthlyTargetReportRequest request, CancellationToken cancellationToken = default);
     Task<GetMonthlyTargetReportTableHeadersResponse?> GetMonthlyTargetReportTableHeadersAsync(GetMonthlyTargetReportTableHeadersRequest request, CancellationToken cancellationToken = default);

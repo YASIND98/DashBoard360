@@ -136,6 +136,22 @@ public class ReportDataProvider : IReportDataProvider
 
     }
 
+    public ProductTop10DifferencesResponse GetProductTop10DailyAndWeeklyDifferences(GetProductTop10DailyAndWeeklyDifferencesRequest request)
+    {
+        request ??= new GetProductTop10DailyAndWeeklyDifferencesRequest();
+        if (MockEnabled)
+            return MockTargetReportData.GetProductTop10DailyAndWeeklyDifferences(request);
+        // SP hazir oldugunda acilacak.
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@ProductId"] = request.ProductId,
+        //     ["@FilterType"] = request.FilterType
+        // };
+        // var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductTop10DailyAndWeeklyDifferences", parameters);
+        // TODO: ds mapping
+        return MockTargetReportData.GetProductTop10DailyAndWeeklyDifferences(request);
+    }
+
     public GetDailyTargetReportTableHeadersResponse? GetDailyTargetReportTableHeaders(string sessionId)
     {
         if (MockEnabled)

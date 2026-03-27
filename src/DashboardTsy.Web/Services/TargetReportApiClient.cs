@@ -58,6 +58,17 @@ public class TargetReportApiClient : ITargetReportApiClient
         return JsonSerializer.Deserialize<GetDailyQuantityTargetReportResponse>(json, _jsonOptions);
     }
 
+    public async Task<ProductTop10DifferencesResponse?> GetProductTop10DailyAndWeeklyDifferencesAsync(
+        GetProductTop10DailyAndWeeklyDifferencesRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetProductTop10DailyAndWeeklyDifferences", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+            return null;
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<ProductTop10DifferencesResponse>(json, _jsonOptions);
+    }
+
     public async Task<GetDailyTargetReportTableHeadersResponse?> GetDailyTargetReportTableHeadersAsync(
         GetDailyTargetReportTableHeadersRequest request,
         CancellationToken cancellationToken = default)

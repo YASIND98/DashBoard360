@@ -255,6 +255,40 @@ public static class MockTargetReportData
         return new GetDailyQuantityTargetReportResponse { Products = roots };
     }
 
+    public static ProductTop10DifferencesResponse GetProductTop10DailyAndWeeklyDifferences(GetProductTop10DailyAndWeeklyDifferencesRequest request)
+    {
+        var dailyFirst = new List<Top10Item>
+        {
+            new() { CompanyId = 12065001, CompanyName = "IGA Havalimani Isletmesi Anonim Sirketi", Value = 672025825.56m },
+            new() { CompanyId = 7687576, CompanyName = "Halic Altin Boynuz Marina Turizm", Value = 435873708.85m }
+        };
+        var dailyLast = new List<Top10Item>
+        {
+            new() { CompanyId = 12065001, CompanyName = "IGA Havalimani Isletmesi Anonim Sirketi", Value = -49876543.56m },
+            new() { CompanyId = 12065001, CompanyName = "IGA Havalimani Isletmesi Anonim Sirketi", Value = -39876543.56m }
+        };
+
+        var weeklyFirst = new List<Top10Item>
+        {
+            new() { CompanyId = 11513754, CompanyName = "F.O.M Grup Mimarlik Ins. Tic. A.S.", Value = 165527615.70m }
+        };
+        var weeklyLast = new List<Top10Item>
+        {
+            new() { CompanyId = 964844, CompanyName = "Turkiye Petrolleri Anonim Ortakligi", Value = -39876543.56m }
+        };
+
+        return request.FilterType switch
+        {
+            0 => new ProductTop10DifferencesResponse { First10 = dailyFirst, Last10 = dailyLast },
+            1 => new ProductTop10DifferencesResponse { First10 = weeklyFirst, Last10 = weeklyLast },
+            _ => new ProductTop10DifferencesResponse
+            {
+                First10 = dailyFirst.Concat(weeklyFirst).ToList(),
+                Last10 = dailyLast.Concat(weeklyLast).ToList()
+            }
+        };
+    }
+
     public static GetMonthlyTargetReportTableHeadersResponse GetMonthlyHeaders(DateTime reportDate)
     {
         var dt = (reportDate == default ? DateTime.Today : reportDate).Date;

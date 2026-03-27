@@ -72,6 +72,19 @@ public class TargetReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /api/TargetReport/GetProductTop10DailyAndWeeklyDifferences
+    /// EXEC dbo.SP_RP_GetProductTop10DailyAndWeeklyDifferences ...
+    /// </summary>
+    [HttpPost("GetProductTop10DailyAndWeeklyDifferences")]
+    public ActionResult<ProductTop10DifferencesResponse> GetProductTop10DailyAndWeeklyDifferences([FromBody] GetProductTop10DailyAndWeeklyDifferencesRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+        var result = _reportDataProvider.GetProductTop10DailyAndWeeklyDifferences(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /api/TargetReport/GetDailyTargetReportTableHeaders
     /// EXEC dbo.SP_RP_GetDailyTargetReportTableHeaders @SessionId=''
     /// </summary>

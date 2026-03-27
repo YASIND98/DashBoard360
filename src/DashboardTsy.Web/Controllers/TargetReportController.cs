@@ -130,6 +130,29 @@ public class TargetReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /api/TargetReport/GetProductTop10DailyAndWeeklyDifferences - proxies to Dashboard API SP_RP_GetProductTop10DailyAndWeeklyDifferences.
+    /// </summary>
+    [HttpPost("GetProductTop10DailyAndWeeklyDifferences")]
+    public async Task<ActionResult<Models.TargetReport.ProductTop10DifferencesResponse>> GetProductTop10DailyAndWeeklyDifferences(
+        [FromBody] Models.TargetReport.GetProductTop10DailyAndWeeklyDifferencesRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var req = new Models.TargetReport.GetProductTop10DailyAndWeeklyDifferencesRequest
+        {
+            ProductId = request.ProductId,
+            FilterType = request.FilterType
+        };
+
+        var result = await _apiClient.GetProductTop10DailyAndWeeklyDifferencesAsync(req, cancellationToken).ConfigureAwait(false);
+        if (result == null)
+            return StatusCode(502);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /api/TargetReport/GetDailyTargetReportTableHeaders - proxies to Dashboard API SP_RP_GetDailyTargetReportTableHeaders.
     /// </summary>
     [HttpPost("GetDailyTargetReportTableHeaders")]
