@@ -110,6 +110,32 @@ public class ReportDataProvider : IReportDataProvider
         return response;
     }
 
+    public GetDailyQuantityTargetReportResponse GetDailyQuantityTargetReport(GetDailyQuantityTargetReportRequest request)
+    {
+        request ??= new GetDailyQuantityTargetReportRequest();
+        if (MockEnabled)
+            return MockTargetReportData.GetDailyQuantityReport(request);
+        // SP hazir oldugunda acilacak.
+        // var parameters = new Dictionary<string, object?>
+        // {
+        //     ["@SessionId"] = request.SessionId ?? string.Empty,
+        //     ["@TabId"] = request.TabId,
+        //     ["@SubTabId"] = request.SubTabId ?? (object)DBNull.Value,
+        //     ["@ReportDate"] = request.ReportDate,
+        //     ["@RegionId"] = ToCsv(request.RegionId) ?? (object)DBNull.Value,
+        //     ["@BranchId"] = ToCsv(request.BranchId) ?? (object)DBNull.Value,
+        //     ["@PortfolioId"] = ToCsv(request.PortfolioId) ?? (object)DBNull.Value,
+        //     ["@SearchText"] = string.IsNullOrWhiteSpace(request.SearchText) ? (object)DBNull.Value : request.SearchText.Trim(),
+        //     ["@ShowDifferences"] = request.ShowDifferences,
+        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+        //     ["@IsAscending"] = request.IsAscending
+        // };
+        // var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyQuantityTargetReport", parameters);
+        // TODO: ds mapping
+        return MockTargetReportData.GetDailyQuantityReport(request);
+
+    }
+
     public GetDailyTargetReportTableHeadersResponse? GetDailyTargetReportTableHeaders(string sessionId)
     {
         if (MockEnabled)

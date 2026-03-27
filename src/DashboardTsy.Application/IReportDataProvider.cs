@@ -19,6 +19,8 @@ public interface IReportDataProvider
 
     GetDailyTargetReportResponse GetDailyTargetReport(GetDailyTargetReportRequest request);
 
+    GetDailyQuantityTargetReportResponse GetDailyQuantityTargetReport(GetDailyQuantityTargetReportRequest request);
+
     GetDailyTargetReportTableHeadersResponse? GetDailyTargetReportTableHeaders(string sessionId);
 
     GetMonthlyTargetReportResponse? GetMonthlyTargetReport(GetMonthlyTargetReportRequest request);

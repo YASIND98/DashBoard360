@@ -155,6 +155,106 @@ public static class MockTargetReportData
         return new GetDailyTargetReportResponse { Products = roots };
     }
 
+    public static GetDailyQuantityTargetReportResponse GetDailyQuantityReport(GetDailyQuantityTargetReportRequest request)
+    {
+        var t = (request.ReportDate == default ? DateTime.Today : request.ReportDate).Date;
+
+        var kredi = new GetDailyQuantityTargetReportResponse.Product
+        {
+            ProductId = 10,
+            ProductName = "Kredi",
+            ParentId = null,
+            LevelNo = 1,
+            SortOrder = 1,
+            LastYearAmount = 120,
+            LastYearDate = t.AddYears(-1),
+            LastWeekAmount = 130,
+            LastWeekDate = t.AddDays(-7),
+            PrevDayAmount = 140,
+            PrevDayDate = t.AddDays(-2),
+            YesterdayAmount = 150,
+            YesterdayDate = t.AddDays(-1),
+            TodayDate = t
+        };
+
+        var ihtiyac = new GetDailyQuantityTargetReportResponse.Product
+        {
+            ProductId = 11,
+            ProductName = "Ihtiyac Kredisi",
+            ParentId = 10,
+            LevelNo = 2,
+            SortOrder = 1,
+            LastYearAmount = 40,
+            LastYearDate = t.AddYears(-1),
+            LastWeekAmount = 45,
+            LastWeekDate = t.AddDays(-7),
+            PrevDayAmount = 47,
+            PrevDayDate = t.AddDays(-2),
+            YesterdayAmount = 49,
+            YesterdayDate = t.AddDays(-1),
+            TodayDate = t
+        };
+
+        var konut = new GetDailyQuantityTargetReportResponse.Product
+        {
+            ProductId = 12,
+            ProductName = "Konut Kredisi",
+            ParentId = 10,
+            LevelNo = 2,
+            SortOrder = 2,
+            LastYearAmount = 80,
+            LastYearDate = t.AddYears(-1),
+            LastWeekAmount = 85,
+            LastWeekDate = t.AddDays(-7),
+            PrevDayAmount = 93,
+            PrevDayDate = t.AddDays(-2),
+            YesterdayAmount = 101,
+            YesterdayDate = t.AddDays(-1),
+            TodayDate = t
+        };
+
+        var mevduat = new GetDailyQuantityTargetReportResponse.Product
+        {
+            ProductId = 20,
+            ProductName = "Mevduat",
+            ParentId = null,
+            LevelNo = 1,
+            SortOrder = 2,
+            LastYearAmount = 200,
+            LastYearDate = t.AddYears(-1),
+            LastWeekAmount = 210,
+            LastWeekDate = t.AddDays(-7),
+            PrevDayAmount = 215,
+            PrevDayDate = t.AddDays(-2),
+            YesterdayAmount = 220,
+            YesterdayDate = t.AddDays(-1),
+            TodayDate = t
+        };
+
+        SetDailyQuantityDiffs(kredi, 155);
+        SetDailyQuantityDiffs(ihtiyac, 52);
+        SetDailyQuantityDiffs(konut, 103);
+        SetDailyQuantityDiffs(mevduat, 218);
+
+        kredi.SubProducts.Add(ihtiyac);
+        kredi.SubProducts.Add(konut);
+
+        var roots = new List<GetDailyQuantityTargetReportResponse.Product> { kredi, mevduat };
+
+        if (!string.IsNullOrWhiteSpace(request.SearchText))
+        {
+            var q = request.SearchText.Trim();
+            roots = FilterDailyQuantityTreeByName(roots, q);
+        }
+
+        if (!request.ShowDifferences)
+            ClearDailyQuantityDiffs(roots);
+
+        roots = SortDailyQuantityTree(roots, request.SortBy, request.IsAscending);
+
+        return new GetDailyQuantityTargetReportResponse { Products = roots };
+    }
+
     public static GetMonthlyTargetReportTableHeadersResponse GetMonthlyHeaders(DateTime reportDate)
     {
         var dt = (reportDate == default ? DateTime.Today : reportDate).Date;
@@ -335,6 +435,68 @@ public static class MockTargetReportData
         foreach (var n in ordered)
             if (n.SubProducts != null && n.SubProducts.Count > 0)
                 n.SubProducts = SortMonthlyTree(n.SubProducts, sortBy, asc);
+        return ordered;
+    }
+
+    private static void SetDailyQuantityDiffs(GetDailyQuantityTargetReportResponse.Product p, double todayAmount)
+    {
+        p.DiffByPrevDayAmount = todayAmount - p.PrevDayAmount;
+        p.DiffByLastYearAmount = todayAmount - p.LastYearAmount;
+        p.DiffByLastWeekAmount = todayAmount - p.LastWeekAmount;
+    }
+
+    private static List<GetDailyQuantityTargetReportResponse.Product> FilterDailyQuantityTreeByName(List<GetDailyQuantityTargetReportResponse.Product> nodes, string q)
+    {
+        bool Matches(GetDailyQuantityTargetReportResponse.Product p)
+            => (p.ProductName ?? string.Empty).Contains(q, StringComparison.OrdinalIgnoreCase);
+
+        List<GetDailyQuantityTargetReportResponse.Product> Recurse(IEnumerable<GetDailyQuantityTargetReportResponse.Product> list)
+        {
+            var result = new List<GetDailyQuantityTargetReportResponse.Product>();
+            foreach (var n in list)
+            {
+                var filteredChildren = Recurse(n.SubProducts ?? new List<GetDailyQuantityTargetReportResponse.Product>());
+                if (Matches(n) || filteredChildren.Count > 0)
+                {
+                    n.SubProducts = filteredChildren;
+                    result.Add(n);
+                }
+            }
+
+            return result;
+        }
+
+        return Recurse(nodes);
+    }
+
+    private static void ClearDailyQuantityDiffs(IEnumerable<GetDailyQuantityTargetReportResponse.Product> nodes)
+    {
+        foreach (var n in nodes)
+        {
+            n.DiffByPrevDayAmount = null;
+            n.DiffByLastYearAmount = null;
+            n.DiffByLastWeekAmount = null;
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                ClearDailyQuantityDiffs(n.SubProducts);
+        }
+    }
+
+    private static List<GetDailyQuantityTargetReportResponse.Product> SortDailyQuantityTree(List<GetDailyQuantityTargetReportResponse.Product> nodes, int? sortBy, bool asc)
+    {
+        Func<GetDailyQuantityTargetReportResponse.Product, object> key = sortBy switch
+        {
+            1 => p => p.ProductName ?? string.Empty,
+            2 => p => p.LastYearAmount,
+            3 => p => p.LastWeekAmount,
+            4 => p => p.PrevDayAmount,
+            5 => p => p.YesterdayAmount,
+            _ => p => p.SortOrder
+        };
+
+        var ordered = (asc ? nodes.OrderBy(key) : nodes.OrderByDescending(key)).ToList();
+        foreach (var n in ordered)
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortDailyQuantityTree(n.SubProducts, sortBy, asc);
         return ordered;
     }
 }
