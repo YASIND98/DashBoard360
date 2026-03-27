@@ -22,7 +22,8 @@ public class StoredProcedureExecutor : IStoredProcedureExecutor
         using var connection = new SqlConnection(connectionString);
         using var cmd = new SqlCommand(procedureName, connection)
         {
-            CommandType = CommandType.StoredProcedure
+            CommandType = CommandType.StoredProcedure,
+            CommandTimeout = 180
         };
 
         if (parameters != null)
@@ -70,7 +71,8 @@ public class StoredProcedureExecutor : IStoredProcedureExecutor
         using var connection = new SqlConnection(connectionString);
         using var cmd = new SqlCommand(sql, connection)
         {
-            CommandType = CommandType.Text
+            CommandType = CommandType.Text,
+            CommandTimeout = 180
         };
 
         if (parameters != null)
