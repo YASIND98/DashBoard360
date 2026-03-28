@@ -8,39 +8,62 @@ $(document).ready(function () {
   var monthlyHeadersLoaded = false;
 
   // ===== Load Menu Texts =====
-  $.ajax({
-      url: '/TargetReport/GetTargetReportMenuTexts',
-      type: 'GET',
-      data: { sessionId: '1' },
-      success: function (data) {
-          $('[data-menu]').each(function () {
-              var key = $(this).data('menu');
-              if (data[key]) $(this).text(data[key]);
-          });
+  var cachedMenu = sessionStorage.getItem('_menuTexts');
+  if (cachedMenu) {
+      var menuData = JSON.parse(cachedMenu);
+      $('[data-menu]').each(function () {
+          var key = $(this).data('menu');
+          if (menuData[key]) $(this).text(menuData[key]);
+      });
+  } else {
+      $.ajax({
+          url: '/TargetReport/GetTargetReportMenuTexts',
+          type: 'GET',
+          data: { sessionId: '1' },
+          success: function (data) {
+              sessionStorage.setItem('_menuTexts', JSON.stringify(data));
+              $('[data-menu]').each(function () {
+                  var key = $(this).data('menu');
+                  if (data[key]) $(this).text(data[key]);
+              });
+          }
+      });
+  }
+
+  // ===== Header Helpers =====
+  function loadHeaders(url, storageKey, callback) {
+      var cached = sessionStorage.getItem(storageKey);
+      if (cached) {
+          callback(JSON.parse(cached));
+          return;
       }
-  });
+      $.ajax({
+          url: url,
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ sessionId: '1' }),
+          success: function (data) {
+              sessionStorage.setItem(storageKey, JSON.stringify(data));
+              callback(data);
+          }
+      });
+  }
 
   // ===== Load Daily Headers =====
   window._dailyHeaders = {};
-  $.ajax({
-      url: '/TargetReport/GetDailyTargetReportTableHeaders',
-      type: 'POST',
-      contentType: 'application/json',
-      data: JSON.stringify({ sessionId: '1' }),
-      success: function (data) {
-          window._dailyHeaders = data;
-          $('[data-daily-header]').each(function () {
-              var key = $(this).data('daily-header');
-              if (key.indexOf('Date') > -1 && data[key]) {
-                  var d = new Date(data[key]);
-                  var dd = String(d.getDate()).padStart(2, '0');
-                  var mm = String(d.getMonth() + 1).padStart(2, '0');
-                  $(this).text('(' + dd + '.' + mm + '.' + d.getFullYear() + ')');
-              } else if (data[key]) {
-                  $(this).text(data[key]);
-              }
-          });
-      }
+  loadHeaders('/TargetReport/GetDailyTargetReportTableHeaders', '_dailyHeaders', function (data) {
+      window._dailyHeaders = data;
+      $('[data-daily-header]').each(function () {
+          var key = $(this).data('daily-header');
+          if (key.indexOf('Date') > -1 && data[key]) {
+              var d = new Date(data[key]);
+              var dd = String(d.getDate()).padStart(2, '0');
+              var mm = String(d.getMonth() + 1).padStart(2, '0');
+              $(this).text('(' + dd + '.' + mm + '.' + d.getFullYear() + ')');
+          } else if (data[key]) {
+              $(this).text(data[key]);
+          }
+      });
   });
 
   // ===== Tab Helpers =====
@@ -61,11 +84,17 @@ $(document).ready(function () {
   }
 
   function getActivePeriod() {
-      return $('.toggle-btn.active').data('period') || 'daily';
+      return $('.period-btn.active').data('period') || 'daily';
+  }
+
+  function getActiveType() {
+      return $('.segment[data-type].active').data('type') || 'hacim';
   }
 
   function loadActiveReport() {
-      if (getActivePeriod() === 'monthly') {
+      if (getActiveType() === 'adet') {
+          loadQuantityReport();
+      } else if (getActivePeriod() === 'monthly') {
           loadMonthlyReport();
       } else {
           loadDailyReport();
@@ -111,7 +140,7 @@ $(document).ready(function () {
       return html;
   }
 
-  function buildDailyRows(products, depth, isSub) {
+  function buildDailyRows(products, depth, isSub, showTop10) {
       var html = '';
       products.forEach(function (p) {
           html += buildRowStart(p, depth, isSub);
@@ -127,10 +156,15 @@ $(document).ready(function () {
           html += '<span class="diff-value ' + (p.DiffByLastWeekAmount < 0 ? 'negative' : (p.DiffByLastWeekAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastWeekAmount || 0) + '</span></span>';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByPrevDayTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0) + '</span></span>';
-          html += '</div></td></tr>';
+          html += '</div>';
+          html += '</td>';
+          if (showTop10) {
+              html += '<td class="col-top10 diff-cell"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
+          }
+          html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
-              html += buildDailyRows(p.SubProducts, depth + 1, true);
+              html += buildDailyRows(p.SubProducts, depth + 1, true, showTop10);
           }
       });
       return html;
@@ -174,7 +208,7 @@ $(document).ready(function () {
           contentType: 'application/json',
           data: JSON.stringify(buildRequest(showDiff)),
           success: function (data) {
-              $('#dailyTableBody').html(buildDailyRows(data.Products, 0, false));
+              $('#dailyTableBody').html(buildDailyRows(data.Products, 0, false, true));
 
               $('#dailyTableBody [data-daily-header]').each(function () {
                   var key = $(this).data('daily-header');
@@ -183,7 +217,10 @@ $(document).ready(function () {
                   }
               });
 
-              if (!showDiff) $('#dailyTableBody .diff-details').hide();
+              if (!showDiff) {
+                  $('#dailyTableBody .diff-details').hide();
+                  $('#dailyTableBody .diff-cell').hide();
+              }
               updateStripes();
               hideSkeleton();
           }
@@ -216,8 +253,57 @@ $(document).ready(function () {
       });
   }
 
+  // ===== Quantity Report =====
+  var quantityHeadersLoaded = false;
+
+  function loadQuantityReport() {
+      var showDiff = $('#quantityDiffToggle').attr('data-active') === 'true';
+
+      if (!quantityHeadersLoaded) {
+          quantityHeadersLoaded = true;
+          loadHeaders('/TargetReport/GetDailyTargetReportTableHeaders', '_dailyHeaders', function (data) {
+              window._quantityHeaders = data;
+              $('[data-quantity-header]').each(function () {
+                  var key = $(this).data('quantity-header');
+                  if (data[key]) $(this).text(data[key]);
+              });
+          });
+      }
+
+      $.ajax({
+          url: '/TargetReport/GetDailyQuantityTargetReport',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(buildRequest(showDiff)),
+          success: function (data) {
+              $('#quantityTableBody').html(buildDailyRows(data.Products, 0, false, false));
+
+              $('#quantityTableBody [data-daily-header]').each(function () {
+                  var key = $(this).data('daily-header');
+                  if (window._quantityHeaders && window._quantityHeaders[key]) {
+                      $(this).text(window._quantityHeaders[key]);
+                  }
+              });
+
+              if (!showDiff) {
+                  $('#quantityTableBody .diff-details').hide();
+                  $('#quantityTableBody .diff-cell').hide();
+              }
+              updateStripes();
+              hideSkeleton();
+          }
+      });
+  }
+
+  $('#quantityDiffToggle').on('click', function () {
+      var isActive = $(this).attr('data-active') === 'true';
+      $(this).attr('data-active', isActive ? 'false' : 'true');
+      loadQuantityReport();
+  });
+  $('#quantityDiffToggle').attr('data-active', 'false');
+
   // ===== Sorting =====
-  $(document).on('click', '#dailyTable thead th, #monthlyTable thead th', function () {
+  $(document).on('click', '#dailyTable thead th, #monthlyTable thead th, #quantityTable thead th', function () {
       var $icon = $(this).find('.sort-icon[data-sort-by]');
       if (!$icon.length) return;
 
@@ -263,33 +349,58 @@ $(document).ready(function () {
       loadActiveReport();
   });
 
-  // ===== Period Toggle =====
-  $('.toggle-btn').on('click', function () {
-      $('.toggle-btn').removeClass('active');
+  // ===== Hacim / Adet Toggle =====
+  $('.segment[data-type]').on('click', function () {
+      $('.segment[data-type]').removeClass('active');
+      $(this).addClass('active');
+
+      var type = $(this).data('type');
+      if (type === 'adet') {
+          $('#dailyTable').hide();
+          $('#monthlyTable').hide();
+          $('.period-toggle').hide();
+          $('#quantityTable').show();
+          loadQuantityReport();
+      } else {
+          $('#quantityTable').hide();
+          $('.period-toggle').show();
+          $('.period-btn').removeClass('active');
+          $('.period-btn[data-period="daily"]').addClass('active');
+          $('#monthlyTable').hide();
+          $('#dailyTable').show();
+          $('#diffToggle').show();
+          loadDailyReport();
+      }
+      updateStripes();
+  });
+
+  // ===== Period Toggle (Günlük / Aylık) =====
+  $('.period-btn').on('click', function () {
+      $('.period-btn').removeClass('active');
       $(this).addClass('active');
 
       var period = $(this).data('period');
       var now = new Date();
       var trMonths = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+      // Adet seçiliyken tablo gösterme
+      var activeType = $('.segment[data-type].active').data('type');
+      if (activeType === 'adet') return;
+
       if (period === 'monthly') {
           $('.date-text').text(trMonths[now.getMonth()] + ' ' + now.getFullYear());
           $('.date-badge').text('Bu Ay');
           $('#dailyTable').hide();
+          $('#quantityTable').hide();
           $('#monthlyTable').show();
           $('#diffToggle').hide();
           if (!monthlyHeadersLoaded) {
               monthlyHeadersLoaded = true;
-              $.ajax({
-                  url: '/TargetReport/GetMonthlyTargetReportTableHeaders',
-                  type: 'POST',
-                  contentType: 'application/json',
-                  data: JSON.stringify({ sessionId: '1' }),
-                  success: function (data) {
-                      $('[data-monthly-header]').each(function () {
-                          var key = $(this).data('monthly-header');
-                          if (data[key]) $(this).text(data[key]);
-                      });
-                  }
+              loadHeaders('/TargetReport/GetMonthlyTargetReportTableHeaders', '_monthlyHeaders', function (data) {
+                  $('[data-monthly-header]').each(function () {
+                      var key = $(this).data('monthly-header');
+                      if (data[key]) $(this).text(data[key]);
+                  });
               });
           }
           loadMonthlyReport();
@@ -298,6 +409,7 @@ $(document).ready(function () {
           $('.date-text').text(dd + ' ' + trMonths[now.getMonth()] + ' ' + now.getFullYear());
           $('.date-badge').text('Bugün');
           $('#monthlyTable').hide();
+          $('#quantityTable').hide();
           $('#dailyTable').show();
           $('#diffToggle').show();
           loadDailyReport();
@@ -314,6 +426,7 @@ $(document).ready(function () {
 
   $('#diffToggle').attr('data-active', 'false');
   $('.diff-details').hide();
+  $('.diff-cell').hide();
 
   // ===== Striping =====
   function updateStripes() {
@@ -445,4 +558,72 @@ $(document).ready(function () {
   });
 
   updateStripes();
+
+  // ===== Top 10 Modal =====
+  var currentTop10ProductId = null;
+  var currentTop10FilterType = 0; // 0: Günlük, 1: Haftalık
+
+  function formatTop10Value(val) {
+    var prefix = val >= 0 ? '+' : '';
+    return prefix + new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
+  }
+
+  function loadTop10Data(productId, filterType) {
+    $('#top10First').html('');
+    $('#top10Last').html('');
+    $.ajax({
+      url: '/TargetReport/GetProductTop10DailyAndWeeklyDifferences',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ ProductId: productId, FilterType: filterType }),
+      success: function (data) {
+        var firstHtml = '';
+        var lastHtml = '';
+        if (data.First10 && data.First10.length > 0) {
+          for (var i = 0; i < data.First10.length; i++) {
+            var f = data.First10[i];
+            firstHtml += '<div class="top10-row"><span class="top10-id">' + (f.CompanyId || '') + '</span><span class="top10-name">' + (f.CompanyName || '') + '</span><span class="top10-value positive">' + formatTop10Value(f.Value) + '</span></div>';
+          }
+        }
+        if (data.Last10 && data.Last10.length > 0) {
+          for (var j = 0; j < data.Last10.length; j++) {
+            var l = data.Last10[j];
+            lastHtml += '<div class="top10-row"><span class="top10-id">' + (l.CompanyId || '') + '</span><span class="top10-name">' + (l.CompanyName || '') + '</span><span class="top10-value negative">' + formatTop10Value(l.Value) + '</span></div>';
+          }
+        }
+        $('#top10First').html(firstHtml);
+        $('#top10Last').html(lastHtml);
+      }
+    });
+  }
+
+  $(document).on('click', '.top10-icon', function (e) {
+    e.stopPropagation();
+    var productId = $(this).data('product-id');
+    var productName = $(this).data('product-name');
+    currentTop10ProductId = productId;
+    currentTop10FilterType = 0;
+    $('.top10-title').text(productName);
+    $('.toggle-btn').removeClass('active');
+    $('.toggle-btn[data-top10-period="daily"]').addClass('active');
+    loadTop10Data(productId, 0);
+    $('#top10Overlay').addClass('active');
+  });
+
+  $('#top10Close').on('click', function () {
+    $('#top10Overlay').removeClass('active');
+  });
+
+  $('#top10Overlay').on('click', function (e) {
+    if ($(e.target).is('#top10Overlay')) {
+      $('#top10Overlay').removeClass('active');
+    }
+  });
+
+  $('.toggle-btn').on('click', function () {
+    $('.toggle-btn').removeClass('active');
+    $(this).addClass('active');
+    currentTop10FilterType = $(this).data('top10-period') === 'weekly' ? 1 : 0;
+    loadTop10Data(currentTop10ProductId, currentTop10FilterType);
+  });
 });
