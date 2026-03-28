@@ -34,7 +34,7 @@ function renderMainTabs() {
             $toggle.append('<div class="divider"></div>');
         }
         var activeClass = (i === 0) ? ' active' : '';
-        $toggle.append('<button class="toggle-btn' + activeClass + '" data-tab-id="' + tab.TabId + '">' + tab.TabName + '</button>');
+        $toggle.append('<button class="segment' + activeClass + '" data-tab-id="' + tab.TabId + '">' + tab.TabName + '</button>');
     });
 
     // İlk tab'ı aktif yap
@@ -110,8 +110,8 @@ function getActiveTabIds() {
 // ===== Event Handlers (delegated) =====
 
 // Main tab click
-$(document).on('click', '#yieldToggle .toggle-btn', function () {
-    $('#yieldToggle .toggle-btn').removeClass('active');
+$(document).on('click', '#yieldToggle .segment', function () {
+    $('#yieldToggle .segment').removeClass('active');
     $(this).addClass('active');
     _activeToggleId = parseInt($(this).data('tab-id'));
     _yieldSortBy = null; _yieldSortAsc = true;

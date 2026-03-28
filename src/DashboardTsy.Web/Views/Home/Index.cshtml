@@ -100,28 +100,31 @@
             <input type="text" placeholder="Ara" id="searchInput" />
         </div>
     </div>
-    <div class="period-toggle">
-      <button class="toggle-btn active" data-period="daily">Günlük</button>
+    <div class="segmented-control">
+      <button class="segment active" data-type="hacim">Hacim</button>
       <div class="divider"></div>
-      <button class="toggle-btn" data-period="monthly">Aylık</button>
+      <button class="segment" data-type="adet">Adet</button>
     </div>
 </div>
 
 <!-- Tabs -->
 <div class="tab-bar">
-    <div class="tab-list">
-        <button class="tab active" data-tab="tumu" data-menu="TabAllTitle"></button>
-        <button class="tab" data-tab="kurumsal" data-menu="TabCorporateTitle"></button>
-        <button class="tab" data-tab="ticari" data-menu="TabCommercialTitle"></button>
-        <button class="tab has-subtabs" data-tab="kobi" data-menu="TabSmeTitle"></button>
-        <button class="tab" data-tab="tarim" data-menu="TabAgricultureTitle"></button>
-        <button class="tab has-subtabs" data-tab="bireysel" data-menu="TabRetailTitle"></button>
-    </div>
-    <div class="diff-toggle" id="diffToggle">
-        <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
-        <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
-        <span>Farkları Göster</span>
-    </div>
+  <div class="tab-list">
+    <button class="tab active" data-tab="tumu" data-menu="TabAllTitle"></button>
+    <button class="tab" data-tab="kurumsal" data-menu="TabCorporateTitle"></button>
+    <button class="tab" data-tab="ticari" data-menu="TabCommercialTitle"></button>
+    <button class="tab has-subtabs" data-tab="kobi" data-menu="TabSmeTitle"></button>
+    <button class="tab" data-tab="tarim" data-menu="TabAgricultureTitle"></button>
+    <button class="tab has-subtabs" data-tab="bireysel" data-menu="TabRetailTitle"></button>
+  </div>
+  <div class="period-toggle">
+    <button class="period-btn active" data-period="daily">
+      <img src="~/images/calendar.svg" alt="" class="period-icon" /> Günlük
+    </button>
+    <button class="period-btn" data-period="monthly">
+      <img src="~/images/calendar-circle.svg" alt="" class="period-icon" /> Aylık
+    </button>
+  </div>
 </div>
 
 <!-- Sub Tabs - KOBİ -->
@@ -181,6 +184,76 @@
         </tbody>
     </table>
   </div>
+  <div class="table-legend">
+    <span class="legend-note">Tablodaki değerler x1000 olarak verilmektedir.</span>
+    <div class="legend-colors">
+      <span class="legend-value">-</span>
+      <span class="legend-bar ratio-red-bg"></span>
+      <span class="legend-value">0</span>
+      <span class="legend-bar ratio-green-bg"></span>
+      <span class="legend-value">+</span>
+    </div>
+    <div class="diff-toggle" id="diffToggle">
+      <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+      <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+      <span>Farkları Göster</span>
+    </div>
+  </div>
+</div>
+
+<!-- Quantity Table -->
+<div class="table-container" id="quantityTable" style="display:none;">
+  <div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="col-index"></th>
+                <th class="col-expand"></th>
+                <th class="col-text valign-top">
+                    <span data-quantity-header="ProductNameTitle"></span>
+                    <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                </th>
+                <th class="text-center">
+                    <span data-daily-header="LastYearTitle"></span>
+                    <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="LastYearDate"></small>
+                </th>
+                <th class="text-center">
+                    <span data-daily-header="LastWeekTitle"></span>
+                    <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="LastWeekDate"></small>
+                </th>
+                <th class="text-center">
+                    <span data-daily-header="PrevDayTitle"></span>
+                    <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="PrevDayDate"></small>
+                </th>
+                <th class="text-center">
+                    <span data-daily-header="YesterdayTitle"></span>
+                    <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="YesterdayDate"></small>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="quantityTableBody">
+        </tbody>
+    </table>
+  </div>
+  <div class="table-legend">
+    <span class="legend-note">Tablodaki değerler x1000 olarak verilmektedir.</span>
+    <div class="legend-colors">
+      <span class="legend-value">-</span>
+      <span class="legend-bar ratio-red-bg"></span>
+      <span class="legend-value">0</span>
+      <span class="legend-bar ratio-green-bg"></span>
+      <span class="legend-value">+</span>
+    </div>
+    <div class="diff-toggle" id="quantityDiffToggle">
+      <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+      <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+      <span>Farkları Göster</span>
+    </div>
+  </div>
 </div>
 
 <!-- Monthly Table -->
@@ -226,6 +299,51 @@
           </tbody>
       </table>
     </div>
+    <div class="table-legend">
+      <span class="legend-note">Tablodaki değerler x1000 olarak verilmektedir.</span>
+      <div class="legend-colors">
+        <span class="legend-value">0</span>
+        <span class="legend-bar ratio-red-bg"></span>
+        <span class="legend-value">75</span>
+        <span class="legend-bar ratio-orange-bg"></span>
+        <span class="legend-value">100</span>
+        <span class="legend-bar ratio-green-bg"></span>
+        <span class="legend-value">120</span>
+        <span class="legend-bar ratio-blue-bg"></span>
+      </div>
+    </div>
+</div>
+
+<!-- Top 10 Modal -->
+<div class="top10-overlay" id="top10Overlay">
+  <div class="top10-modal">
+    <div class="top10-header">
+      <h2 class="top10-title"></h2>
+      <div class="top10-header-right">
+        <div class="top10-period-toggle">
+          <button class="toggle-btn active" data-top10-period="daily">
+            <img src="~/images/calendar.svg" alt="calendar" class="top10-toggle-icon" /> Günlük
+          </button>
+          <button class="toggle-btn" data-top10-period="weekly">
+            <img src="~/images/weekly-calendar.svg" alt="calendar" class="top10-toggle-icon" /> Haftalık
+          </button>
+        </div>
+        <button class="top10-close" id="top10Close">
+          <img src="~/images/close-circle.svg" alt="Kapat" />
+        </button>
+      </div>
+    </div>
+    <div class="top10-body">
+      <div class="top10-column">
+        <h3 class="top10-column-title">İlk 10</h3>
+        <div class="top10-list" id="top10First"></div>
+      </div>
+      <div class="top10-column">
+        <h3 class="top10-column-title">Son 10</h3>
+        <div class="top10-list" id="top10Last"></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 @section Scripts {
