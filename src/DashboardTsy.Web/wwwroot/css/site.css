@@ -698,11 +698,13 @@ body {
   border-radius: 0;
 }
 
-.data-table tbody tr:first-child td:last-child {
+.data-table tbody tr:first-child td:last-child,
+.data-table tbody tr:first-child td:has(+ td.diff-cell[style*="display: none"]) {
   border-radius: 0 30px 0 0;
 }
 
-#dynamicTableContainer2 .data-table tbody tr:first-child td:last-child {
+#dynamicTableContainer2 .data-table tbody tr:first-child td:last-child,
+#dynamicTableContainer2 .data-table tbody tr:first-child td:has(+ td.diff-cell[style*="display: none"]) {
   border-radius: 0;
 }
 
@@ -714,11 +716,13 @@ body {
   border-radius: 0 0 0 40px;
 }
 
-.data-table tbody tr.last-visible-row td:last-child {
+.data-table tbody tr.last-visible-row td:last-child,
+.data-table tbody tr.last-visible-row td:has(+ td.diff-cell[style*="display: none"]) {
   border-radius: 0 0 30px 0;
 }
 
-#dynamicTableContainer2 .data-table tbody tr.last-visible-row td:last-child {
+#dynamicTableContainer2 .data-table tbody tr.last-visible-row td:last-child,
+#dynamicTableContainer2 .data-table tbody tr.last-visible-row td:has(+ td.diff-cell[style*="display: none"]) {
   border-radius: 0 0 40px 0;
 }
 
@@ -736,7 +740,8 @@ body {
   border-left: 1px solid var(--border-row);
 }
 
-.table-row td:last-child {
+.table-row td:last-child,
+.table-row td:has(+ td.diff-cell[style*="display: none"]) {
   border-right: 1px solid var(--border-row);
 }
 

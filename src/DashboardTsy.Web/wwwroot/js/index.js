@@ -148,7 +148,7 @@ $(document).ready(function () {
           html += '<td class="text-center">' + formatNumber(p.LastWeekAmount) + '</td>';
           html += '<td class="text-center">' + formatNumber(p.PrevDayAmount) + '</td>';
           html += '<td class="col-diff text-center">';
-          html += '<div class="diff-main">' + formatNumber(p.YesterdayAmount) + '</div>';
+          html += '<div>' + formatNumber(p.YesterdayAmount) + '</div>';
           html += '<div class="diff-details">';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0) + '</span></span>';
