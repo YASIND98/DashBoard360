@@ -168,12 +168,10 @@ public static class MockTargetReportData
             SortOrder = 1,
             LastYearAmount = 120,
             LastYearDate = t.AddYears(-1),
-            LastWeekAmount = 130,
-            LastWeekDate = t.AddDays(-7),
-            PrevDayAmount = 140,
-            PrevDayDate = t.AddDays(-2),
-            YesterdayAmount = 150,
-            YesterdayDate = t.AddDays(-1),
+            LastMonthAmount = 130,
+            LastMonthDate = t.AddDays(-7),
+            LastTwoMonthEarlierAmount = 140,
+            LastTwoMonthEarlierDate = t.AddDays(-2),
             TodayDate = t
         };
 
@@ -186,12 +184,10 @@ public static class MockTargetReportData
             SortOrder = 1,
             LastYearAmount = 40,
             LastYearDate = t.AddYears(-1),
-            LastWeekAmount = 45,
-            LastWeekDate = t.AddDays(-7),
-            PrevDayAmount = 47,
-            PrevDayDate = t.AddDays(-2),
-            YesterdayAmount = 49,
-            YesterdayDate = t.AddDays(-1),
+            LastMonthAmount = 45,
+            LastMonthDate = t.AddDays(-7),
+            LastTwoMonthEarlierAmount = 47,
+            LastTwoMonthEarlierDate = t.AddDays(-2),
             TodayDate = t
         };
 
@@ -204,12 +200,10 @@ public static class MockTargetReportData
             SortOrder = 2,
             LastYearAmount = 80,
             LastYearDate = t.AddYears(-1),
-            LastWeekAmount = 85,
-            LastWeekDate = t.AddDays(-7),
-            PrevDayAmount = 93,
-            PrevDayDate = t.AddDays(-2),
-            YesterdayAmount = 101,
-            YesterdayDate = t.AddDays(-1),
+            LastMonthAmount = 85,
+            LastMonthDate = t.AddDays(-7),
+            LastTwoMonthEarlierAmount = 93,
+            LastTwoMonthEarlierDate = t.AddDays(-2),
             TodayDate = t
         };
 
@@ -222,12 +216,10 @@ public static class MockTargetReportData
             SortOrder = 2,
             LastYearAmount = 200,
             LastYearDate = t.AddYears(-1),
-            LastWeekAmount = 210,
-            LastWeekDate = t.AddDays(-7),
-            PrevDayAmount = 215,
-            PrevDayDate = t.AddDays(-2),
-            YesterdayAmount = 220,
-            YesterdayDate = t.AddDays(-1),
+            LastMonthAmount = 210,
+            LastMonthDate = t.AddDays(-7),
+            LastTwoMonthEarlierAmount = 215,
+            LastTwoMonthEarlierDate = t.AddDays(-2),
             TodayDate = t
         };
 
@@ -474,9 +466,9 @@ public static class MockTargetReportData
 
     private static void SetDailyQuantityDiffs(GetDailyQuantityTargetReportResponse.Product p, double todayAmount)
     {
-        p.DiffByPrevDayAmount = todayAmount - p.PrevDayAmount;
+        p.DiffByLastTwoMonthEarlierAmount = todayAmount - p.DiffByLastTwoMonthEarlierAmount;
         p.DiffByLastYearAmount = todayAmount - p.LastYearAmount;
-        p.DiffByLastWeekAmount = todayAmount - p.LastWeekAmount;
+        p.DiffByLastMonthAmount = todayAmount - p.DiffByLastMonthAmount;
     }
 
     private static List<GetDailyQuantityTargetReportResponse.Product> FilterDailyQuantityTreeByName(List<GetDailyQuantityTargetReportResponse.Product> nodes, string q)
@@ -507,9 +499,9 @@ public static class MockTargetReportData
     {
         foreach (var n in nodes)
         {
-            n.DiffByPrevDayAmount = null;
+            n.DiffByLastTwoMonthEarlierAmount = null;
             n.DiffByLastYearAmount = null;
-            n.DiffByLastWeekAmount = null;
+            n.DiffByLastMonthAmount = null;
             if (n.SubProducts != null && n.SubProducts.Count > 0)
                 ClearDailyQuantityDiffs(n.SubProducts);
         }
@@ -521,9 +513,8 @@ public static class MockTargetReportData
         {
             1 => p => p.ProductName ?? string.Empty,
             2 => p => p.LastYearAmount,
-            3 => p => p.LastWeekAmount,
-            4 => p => p.PrevDayAmount,
-            5 => p => p.YesterdayAmount,
+            3 => p => p.LastMonthAmount,
+            4 => p => p.LastTwoMonthEarlierAmount,
             _ => p => p.SortOrder
         };
 

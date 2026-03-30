@@ -15,20 +15,17 @@ public class GetDailyQuantityTargetReportResponse
         public double LastYearAmount { get; set; }
         public DateTime LastYearDate { get; set; }
 
-        public double LastWeekAmount { get; set; }
-        public DateTime LastWeekDate { get; set; }
+        public double LastMonthAmount { get; set; }
+        public DateTime LastMonthDate { get; set; }
 
-        public double PrevDayAmount { get; set; }
-        public DateTime PrevDayDate { get; set; }
-
-        public double YesterdayAmount { get; set; }
-        public DateTime YesterdayDate { get; set; }
+        public double LastTwoMonthEarlierAmount { get; set; }
+        public DateTime LastTwoMonthEarlierDate { get; set; }
 
         public DateTime TodayDate { get; set; }
 
-        public double? DiffByPrevDayAmount { get; set; }
+        public double? DiffByLastTwoMonthEarlierAmount { get; set; }
         public double? DiffByLastYearAmount { get; set; }
-        public double? DiffByLastWeekAmount { get; set; }
+        public double? DiffByLastMonthAmount { get; set; }
 
         public List<Product> SubProducts { get; set; } = new();
     }
