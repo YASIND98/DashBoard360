@@ -118,32 +118,38 @@ $(document).ready(function () {
   }
 
   // ===== Row Builders =====
-  function buildRowStart(product, depth, isSub) {
+  function buildRowStart(product, depth, isSub, indexLabel) {
       var isExpandable = product.SubProducts && product.SubProducts.length > 0;
       var rowClass = isSub ? 'table-row sub-row depth-' + depth : 'table-row';
       if (isExpandable) rowClass += ' expandable';
 
       var html = '<tr class="' + rowClass + '">';
-      html += '<td class="col-index"></td>';
-      html += '<td class="col-expand">';
-      if (isExpandable) {
-          html += '<span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span>';
-      }
-      html += '</td>';
-      html += '<td class="col-text">';
       if (isSub) {
-          html += '<span style="padding-left: ' + (depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + product.ProductName + '</span>';
+          html += '<td class="col-index"></td>';
+          html += '<td class="col-expand">';
+          if (isExpandable) {
+              html += '<span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span>';
+          }
+          html += '</td>';
+          html += '<td class="col-text"><span class="sub-index" style="padding-left: ' + (depth * 16) + 'px">' + indexLabel + '</span>  ' + product.ProductName;
       } else {
-          html += product.ProductName;
+          html += '<td class="col-index">' + indexLabel + '</td>';
+          html += '<td class="col-expand">';
+          if (isExpandable) {
+              html += '<span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span>';
+          }
+          html += '</td>';
+          html += '<td class="col-text">' + product.ProductName;
       }
       html += '</td>';
       return html;
   }
 
-  function buildDailyRows(products, depth, isSub, showTop10) {
+  function buildDailyRows(products, depth, isSub, showTop10, parentIndex) {
       var html = '';
-      products.forEach(function (p) {
-          html += buildRowStart(p, depth, isSub);
+      products.forEach(function (p, i) {
+          var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
+          html += buildRowStart(p, depth, isSub, indexLabel);
           html += '<td class="text-center">' + formatNumber(p.LastYearAmount) + '</td>';
           html += '<td class="text-center">' + formatNumber(p.LastWeekAmount) + '</td>';
           html += '<td class="text-center">' + formatNumber(p.PrevDayAmount) + '</td>';
@@ -159,31 +165,57 @@ $(document).ready(function () {
           html += '</div>';
           html += '</td>';
           if (showTop10) {
-              html += '<td class="col-top10 diff-cell"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
+              html += '<td class="col-top10"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
           }
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
-              html += buildDailyRows(p.SubProducts, depth + 1, true, showTop10);
+              html += buildDailyRows(p.SubProducts, depth + 1, true, showTop10, indexLabel);
           }
       });
       return html;
   }
 
-  function buildMonthlyRows(products, depth, isSub) {
+  function buildQuantityRows(products, depth, isSub, parentIndex) {
       var html = '';
-      products.forEach(function (p) {
-          html += buildRowStart(p, depth, isSub);
-          html += '<td class="text-center month-col month-col-first">' + formatNumber(p.MonthActualAmount) + '</td>';
-          html += '<td class="text-center month-col">' + formatNumber(p.MonthTargetAmount) + '</td>';
-          html += '<td class="text-center month-col month-col-last col-ratio ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
-          html += '<td class="text-center">' + formatNumber(p.YearActualAmount) + '</td>';
-          html += '<td class="text-center">' + formatNumber(p.YearTargetAmount) + '</td>';
-          html += '<td class="text-center col-ratio ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';
+      products.forEach(function (p, i) {
+          var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
+          html += buildRowStart(p, depth, isSub, indexLabel);
+          html += '<td class="text-center">' + formatNumber(p.LastYearAmount, false) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.LastTwoMonthEarlierAmount, false) + '</td>';
+          html += '<td class="col-diff text-center">';
+          html += '<div>' + formatNumber(p.LastMonthAmount, false) + '</div>';
+          html += '<div class="diff-details">';
+          html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastYearTitle"></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0, false) + '</span></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastTwoMonthEarlierTitle"></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastTwoMonthEarlierAmount < 0 ? 'negative' : (p.DiffByLastTwoMonthEarlierAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastTwoMonthEarlierAmount || 0, false) + '</span></span>';
+          html += '</div>';
+          html += '</td>';
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
-              html += buildMonthlyRows(p.SubProducts, depth + 1, true);
+              html += buildQuantityRows(p.SubProducts, depth + 1, true, indexLabel);
+          }
+      });
+      return html;
+  }
+
+  function buildMonthlyRows(products, depth, isSub, parentIndex) {
+      var html = '';
+      products.forEach(function (p, i) {
+          var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
+          html += buildRowStart(p, depth, isSub, indexLabel);
+          html += '<td class="text-center month-col month-col-first">' + formatNumber(p.MonthActualAmount) + '</td>';
+          html += '<td class="text-center month-col">' + formatNumber(p.MonthTargetAmount) + '</td>';
+          html += '<td class="text-center month-col month-col-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
+          html += '<td class="text-center">' + formatNumber(p.YearActualAmount) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.YearTargetAmount) + '</td>';
+          html += '<td class="text-center ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';
+          html += '</tr>';
+
+          if (p.SubProducts && p.SubProducts.length > 0) {
+              html += buildMonthlyRows(p.SubProducts, depth + 1, true, indexLabel);
           }
       });
       return html;
@@ -219,7 +251,7 @@ $(document).ready(function () {
 
               if (!showDiff) {
                   $('#dailyTableBody .diff-details').hide();
-                  $('#dailyTableBody .diff-cell').hide();
+                  $('#dailyTableBody .col-top10').hide();
               }
               updateStripes();
               hideSkeleton();
@@ -261,11 +293,18 @@ $(document).ready(function () {
 
       if (!quantityHeadersLoaded) {
           quantityHeadersLoaded = true;
-          loadHeaders('/TargetReport/GetDailyTargetReportTableHeaders', '_dailyHeaders', function (data) {
+          loadHeaders('/TargetReport/GetDailyQuantityTargetReportTableHeaders', '_quantityHeaders', function (data) {
               window._quantityHeaders = data;
               $('[data-quantity-header]').each(function () {
                   var key = $(this).data('quantity-header');
-                  if (data[key]) $(this).text(data[key]);
+                  if (key.indexOf('Date') > -1 && data[key]) {
+                      var d = new Date(data[key]);
+                      var dd = String(d.getDate()).padStart(2, '0');
+                      var mm = String(d.getMonth() + 1).padStart(2, '0');
+                      $(this).text('(' + dd + '.' + mm + '.' + d.getFullYear() + ')');
+                  } else if (data[key]) {
+                      $(this).text(data[key]);
+                  }
               });
           });
       }
@@ -276,10 +315,10 @@ $(document).ready(function () {
           contentType: 'application/json',
           data: JSON.stringify(buildRequest(showDiff)),
           success: function (data) {
-              $('#quantityTableBody').html(buildDailyRows(data.Products, 0, false, false));
+              $('#quantityTableBody').html(buildQuantityRows(data.Products, 0, false));
 
-              $('#quantityTableBody [data-daily-header]').each(function () {
-                  var key = $(this).data('daily-header');
+              $('#quantityTableBody [data-quantity-header]').each(function () {
+                  var key = $(this).data('quantity-header');
                   if (window._quantityHeaders && window._quantityHeaders[key]) {
                       $(this).text(window._quantityHeaders[key]);
                   }
@@ -287,7 +326,6 @@ $(document).ready(function () {
 
               if (!showDiff) {
                   $('#quantityTableBody .diff-details').hide();
-                  $('#quantityTableBody .diff-cell').hide();
               }
               updateStripes();
               hideSkeleton();
@@ -426,21 +464,25 @@ $(document).ready(function () {
 
   $('#diffToggle').attr('data-active', 'false');
   $('.diff-details').hide();
-  $('.diff-cell').hide();
+  $('.col-top10').hide();
 
   // ===== Striping =====
   function updateStripes() {
       $('.table-container:visible .data-table').each(function () {
           var $table = $(this);
-          var visibleIndex = 0;
+          var stripeIndex = 0;
+          var mainIndex = 0;
           var $lastVisible = null;
           $table.find('tbody tr').each(function () {
               var $tr = $(this);
               $tr.removeClass('stripe-odd stripe-even last-visible-row');
               if ($tr.hasClass('sub-row') && !$tr.hasClass('visible')) return;
-              visibleIndex++;
-              $tr.addClass(visibleIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
-              $tr.find('td:first').text(visibleIndex);
+              stripeIndex++;
+              if (!$tr.hasClass('sub-row')) {
+                  mainIndex++;
+                  $tr.find('td:first').text(mainIndex);
+              }
+              $tr.addClass(stripeIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
               $lastVisible = $tr;
           });
           if ($lastVisible) $lastVisible.addClass('last-visible-row');
