@@ -157,11 +157,11 @@ $(document).ready(function () {
           html += '<div>' + formatNumber(p.YesterdayAmount) + '</div>';
           html += '<div class="diff-details">';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0) + '</span></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0, false) + '</span></span>';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastWeekTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByLastWeekAmount < 0 ? 'negative' : (p.DiffByLastWeekAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastWeekAmount || 0) + '</span></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastWeekAmount < 0 ? 'negative' : (p.DiffByLastWeekAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastWeekAmount || 0, false) + '</span></span>';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByPrevDayTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0) + '</span></span>';
+          html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0, false) + '</span></span>';
           html += '</div>';
           html += '</td>';
           if (showTop10) {
