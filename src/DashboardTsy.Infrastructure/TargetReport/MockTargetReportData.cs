@@ -163,9 +163,7 @@ public static class MockTargetReportData
         {
             ProductId = 10,
             ProductName = "Kredi",
-            ParentId = null,
-            LevelNo = 1,
-            SortOrder = 1,
+            ParentProductId = null,
             LastYearAmount = 120,
             LastYearDate = t.AddYears(-1),
             LastMonthAmount = 130,
@@ -179,9 +177,7 @@ public static class MockTargetReportData
         {
             ProductId = 11,
             ProductName = "Ihtiyac Kredisi",
-            ParentId = 10,
-            LevelNo = 2,
-            SortOrder = 1,
+            ParentProductId = 10,
             LastYearAmount = 40,
             LastYearDate = t.AddYears(-1),
             LastMonthAmount = 45,
@@ -195,9 +191,7 @@ public static class MockTargetReportData
         {
             ProductId = 12,
             ProductName = "Konut Kredisi",
-            ParentId = 10,
-            LevelNo = 2,
-            SortOrder = 2,
+            ParentProductId = 10,
             LastYearAmount = 80,
             LastYearDate = t.AddYears(-1),
             LastMonthAmount = 85,
@@ -211,9 +205,7 @@ public static class MockTargetReportData
         {
             ProductId = 20,
             ProductName = "Mevduat",
-            ParentId = null,
-            LevelNo = 1,
-            SortOrder = 2,
+            ParentProductId = null,
             LastYearAmount = 200,
             LastYearDate = t.AddYears(-1),
             LastMonthAmount = 210,
@@ -245,6 +237,36 @@ public static class MockTargetReportData
         roots = SortDailyQuantityTree(roots, request.SortBy, request.IsAscending);
 
         return new GetDailyQuantityTargetReportResponse { Products = roots };
+    }
+
+    public static GetDailyQuantityTargetReportTableHeadersResponse GetDailyQuantityHeaders(DateTime reportDate)
+    {
+        var t = (reportDate == default ? DateTime.Today : reportDate).Date;
+
+        var lastMonth = new DateTime(t.Year, t.Month, 1).AddMonths(-1);
+        var twoMonthsEarlier = lastMonth.AddMonths(-2);
+        var lastYearDate = new DateTime(lastMonth.Year - 1, 12, 31);
+
+        return new GetDailyQuantityTargetReportTableHeadersResponse
+        {
+            ProductNameTitle = "Ürün Adı",
+
+            LastYearTitle = "Geçen Yıl",
+            LastYearDate = lastYearDate,
+
+            LastTwoMonthEarlierTitle = "2 Ay Önce",
+            LastTwoMonthEarlierDate = twoMonthsEarlier,
+
+            LastMonthTitle = "Geçen Ay",
+            LastMonthDate = lastMonth,
+
+            TodayTitle = "Bugün",
+            TodayDate = reportDate,
+
+            DiffByLastTwoMonthEarlierTitle = "2 Ay Önceye Göre",
+            DiffByLastYearTitle = "Yıla Göre",
+            DiffByLastMonthTitle = "T-2'ye Göre"
+        };
     }
 
     public static ProductTop10DifferencesResponse GetProductTop10DailyAndWeeklyDifferences(GetProductTop10DailyAndWeeklyDifferencesRequest request)
@@ -515,7 +537,7 @@ public static class MockTargetReportData
             2 => p => p.LastYearAmount,
             3 => p => p.LastMonthAmount,
             4 => p => p.LastTwoMonthEarlierAmount,
-            _ => p => p.SortOrder
+            _ => p => p.ProductId
         };
 
         var ordered = (asc ? nodes.OrderBy(key) : nodes.OrderByDescending(key)).ToList();

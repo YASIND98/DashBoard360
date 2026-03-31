@@ -19,6 +19,7 @@ public interface IReportDataProvider
 
     GetDailyTargetReportResponse GetDailyTargetReport(GetDailyTargetReportRequest request);
 
+    GetDailyQuantityTargetReportTableHeadersResponse GetDailyQuantityTargetReportTableHeaders(GetDailyQuantityTargetReportTableHeadersRequest request);
     GetDailyQuantityTargetReportResponse GetDailyQuantityTargetReport(GetDailyQuantityTargetReportRequest request);
     ProductTop10DifferencesResponse GetProductTop10DailyAndWeeklyDifferences(GetProductTop10DailyAndWeeklyDifferencesRequest request);
 

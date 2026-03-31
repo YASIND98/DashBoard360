@@ -47,6 +47,17 @@ public class TargetReportApiClient : ITargetReportApiClient
         return JsonSerializer.Deserialize<GetDailyTargetReportResponse>(json, _jsonOptions);
     }
 
+    public async Task<GetDailyQuantityTargetReportTableHeadersResponse?> GetDailyQuantityTargetReportTableHeadersAsync(
+    GetDailyQuantityTargetReportTableHeadersRequest request,
+    CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetDailyQuantityTargetReportTableHeaders", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+            return null;
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<GetDailyQuantityTargetReportTableHeadersResponse>(json, _jsonOptions);
+    }
+
     public async Task<GetDailyQuantityTargetReportResponse?> GetDailyQuantityTargetReportAsync(
         GetDailyQuantityTargetReportRequest request,
         CancellationToken cancellationToken = default)

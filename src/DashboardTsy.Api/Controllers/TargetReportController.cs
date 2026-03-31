@@ -59,6 +59,19 @@ public class TargetReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /api/TargetReport/GetDailyQuantityTargetReportTableHeaders
+    /// EXEC dbo.SP_RP_GetDailyQuantityTargetReportTableHeaders @SessionId=''
+    /// </summary>
+    [HttpPost("GetDailyQuantityTargetReportTableHeaders")]
+    public ActionResult<GetDailyQuantityTargetReportTableHeadersResponse> GetDailyQuantityTargetReportTableHeaders([FromBody] GetDailyQuantityTargetReportTableHeadersRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+        var result = _reportDataProvider.GetDailyQuantityTargetReportTableHeaders(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /api/TargetReport/GetDailyQuantityTargetReport
     /// EXEC dbo.SP_RP_GetDailyQuantityTargetReport ...
     /// </summary>

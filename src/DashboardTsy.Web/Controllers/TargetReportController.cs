@@ -94,6 +94,32 @@ public class TargetReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /api/TargetReport/GetDailyQuantityTargetReportTableHeaders - proxies to Dashboard API SP_RP_GetDailyQuantityTargetReportTableHeaders.
+    /// </summary>
+    [HttpPost("GetDailyQuantityTargetReportTableHeaders")]
+    public async Task<ActionResult<Models.TargetReport.GetDailyQuantityTargetReportTableHeadersResponse>> GetDailyQuantityTargetReportTableHeaders(
+        [FromBody] Models.TargetReport.GetDailyQuantityTargetReportTableHeadersRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var sid = request.SessionId;
+        if (string.IsNullOrEmpty(sid))
+            sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
+
+        var req = new Models.TargetReport.GetDailyQuantityTargetReportTableHeadersRequest
+        {
+            SessionId = sid
+        };
+
+        var result = await _apiClient.GetDailyQuantityTargetReportTableHeadersAsync(req, cancellationToken).ConfigureAwait(false);
+        if (result == null)
+            return StatusCode(502);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /api/TargetReport/GetDailyQuantityTargetReport - proxies to Dashboard API SP_RP_GetDailyQuantityTargetReport.
     /// </summary>
     [HttpPost("GetDailyQuantityTargetReport")]

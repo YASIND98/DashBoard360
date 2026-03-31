@@ -8,9 +8,9 @@ public class GetDailyQuantityTargetReportResponse
     {
         public long ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
-        public int? ParentId { get; set; }
-        public int LevelNo { get; set; }
-        public int SortOrder { get; set; }
+
+        /// <summary>SP'den gelen parent id; null/0 ise root ürün.</summary>
+        public long? ParentProductId { get; set; }
 
         public double LastYearAmount { get; set; }
         public DateTime LastYearDate { get; set; }

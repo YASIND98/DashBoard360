@@ -113,43 +113,97 @@ public class ReportDataProvider : IReportDataProvider
     public GetDailyQuantityTargetReportResponse GetDailyQuantityTargetReport(GetDailyQuantityTargetReportRequest request)
     {
         request ??= new GetDailyQuantityTargetReportRequest();
+
         if (MockEnabled)
             return MockTargetReportData.GetDailyQuantityReport(request);
-        // SP hazir oldugunda acilacak.
-        // var parameters = new Dictionary<string, object?>
-        // {
-        //     ["@SessionId"] = request.SessionId ?? string.Empty,
-        //     ["@TabId"] = request.TabId,
-        //     ["@SubTabId"] = request.SubTabId ?? (object)DBNull.Value,
-        //     ["@ReportDate"] = request.ReportDate,
-        //     ["@RegionId"] = ToCsv(request.RegionId) ?? (object)DBNull.Value,
-        //     ["@BranchId"] = ToCsv(request.BranchId) ?? (object)DBNull.Value,
-        //     ["@PortfolioId"] = ToCsv(request.PortfolioId) ?? (object)DBNull.Value,
-        //     ["@SearchText"] = string.IsNullOrWhiteSpace(request.SearchText) ? (object)DBNull.Value : request.SearchText.Trim(),
-        //     ["@ShowDifferences"] = request.ShowDifferences,
-        //     ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-        //     ["@IsAscending"] = request.IsAscending
-        // };
-        // var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyQuantityTargetReport", parameters);
-        // TODO: ds mapping
-        return MockTargetReportData.GetDailyQuantityReport(request);
 
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@TabId"] = request.TabId,
+            ["@SubTabId"] = request.SubTabId ?? (object)DBNull.Value,
+            ["@ReportDate"] = request.ReportDate,
+            ["@RegionId"] = ToCsv(request.RegionId) ?? (object)DBNull.Value,
+            ["@BranchId"] = ToCsv(request.BranchId) ?? (object)DBNull.Value,
+            ["@PortfolioId"] = ToCsv(request.PortfolioId) ?? (object)DBNull.Value,
+            ["@SearchText"] = string.IsNullOrWhiteSpace(request.SearchText) ? (object)DBNull.Value : request.SearchText.Trim(),
+            ["@ShowDifferences"] = request.ShowDifferences,
+            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+            ["@IsAscending"] = request.IsAscending
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyQuantityTargetReport", parameters);
+        var response = new GetDailyQuantityTargetReportResponse();
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return response;
+
+        var roots = BuildDailyQuantityProductTree(ds, request.ReportDate);
+
+        if (!string.IsNullOrWhiteSpace(request.SearchText))
+        {
+            var q = request.SearchText.Trim();
+            roots = FilterDailyQuantityTreeByName(roots, q);
+        }
+
+        if (!request.ShowDifferences)
+            ClearDailyQuantityDiffs(roots);
+
+        roots = SortDailyQuantityTree(roots, request.SortBy, request.IsAscending);
+
+        response.Products = roots;
+        return response;
+    }
+
+    public GetDailyQuantityTargetReportTableHeadersResponse? GetDailyQuantityTargetReportTableHeaders(GetDailyQuantityTargetReportTableHeadersRequest request)
+    {
+        if (MockEnabled)
+            return MockTargetReportData.GetDailyQuantityHeaders(DateTime.Today);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyQuantityTargetReportTableHeaders", parameters);
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return null;
+
+        return DataTableHelper.ToObject<GetDailyQuantityTargetReportTableHeadersResponse>(ds.Tables[0].Rows[0]);
     }
 
     public ProductTop10DifferencesResponse GetProductTop10DailyAndWeeklyDifferences(GetProductTop10DailyAndWeeklyDifferencesRequest request)
     {
         request ??= new GetProductTop10DailyAndWeeklyDifferencesRequest();
+
         if (MockEnabled)
             return MockTargetReportData.GetProductTop10DailyAndWeeklyDifferences(request);
-        // SP hazir oldugunda acilacak.
-        // var parameters = new Dictionary<string, object?>
-        // {
-        //     ["@ProductId"] = request.ProductId,
-        //     ["@FilterType"] = request.FilterType
-        // };
-        // var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductTop10DailyAndWeeklyDifferences", parameters);
-        // TODO: ds mapping
-        return MockTargetReportData.GetProductTop10DailyAndWeeklyDifferences(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@ProductId"] = request.ProductId,
+            ["@FilterType"] = request.FilterType
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductTop10DailyAndWeeklyDifferences", parameters);
+
+        var response = new ProductTop10DifferencesResponse
+        {
+            First10 = new List<Top10Item>(),
+            Last10 = new List<Top10Item>()
+        };
+
+        if (ds.Tables.Count == 0)
+            return response;
+
+        if (ds.Tables.Count > 0 && ds.Tables[0].Rows.Count > 0)
+            response.First10 = DataTableHelper.ToList<Top10Item>(ds.Tables[0]);
+
+        if (ds.Tables.Count > 1 && ds.Tables[1].Rows.Count > 0)
+            response.Last10 = DataTableHelper.ToList<Top10Item>(ds.Tables[1]);
+
+        return response;
     }
 
     public GetDailyTargetReportTableHeadersResponse? GetDailyTargetReportTableHeaders(string sessionId)
@@ -793,6 +847,169 @@ ORDER BY SUBE_ADI;";
         {
             if (n.SubProducts != null && n.SubProducts.Count > 0)
                 n.SubProducts = SortMonthlyTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
+
+    private sealed class DailyQuantityTargetRow
+    {
+        public long ProductId { get; set; }
+        public long? ParentProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+
+        public double LastYearAmount { get; set; }
+        public DateTime LastYearDate { get; set; }
+
+        public double LastMonthAmount { get; set; }
+        public DateTime LastMonthDate { get; set; }
+
+        public double LastTwoMonthEarlierAmount { get; set; }
+        public DateTime LastTwoMonthEarlierDate { get; set; }
+
+        public DateTime TodayDate { get; set; }
+
+        public double? DiffByLastTwoMonthEarlierAmount { get; set; }
+        public double? DiffByLastYearAmount { get; set; }
+        public double? DiffByLastMonthAmount { get; set; }
+    }
+
+    private static List<GetDailyQuantityTargetReportResponse.Product> BuildDailyQuantityProductTree(DataSet ds, DateTime reportDate)
+    {
+        var t0 = ds.Tables[0];
+        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
+
+        if (hasParentInT0)
+        {
+            var rows = DataTableHelper.ToList<DailyQuantityTargetRow>(t0);
+            foreach (var r in rows)
+                if (r.TodayDate == default) r.TodayDate = reportDate;
+            return DailyQuantityTreeFromRows(rows);
+        }
+
+        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
+        {
+            var roots = DataTableHelper.ToList<DailyQuantityTargetRow>(ds.Tables[0]);
+            var children = DataTableHelper.ToList<DailyQuantityTargetRow>(ds.Tables[1]);
+
+            foreach (var r in roots.Concat(children))
+                if (r.TodayDate == default) r.TodayDate = reportDate;
+
+            var all = new List<DailyQuantityTargetRow>(roots.Count + children.Count);
+            all.AddRange(roots);
+            all.AddRange(children);
+
+            return DailyQuantityTreeFromRows(all);
+        }
+
+        var flat = DataTableHelper.ToList<DailyQuantityTargetRow>(t0);
+        foreach (var r in flat)
+            if (r.TodayDate == default) r.TodayDate = reportDate;
+        return flat.Select(MapDailyQuantityProduct).ToList();
+    }
+
+    private static List<GetDailyQuantityTargetReportResponse.Product> DailyQuantityTreeFromRows(List<DailyQuantityTargetRow> rows)
+    {
+        var byId = rows
+            .GroupBy(r => r.ProductId)
+            .ToDictionary(g => g.Key, g => MapDailyQuantityProduct(g.First()));
+
+        foreach (var r in rows)
+        {
+            if (!byId.TryGetValue(r.ProductId, out var node))
+            {
+                node = MapDailyQuantityProduct(r);
+                byId[r.ProductId] = node;
+            }
+
+            var parentId = r.ParentProductId;
+            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
+                parent.SubProducts.Add(node);
+        }
+
+        var rootIds = rows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => r.ProductId)
+            .Distinct()
+            .ToList();
+
+        return rootIds.Select(id => byId[id]).ToList();
+    }
+
+    private static GetDailyQuantityTargetReportResponse.Product MapDailyQuantityProduct(DailyQuantityTargetRow r)
+    {
+        return new GetDailyQuantityTargetReportResponse.Product
+        {
+            ProductId = r.ProductId,
+            ProductName = r.ProductName ?? string.Empty,
+            ParentProductId = r.ParentProductId,
+            LastYearAmount = r.LastYearAmount,
+            LastYearDate = r.LastYearDate,
+            LastMonthAmount = r.LastMonthAmount,
+            LastMonthDate = r.LastMonthDate,
+            LastTwoMonthEarlierAmount = r.LastTwoMonthEarlierAmount,
+            LastTwoMonthEarlierDate = r.LastTwoMonthEarlierDate,
+            TodayDate = r.TodayDate,
+            DiffByLastTwoMonthEarlierAmount = r.DiffByLastTwoMonthEarlierAmount,
+            DiffByLastYearAmount = r.DiffByLastYearAmount,
+            DiffByLastMonthAmount = r.DiffByLastMonthAmount,
+            SubProducts = new List<GetDailyQuantityTargetReportResponse.Product>()
+        };
+    }
+
+    private static List<GetDailyQuantityTargetReportResponse.Product> FilterDailyQuantityTreeByName(List<GetDailyQuantityTargetReportResponse.Product> nodes, string searchText)
+    {
+        bool Matches(GetDailyQuantityTargetReportResponse.Product p)
+            => (p.ProductName ?? string.Empty).Contains(searchText, StringComparison.OrdinalIgnoreCase);
+
+        List<GetDailyQuantityTargetReportResponse.Product> Recurse(IEnumerable<GetDailyQuantityTargetReportResponse.Product> list)
+        {
+            var result = new List<GetDailyQuantityTargetReportResponse.Product>();
+            foreach (var n in list)
+            {
+                var filteredChildren = Recurse(n.SubProducts ?? new List<GetDailyQuantityTargetReportResponse.Product>());
+                if (Matches(n) || filteredChildren.Count > 0)
+                {
+                    n.SubProducts = filteredChildren;
+                    result.Add(n);
+                }
+            }
+
+            return result;
+        }
+
+        return Recurse(nodes);
+    }
+
+    private static void ClearDailyQuantityDiffs(IEnumerable<GetDailyQuantityTargetReportResponse.Product> nodes)
+    {
+        foreach (var n in nodes)
+        {
+            n.DiffByLastTwoMonthEarlierAmount = null;
+            n.DiffByLastYearAmount = null;
+            n.DiffByLastMonthAmount = null;
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                ClearDailyQuantityDiffs(n.SubProducts);
+        }
+    }
+
+    private static List<GetDailyQuantityTargetReportResponse.Product> SortDailyQuantityTree(List<GetDailyQuantityTargetReportResponse.Product> nodes, int? sortBy, bool isAscending)
+    {
+        Func<GetDailyQuantityTargetReportResponse.Product, object> keySelector = sortBy switch
+        {
+            1 => p => p.ProductName ?? string.Empty,
+            2 => p => p.LastYearAmount,
+            3 => p => p.LastMonthAmount,
+            4 => p => p.LastTwoMonthEarlierAmount,
+            _ => p => p.ProductId
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortDailyQuantityTree(n.SubProducts, sortBy, isAscending);
         }
 
         return ordered;
