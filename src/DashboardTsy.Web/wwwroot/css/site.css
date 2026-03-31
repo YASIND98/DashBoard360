@@ -60,8 +60,7 @@
   --bg-scorecard: linear-gradient(180deg, rgba(6, 11, 40, 0.74) 0%, rgba(10, 14, 35, 0.71) 100%);
   --bg-scorecard-panel: linear-gradient(180deg, rgb(6, 11, 40) 0%, rgb(10, 14, 35) 100%);
   --bg-dropdown-panel: linear-gradient(180deg, #0152DE 0%, #012C78 100%);
-  --bg-stripe: rgba(246, 247, 249, 0.2);
-  --bg-stripe-alt: rgba(246, 247, 249, 0.08);
+  --bg-stripe: rgba(246, 247, 249, 0.08);
   --bg-period: #eceef2;
   --bg-subtab: #7db4f3;
   --bg-hover: linear-gradient(180deg, rgba(5, 108, 194, 0.15) 0%, rgba(5, 108, 194, 0.75) 100%);
@@ -361,8 +360,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 6px 12px;
-  border: 1.5px solid var(--white);
+  padding: 5px 12px;
+  border: 1px solid var(--white);
   background: transparent;
   color: var(--white);
   border-radius: 24px;
@@ -377,8 +376,8 @@ body {
 }
 
 .period-icon {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
 }
 
 /* Dropdown Panel */
@@ -609,6 +608,26 @@ body {
   display: inline;
 }
 
+.legend-actions {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+
+.download-pdf-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-blue-light);
+  cursor: pointer;
+}
+
+.download-pdf-btn img {
+  width: 24px;
+  height: 24px;
+}
+
 /* ===== Data Table ===== */
 .table-container {
   background: var(--bg-card);
@@ -687,7 +706,7 @@ body {
 }
 
 #dynamicTableContainer2 .data-table tbody tr.stripe-even {
-  background: var(--bg-stripe-alt);
+  background: var(--bg-stripe);
 }
 
 .data-table tbody tr:first-child td:first-child {
@@ -699,12 +718,11 @@ body {
 }
 
 .data-table tbody tr:first-child td:last-child,
-.data-table tbody tr:first-child td:has(+ td.diff-cell[style*="display: none"]) {
+.data-table tbody tr:first-child td:has(+ td.col-top10[style*="display: none"]) {
   border-radius: 0 30px 0 0;
 }
 
-#dynamicTableContainer2 .data-table tbody tr:first-child td:last-child,
-#dynamicTableContainer2 .data-table tbody tr:first-child td:has(+ td.diff-cell[style*="display: none"]) {
+#dynamicTableContainer2 .data-table tbody tr:first-child td:last-child {
   border-radius: 0;
 }
 
@@ -717,12 +735,11 @@ body {
 }
 
 .data-table tbody tr.last-visible-row td:last-child,
-.data-table tbody tr.last-visible-row td:has(+ td.diff-cell[style*="display: none"]) {
+.data-table tbody tr.last-visible-row td:has(+ td.col-top10[style*="display: none"]) {
   border-radius: 0 0 30px 0;
 }
 
-#dynamicTableContainer2 .data-table tbody tr.last-visible-row td:last-child,
-#dynamicTableContainer2 .data-table tbody tr.last-visible-row td:has(+ td.diff-cell[style*="display: none"]) {
+#dynamicTableContainer2 .data-table tbody tr.last-visible-row td:last-child {
   border-radius: 0 0 40px 0;
 }
 
@@ -741,7 +758,7 @@ body {
 }
 
 .table-row td:last-child,
-.table-row td:has(+ td.diff-cell[style*="display: none"]) {
+.table-row td:has(+ td.col-top10[style*="display: none"]) {
   border-right: 1px solid var(--border-row);
 }
 
@@ -751,13 +768,20 @@ body {
   padding: 12px 24px !important;
 }
 
+.sub-index {
+  font-size: 14px;
+  color: var(--text-body);
+  margin-right: 8px;
+}
+
 .col-expand {
   width: 36px;
-  padding: 12px 0 !important;
+  text-align: center !important;
 }
 
 .col-text {
   color: var(--text-blue-light) !important;
+  padding: 12px 16px 12px 0 !important;
 }
 
 .text-center {
@@ -776,8 +800,8 @@ body {
 .diff-details {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-top: 4px;
+  gap: 16px;
+  margin-top: 8px;
 }
 
 .diff-detail {
@@ -800,7 +824,7 @@ body {
 }
 
 .diff-label {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 300;
   color: var(--text-muted);
   margin-bottom: 4px;
@@ -808,8 +832,8 @@ body {
 }
 
 .diff-value {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 /* Has-diff cells: main value + diff stacked */
@@ -859,10 +883,6 @@ body {
 
 .month-col-last {
   border-right: 1px dashed var(--white) !important;
-}
-
-.col-ratio {
-  font-size: 12px !important;
 }
 
 .ratio-red {
@@ -939,8 +959,8 @@ body {
 }
 
 .expand-icon img {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   transform: rotate(180deg);
   transition: transform 0.25s ease;
 }
@@ -1196,9 +1216,7 @@ body {
 
 /* Top 10 icon column */
 .col-top10 {
-  width: 40px;
-  text-align: center;
-  vertical-align: middle;
+  padding: 12px !important;
 }
 
 .top10-icon {
@@ -1394,6 +1412,14 @@ body {
   .segmented-control .segment {
     padding: 4px 8px;
     font-size: 13px;
+  }
+
+  .legend-actions {
+    gap: 16px;
+  }
+
+  .download-pdf-btn {
+    font-size: 12px;
   }
   
   .diff-toggle {

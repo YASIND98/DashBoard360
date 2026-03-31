@@ -119,10 +119,10 @@
   </div>
   <div class="period-toggle">
     <button class="period-btn active" data-period="daily">
-      <img src="~/images/calendar.svg" alt="" class="period-icon" /> Günlük
+      <img src="~/images/balance.svg" alt="" class="period-icon" /> Bakiye
     </button>
     <button class="period-btn" data-period="monthly">
-      <img src="~/images/calendar-circle.svg" alt="" class="period-icon" /> Aylık
+      <img src="~/images/percentage.svg" alt="" class="period-icon" /> H / G
     </button>
   </div>
 </div>
@@ -155,8 +155,7 @@
                 <th class="col-index"></th>
                 <th class="col-expand"></th>
                 <th class="col-text valign-top">
-                    <span data-daily-header="ProductNameTitle"></span>
-                    <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                  <span data-daily-header="ProductNameTitle"></span>
                 </th>
                 <th class="text-center">
                     <span data-daily-header="LastYearTitle"></span>
@@ -193,10 +192,16 @@
       <span class="legend-bar ratio-green-bg"></span>
       <span class="legend-value">+</span>
     </div>
-    <div class="diff-toggle" id="diffToggle">
-      <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
-      <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
-      <span>Farkları Göster</span>
+    <div class="legend-actions">
+      <div class="diff-toggle" id="diffToggle">
+        <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+        <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+        <span>Farkları Göster</span>
+      </div>
+      <div class="download-pdf-btn" id="downloadPdfBtn" style="cursor:pointer;">
+        <img src="~/images/download.svg" alt="PDF İndir" />
+        <span>PDF İndir</span>
+      </div>
     </div>
   </div>
 </div>
@@ -210,28 +215,22 @@
                 <th class="col-index"></th>
                 <th class="col-expand"></th>
                 <th class="col-text valign-top">
-                    <span data-quantity-header="ProductNameTitle"></span>
-                    <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                  <span data-quantity-header="ProductNameTitle"></span>
                 </th>
                 <th class="text-center">
-                    <span data-daily-header="LastYearTitle"></span>
+                    <span data-quantity-header="LastYearTitle"></span>
                     <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="LastYearDate"></small>
+                    <small data-quantity-header="LastYearDate"></small>
                 </th>
                 <th class="text-center">
-                    <span data-daily-header="LastWeekTitle"></span>
+                    <span data-quantity-header="LastTwoMonthEarlierTitle"></span>
                     <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="LastWeekDate"></small>
+                    <small data-quantity-header="LastTwoMonthEarlierDate"></small>
                 </th>
                 <th class="text-center">
-                    <span data-daily-header="PrevDayTitle"></span>
+                    <span data-quantity-header="LastMonthTitle"></span>
                     <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="PrevDayDate"></small>
-                </th>
-                <th class="text-center">
-                    <span data-daily-header="YesterdayTitle"></span>
-                    <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
-                    <small data-daily-header="YesterdayDate"></small>
+                    <small data-quantity-header="LastMonthDate"></small>
                 </th>
             </tr>
         </thead>
@@ -248,10 +247,16 @@
       <span class="legend-bar ratio-green-bg"></span>
       <span class="legend-value">+</span>
     </div>
-    <div class="diff-toggle" id="quantityDiffToggle">
-      <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
-      <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
-      <span>Farkları Göster</span>
+    <div class="legend-actions">
+      <div class="diff-toggle" id="quantityDiffToggle">
+        <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+        <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+        <span>Farkları Göster</span>
+      </div>
+      <div class="download-pdf-btn" style="cursor:pointer;">
+        <img src="~/images/download.svg" alt="PDF İndir" />
+        <span>PDF İndir</span>
+      </div>
     </div>
   </div>
 </div>
@@ -280,8 +285,7 @@
                   <th class="col-index" rowspan="2"></th>
                   <th class="col-expand" rowspan="2"></th>
                   <th class="col-text valign-bottom" rowspan="2">
-                      <span data-monthly-header="ProductNameTitle"></span>
-                      <i class="sort-icon" data-sort-by="1"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <span data-monthly-header="ProductNameTitle"></span>
                   </th>
                   <th colspan="3" class="col-group-header selected" data-monthly-header="MonthGroupTitle"></th>
                   <th colspan="3" class="col-group-header" data-monthly-header="YearGroupTitle"></th>
@@ -310,6 +314,12 @@
         <span class="legend-bar ratio-green-bg"></span>
         <span class="legend-value">120</span>
         <span class="legend-bar ratio-blue-bg"></span>
+      </div>
+      <div class="legend-actions">
+        <div class="download-pdf-btn" style="cursor:pointer;">
+          <img src="~/images/download.svg" alt="PDF İndir" />
+          <span>PDF İndir</span>
+        </div>
       </div>
     </div>
 </div>
@@ -347,5 +357,8 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
     <script src="~/js/index.js"></script>
+    <script src="~/js/download-pdf.js"></script>
 }
