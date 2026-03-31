@@ -800,7 +800,6 @@ body {
 .diff-details {
   display: flex;
   justify-content: center;
-  gap: 16px;
   margin-top: 8px;
 }
 
@@ -809,7 +808,8 @@ body {
   flex-direction: column;
   align-items: center;
   position: relative;
-  padding-left: 12px;
+  padding: 0 12px;
+  flex: 1;
 }
 
 .diff-detail + .diff-detail::before {
