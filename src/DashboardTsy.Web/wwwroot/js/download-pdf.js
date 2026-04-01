@@ -1,6 +1,6 @@
 $(function () {
   function getPdfInfo() {
-    var pageTitle = $('.page-title').text().trim() || 'Hedef Raporları';
+    var pageTitle = $('.page-title').text().trim();
     var dateText = $('.date-text').text().trim() || '';
 
     var region = $('#indexRegionLabel').text().trim();
@@ -68,19 +68,23 @@ $(function () {
     );
 
     // Line 2: Rapor türü
-    $header.append(
-      $('<div></div>').attr('style', lineStyle)
-        .text('Rapor Türü: ' + info.reportType)
-    );
+    if (info.reportType) {
+      $header.append(
+        $('<div></div>').attr('style', lineStyle)
+          .text('Rapor Türü: ' + info.reportType)
+      );
+    }
 
     // Line 3: Segment + Alt Segment
-    var segmentText = 'Segment: ' + info.segment;
-    if (info.subSegment) {
-      segmentText += '  >  ' + info.subSegment;
+    if (info.segment) {
+      var segmentText = 'Segment: ' + info.segment;
+      if (info.subSegment) {
+        segmentText += '  >  ' + info.subSegment;
+      }
+      $header.append(
+        $('<div></div>').attr('style', lineStyle).text(segmentText)
+      );
     }
-    $header.append(
-      $('<div></div>').attr('style', lineStyle).text(segmentText)
-    );
 
     return $header;
   }
@@ -96,44 +100,58 @@ $(function () {
     }
 
     var info = getPdfInfo();
-    var target = $visibleTable[0];
+
+    // Tüm görünür tablo container'larının max genişliğini bul
+    var maxWidth = 0;
+    $visibleTable.each(function () {
+      if (this.scrollWidth > maxWidth) maxWidth = this.scrollWidth;
+    });
 
     var $wrapper = $('<div></div>').css({
       'position': 'absolute',
       'left': '-9999px',
       'top': '0',
       'background-color': '#060b28',
-      'width': target.scrollWidth + 'px'
+      'width': maxWidth + 'px'
     });
 
     var $infoHeader = buildInfoHeader(info);
-    var $tableClone = $(target).clone().css({ 'display': 'block' });
+    $wrapper.append($infoHeader);
 
-    // Tüm alt kırılımları açık göster
-    $tableClone.find('.sub-row').addClass('visible');
-    $tableClone.find('.expandable').addClass('expanded');
+    // Her görünür tablo container'ını klonla ve ekle
+    $visibleTable.each(function () {
+      var $tableClone = $(this).clone().css({ 'display': 'block', 'margin-bottom': '16px' });
 
-    // PDF'te download-pdf-btn (PDF İndir) gizle
-    $tableClone.find('.download-pdf-btn').hide();
+      // Tüm alt kırılımları açık göster
+      $tableClone.find('.sub-row').addClass('visible');
+      $tableClone.find('.expandable').addClass('expanded');
 
-    // Stripe'ları yeniden hesapla
-    var stripeIndex = 0;
-    var mainIndex = 0;
-    var $lastVisible = null;
-    $tableClone.find('tbody tr').each(function () {
-      var $tr = $(this);
-      $tr.removeClass('stripe-odd stripe-even last-visible-row');
-      stripeIndex++;
-      if (!$tr.hasClass('sub-row')) {
-        mainIndex++;
-        $tr.find('td:first').text(mainIndex);
-      }
-      $tr.addClass(stripeIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
-      $lastVisible = $tr;
+      // PDF'te download-pdf-btn (PDF İndir) gizle
+      $tableClone.find('.download-pdf-btn').hide();
+      $tableClone.find('.table-legend').hide();
+
+      // Stripe'ları yeniden hesapla
+      $tableClone.find('.data-table').each(function () {
+        var stripeIndex = 0;
+        var mainIndex = 0;
+        var $lastVisible = null;
+        $(this).find('tbody tr').each(function () {
+          var $tr = $(this);
+          $tr.removeClass('stripe-odd stripe-even last-visible-row');
+          stripeIndex++;
+          if (!$tr.hasClass('sub-row')) {
+            mainIndex++;
+            $tr.find('td:first').text(mainIndex);
+          }
+          $tr.addClass(stripeIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
+          $lastVisible = $tr;
+        });
+        if ($lastVisible) $lastVisible.addClass('last-visible-row');
+      });
+
+      $wrapper.append($tableClone);
     });
-    if ($lastVisible) $lastVisible.addClass('last-visible-row');
 
-    $wrapper.append($infoHeader).append($tableClone);
     $('body').append($wrapper);
 
     html2canvas($wrapper[0], {
