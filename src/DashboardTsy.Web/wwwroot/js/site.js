@@ -30,8 +30,10 @@ function renderTableLegend(containerId, options) {
   var html = '<span class="legend-note">' + note + '</span>';
   if (options.diff) html += '<div class="legend-colors">' + buildDiffLegend(options.diff) + '</div>';
   if (options.ratio) html += '<div class="legend-colors">' + LEGEND_RATIO + '</div>';
+  html += '<span class="download-pdf-btn"><img src="/images/download.svg" alt="PDF" /> PDF İndir</span>';
   $el.html(html);
 }
+
 
 // ===== Shared Report Date =====
 var _reportDate = new Date().toISOString();

@@ -210,7 +210,7 @@ function loadGeneralRegionReport(regionCode) {
                     }
                 }
 
-                var indent = row.LevelNo > 0 ? '<span style="padding-left:' + (row.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + row.BranchName + '</span>' : row.BranchName;
+                var indent = row.LevelNo > 0 ? '<span style="padding-left:' + (row.LevelNo * 16) + 'px">' + row.BranchName + '</span>' : row.BranchName;
                 html += '<td class="col-text">' + indent + '</td>';
                 html += '<td class="' + percentColor(row.FirstMonthRealizationRate) + '">' + formatPercent(row.FirstMonthRealizationRate) + '</td>';
                 html += '<td class="' + percentColor(row.SecondMonthRealizationRate) + '">' + formatPercent(row.SecondMonthRealizationRate) + '</td>';
@@ -334,7 +334,7 @@ function renderDynamicHeaders(headers, hasExpandable) {
 // ===== Volume Region Report (Hacim — Bölge) =====
 function loadVolumeRegionReport(regionCode, subTabId) {
     $.ajax({
-        url: '/Home/GetProductivityVolumeRegionReport',
+        url: '/ProductivityReport/GetProductivityVolumeRegionReport',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
@@ -385,7 +385,7 @@ function renderVolumeRegionTable(items) {
         }
 
         // Product name with indent
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td class="has-diff">' + item.RealizationRegionValue + formatDiff(item.RealizationRegionDiff) + '</td>';
@@ -456,7 +456,7 @@ function renderVolumeBranchTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.RealizationBranchValue + '</td>';
@@ -531,7 +531,7 @@ function renderCountCustomerRegionTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td class="has-diff">' + item.RealizationRegion + formatDiff(item.RealizationRegionDiff) + '</td>';
@@ -598,7 +598,7 @@ function renderCountCustomerBranchTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.RealizationBranchValue + '</td>';
@@ -668,7 +668,7 @@ function renderCountCardPosBranchTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.CurrentPeriodBranchValue + '</td>';
@@ -735,7 +735,7 @@ function renderCountCardPosRegionTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.CurrentMonthRegionValue + '</td>';
@@ -747,6 +747,145 @@ function renderCountCardPosRegionTable(items) {
 
     $('#dynamicTableBody').html(html);
     updateProductivityStripes();
+}
+
+// ===== Count Card/POS Ratio Region Report (Adet — Oran Tablosu — Bölge) =====
+function loadCountCardPosRatioRegionReport(regionCode, tabId) {
+    // Load headers first, then data
+    $.ajax({
+        url: '/ProductivityReport/GetProductivityCountCardPosRatioRegionReportTableHeaders',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            sessionId: '1',
+            tabId: tabId,
+            reportDate: _reportDate
+        }),
+        success: function (headers) {
+            renderCountCardPosRatioRegionHeaders(headers);
+
+            $.ajax({
+                url: '/ProductivityReport/GetProductivityCountCardPosRatioRegionReport',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    sessionId: '1',
+                    regionCode: regionCode,
+                    tabId: tabId,
+                    reportDate: _reportDate
+                }),
+                success: function (data) {
+                    renderCountCardPosRatioRegionTable(data);
+                    $('#dynamicTableContainer2').show();
+                }
+            });
+        }
+    });
+}
+
+function renderCountCardPosRatioRegionHeaders(h) {
+    var $thead = $('#dynamicTableHead2');
+    $thead.empty();
+
+    var row = '<tr>';
+    row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
+    row += '<th>' + h.RatioNameTitle + '</th>';
+    row += '<th>' + h.PreviousQuarterRegionTitle + '</th>';
+    row += '<th>' + h.CurrentRegionTitle + '</th>';
+    row += '<th>' + h.CurrentRegionTitle + '</th>';
+    row += '<th>' + h.CurrentBankAverageTitle + '</th>';
+    row += '</tr>';
+
+    $thead.append(row);
+}
+
+function renderCountCardPosRatioRegionTable(items) {
+    var html = '';
+
+    items.forEach(function (item, i) {
+        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+
+        html += '<tr class="table-row ' + cls + '">';
+        html += '<td class="col-index">' + (i + 1) + '</td>';
+        html += '<td class="col-text">' + item.RatioName + '</td>';
+        html += '<td>' + item.PreviousQuarterRegionValue + '</td>';
+        html += '<td class="has-diff">' + item.CurrentRegionValue + formatDiff(item.CurrentRegionDiff) + '</td>';
+        html += '<td class="has-diff">' + item.CurrentRegionValue + formatDiff(item.CurrentRegionDiff) + '</td>';
+        html += '<td class="has-diff">' + item.CurrentBankAverageValue + formatDiff(item.CurrentBankAverageDiff) + '</td>';
+        html += '</tr>';
+    });
+
+    $('#dynamicTableBody2').html(html);
+    updateProductivityStripes2();
+}
+
+// ===== Count Card/POS Ratio Branch Report (Adet — Oran Tablosu — Şube) =====
+function loadCountCardPosRatioBranchReport(branchCode, tabId) {
+    $.ajax({
+        url: '/ProductivityReport/GetProductivityCountCardPosRatioBranchReportTableHeaders',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            sessionId: '1',
+            tabId: tabId,
+            reportDate: _reportDate
+        }),
+        success: function (headers) {
+            renderCountCardPosRatioBranchHeaders(headers);
+
+            $.ajax({
+                url: '/ProductivityReport/GetProductivityCountCardPosRatioBranchReport',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    sessionId: '1',
+                    branchCode: branchCode,
+                    tabId: tabId,
+                    reportDate: _reportDate
+                }),
+                success: function (data) {
+                    renderCountCardPosRatioBranchTable(data);
+                    $('#dynamicTableContainer2').show();
+                }
+            });
+        }
+    });
+}
+
+function renderCountCardPosRatioBranchHeaders(h) {
+    var $thead = $('#dynamicTableHead2');
+    $thead.empty();
+
+    var row = '<tr>';
+    row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
+    row += '<th>' + h.RatioNameTitle + '</th>';
+    row += '<th>' + h.PreviousQuarterBranchTitle + '</th>';
+    row += '<th>' + h.CurrentBranchTitle + '</th>';
+    row += '<th>' + h.CurrentRegionAverageTitle + '</th>';
+    row += '<th>' + h.CurrentBankAverageTitle + '</th>';
+    row += '</tr>';
+
+    $thead.append(row);
+}
+
+function renderCountCardPosRatioBranchTable(items) {
+    var html = '';
+
+    items.forEach(function (item, i) {
+        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+
+        html += '<tr class="table-row ' + cls + '">';
+        html += '<td class="col-index">' + (i + 1) + '</td>';
+        html += '<td class="col-text">' + item.RatioName + '</td>';
+        html += '<td>' + item.PreviousQuarterBranchValue + '</td>';
+        html += '<td class="has-diff">' + item.CurrentBranchValue + formatDiff(item.CurrentBranchValueDiff) + '</td>';
+        html += '<td class="has-diff">' + item.CurrentRegionAverageValue + formatDiff(item.CurrentRegionAverageValueDiff) + '</td>';
+        html += '<td class="has-diff">' + item.CurrentBankAverageValue + formatDiff(item.CurrentBankAverageValueDiff) + '</td>';
+        html += '</tr>';
+    });
+
+    $('#dynamicTableBody2').html(html);
+    updateProductivityStripes2();
 }
 
 // ===== Profit Total Region Report (Karlılık — Üst Tablo — Bölge) =====
@@ -805,7 +944,7 @@ function renderProfitTotalRegionTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -899,7 +1038,7 @@ function renderProfitRatioRegionTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.RatioName + '</span>' : item.RatioName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -967,7 +1106,7 @@ function renderProfitRatioBranchTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.RatioName + '</span>' : item.RatioName;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -1038,7 +1177,7 @@ function renderProfitTotalBranchTable(items) {
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
+        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -1197,39 +1336,44 @@ function renderProfitSpreadManagementBranchTable(items) {
     updateProductivityStripes();
 }
 
-function updateProductivityStripes2() {
-    var visibleIndex = 0;
+function applyProductivityStripes($table) {
+    var stripeIndex = 0;
+    var mainIndex = 0;
+    var subCounters = {};
     var $lastVisible = null;
-    $('#dynamicTable2 tbody tr').each(function () {
+    $table.find('tbody tr').each(function () {
         var $tr = $(this);
         $tr.removeClass('stripe-odd stripe-even last-visible-row');
         if ($tr.hasClass('sub-row') && !$tr.hasClass('visible')) {
             return;
         }
-        visibleIndex++;
-        $tr.addClass(visibleIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
-        $tr.find('td.col-index').text(visibleIndex);
+        stripeIndex++;
+        if (!$tr.hasClass('sub-row')) {
+            mainIndex++;
+            subCounters[mainIndex] = 0;
+            $tr.find('td.col-index').text(mainIndex);
+            $tr.find('td.col-text .sub-index').remove();
+        } else {
+            subCounters[mainIndex] = (subCounters[mainIndex] || 0) + 1;
+            var subLabel = mainIndex + '.' + subCounters[mainIndex];
+            $tr.find('td.col-index').text('');
+            var $colText = $tr.find('td.col-text');
+            $colText.find('.sub-index').remove();
+            $colText.prepend('<span class="sub-index">' + subLabel + '</span>  ');
+        }
+        $tr.addClass(stripeIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
         $lastVisible = $tr;
     });
     if ($lastVisible) $lastVisible.addClass('last-visible-row');
+}
+
+function updateProductivityStripes2() {
+    applyProductivityStripes($('#dynamicTable2'));
     reapplySortVisual($('#dynamicTable2'));
 }
 
 function updateProductivityStripes() {
-    var visibleIndex = 0;
-    var $lastVisible = null;
-    $('#dynamicTable tbody tr').each(function () {
-        var $tr = $(this);
-        $tr.removeClass('stripe-odd stripe-even last-visible-row');
-        if ($tr.hasClass('sub-row') && !$tr.hasClass('visible')) {
-            return;
-        }
-        visibleIndex++;
-        $tr.addClass(visibleIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
-        $tr.find('td.col-index').text(visibleIndex);
-        $lastVisible = $tr;
-    });
-    if ($lastVisible) $lastVisible.addClass('last-visible-row');
+    applyProductivityStripes($('#dynamicTable'));
     reapplySortVisual($('#dynamicTable'));
 }
 
@@ -1241,8 +1385,8 @@ function reapplySortVisual($table) {
 }
 
 function formatDiff(val) {
-    if (val == null) return '<div class="diff-value">&nbsp;</div>';
+    if (val == null) return '<div class="diff-value-for-productivity">&nbsp;</div>';
     var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
     var prefix = val > 0 ? '+' : '';
-    return '<div class="diff-value ' + cls + '">' + prefix + val + '</div>';
+    return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + val + '</div>';
 }
