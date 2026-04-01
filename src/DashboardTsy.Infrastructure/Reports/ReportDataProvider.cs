@@ -419,6 +419,26 @@ ORDER BY SUBE_ADI;";
         return MockProductivityReportData.GetProductivityCountCardPosRegionReport(request);
     }
 
+    public IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem> GetProductivityCountCardPosRatioRegionReport(GetProductivityCountCardPosRatioRegionReportRequest request)
+    {
+        request ??= new GetProductivityCountCardPosRatioRegionReportRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityCountCardPosRatioRegionReport(request);
+
+        return MockProductivityReportData.GetProductivityCountCardPosRatioRegionReport(request);
+    }
+
+    public GetProductivityCountCardPosRatioRegionReportTableHeadersItem GetProductivityCountCardPosRatioRegionReportTableHeaders(GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request)
+    {
+        request ??= new GetProductivityCountCardPosRatioRegionReportTableHeadersRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityCountCardPosRatioRegionReportTableHeaders(request);
+
+        return MockProductivityReportData.GetProductivityCountCardPosRatioRegionReportTableHeaders(request);
+    }
+
     public IReadOnlyList<GetProductivityCountCustomerRegionReportItem> GetProductivityCountCustomerRegionReport(GetProductivityCountCustomerRegionReportRequest request)
     {
         request ??= new GetProductivityCountCustomerRegionReportRequest();
@@ -487,6 +507,26 @@ ORDER BY SUBE_ADI;";
             return MockProductivityReportData.GetProductivityCountCardPosBranchReport(request);
 
         return MockProductivityReportData.GetProductivityCountCardPosBranchReport(request);
+    }
+
+    public IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem> GetProductivityCountCardPosRatioBranchReport(GetProductivityCountCardPosRatioBranchReportRequest request)
+    {
+        request ??= new GetProductivityCountCardPosRatioBranchReportRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityCountCardPosRatioBranchReport(request);
+
+        return MockProductivityReportData.GetProductivityCountCardPosRatioBranchReport(request);
+    }
+
+    public GetProductivityCountCardPosRatioBranchReportTableHeadersItem GetProductivityCountCardPosRatioBranchReportTableHeaders(GetProductivityCountCardPosRatioBranchReportTableHeadersRequest request)
+    {
+        request ??= new GetProductivityCountCardPosRatioBranchReportTableHeadersRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityCountCardPosRatioBranchReportTableHeaders(request);
+
+        return MockProductivityReportData.GetProductivityCountCardPosRatioBranchReportTableHeaders(request);
     }
 
     public IReadOnlyList<GetProductivityProfitRatioBranchReportItem> GetProductivityProfitRatioBranchReport(GetProductivityProfitRatioBranchReportRequest request)

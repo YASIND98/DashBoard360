@@ -64,6 +64,8 @@ public interface IReportDataProvider
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
     IReadOnlyList<GetProductivityCountCardPosRegionReportItem> GetProductivityCountCardPosRegionReport(GetProductivityCountCardPosRegionReportRequest request);
+    IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem> GetProductivityCountCardPosRatioRegionReport(GetProductivityCountCardPosRatioRegionReportRequest request);
+    GetProductivityCountCardPosRatioRegionReportTableHeadersItem GetProductivityCountCardPosRatioRegionReportTableHeaders(GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için müşteri sayısı bölge raporunu döner (Tümü/Kurumsal/Ticari/KOBİ/Tarım/Bireysel).
@@ -106,6 +108,8 @@ public interface IReportDataProvider
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
     IReadOnlyList<GetProductivityCountCardPosBranchReportItem> GetProductivityCountCardPosBranchReport(GetProductivityCountCardPosBranchReportRequest request);
+    IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem> GetProductivityCountCardPosRatioBranchReport(GetProductivityCountCardPosRatioBranchReportRequest request);
+    GetProductivityCountCardPosRatioBranchReportTableHeadersItem GetProductivityCountCardPosRatioBranchReportTableHeaders(GetProductivityCountCardPosRatioBranchReportTableHeadersRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için karlılık oranı şube raporunu döner.

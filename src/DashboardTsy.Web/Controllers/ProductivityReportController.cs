@@ -149,6 +149,28 @@ public class ProductivityReportController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("GetProductivityCountCardPosRatioRegionReport")]
+    public async Task<ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem>>> GetProductivityCountCardPosRatioRegionReport(
+    [FromBody] GetProductivityCountCardPosRatioRegionReportRequest? request,
+    CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountCardPosRatioRegionReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    [HttpPost("GetProductivityCountCardPosRatioRegionReportTableHeaders")]
+    public async Task<ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportTableHeadersItem>>> GetProductivityCountCardPosRatioRegionReportTableHeaders(
+    [FromBody] GetProductivityCountCardPosRatioRegionReportTableHeadersRequest? request,
+    CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountCardPosRatioRegionReportTableHeadersAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
     [HttpPost("GetProductivityCountCustomerRegionReport")]
     public async Task<ActionResult<IReadOnlyList<GetProductivityCountCustomerRegionReportItem>>> GetProductivityCountCustomerRegionReport(
         [FromBody] GetProductivityCountCustomerRegionReportRequest? request,
@@ -223,6 +245,28 @@ public class ProductivityReportController : ControllerBase
         if (request == null) return BadRequest();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityCountCardPosBranchReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    [HttpPost("GetProductivityCountCardPosRatioBranchReport")]
+    public async Task<ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem>>> GetProductivityCountCardPosRatioBranchReport(
+    [FromBody] GetProductivityCountCardPosRatioBranchReportRequest? request,
+    CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountCardPosRatioBranchReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    [HttpPost("GetProductivityCountCardPosRatioBranchReportTableHeaders")]
+    public async Task<ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioBranchReportTableHeadersItem>>> GetProductivityCountCardPosRatioBranchReportTableHeaders(
+    [FromBody] GetProductivityCountCardPosRatioBranchReportTableHeadersRequest? request,
+    CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountCardPosRatioBranchReportTableHeadersAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
 

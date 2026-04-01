@@ -225,6 +225,71 @@ public static class MockProductivityReportData
         return items;
     }
 
+    public static IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem> GetProductivityCountCardPosRatioRegionReport(GetProductivityCountCardPosRatioRegionReportRequest request)
+    {
+        var items = new List<GetProductivityCountCardPosRatioRegionReportItem>
+    {
+        new()
+        {
+            Id = 1,
+            RatioName = request.TabId == 1 ? "Toplam Kredi Kartı" : "Toplam Satış",
+            PreviousQuarterRegionValue = 35m,
+            CurrentRegionValue = 24m,
+            CurrentRegionDiff = 11m,
+            CurrentBankAverageValue = 20m,
+            CurrentBankAverageDiff = 15m
+        },
+        new()
+        {
+            Id = 2,
+            RatioName = request.TabId == 1 ? "Aktif Kredi Kartı" : "Aktif Satış",
+            PreviousQuarterRegionValue = 35m,
+            CurrentRegionValue = 24m,
+            CurrentRegionDiff = 11m,
+            CurrentBankAverageValue = 20m,
+            CurrentBankAverageDiff = 15m
+        },
+        new()
+        {
+            Id = 3,
+            RatioName = "Aktiflik Oranı %",
+            PreviousQuarterRegionValue = 35m,
+            CurrentRegionValue = 24m,
+            CurrentRegionDiff = 11m,
+            CurrentBankAverageValue = 20m,
+            CurrentBankAverageDiff = 15m
+        }
+    };
+
+        if (request.TabId == 1)
+        {
+            items.Add(new GetProductivityCountCardPosRatioRegionReportItem
+            {
+                Id = 4,
+                RatioName = "Anında Kart Şifre Alım %",
+                PreviousQuarterRegionValue = 35m,
+                CurrentRegionValue = 24m,
+                CurrentRegionDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageDiff = 15m
+            });
+        }
+
+        return items;
+    }
+
+    public static GetProductivityCountCardPosRatioRegionReportTableHeadersItem GetProductivityCountCardPosRatioRegionReportTableHeaders(GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request)
+    {
+        return new GetProductivityCountCardPosRatioRegionReportTableHeadersItem
+        {
+            RowNumberTitle = "#",
+            RatioNameTitle = "Oran Adı",
+            PreviousQuarterRegionTitle = "Önceki Çeyrek (Bölge)",
+            CurrentRegionTitle = "Bölge",
+            CurrentBankAverageTitle = "Banka"
+        };
+    }
+
     public static IReadOnlyList<GetProductivityCountCardPosBranchReportItem> GetProductivityCountCardPosBranchReport(GetProductivityCountCardPosBranchReportRequest request)
     {
         var isCard = request.TabId == 1;
@@ -289,6 +354,80 @@ public static class MockProductivityReportData
         };
 
         return items;
+    }
+
+    public static IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem> GetProductivityCountCardPosRatioBranchReport(GetProductivityCountCardPosRatioBranchReportRequest request)
+    {
+        var items = new List<GetProductivityCountCardPosRatioBranchReportItem>
+    {
+        new()
+        {
+            Id = 1,
+            RatioName = request.TabId == 1 ? "Toplam Kredi Kartı" : "Toplam Satış",
+            PreviousQuarterBranchValue = 35m,
+            CurrentBranchValue = 24m,
+            CurrentBranchValueDiff = 11m,
+            CurrentRegionAverageValue = 24m,
+            CurrentRegionAverageValueDiff = 11m,
+            CurrentBankAverageValue = 20m,
+            CurrentBankAverageValueDiff = 15m
+        },
+        new()
+        {
+            Id = 2,
+            RatioName = request.TabId == 1 ? "Aktif Kredi Kartı" : "Aktif Satış",
+            PreviousQuarterBranchValue = 35m,
+            CurrentBranchValue = 24m,
+            CurrentBranchValueDiff = 11m,
+            CurrentRegionAverageValue = 24m,
+            CurrentRegionAverageValueDiff = 11m,
+            CurrentBankAverageValue = 20m,
+            CurrentBankAverageValueDiff = 15m
+        },
+        new()
+        {
+            Id = 3,
+            RatioName = "Aktiflik Oranı %",
+            PreviousQuarterBranchValue = 35m,
+            CurrentBranchValue = 24m,
+            CurrentBranchValueDiff = 11m,
+            CurrentRegionAverageValue = 24m,
+            CurrentRegionAverageValueDiff = 11m,
+            CurrentBankAverageValue = 20m,
+            CurrentBankAverageValueDiff = 15m
+        }
+    };
+
+        if (request.TabId == 1)
+        {
+            items.Add(new GetProductivityCountCardPosRatioBranchReportItem
+            {
+                Id = 4,
+                RatioName = "Anında Kart Şifre Alım %",
+                PreviousQuarterBranchValue = 35m,
+                CurrentBranchValue = 24m,
+                CurrentBranchValueDiff = 11m,
+                CurrentRegionAverageValue = 24m,
+                CurrentRegionAverageValueDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageValueDiff = 15m
+            });
+        }
+
+        return items;
+    }
+
+    public static GetProductivityCountCardPosRatioBranchReportTableHeadersItem GetProductivityCountCardPosRatioBranchReportTableHeaders(GetProductivityCountCardPosRatioBranchReportTableHeadersRequest request)
+    {
+        return new GetProductivityCountCardPosRatioBranchReportTableHeadersItem
+        {
+            RowNumberTitle = "#",
+            RatioNameTitle = "Oran Adı",
+            PreviousQuarterBranchTitle = "Önceki Çeyrek (Şube)",
+            CurrentBranchTitle = "Şube",
+            CurrentRegionAverageTitle = "Bölge",
+            CurrentBankAverageTitle = "Banka"
+        };
     }
 
     public static IReadOnlyList<GetProductivityCountCustomerRegionReportItem> GetProductivityCountCustomerRegionReport(GetProductivityCountCustomerRegionReportRequest request)

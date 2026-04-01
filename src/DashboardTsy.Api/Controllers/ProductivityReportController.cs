@@ -129,6 +129,38 @@ public class ProductivityReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountCardPosRatioRegionReport
+    /// Verimlilik ekranı için Adet sekmesinde Kredi Kartı/POS tabı için oran tablosu verilerini getirir.
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    [HttpPost("GetProductivityCountCardPosRatioRegionReport")]
+    public ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem>> GetProductivityCountCardPosRatioRegionReport(
+        [FromBody] GetProductivityCountCardPosRatioRegionReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountCardPosRatioRegionReport(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountCardPosRatioRegionReportTableHeaders
+    /// Verimlilik ekranı için Adet sekmesinde Kredi Kartı/POS orta tabı için üstte yer alan oran tablosunun kolon başlık bilgilerini getirir.
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    [HttpPost("GetProductivityCountCardPosRatioRegionReportTableHeaders")]
+    public ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportTableHeadersItem>> GetProductivityCountCardPosRatioRegionReportTableHeaders(
+        [FromBody] GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountCardPosRatioRegionReportTableHeaders(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /ProductivityReport/GetProductivityCountCustomerRegionReport
     /// Verimlilik ekranı için müşteri sayısı bölge raporunu döner (Tümü/Kurumsal/Ticari/KOBİ/Tarım/Bireysel).
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
@@ -237,6 +269,40 @@ public class ProductivityReportController : ControllerBase
             return BadRequest();
 
         var result = _reportDataProvider.GetProductivityCountCardPosBranchReport(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountCardPosRatioBranchReport
+    /// Verimlilik ekranı için şube filtresi seçiliyken Adet sekmesi altında yer alan 
+    /// Kredi Kartı/POS tabları için üstte bulunan oran tablosunun verilerini getirir.
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    [HttpPost("GetProductivityCountCardPosRatioBranchReport")]
+    public ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem>> GetProductivityCountCardPosRatioBranchReport(
+        [FromBody] GetProductivityCountCardPosRatioBranchReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountCardPosRatioBranchReport(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountCardPosRatioBranchReportTableHeaders
+    /// Verimlilik ekranı için şube filtresi seçiliyken Adet sekmesi altında yer alan 
+    /// Kredi Kartı/POS tabları için üstte bulunan oran tablosunun kolon başlıklarını getirir.
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    [HttpPost("GetProductivityCountCardPosRatioBranchReportTableHeaders")]
+    public ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioBranchReportTableHeadersItem>> GetProductivityCountCardPosRatioBranchReportTableHeaders(
+        [FromBody] GetProductivityCountCardPosRatioBranchReportTableHeadersRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountCardPosRatioBranchReportTableHeaders(request);
         return Ok(result);
     }
 
