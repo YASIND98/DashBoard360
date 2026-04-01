@@ -177,8 +177,8 @@ function loadGeneralRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode || null,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             data.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
@@ -342,8 +342,8 @@ function loadVolumeRegionReport(regionCode, subTabId) {
             regionCode: regionCode,
             subTabId: subTabId || 0,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             // Data'da parentId olan satır var mı?
@@ -416,8 +416,8 @@ function loadVolumeBranchReport(branchCode, subTabId) {
             branchCode: branchCode,
             subTabId: subTabId || 0,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -491,8 +491,8 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             regionCode: regionCode,
             subTabId: subTabId || 0,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -558,8 +558,8 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             branchCode: branchCode,
             subTabId: subTabId || 0,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -628,8 +628,8 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             branchCode: branchCode,
             tabId: tabId,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -695,8 +695,8 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             regionCode: regionCode,
             tabId: tabId,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -760,8 +760,8 @@ function loadProfitTotalRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -836,8 +836,8 @@ function loadProfitRatioRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -926,8 +926,8 @@ function loadProfitRatioBranchReport(branchCode) {
             sessionId: '1',
             branchCode: branchCode,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -994,8 +994,8 @@ function loadProfitTotalBranchReport(branchCode) {
             sessionId: '1',
             branchCode: branchCode,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -1070,8 +1070,8 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
             sessionId: '1',
             regionCode: regionCode,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
@@ -1137,8 +1137,8 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
             sessionId: '1',
             branchCode: branchCode,
             reportDate: _reportDate,
-            sortBy: _yieldSortBy,
-            isAscending: _yieldSortAsc
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (data) {
             var hasExpandable = data.some(function (item) { return item.ParentId !== null; });

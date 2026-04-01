@@ -112,8 +112,8 @@ $(document).ready(function () {
           branchId: selectedBranch ? [selectedBranch.code] : [],
           searchText: $('#searchInput').val() || null,
           showDifferences: showDiff || false,
-          sortBy: currentSortBy,
-          isAscending: currentSortState === 'asc'
+          sortBy: currentSortState ? currentSortBy : 0,
+          isAscending: currentSortState ? currentSortState === 'asc' : true
       };
   }
 
