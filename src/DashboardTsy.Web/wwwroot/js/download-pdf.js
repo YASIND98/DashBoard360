@@ -93,7 +93,7 @@ $(function () {
     var $btn = $(this);
     $btn.css('pointer-events', 'none');
     var originalHtml = $btn.html();
-    $btn.html('<span class="pdf-spinner"></span> PDF Yükleniyor...');
+    $btn.html('<div class="pdf-spinner"></div> <span>PDF Yükleniyor...</span>');
 
     var $visibleTable = $('.table-container:visible');
     if (!$visibleTable.length) {
@@ -103,18 +103,11 @@ $(function () {
 
     var info = getPdfInfo();
 
-    // Tüm görünür tablo container'larının max genişliğini bul
-    var maxWidth = 0;
-    $visibleTable.each(function () {
-      if (this.scrollWidth > maxWidth) maxWidth = this.scrollWidth;
-    });
-
     var $wrapper = $('<div></div>').css({
       'position': 'absolute',
       'left': '-9999px',
       'top': '0',
-      'background-color': '#060b28',
-      'width': maxWidth + 'px'
+      'background-color': '#060b28'
     });
 
     var $infoHeader = buildInfoHeader(info);
@@ -122,7 +115,8 @@ $(function () {
 
     // Her görünür tablo container'ını klonla ve ekle
     $visibleTable.each(function () {
-      var $tableClone = $(this).clone().css({ 'display': 'block', 'margin-bottom': '16px' });
+      var $tableClone = $(this).clone().css({ 'display': 'block', 'margin-bottom': '16px', 'overflow': 'visible' });
+      $tableClone.find('.table-wrapper').css('overflow', 'visible');
 
       // Tüm alt kırılımları açık göster
       $tableClone.find('.sub-row').addClass('visible');
@@ -155,6 +149,19 @@ $(function () {
     });
 
     $('body').append($wrapper);
+
+    // DOM'a eklendikten sonra gerçek genişliği hesapla ve uygula
+    var realWidth = $wrapper[0].scrollWidth;
+    $wrapper.css('width', realWidth + 'px');
+    $wrapper.find('.table-container').css('width', realWidth + 'px');
+    $wrapper.find('.data-table').css('width', '100%');
+
+    // Minimum yükseklik: A4 landscape oranı (297/210) ile genişliğe göre hesapla
+    var minHeight = Math.round(realWidth * (210 / 297));
+    var actualHeight = $wrapper[0].scrollHeight;
+    if (actualHeight < minHeight) {
+      $wrapper.css('height', minHeight + 'px');
+    }
 
     html2canvas($wrapper[0], {
       scale: 2,

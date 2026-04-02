@@ -1,3 +1,23 @@
+// ===== Yield Table Skeleton + Loading =====
+function showYieldTableLoading() {
+    // Tablo container'ları gizle, skeleton göster
+    $('#dynamicTableContainer').hide();
+    $('#dynamicTableContainer2').hide();
+    $('#dynamicTableBody').html('');
+    $('#dynamicTableBody2').html('');
+    $('#pageSkeleton').show();
+    $('body').loading({
+        stoppable: false,
+        message: '<div><img src="/assets/img/loader.gif" style="width: 60px;" /></div>'
+    });
+}
+
+function hideYieldTableLoading() {
+    $('#pageSkeleton').hide();
+    $('#dynamicTableContainer').show();
+    $('body').loading('stop');
+}
+
 // ===== Tab State =====
 var _productivityTabs = [];
 var _activeToggleId = null;
@@ -1370,11 +1390,13 @@ function applyProductivityStripes($table) {
 function updateProductivityStripes2() {
     applyProductivityStripes($('#dynamicTable2'));
     reapplySortVisual($('#dynamicTable2'));
+    hideYieldTableLoading();
 }
 
 function updateProductivityStripes() {
     applyProductivityStripes($('#dynamicTable'));
     reapplySortVisual($('#dynamicTable'));
+    hideYieldTableLoading();
 }
 
 function reapplySortVisual($table) {

@@ -58,9 +58,7 @@
     <div class="page-icons">
       <img src="~/images/notification.svg" alt="Bildirimler" />
       <img src="~/images/help.svg" alt="Yardım" />
-      <div class="avatar">
-          <img src="@avatarUrl" alt="Avatar" />
-      </div>
+      <img src="@avatarUrl" alt="Avatar" class="avatar" />
     </div>
 </div>
 
@@ -261,9 +259,9 @@
   </div>
 </div>
 
-<!-- Monthly Table -->
-<div class="table-container" id="monthlyTable" style="display:none;">
-    <div class="table-skeleton" id="monthlyTableSkeleton" style="display:none;">
+<!-- Monthly Skeleton -->
+<div id="monthlyTableSkeleton" class="page-skeleton" style="display:none;">
+    <div class="skeleton-table">
         @for (int i = 0; i < 12; i++)
         {
             <div class="skeleton-table-row">
@@ -278,6 +276,10 @@
             </div>
         }
     </div>
+</div>
+
+<!-- Monthly Table -->
+<div class="table-container" id="monthlyTable" style="display:none;">
     <div class="table-wrapper">
       <table class="data-table" id="monthlyDataTable">
           <thead>
