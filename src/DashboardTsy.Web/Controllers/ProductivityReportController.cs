@@ -161,7 +161,7 @@ public class ProductivityReportController : ControllerBase
     }
 
     [HttpPost("GetProductivityCountCardPosRatioRegionReportTableHeaders")]
-    public async Task<ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportTableHeadersItem>>> GetProductivityCountCardPosRatioRegionReportTableHeaders(
+    public async Task<ActionResult<GetProductivityCountCardPosRatioRegionReportTableHeadersItem>> GetProductivityCountCardPosRatioRegionReportTableHeaders(
     [FromBody] GetProductivityCountCardPosRatioRegionReportTableHeadersRequest? request,
     CancellationToken cancellationToken)
     {
@@ -260,7 +260,7 @@ public class ProductivityReportController : ControllerBase
     }
 
     [HttpPost("GetProductivityCountCardPosRatioBranchReportTableHeaders")]
-    public async Task<ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioBranchReportTableHeadersItem>>> GetProductivityCountCardPosRatioBranchReportTableHeaders(
+    public async Task<ActionResult<GetProductivityCountCardPosRatioBranchReportTableHeadersItem>> GetProductivityCountCardPosRatioBranchReportTableHeaders(
     [FromBody] GetProductivityCountCardPosRatioBranchReportTableHeadersRequest? request,
     CancellationToken cancellationToken)
     {

@@ -296,7 +296,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityCountCardPosRatioBranchReportTableHeaders")]
-    public ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioBranchReportTableHeadersItem>> GetProductivityCountCardPosRatioBranchReportTableHeaders(
+    public ActionResult<GetProductivityCountCardPosRatioBranchReportTableHeadersItem> GetProductivityCountCardPosRatioBranchReportTableHeaders(
         [FromBody] GetProductivityCountCardPosRatioBranchReportTableHeadersRequest request)
     {
         if (request == null)
