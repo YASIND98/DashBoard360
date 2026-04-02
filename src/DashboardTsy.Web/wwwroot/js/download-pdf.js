@@ -92,6 +92,8 @@ $(function () {
   $(document).on('click', '.download-pdf-btn', function () {
     var $btn = $(this);
     $btn.css('pointer-events', 'none');
+    var originalHtml = $btn.html();
+    $btn.html('<span class="pdf-spinner"></span> PDF Yükleniyor...');
 
     var $visibleTable = $('.table-container:visible');
     if (!$visibleTable.length) {
@@ -176,10 +178,12 @@ $(function () {
       pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save('Hedef-Raporlari.pdf');
 
+      $btn.html(originalHtml);
       $btn.css('pointer-events', '');
     }).catch(function (err) {
       console.error('PDF oluşturma hatası:', err);
       $wrapper.remove();
+      $btn.html(originalHtml);
       $btn.css('pointer-events', '');
     });
   });

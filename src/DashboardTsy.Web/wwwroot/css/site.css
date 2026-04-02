@@ -181,8 +181,10 @@ body {
 /* ===== Main Content ===== */
 .main-content {
   width: 100%;
+  min-width: 0;
   min-height: 100vh;
   background: var(--bg-main);
+  overflow-x: hidden;
 }
 
 /* ===== Page Header ===== */
@@ -628,6 +630,21 @@ body {
   height: 24px;
 }
 
+.pdf-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: pdf-spin 0.6s linear infinite;
+  vertical-align: middle;
+}
+
+@keyframes pdf-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* ===== Data Table ===== */
 .table-container {
   background: var(--bg-card);
@@ -635,6 +652,7 @@ body {
   margin: 0 16px;
   border-radius: var(--radius-xl);
   user-select: none;
+  overflow-x: auto;
 }
 
 #dynamicTableContainer2.table-container {
@@ -1250,9 +1268,8 @@ body {
   background: linear-gradient(180deg, rgba(6, 11, 40, 0.94) 0%, rgba(10, 14, 35, 1) 100%);
   border-radius: 16px;
   width: 90%;
-  max-width: 1200px;
+  max-width: 1300px;
   max-height: 80vh;
-  overflow-y: auto;
   padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -1367,7 +1384,7 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   padding-right: 12px;
 }
@@ -1388,7 +1405,21 @@ body {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 900px) {
+@media (max-width: 1000px) {
+  .sidebar {
+    padding: 16px 10px;
+  }
+
+  .sidebar-logo img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .sidebar-nav img {
+    width: 20px;
+    height: 20px;
+  }
+
   .page-header {
     padding: 12px 16px;
   }
@@ -1419,6 +1450,17 @@ body {
     font-size: 13px;
   }
 
+  .period-btn {
+    font-size: 13px;
+    padding: 4px 8px;
+    gap: 6px;
+  }
+
+  .period-icon {
+    width: 18px;
+    height: 18px;
+  }
+
   .legend-actions {
     gap: 16px;
   }
@@ -1439,7 +1481,33 @@ body {
     font-size: 14px;
   }
 
+  .table-legend {
+    padding: 16px 8px 0;
+  }
+
   .top10-body {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 750px) {
+  .tab {
+    margin: 0 14px;
+    font-size: 15px;
+  }
+
+  .download-pdf-btn span {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .tab {
+    margin: 0 10px;
+    font-size: 15px;
+  }
+
+  .legend-note {
+    max-width: 200px;
   }
 }
