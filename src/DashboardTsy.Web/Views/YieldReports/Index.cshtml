@@ -30,9 +30,7 @@
     <div class="page-icons">
       <img src="~/images/notification.svg" alt="Bildirimler" />
       <img src="~/images/help.svg" alt="Yardım" />
-      <div class="avatar">
-          <img src="@avatarUrl" alt="Avatar" />
-      </div>
+      <img src="@avatarUrl" alt="Avatar" class="avatar" />
     </div>
 </div>
 
@@ -105,9 +103,25 @@
         <tbody id="dynamicTableBody2"></tbody>
     </table>
 </div>
+<div id="pageSkeleton" class="page-skeleton">
+    <div class="skeleton-table" id="yieldInitialSkeleton">
+        @for (var i = 0; i < 8; i++)
+        {
+            <div class="skeleton-table-row">
+                <div class="skeleton-bar" style="width:30px;height:16px"></div>
+                <div class="skeleton-bar" style="width:55%;height:16px"></div>
+                <div class="skeleton-bar" style="width:16%;height:16px"></div>
+                <div class="skeleton-bar" style="width:16%;height:16px"></div>
+                <div class="skeleton-bar" style="width:16%;height:16px"></div>
+                <div class="skeleton-bar" style="width:16%;height:16px"></div>
+                <div class="skeleton-bar" style="width:16%;height:16px"></div>
+            </div>
+        }
+    </div>
+</div>
 
 <!-- Dynamic Table (headers from service) -->
-<div class="table-container" id="dynamicTableContainer">
+<div class="table-container" id="dynamicTableContainer" style="display:none;">
     <div class="table-wrapper">
       <table class="data-table yield-table" id="dynamicTable">
           <thead id="dynamicTableHead"></thead>
@@ -397,6 +411,7 @@
 
             $('#dynamicTableContainer').show();
             $('#dynamicTableContainer2').hide();
+            showYieldTableLoading();
 
             // Update legend based on active tab
             var isBranch = selectedBranch !== null;

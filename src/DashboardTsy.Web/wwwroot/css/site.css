@@ -223,7 +223,7 @@ body {
   gap: 24px;
 }
 
-.avatar img {
+.avatar {
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -621,7 +621,7 @@ body {
   align-items: center;
   gap: 6px;
   font-size: 14px;
-  color: var(--text-blue-light);
+  color: var(--text-muted);
   cursor: pointer;
 }
 
@@ -1112,7 +1112,7 @@ body {
 .scorecard-section-title {
   background: var(--text-gray);
   padding: 10px 14px;
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text-light);
   border-radius: 18px 18px 0 0;
@@ -1198,7 +1198,7 @@ body {
 }
 
 .page-skeleton {
-  padding: 24px;
+  padding: 0 24px;
 }
 
 .skeleton-header {
@@ -1405,7 +1405,7 @@ body {
 }
 
 /* ===== Responsive ===== */
-@media (max-width: 1000px) {
+@media (max-width: 950px) {
   .sidebar {
     padding: 16px 10px;
   }
@@ -1422,6 +1422,10 @@ body {
 
   .page-header {
     padding: 12px 16px;
+  }
+
+  .page-title {
+    font-size: 20px;
   }
 
   .tab {
@@ -1488,9 +1492,38 @@ body {
   .top10-body {
     flex-direction: column;
   }
+
+  .scorecard-btn span {
+    font-size: 14px;
+  }
+
+  .scorecard-header span {
+    font-size: 14px;
+  }
+
+  .scorecard-section-title {
+    font-size: 14px;
+  }
 }
 
 @media (max-width: 750px) {
+  .breadcrumb-bar {
+    padding: 16px 0 0 16px;
+  }
+
+  .page-title {
+    font-size: 18px;
+  }
+
+  .page-icons {
+    gap: 16px;
+  }
+
+  .avatar {
+    width: 28px;
+    height: 28px;
+  }
+
   .tab {
     margin: 0 14px;
     font-size: 15px;

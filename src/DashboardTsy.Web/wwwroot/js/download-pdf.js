@@ -93,7 +93,7 @@ $(function () {
     var $btn = $(this);
     $btn.css('pointer-events', 'none');
     var originalHtml = $btn.html();
-    $btn.html('<span class="pdf-spinner"></span> PDF Yükleniyor...');
+    $btn.html('<div class="pdf-spinner"></div> <span>PDF Yükleniyor...</span>');
 
     var $visibleTable = $('.table-container:visible');
     if (!$visibleTable.length) {
