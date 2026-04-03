@@ -68,6 +68,7 @@ public static class MockProductivityReportData
 
         return headers;
     }
+
     public static IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
     {
         var tabs = new List<GetProductivityReportTabItem>
@@ -228,38 +229,38 @@ public static class MockProductivityReportData
     public static IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem> GetProductivityCountCardPosRatioRegionReport(GetProductivityCountCardPosRatioRegionReportRequest request)
     {
         var items = new List<GetProductivityCountCardPosRatioRegionReportItem>
-    {
-        new()
         {
-            Id = 1,
-            RatioName = request.TabId == 1 ? "Toplam Kredi Kartı" : "Toplam Satış",
-            PreviousQuarterRegionValue = 35m,
-            CurrentRegionValue = 24m,
-            CurrentRegionDiff = 11m,
-            CurrentBankAverageValue = 20m,
-            CurrentBankAverageDiff = 15m
-        },
-        new()
-        {
-            Id = 2,
-            RatioName = request.TabId == 1 ? "Aktif Kredi Kartı" : "Aktif Satış",
-            PreviousQuarterRegionValue = 35m,
-            CurrentRegionValue = 24m,
-            CurrentRegionDiff = 11m,
-            CurrentBankAverageValue = 20m,
-            CurrentBankAverageDiff = 15m
-        },
-        new()
-        {
-            Id = 3,
-            RatioName = "Aktiflik Oranı %",
-            PreviousQuarterRegionValue = 35m,
-            CurrentRegionValue = 24m,
-            CurrentRegionDiff = 11m,
-            CurrentBankAverageValue = 20m,
-            CurrentBankAverageDiff = 15m
-        }
-    };
+            new()
+            {
+                Id = 1,
+                RatioName = request.TabId == 1 ? "Toplam Kredi Kartı" : "Toplam Satış",
+                PreviousQuarterRegionValue = 35m,
+                CurrentRegionValue = 24m,
+                CurrentRegionDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageDiff = 15m
+            },
+            new()
+            {
+                Id = 2,
+                RatioName = request.TabId == 1 ? "Aktif Kredi Kartı" : "Aktif Satış",
+                PreviousQuarterRegionValue = 35m,
+                CurrentRegionValue = 24m,
+                CurrentRegionDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageDiff = 15m
+            },
+            new()
+            {
+                Id = 3,
+                RatioName = "Aktiflik Oranı %",
+                PreviousQuarterRegionValue = 35m,
+                CurrentRegionValue = 24m,
+                CurrentRegionDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageDiff = 15m
+            }
+        };
 
         if (request.TabId == 1)
         {
@@ -359,44 +360,44 @@ public static class MockProductivityReportData
     public static IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem> GetProductivityCountCardPosRatioBranchReport(GetProductivityCountCardPosRatioBranchReportRequest request)
     {
         var items = new List<GetProductivityCountCardPosRatioBranchReportItem>
-    {
-        new()
         {
-            Id = 1,
-            RatioName = request.TabId == 1 ? "Toplam Kredi Kartı" : "Toplam Satış",
-            PreviousQuarterBranchValue = 35m,
-            CurrentBranchValue = 24m,
-            CurrentBranchValueDiff = 11m,
-            CurrentRegionAverageValue = 24m,
-            CurrentRegionAverageValueDiff = 11m,
-            CurrentBankAverageValue = 20m,
-            CurrentBankAverageValueDiff = 15m
-        },
-        new()
-        {
-            Id = 2,
-            RatioName = request.TabId == 1 ? "Aktif Kredi Kartı" : "Aktif Satış",
-            PreviousQuarterBranchValue = 35m,
-            CurrentBranchValue = 24m,
-            CurrentBranchValueDiff = 11m,
-            CurrentRegionAverageValue = 24m,
-            CurrentRegionAverageValueDiff = 11m,
-            CurrentBankAverageValue = 20m,
-            CurrentBankAverageValueDiff = 15m
-        },
-        new()
-        {
-            Id = 3,
-            RatioName = "Aktiflik Oranı %",
-            PreviousQuarterBranchValue = 35m,
-            CurrentBranchValue = 24m,
-            CurrentBranchValueDiff = 11m,
-            CurrentRegionAverageValue = 24m,
-            CurrentRegionAverageValueDiff = 11m,
-            CurrentBankAverageValue = 20m,
-            CurrentBankAverageValueDiff = 15m
-        }
-    };
+            new()
+            {
+                Id = 1,
+                RatioName = request.TabId == 1 ? "Toplam Kredi Kartı" : "Toplam Satış",
+                PreviousQuarterBranchValue = 35m,
+                CurrentBranchValue = 24m,
+                CurrentBranchValueDiff = 11m,
+                CurrentRegionAverageValue = 24m,
+                CurrentRegionAverageValueDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageValueDiff = 15m
+            },
+            new()
+            {
+                Id = 2,
+                RatioName = request.TabId == 1 ? "Aktif Kredi Kartı" : "Aktif Satış",
+                PreviousQuarterBranchValue = 35m,
+                CurrentBranchValue = 24m,
+                CurrentBranchValueDiff = 11m,
+                CurrentRegionAverageValue = 24m,
+                CurrentRegionAverageValueDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageValueDiff = 15m
+            },
+            new()
+            {
+                Id = 3,
+                RatioName = "Aktiflik Oranı %",
+                PreviousQuarterBranchValue = 35m,
+                CurrentBranchValue = 24m,
+                CurrentBranchValueDiff = 11m,
+                CurrentRegionAverageValue = 24m,
+                CurrentRegionAverageValueDiff = 11m,
+                CurrentBankAverageValue = 20m,
+                CurrentBankAverageValueDiff = 15m
+            }
+        };
 
         if (request.TabId == 1)
         {
@@ -505,162 +506,160 @@ public static class MockProductivityReportData
         return items;
     }
 
-    public static IReadOnlyList<GetProductivityVolumeRegionReportItem> GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request)
+    public static GetProductivityVolumeRegionReportResponse GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request)
     {
         var segmentNames = new[] { "Tümü", "Kurumsal", "Ticari", "KOBİ", "Tarım", "Bireysel" };
         var segmentName = request.SubTabId >= 0 && request.SubTabId < segmentNames.Length
             ? segmentNames[request.SubTabId]
             : "Tümü";
 
-        var items = new List<GetProductivityVolumeRegionReportItem>
+        var root = new GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem
         {
-            new()
-            {
-                Id = 1,
-                ParentId = null,
-                LevelNo = 0,
-                SortOrder = 1,
-                ProductName = $"{segmentName} - Hacim Toplam",
-                RealizationRegionValue = 1250m,
-                RealizationRegionDiff = 150m,
-                RealizationBankAverageValue = 1100m,
-                RealizationBankAverageDiff = 0m,
-                TargetValue = 1200m,
-                HgRate = 0.92m,
-                NetGrowthRegionValue = 85m,
-                NetGrowthRegionDiff = 15m,
-                NetGrowthBankAverageValue = 70m,
-                NetGrowthBankAverageDiff = 0m,
-                YtdRegionValue = 14200m,
-                YtdRegionDiff = 1400m,
-                YtdBankAverageValue = 12800m,
-                YtdBankAverageDiff = 0m,
-                QtdRegionValue = 3800m,
-                QtdRegionDiff = 400m,
-                QtdBankAverageValue = 3400m,
-                QtdBankAverageDiff = 0m
-            },
-            new()
-            {
-                Id = 2,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 1,
-                ProductName = $"{segmentName} - Ürün A",
-                RealizationRegionValue = 650m,
-                RealizationRegionDiff = 70m,
-                RealizationBankAverageValue = 580m,
-                RealizationBankAverageDiff = 0m,
-                TargetValue = 600m,
-                HgRate = 0.93m,
-                NetGrowthRegionValue = 45m,
-                NetGrowthRegionDiff = 7m,
-                NetGrowthBankAverageValue = 38m,
-                NetGrowthBankAverageDiff = 0m,
-                YtdRegionValue = 7200m,
-                YtdRegionDiff = 700m,
-                YtdBankAverageValue = 6500m,
-                YtdBankAverageDiff = 0m,
-                QtdRegionValue = 1950m,
-                QtdRegionDiff = 200m,
-                QtdBankAverageValue = 1750m,
-                QtdBankAverageDiff = 0m
-            },
-            new()
-            {
-                Id = 3,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 2,
-                ProductName = $"{segmentName} - Ürün B",
-                RealizationRegionValue = 600m,
-                RealizationRegionDiff = 80m,
-                RealizationBankAverageValue = 520m,
-                RealizationBankAverageDiff = 0m,
-                TargetValue = 600m,
-                HgRate = 0.90m,
-                NetGrowthRegionValue = 40m,
-                NetGrowthRegionDiff = 8m,
-                NetGrowthBankAverageValue = 32m,
-                NetGrowthBankAverageDiff = 0m,
-                YtdRegionValue = 7000m,
-                YtdRegionDiff = 700m,
-                YtdBankAverageValue = 6300m,
-                YtdBankAverageDiff = 0m,
-                QtdRegionValue = 1850m,
-                QtdRegionDiff = 200m,
-                QtdBankAverageValue = 1650m,
-                QtdBankAverageDiff = 0m
-            }
+            Id = 1,
+            ProductName = $"{segmentName} - Hacim Toplam",
+            RealizationRegionValue = 1250m,
+            RealizationRegionDiff = 150m,
+            RealizationBankAverageValue = 1100m,
+            RealizationBankAverageDiff = 0m,
+            TargetValue = 1200m,
+            HgRate = 0.92m,
+            NetGrowthRegionValue = 85m,
+            NetGrowthRegionDiff = 15m,
+            NetGrowthBankAverageValue = 70m,
+            NetGrowthBankAverageDiff = 0m,
+            YtdRegionValue = 14200m,
+            YtdRegionDiff = 1400m,
+            YtdBankAverageValue = 12800m,
+            YtdBankAverageDiff = 0m,
+            QtdRegionValue = 3800m,
+            QtdRegionDiff = 400m,
+            QtdBankAverageValue = 3400m,
+            QtdBankAverageDiff = 0m
         };
 
-        return items;
+        var sub1 = new GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem
+        {
+            Id = 2,
+            ProductName = $"{segmentName} - Ürün A",
+            RealizationRegionValue = 650m,
+            RealizationRegionDiff = 70m,
+            RealizationBankAverageValue = 580m,
+            RealizationBankAverageDiff = 0m,
+            TargetValue = 600m,
+            HgRate = 0.93m,
+            NetGrowthRegionValue = 45m,
+            NetGrowthRegionDiff = 7m,
+            NetGrowthBankAverageValue = 38m,
+            NetGrowthBankAverageDiff = 0m,
+            YtdRegionValue = 7200m,
+            YtdRegionDiff = 700m,
+            YtdBankAverageValue = 6500m,
+            YtdBankAverageDiff = 0m,
+            QtdRegionValue = 1950m,
+            QtdRegionDiff = 200m,
+            QtdBankAverageValue = 1750m,
+            QtdBankAverageDiff = 0m
+        };
+
+        var sub2 = new GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem
+        {
+            Id = 3,
+            ProductName = $"{segmentName} - Ürün B",
+            RealizationRegionValue = 600m,
+            RealizationRegionDiff = 80m,
+            RealizationBankAverageValue = 520m,
+            RealizationBankAverageDiff = 0m,
+            TargetValue = 600m,
+            HgRate = 0.90m,
+            NetGrowthRegionValue = 40m,
+            NetGrowthRegionDiff = 8m,
+            NetGrowthBankAverageValue = 32m,
+            NetGrowthBankAverageDiff = 0m,
+            YtdRegionValue = 7000m,
+            YtdRegionDiff = 700m,
+            YtdBankAverageValue = 6300m,
+            YtdBankAverageDiff = 0m,
+            QtdRegionValue = 1850m,
+            QtdRegionDiff = 200m,
+            QtdBankAverageValue = 1650m,
+            QtdBankAverageDiff = 0m
+        };
+
+        root.SubProducts.Add(sub1);
+        root.SubProducts.Add(sub2);
+
+        var roots = new List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem> { root };
+        roots = SortVolumeRegionTree(roots, request.SortBy, request.IsAscending);
+
+        return new GetProductivityVolumeRegionReportResponse
+        {
+            GetProductivityVolumeRegionReports = roots
+        };
     }
 
-    public static IReadOnlyList<GetProductivityProfitRatioRegionReportItem> GetProductivityProfitRatioRegionReport(GetProductivityProfitRatioRegionReportRequest request)
+    public static GetProductivityProfitRatioRegionReportResponse GetProductivityProfitRatioRegionReport(GetProductivityProfitRatioRegionReportRequest request)
     {
-        var items = new List<GetProductivityProfitRatioRegionReportItem>
+        var root = new GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem
         {
-            new()
-            {
-                Id = 1,
-                ParentId = null,
-                LevelNo = 0,
-                SortOrder = 1,
-                RatioName = "Karlılık Oranı - Toplam",
-                TargetValue = 0.25m,
-                RegionValue = 0.24m,
-                RegionValueDiff = 0.01m,
-                BankValue = 0.23m,
-                BankValueDiff = 0m,
-                RetailValue = 0.22m,
-                KobiValue = 0.26m,
-                AgricultureValue = 0.20m,
-                AgricultureValueDiff = 0.03m,
-                CommercialValue = 0.28m,
-                CommercialValueDiff = 0.05m
-            },
-            new()
-            {
-                Id = 2,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 1,
-                RatioName = "Net Faiz Marjı",
-                TargetValue = 0.12m,
-                RegionValue = 0.115m,
-                RegionValueDiff = 0.005m,
-                BankValue = 0.11m,
-                BankValueDiff = 0m,
-                RetailValue = 0.10m,
-                KobiValue = 0.13m,
-                AgricultureValue = 0.09m,
-                AgricultureValueDiff = 0.02m,
-                CommercialValue = 0.14m,
-                CommercialValueDiff = 0.03m
-            },
-            new()
-            {
-                Id = 3,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 2,
-                RatioName = "Komisyon Geliri Oranı",
-                TargetValue = 0.08m,
-                RegionValue = 0.078m,
-                RegionValueDiff = 0.003m,
-                BankValue = 0.075m,
-                BankValueDiff = 0m,
-                RetailValue = 0.082m,
-                KobiValue = 0.07m,
-                AgricultureValue = 0.06m,
-                AgricultureValueDiff = 0.01m,
-                CommercialValue = 0.09m,
-                CommercialValueDiff = 0.015m
-            }
+            Id = 1,
+            RatioName = "Karlılık Oranı - Toplam",
+            TargetValue = 0.25m,
+            RegionValue = 0.24m,
+            RegionValueDiff = 0.01m,
+            BankValue = 0.23m,
+            BankValueDiff = 0m,
+            RetailValue = 0.22m,
+            KobiValue = 0.26m,
+            AgricultureValue = 0.20m,
+            AgricultureValueDiff = 0.03m,
+            CommercialValue = 0.28m,
+            CommercialValueDiff = 0.05m
         };
 
-        return items;
+        var sub1 = new GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem
+        {
+            Id = 2,
+            RatioName = "Net Faiz Marjı",
+            TargetValue = 0.12m,
+            RegionValue = 0.115m,
+            RegionValueDiff = 0.005m,
+            BankValue = 0.11m,
+            BankValueDiff = 0m,
+            RetailValue = 0.10m,
+            KobiValue = 0.13m,
+            AgricultureValue = 0.09m,
+            AgricultureValueDiff = 0.02m,
+            CommercialValue = 0.14m,
+            CommercialValueDiff = 0.03m
+        };
+
+        var sub2 = new GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem
+        {
+            Id = 3,
+            RatioName = "Komisyon Geliri Oranı",
+            TargetValue = 0.08m,
+            RegionValue = 0.078m,
+            RegionValueDiff = 0.003m,
+            BankValue = 0.075m,
+            BankValueDiff = 0m,
+            RetailValue = 0.082m,
+            KobiValue = 0.07m,
+            AgricultureValue = 0.06m,
+            AgricultureValueDiff = 0.01m,
+            CommercialValue = 0.09m,
+            CommercialValueDiff = 0.015m
+        };
+
+        root.SubProducts.Add(sub1);
+        root.SubProducts.Add(sub2);
+
+        var roots = new List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem> { root };
+        roots = SortProfitRatioRegionTree(roots, request.SortBy, request.IsAscending);
+
+        return new GetProductivityProfitRatioRegionReportResponse
+        {
+            GetProductivityProfitRatioRegionReports = roots
+        };
     }
 
     public static IReadOnlyList<GetProductivityProfitRatioBranchReportItem> GetProductivityProfitRatioBranchReport(GetProductivityProfitRatioBranchReportRequest request)
@@ -1032,154 +1031,152 @@ public static class MockProductivityReportData
         return items;
     }
 
-    public static IReadOnlyList<GetProductivityProfitTotalRegionReportItem> GetProductivityProfitTotalRegionReport(GetProductivityProfitTotalRegionReportRequest request)
+    public static GetProductivityProfitTotalRegionReportResponse GetProductivityProfitTotalRegionReport(GetProductivityProfitTotalRegionReportRequest request)
     {
-        var items = new List<GetProductivityProfitTotalRegionReportItem>
+        var root = new GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem
         {
-            new()
-            {
-                Id = 1,
-                ParentId = null,
-                LevelNo = 0,
-                SortOrder = 1,
-                Description = "Toplam Karlılık",
-                TargetValue = 5000m,
-                RealizationRegionValue = 4800m,
-                RealizationRegionValueDiff = 200m,
-                RealizationBankAverageValue = 4600m,
-                RealizationBankAverageValueDiff = 0m,
-                HgRegionValue = 0.96m,
-                HgRegionValueDiff = 0.04m,
-                HgBankAverageValue = 0.92m,
-                HgBankAverageValueDiff = 0m,
-                RetailValue = 2200m,
-                KobiValue = 1200m,
-                AgricultureValue = 400m,
-                CommercialValue = 800m,
-                CommercialValueDiff = 50m,
-                PartnerValue = 200m
-            },
-            new()
-            {
-                Id = 2,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 1,
-                Description = "Net Faiz Geliri",
-                TargetValue = 2800m,
-                RealizationRegionValue = 2700m,
-                RealizationRegionValueDiff = 100m,
-                RealizationBankAverageValue = 2600m,
-                RealizationBankAverageValueDiff = 0m,
-                HgRegionValue = 0.96m,
-                HgRegionValueDiff = 0.03m,
-                HgBankAverageValue = 0.93m,
-                HgBankAverageValueDiff = 0m,
-                RetailValue = 1300m,
-                KobiValue = 700m,
-                AgricultureValue = 250m,
-                CommercialValue = 400m,
-                CommercialValueDiff = 25m,
-                PartnerValue = 50m
-            },
-            new()
-            {
-                Id = 3,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 2,
-                Description = "Komisyon Geliri",
-                TargetValue = 1200m,
-                RealizationRegionValue = 1150m,
-                RealizationRegionValueDiff = 50m,
-                RealizationBankAverageValue = 1100m,
-                RealizationBankAverageValueDiff = 0m,
-                HgRegionValue = 0.96m,
-                HgRegionValueDiff = 0.04m,
-                HgBankAverageValue = 0.92m,
-                HgBankAverageValueDiff = 0m,
-                RetailValue = 600m,
-                KobiValue = 300m,
-                AgricultureValue = 100m,
-                CommercialValue = 250m,
-                CommercialValueDiff = 15m,
-                PartnerValue = 100m
-            }
+            Id = 1,
+            Description = "Toplam Karlılık",
+            TargetValue = 5000m,
+            RealizationRegionValue = 4800m,
+            RealizationRegionValueDiff = 200m,
+            RealizationBankAverageValue = 4600m,
+            RealizationBankAverageValueDiff = 0m,
+            HgRegionValue = 0.96m,
+            HgRegionValueDiff = 0.04m,
+            HgBankAverageValue = 0.92m,
+            HgBankAverageValueDiff = 0m,
+            RetailValue = 2200m,
+            KobiValue = 1200m,
+            AgricultureValue = 400m,
+            CommercialValue = 800m,
+            CommercialValueDiff = 50m,
+            PartnerValue = 200m
         };
 
-        return items;
+        var sub1 = new GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem
+        {
+            Id = 2,
+            Description = "Net Faiz Geliri",
+            TargetValue = 2800m,
+            RealizationRegionValue = 2700m,
+            RealizationRegionValueDiff = 100m,
+            RealizationBankAverageValue = 2600m,
+            RealizationBankAverageValueDiff = 0m,
+            HgRegionValue = 0.96m,
+            HgRegionValueDiff = 0.03m,
+            HgBankAverageValue = 0.93m,
+            HgBankAverageValueDiff = 0m,
+            RetailValue = 1300m,
+            KobiValue = 700m,
+            AgricultureValue = 250m,
+            CommercialValue = 400m,
+            CommercialValueDiff = 25m,
+            PartnerValue = 50m
+        };
+
+        var sub2 = new GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem
+        {
+            Id = 3,
+            Description = "Komisyon Geliri",
+            TargetValue = 1200m,
+            RealizationRegionValue = 1150m,
+            RealizationRegionValueDiff = 50m,
+            RealizationBankAverageValue = 1100m,
+            RealizationBankAverageValueDiff = 0m,
+            HgRegionValue = 0.96m,
+            HgRegionValueDiff = 0.04m,
+            HgBankAverageValue = 0.92m,
+            HgBankAverageValueDiff = 0m,
+            RetailValue = 600m,
+            KobiValue = 300m,
+            AgricultureValue = 100m,
+            CommercialValue = 250m,
+            CommercialValueDiff = 15m,
+            PartnerValue = 100m
+        };
+
+        root.SubProducts.Add(sub1);
+        root.SubProducts.Add(sub2);
+
+        var roots = new List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem> { root };
+        roots = SortProfitTotalRegionTree(roots, request.SortBy, request.IsAscending);
+
+        return new GetProductivityProfitTotalRegionReportResponse
+        {
+            GetProductivityProfitTotalRegionReports = roots
+        };
     }
 
-    public static IReadOnlyList<GetProductivityProfitSpreadManagementRegionReportItem> GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request)
+    public static GetProductivityProfitSpreadManagementRegionReportResponse GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request)
     {
-        var items = new List<GetProductivityProfitSpreadManagementRegionReportItem>
+        var root = new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
         {
-            new()
-            {
-                Id = 1,
-                ParentId = null,
-                LevelNo = 0,
-                SortOrder = 1,
-                Description = "Spread Yönetimi - Toplam",
-                SpreadValue = 0.035m,
-                RatioRegionValue = 0.034m,
-                RatioRegionValueDiff = 0.002m,
-                RatioBankAverageValue = 0.032m,
-                RatioBankAverageValueDiff = 0m,
-                NetReturnRegionValue = 420m,
-                NetReturnRegionValueDiff = 40m,
-                NetReturnBankAverageValue = 380m,
-                NetReturnBankAverageValueDiff = 0m,
-                NetReturnHgRegionValue = 0.97m,
-                NetReturnHgRegionValueDiff = 0.05m,
-                NetReturnHgBankAverageValue = 0.92m,
-                NetReturnHgBankAverageValueDiff = 0m
-            },
-            new()
-            {
-                Id = 2,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 1,
-                Description = "Mevduat Spread",
-                SpreadValue = 0.018m,
-                RatioRegionValue = 0.0175m,
-                RatioRegionValueDiff = 0.001m,
-                RatioBankAverageValue = 0.0165m,
-                RatioBankAverageValueDiff = 0m,
-                NetReturnRegionValue = 210m,
-                NetReturnRegionValueDiff = 15m,
-                NetReturnBankAverageValue = 195m,
-                NetReturnBankAverageValueDiff = 0m,
-                NetReturnHgRegionValue = 0.97m,
-                NetReturnHgRegionValueDiff = 0.05m,
-                NetReturnHgBankAverageValue = 0.92m,
-                NetReturnHgBankAverageValueDiff = 0m
-            },
-            new()
-            {
-                Id = 3,
-                ParentId = 1,
-                LevelNo = 1,
-                SortOrder = 2,
-                Description = "Kredi Spread",
-                SpreadValue = 0.017m,
-                RatioRegionValue = 0.0165m,
-                RatioRegionValueDiff = 0.001m,
-                RatioBankAverageValue = 0.0155m,
-                RatioBankAverageValueDiff = 0m,
-                NetReturnRegionValue = 210m,
-                NetReturnRegionValueDiff = 25m,
-                NetReturnBankAverageValue = 185m,
-                NetReturnBankAverageValueDiff = 0m,
-                NetReturnHgRegionValue = 0.97m,
-                NetReturnHgRegionValueDiff = 0.06m,
-                NetReturnHgBankAverageValue = 0.91m,
-                NetReturnHgBankAverageValueDiff = 0m
-            }
+            Id = 1,
+            Description = "Spread Yönetimi - Toplam",
+            SpreadValue = 0.035m,
+            RatioRegionValue = 0.034m,
+            RatioRegionValueDiff = 0.002m,
+            RatioBankAverageValue = 0.032m,
+            RatioBankAverageValueDiff = 0m,
+            NetReturnRegionValue = 420m,
+            NetReturnRegionValueDiff = 40m,
+            NetReturnBankAverageValue = 380m,
+            NetReturnBankAverageValueDiff = 0m,
+            NetReturnHgRegionValue = 0.97m,
+            NetReturnHgRegionValueDiff = 0.05m,
+            NetReturnHgBankAverageValue = 0.92m,
+            NetReturnHgBankAverageValueDiff = 0m
         };
 
-        return items;
+        var sub1 = new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
+        {
+            Id = 2,
+            Description = "Mevduat Spread",
+            SpreadValue = 0.018m,
+            RatioRegionValue = 0.0175m,
+            RatioRegionValueDiff = 0.001m,
+            RatioBankAverageValue = 0.0165m,
+            RatioBankAverageValueDiff = 0m,
+            NetReturnRegionValue = 210m,
+            NetReturnRegionValueDiff = 15m,
+            NetReturnBankAverageValue = 195m,
+            NetReturnBankAverageValueDiff = 0m,
+            NetReturnHgRegionValue = 0.97m,
+            NetReturnHgRegionValueDiff = 0.05m,
+            NetReturnHgBankAverageValue = 0.92m,
+            NetReturnHgBankAverageValueDiff = 0m
+        };
+
+        var sub2 = new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
+        {
+            Id = 3,
+            Description = "Kredi Spread",
+            SpreadValue = 0.017m,
+            RatioRegionValue = 0.0165m,
+            RatioRegionValueDiff = 0.001m,
+            RatioBankAverageValue = 0.0155m,
+            RatioBankAverageValueDiff = 0m,
+            NetReturnRegionValue = 210m,
+            NetReturnRegionValueDiff = 25m,
+            NetReturnBankAverageValue = 185m,
+            NetReturnBankAverageValueDiff = 0m,
+            NetReturnHgRegionValue = 0.97m,
+            NetReturnHgRegionValueDiff = 0.06m,
+            NetReturnHgBankAverageValue = 0.91m,
+            NetReturnHgBankAverageValueDiff = 0m
+        };
+
+        root.SubProducts.Add(sub1);
+        root.SubProducts.Add(sub2);
+
+        var roots = new List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> { root };
+        roots = SortProfitSpreadManagementRegionTree(roots, request.SortBy, request.IsAscending);
+
+        return new GetProductivityProfitSpreadManagementRegionReportResponse
+        {
+            GetProductivityProfitSpreadManagementRegionReports = roots
+        };
     }
 
     public static IReadOnlyList<GetProductivityProfitSpreadManagementBranchReportItem> GetProductivityProfitSpreadManagementBranchReport(GetProductivityProfitSpreadManagementBranchReportRequest request)
@@ -1286,7 +1283,116 @@ public static class MockProductivityReportData
             new() { Id = 7, HeaderName = "Karlılık",       ParentId = 4, OrderNo = 3, Sortable = true }
         };
 
-        // İleride MainTabId / MidTabId / SubTabId / FilterType'a göre filtrelenebilir.
         return headers;
     }
+
+    #region Helpers
+
+    private static List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem> SortVolumeRegionTree(
+        List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem> nodes, int? sortBy, bool asc)
+    {
+        Func<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem, object> key = sortBy switch
+        {
+            1 => p => p.ProductName ?? string.Empty,
+            2 => p => p.RealizationRegionValue,
+            3 => p => p.RealizationBankAverageValue,
+            4 => p => p.TargetValue,
+            5 => p => p.HgRate,
+            6 => p => p.NetGrowthRegionValue,
+            7 => p => p.NetGrowthBankAverageValue,
+            8 => p => p.YtdRegionValue,
+            9 => p => p.YtdBankAverageValue,
+            10 => p => p.QtdRegionValue,
+            11 => p => p.QtdBankAverageValue,
+            _ => p => p.Id
+        };
+
+        var ordered = asc ? nodes.OrderBy(key).ToList() : nodes.OrderByDescending(key).ToList();
+
+        foreach (var n in ordered)
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortVolumeRegionTree(n.SubProducts, sortBy, asc);
+
+        return ordered;
+    }
+
+    private static List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem> SortProfitRatioRegionTree(
+        List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem> nodes, int? sortBy, bool asc)
+    {
+        Func<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem, object> key = sortBy switch
+        {
+            1 => p => p.RatioName ?? string.Empty,
+            2 => p => p.TargetValue,
+            3 => p => p.RegionValue,
+            4 => p => p.BankValue,
+            5 => p => p.RetailValue,
+            6 => p => p.KobiValue,
+            7 => p => p.AgricultureValue,
+            8 => p => p.CommercialValue,
+            _ => p => p.Id
+        };
+
+        var ordered = asc ? nodes.OrderBy(key).ToList() : nodes.OrderByDescending(key).ToList();
+
+        foreach (var n in ordered)
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProfitRatioRegionTree(n.SubProducts, sortBy, asc);
+
+        return ordered;
+    }
+
+    private static List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem> SortProfitTotalRegionTree(
+        List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem> nodes, int? sortBy, bool asc)
+    {
+        Func<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem, object> key = sortBy switch
+        {
+            1 => p => p.Description ?? string.Empty,
+            2 => p => p.TargetValue,
+            3 => p => p.RealizationRegionValue,
+            4 => p => p.RealizationBankAverageValue,
+            5 => p => p.HgRegionValue,
+            6 => p => p.HgBankAverageValue,
+            7 => p => p.RetailValue,
+            8 => p => p.KobiValue,
+            9 => p => p.AgricultureValue,
+            10 => p => p.CommercialValue,
+            11 => p => p.PartnerValue,
+            _ => p => p.Id
+        };
+
+        var ordered = asc ? nodes.OrderBy(key).ToList() : nodes.OrderByDescending(key).ToList();
+
+        foreach (var n in ordered)
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProfitTotalRegionTree(n.SubProducts, sortBy, asc);
+
+        return ordered;
+    }
+
+    private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> SortProfitSpreadManagementRegionTree(
+        List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> nodes, int? sortBy, bool asc)
+    {
+        Func<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem, object> key = sortBy switch
+        {
+            1 => p => p.Description ?? string.Empty,
+            2 => p => p.SpreadValue,
+            3 => p => p.RatioRegionValue,
+            4 => p => p.RatioBankAverageValue,
+            5 => p => p.NetReturnRegionValue,
+            6 => p => p.NetReturnBankAverageValue,
+            7 => p => p.NetReturnHgRegionValue,
+            8 => p => p.NetReturnHgBankAverageValue,
+            _ => p => p.Id
+        };
+
+        var ordered = asc ? nodes.OrderBy(key).ToList() : nodes.OrderByDescending(key).ToList();
+
+        foreach (var n in ordered)
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProfitSpreadManagementRegionTree(n.SubProducts, sortBy, asc);
+
+        return ordered;
+    }
+
+    #endregion
 }

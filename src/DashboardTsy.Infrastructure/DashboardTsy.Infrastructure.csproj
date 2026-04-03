@@ -7,9 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Context\" />
-    <Folder Include="Repository\Abstract\" />
-    <Folder Include="Repository\Concrete\" />
     <Folder Include="Data\" />
     <Folder Include="TargetReport\" />
   </ItemGroup>

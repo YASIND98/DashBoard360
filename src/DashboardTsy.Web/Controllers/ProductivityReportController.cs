@@ -183,8 +183,8 @@ public class ProductivityReportController : ControllerBase
     }
 
     [HttpPost("GetProductivityVolumeRegionReport")]
-    public async Task<ActionResult<IReadOnlyList<GetProductivityVolumeRegionReportItem>>> GetProductivityVolumeRegionReport(
-        [FromBody] GetProductivityVolumeRegionReportRequest? request,
+    public async Task<ActionResult<DashboardTsy.Web.Models.ProductivityReport.GetProductivityVolumeRegionReportResponse>> GetProductivityVolumeRegionReport(
+        [FromBody] DashboardTsy.Web.Models.ProductivityReport.GetProductivityVolumeRegionReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
@@ -194,8 +194,8 @@ public class ProductivityReportController : ControllerBase
     }
 
     [HttpPost("GetProductivityProfitRatioRegionReport")]
-    public async Task<ActionResult<IReadOnlyList<GetProductivityProfitRatioRegionReportItem>>> GetProductivityProfitRatioRegionReport(
-        [FromBody] GetProductivityProfitRatioRegionReportRequest? request,
+    public async Task<ActionResult<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitRatioRegionReportResponse>> GetProductivityProfitRatioRegionReport(
+        [FromBody] DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitRatioRegionReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
@@ -205,8 +205,8 @@ public class ProductivityReportController : ControllerBase
     }
 
     [HttpPost("GetProductivityProfitTotalRegionReport")]
-    public async Task<ActionResult<IReadOnlyList<GetProductivityProfitTotalRegionReportItem>>> GetProductivityProfitTotalRegionReport(
-        [FromBody] GetProductivityProfitTotalRegionReportRequest? request,
+    public async Task<ActionResult<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitTotalRegionReportResponse>> GetProductivityProfitTotalRegionReport(
+        [FromBody] DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitTotalRegionReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
@@ -216,8 +216,8 @@ public class ProductivityReportController : ControllerBase
     }
 
     [HttpPost("GetProductivityProfitSpreadManagementRegionReport")]
-    public async Task<ActionResult<IReadOnlyList<GetProductivityProfitSpreadManagementRegionReportItem>>> GetProductivityProfitSpreadManagementRegionReport(
-        [FromBody] GetProductivityProfitSpreadManagementRegionReportRequest? request,
+    public async Task<ActionResult<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitSpreadManagementRegionReportResponse>> GetProductivityProfitSpreadManagementRegionReport(
+        [FromBody] DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitSpreadManagementRegionReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
@@ -305,8 +305,8 @@ public class ProductivityReportController : ControllerBase
     }
 
     [HttpPost("GetProductivityRegionScoreCardReport")]
-    public async Task<ActionResult<GetProductivityRegionScoreCardReportItem>> GetProductivityRegionScoreCardReport(
-        [FromBody] GetProductivityRegionScoreCardReportRequest? request,
+    public async Task<ActionResult<DashboardTsy.Web.Models.ProductivityReport.GetProductivityRegionScoreCardReportItem>> GetProductivityRegionScoreCardReport(
+        [FromBody] DashboardTsy.Web.Models.ProductivityReport.GetProductivityRegionScoreCardReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();

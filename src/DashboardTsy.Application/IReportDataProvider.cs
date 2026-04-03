@@ -19,7 +19,7 @@ public interface IReportDataProvider
 
     GetDailyTargetReportResponse GetDailyTargetReport(GetDailyTargetReportRequest request);
 
-    GetDailyQuantityTargetReportTableHeadersResponse GetDailyQuantityTargetReportTableHeaders(GetDailyQuantityTargetReportTableHeadersRequest request);
+    GetDailyQuantityTargetReportTableHeadersResponse? GetDailyQuantityTargetReportTableHeaders(GetDailyQuantityTargetReportTableHeadersRequest request);
     GetDailyQuantityTargetReportResponse GetDailyQuantityTargetReport(GetDailyQuantityTargetReportRequest request);
     ProductTop10DifferencesResponse GetProductTop10DailyAndWeeklyDifferences(GetProductTop10DailyAndWeeklyDifferencesRequest request);
 
@@ -77,25 +77,25 @@ public interface IReportDataProvider
     /// Verimlilik ekranı için hacim bölge raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityVolumeRegionReportItem> GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request);
+    GetProductivityVolumeRegionReportResponse GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için karlılık oranı bölge raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityProfitRatioRegionReportItem> GetProductivityProfitRatioRegionReport(GetProductivityProfitRatioRegionReportRequest request);
+    GetProductivityProfitRatioRegionReportResponse GetProductivityProfitRatioRegionReport(GetProductivityProfitRatioRegionReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için toplam karlılık bölge raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityProfitTotalRegionReportItem> GetProductivityProfitTotalRegionReport(GetProductivityProfitTotalRegionReportRequest request);
+    GetProductivityProfitTotalRegionReportResponse GetProductivityProfitTotalRegionReport(GetProductivityProfitTotalRegionReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için spread yönetimi karlılık bölge raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityProfitSpreadManagementRegionReportItem> GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request);
+    GetProductivityProfitSpreadManagementRegionReportResponse GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için spread yönetimi karlılık şube raporunu döner.
@@ -133,7 +133,7 @@ public interface IReportDataProvider
     /// Verimlilik ekranı için bölge skor kartı raporunu döner (tek satır).
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    GetProductivityRegionScoreCardReportItem GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request);
+    GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için müşteri sayısı şube raporunu döner.

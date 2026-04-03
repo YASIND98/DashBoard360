@@ -182,7 +182,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityVolumeRegionReport")]
-    public ActionResult<IReadOnlyList<GetProductivityVolumeRegionReportItem>> GetProductivityVolumeRegionReport(
+    public ActionResult<GetProductivityVolumeRegionReportResponse> GetProductivityVolumeRegionReport(
         [FromBody] GetProductivityVolumeRegionReportRequest request)
     {
         if (request == null)
@@ -198,7 +198,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityProfitRatioRegionReport")]
-    public ActionResult<IReadOnlyList<GetProductivityProfitRatioRegionReportItem>> GetProductivityProfitRatioRegionReport(
+    public ActionResult<GetProductivityProfitRatioRegionReportResponse> GetProductivityProfitRatioRegionReport(
         [FromBody] GetProductivityProfitRatioRegionReportRequest request)
     {
         if (request == null)
@@ -214,7 +214,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityProfitTotalRegionReport")]
-    public ActionResult<IReadOnlyList<GetProductivityProfitTotalRegionReportItem>> GetProductivityProfitTotalRegionReport(
+    public ActionResult<GetProductivityProfitTotalRegionReportResponse> GetProductivityProfitTotalRegionReport(
         [FromBody] GetProductivityProfitTotalRegionReportRequest request)
     {
         if (request == null)
@@ -230,7 +230,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityProfitSpreadManagementRegionReport")]
-    public ActionResult<IReadOnlyList<GetProductivityProfitSpreadManagementRegionReportItem>> GetProductivityProfitSpreadManagementRegionReport(
+    public ActionResult<GetProductivityProfitSpreadManagementRegionReportResponse> GetProductivityProfitSpreadManagementRegionReport(
         [FromBody] GetProductivityProfitSpreadManagementRegionReportRequest request)
     {
         if (request == null)

@@ -1,12 +1,9 @@
 ﻿namespace DashboardTsy.Web.Models.ProductivityReport;
 
-public class GetProductivityCountCardPosRatioRegionReportRequest
+public class GetProductivityRegionScoreCardReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
     public string RegionCode { get; set; } = string.Empty;
-    /// <summary>
-    /// 1 = KrediKartı, 2 = POS
-    /// </summary>
-    public int TabId { get; set; }
+    public string? BranchCode { get; set; }
     public DateTime ReportDate { get; set; }
 }

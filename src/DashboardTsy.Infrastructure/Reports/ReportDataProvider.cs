@@ -1,7 +1,4 @@
 using System.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DashboardTsy.Application;
 using DashboardTsy.Application.TargetReport.Requests;
 using DashboardTsy.Application.TargetReport.Responses;
@@ -449,44 +446,137 @@ ORDER BY SUBE_ADI;";
         return MockProductivityReportData.GetProductivityCountCustomerRegionReport(request);
     }
 
-    public IReadOnlyList<GetProductivityVolumeRegionReportItem> GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request)
+    public GetProductivityVolumeRegionReportResponse GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request)
     {
         request ??= new GetProductivityVolumeRegionReportRequest();
 
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityVolumeRegionReport(request);
 
-        return MockProductivityReportData.GetProductivityVolumeRegionReport(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@RegionCode"] = request.RegionCode ?? string.Empty,
+            ["@SubTabId"] = request.SubTabId,
+            ["@ReportDate"] = request.ReportDate,
+            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+            ["@IsAscending"] = request.IsAscending
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetProductivityVolumeRegionReport",
+            parameters);
+
+        var response = new GetProductivityVolumeRegionReportResponse();
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return response;
+
+        var roots = BuildProductivityVolumeRegionReportTree(ds, request.ReportDate);
+        roots = SortProductivityVolumeRegionTree(roots, request.SortBy, request.IsAscending);
+
+        response.GetProductivityVolumeRegionReports = roots;
+        return response;
     }
 
-    public IReadOnlyList<GetProductivityProfitRatioRegionReportItem> GetProductivityProfitRatioRegionReport(GetProductivityProfitRatioRegionReportRequest request)
+    public GetProductivityProfitRatioRegionReportResponse GetProductivityProfitRatioRegionReport(GetProductivityProfitRatioRegionReportRequest request)
     {
         request ??= new GetProductivityProfitRatioRegionReportRequest();
 
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityProfitRatioRegionReport(request);
 
-        return MockProductivityReportData.GetProductivityProfitRatioRegionReport(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@RegionCode"] = request.RegionCode ?? string.Empty,
+            ["@ReportDate"] = request.ReportDate,
+            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+            ["@IsAscending"] = request.IsAscending
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetProductivityProfitRatioRegionReport",
+            parameters);
+
+        var response = new GetProductivityProfitRatioRegionReportResponse();
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return response;
+
+        var roots = BuildProductivityProfitRatioRegionReportTree(ds, request.ReportDate);
+        roots = SortProductivityProfitRatioRegionTree(roots, request.SortBy, request.IsAscending);
+
+        response.GetProductivityProfitRatioRegionReports = roots;
+        return response;
     }
 
-    public IReadOnlyList<GetProductivityProfitTotalRegionReportItem> GetProductivityProfitTotalRegionReport(GetProductivityProfitTotalRegionReportRequest request)
+    public GetProductivityProfitTotalRegionReportResponse GetProductivityProfitTotalRegionReport(GetProductivityProfitTotalRegionReportRequest request)
     {
         request ??= new GetProductivityProfitTotalRegionReportRequest();
 
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityProfitTotalRegionReport(request);
 
-        return MockProductivityReportData.GetProductivityProfitTotalRegionReport(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@RegionCode"] = request.RegionCode ?? string.Empty,
+            ["@ReportDate"] = request.ReportDate,
+            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+            ["@IsAscending"] = request.IsAscending
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetProductivityProfitTotalRegionReport",
+            parameters);
+
+        var response = new GetProductivityProfitTotalRegionReportResponse();
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return response;
+
+        var roots = BuildProductivityProfitTotalRegionReportTree(ds, request.ReportDate);
+        roots = SortProductivityProfitTotalRegionTree(roots, request.SortBy, request.IsAscending);
+
+        response.GetProductivityProfitTotalRegionReports = roots;
+        return response;
     }
 
-    public IReadOnlyList<GetProductivityProfitSpreadManagementRegionReportItem> GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request)
+    public GetProductivityProfitSpreadManagementRegionReportResponse GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request)
     {
         request ??= new GetProductivityProfitSpreadManagementRegionReportRequest();
 
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityProfitSpreadManagementRegionReport(request);
 
-        return MockProductivityReportData.GetProductivityProfitSpreadManagementRegionReport(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@RegionCode"] = request.RegionCode ?? string.Empty,
+            ["@ReportDate"] = request.ReportDate,
+            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+            ["@IsAscending"] = request.IsAscending
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetProductivityProfitSpreadManagementRegionReport",
+            parameters);
+
+        var response = new GetProductivityProfitSpreadManagementRegionReportResponse();
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return response;
+
+        var roots = BuildProductivityProfitSpreadManagementRegionReportTree(ds, request.ReportDate);
+        roots = SortProductivityProfitSpreadManagementRegionTree(roots, request.SortBy, request.IsAscending);
+
+        response.GetProductivityProfitSpreadManagementRegionReports = roots;
+        return response;
     }
 
     public IReadOnlyList<GetProductivityProfitSpreadManagementBranchReportItem> GetProductivityProfitSpreadManagementBranchReport(GetProductivityProfitSpreadManagementBranchReportRequest request)
@@ -559,14 +649,27 @@ ORDER BY SUBE_ADI;";
         return MockProductivityReportData.GetProductivityBranchScoreCardReport(request);
     }
 
-    public GetProductivityRegionScoreCardReportItem GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request)
+    public GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request)
     {
         request ??= new GetProductivityRegionScoreCardReportRequest();
 
         if (MockEnabled)
             return MockProductivityReportData.GetProductivityRegionScoreCardReport(request);
 
-        return MockProductivityReportData.GetProductivityRegionScoreCardReport(request);
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@RegionCode"] = request.RegionCode ?? string.Empty,
+            ["@BranchCode"] = string.IsNullOrWhiteSpace(request.BranchCode) ? (object)DBNull.Value : request.BranchCode,
+            ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
+        };
+
+        var ds = _spExecutor.ExecuteDataSet( "YoneticiRaporu", "SP_RP_GetProductivityRegionScoreCardReport", parameters);
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return new GetProductivityRegionScoreCardReportItem();
+
+        return DataTableHelper.ToObject<GetProductivityRegionScoreCardReportItem>(ds.Tables[0].Rows[0]);
     }
 
     public IReadOnlyList<GetProductivityCountCustomerBranchReportItem> GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request)
@@ -588,6 +691,8 @@ ORDER BY SUBE_ADI;";
 
         return MockProductivityReportData.GetProductivityVolumeBranchReport(request);
     }
+
+    #region Helpers
 
     private static string? ToCsv(List<int>? list)
         => list != null && list.Count > 0 ? string.Join(",", list) : null;
@@ -1054,4 +1159,573 @@ ORDER BY SUBE_ADI;";
 
         return ordered;
     }
+
+    private sealed class ProductivityProfitSpreadManagementRegionRow
+    {
+        public int Id { get; set; }
+        public int? ParentProductId { get; set; }
+
+        public string Description { get; set; } = string.Empty;
+
+        public decimal SpreadValue { get; set; }
+
+        public decimal RatioRegionValue { get; set; }
+        public decimal? RatioRegionValueDiff { get; set; }
+        public decimal RatioBankAverageValue { get; set; }
+        public decimal? RatioBankAverageValueDiff { get; set; }
+
+        public decimal NetReturnRegionValue { get; set; }
+        public decimal? NetReturnRegionValueDiff { get; set; }
+        public decimal NetReturnBankAverageValue { get; set; }
+        public decimal? NetReturnBankAverageValueDiff { get; set; }
+
+        public decimal NetReturnHgRegionValue { get; set; }
+        public decimal? NetReturnHgRegionValueDiff { get; set; }
+        public decimal NetReturnHgBankAverageValue { get; set; }
+        public decimal? NetReturnHgBankAverageValueDiff { get; set; }
+    }
+
+    private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>
+        BuildProductivityProfitSpreadManagementRegionReportTree(DataSet ds, DateTime reportDate)
+    {
+        var t0 = ds.Tables[0];
+        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
+
+        if (hasParentInT0)
+        {
+            var rows = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(t0);
+            return ProductivityProfitSpreadManagementRegionReportTreeFromRows(rows);
+        }
+
+        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
+        {
+            var roots = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(ds.Tables[0]);
+            var children = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(ds.Tables[1]);
+
+            var all = new List<ProductivityProfitSpreadManagementRegionRow>(roots.Count + children.Count);
+            all.AddRange(roots);
+            all.AddRange(children);
+
+            return ProductivityProfitSpreadManagementRegionReportTreeFromRows(all);
+        }
+
+        var flat = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(t0);
+        return flat.Select(MapProductivityProfitSpreadManagementRegionReportItem).ToList();
+    }
+
+    private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>
+        ProductivityProfitSpreadManagementRegionReportTreeFromRows(List<ProductivityProfitSpreadManagementRegionRow> rows)
+    {
+        var byId = rows
+            .GroupBy(r => r.Id)
+            .ToDictionary(g => g.Key, g => MapProductivityProfitSpreadManagementRegionReportItem(g.First()));
+
+        foreach (var r in rows)
+        {
+            if (!byId.TryGetValue(r.Id, out var node))
+            {
+                node = MapProductivityProfitSpreadManagementRegionReportItem(r);
+                byId[r.Id] = node;
+            }
+
+            var parentId = r.ParentProductId;
+            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
+                parent.SubProducts.Add(node);
+        }
+
+        var rootIds = rows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => r.Id)
+            .Distinct()
+            .ToList();
+
+        return rootIds.Select(id => byId[id]).ToList();
+    }
+
+    private static GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
+        MapProductivityProfitSpreadManagementRegionReportItem(ProductivityProfitSpreadManagementRegionRow r)
+    {
+        return new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
+        {
+            Id = r.Id,
+            Description = r.Description ?? string.Empty,
+            SpreadValue = r.SpreadValue,
+            RatioRegionValue = r.RatioRegionValue,
+            RatioRegionValueDiff = r.RatioRegionValueDiff,
+            RatioBankAverageValue = r.RatioBankAverageValue,
+            RatioBankAverageValueDiff = r.RatioBankAverageValueDiff,
+            NetReturnRegionValue = r.NetReturnRegionValue,
+            NetReturnRegionValueDiff = r.NetReturnRegionValueDiff,
+            NetReturnBankAverageValue = r.NetReturnBankAverageValue,
+            NetReturnBankAverageValueDiff = r.NetReturnBankAverageValueDiff,
+            NetReturnHgRegionValue = r.NetReturnHgRegionValue,
+            NetReturnHgRegionValueDiff = r.NetReturnHgRegionValueDiff,
+            NetReturnHgBankAverageValue = r.NetReturnHgBankAverageValue,
+            NetReturnHgBankAverageValueDiff = r.NetReturnHgBankAverageValueDiff,
+            SubProducts = new List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>()
+        };
+    }
+
+    private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>
+        SortProductivityProfitSpreadManagementRegionTree(
+            List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> nodes,
+            int? sortBy,
+            bool isAscending)
+    {
+        Func<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem, object> keySelector = sortBy switch
+        {
+            1 => p => p.Description ?? string.Empty,
+            2 => p => p.SpreadValue,
+            3 => p => p.RatioRegionValue,
+            4 => p => p.RatioBankAverageValue,
+            5 => p => p.NetReturnRegionValue,
+            6 => p => p.NetReturnBankAverageValue,
+            7 => p => p.NetReturnHgRegionValue,
+            8 => p => p.NetReturnHgBankAverageValue,
+            _ => p => p.Id
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProductivityProfitSpreadManagementRegionTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
+
+    private sealed class ProductivityProfitTotalRegionRow
+    {
+        public int Id { get; set; }
+        public int? ParentProductId { get; set; }
+
+        public string Description { get; set; } = string.Empty;
+
+        public decimal TargetValue { get; set; }
+
+        public decimal RealizationRegionValue { get; set; }
+        public decimal? RealizationRegionValueDiff { get; set; }
+        public decimal RealizationBankAverageValue { get; set; }
+        public decimal? RealizationBankAverageValueDiff { get; set; }
+
+        public decimal HgRegionValue { get; set; }
+        public decimal? HgRegionValueDiff { get; set; }
+        public decimal HgBankAverageValue { get; set; }
+        public decimal? HgBankAverageValueDiff { get; set; }
+
+        public decimal RetailValue { get; set; }
+        public decimal KobiValue { get; set; }
+        public decimal AgricultureValue { get; set; }
+        public decimal CommercialValue { get; set; }
+        public decimal? CommercialValueDiff { get; set; }
+        public decimal PartnerValue { get; set; }
+    }
+
+    private static List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem>
+    BuildProductivityProfitTotalRegionReportTree(DataSet ds, DateTime reportDate)
+    {
+        var t0 = ds.Tables[0];
+        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
+
+        if (hasParentInT0)
+        {
+            var rows = DataTableHelper.ToList<ProductivityProfitTotalRegionRow>(t0);
+            return ProductivityProfitTotalRegionReportTreeFromRows(rows);
+        }
+
+        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
+        {
+            var roots = DataTableHelper.ToList<ProductivityProfitTotalRegionRow>(ds.Tables[0]);
+            var children = DataTableHelper.ToList<ProductivityProfitTotalRegionRow>(ds.Tables[1]);
+
+            var all = new List<ProductivityProfitTotalRegionRow>(roots.Count + children.Count);
+            all.AddRange(roots);
+            all.AddRange(children);
+
+            return ProductivityProfitTotalRegionReportTreeFromRows(all);
+        }
+
+        var flat = DataTableHelper.ToList<ProductivityProfitTotalRegionRow>(t0);
+        return flat.Select(MapProductivityProfitTotalRegionReportItem).ToList();
+    }
+
+    private static List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem>
+    ProductivityProfitTotalRegionReportTreeFromRows(List<ProductivityProfitTotalRegionRow> rows)
+    {
+        var byId = rows
+            .GroupBy(r => r.Id)
+            .ToDictionary(g => g.Key, g => MapProductivityProfitTotalRegionReportItem(g.First()));
+
+        foreach (var r in rows)
+        {
+            if (!byId.TryGetValue(r.Id, out var node))
+            {
+                node = MapProductivityProfitTotalRegionReportItem(r);
+                byId[r.Id] = node;
+            }
+
+            var parentId = r.ParentProductId;
+            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
+                parent.SubProducts.Add(node);
+        }
+
+        var rootIds = rows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => r.Id)
+            .Distinct()
+            .ToList();
+
+        return rootIds.Select(id => byId[id]).ToList();
+    }
+
+    private static GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem
+    MapProductivityProfitTotalRegionReportItem(ProductivityProfitTotalRegionRow r)
+    {
+        return new GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem
+        {
+            Id = r.Id,
+            Description = r.Description ?? string.Empty,
+            TargetValue = r.TargetValue,
+            RealizationRegionValue = r.RealizationRegionValue,
+            RealizationRegionValueDiff = r.RealizationRegionValueDiff,
+            RealizationBankAverageValue = r.RealizationBankAverageValue,
+            RealizationBankAverageValueDiff = r.RealizationBankAverageValueDiff,
+            HgRegionValue = r.HgRegionValue,
+            HgRegionValueDiff = r.HgRegionValueDiff,
+            HgBankAverageValue = r.HgBankAverageValue,
+            HgBankAverageValueDiff = r.HgBankAverageValueDiff,
+            RetailValue = r.RetailValue,
+            KobiValue = r.KobiValue,
+            AgricultureValue = r.AgricultureValue,
+            CommercialValue = r.CommercialValue,
+            CommercialValueDiff = r.CommercialValueDiff,
+            PartnerValue = r.PartnerValue,
+            SubProducts = new List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem>()
+        };
+    }
+
+    private static List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem>
+    SortProductivityProfitTotalRegionTree(
+        List<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem> nodes,
+        int? sortBy,
+        bool isAscending)
+    {
+        Func<GetProductivityProfitTotalRegionReportResponse.GetProductivityProfitTotalRegionReportItem, object> keySelector = sortBy switch
+        {
+            1 => p => p.Description ?? string.Empty,
+            2 => p => p.TargetValue,
+            3 => p => p.RealizationRegionValue,
+            4 => p => p.RealizationBankAverageValue,
+            5 => p => p.HgRegionValue,
+            6 => p => p.HgBankAverageValue,
+            7 => p => p.RetailValue,
+            8 => p => p.KobiValue,
+            9 => p => p.AgricultureValue,
+            10 => p => p.CommercialValue,
+            11 => p => p.PartnerValue,
+            _ => p => p.Id
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProductivityProfitTotalRegionTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
+
+    private sealed class ProductivityProfitRatioRegionRow
+    {
+        public int Id { get; set; }
+        public int? ParentProductId { get; set; }
+
+        public string RatioName { get; set; } = string.Empty;
+
+        public decimal TargetValue { get; set; }
+
+        public decimal RegionValue { get; set; }
+        public decimal? RegionValueDiff { get; set; }
+
+        public decimal BankValue { get; set; }
+        public decimal? BankValueDiff { get; set; }
+
+        public decimal RetailValue { get; set; }
+        public decimal KobiValue { get; set; }
+
+        public decimal AgricultureValue { get; set; }
+        public decimal? AgricultureValueDiff { get; set; }
+
+        public decimal CommercialValue { get; set; }
+        public decimal? CommercialValueDiff { get; set; }
+    }
+
+    private static List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem>
+    BuildProductivityProfitRatioRegionReportTree(DataSet ds, DateTime reportDate)
+    {
+        var t0 = ds.Tables[0];
+        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
+
+        if (hasParentInT0)
+        {
+            var rows = DataTableHelper.ToList<ProductivityProfitRatioRegionRow>(t0);
+            return ProductivityProfitRatioRegionReportTreeFromRows(rows);
+        }
+
+        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
+        {
+            var roots = DataTableHelper.ToList<ProductivityProfitRatioRegionRow>(ds.Tables[0]);
+            var children = DataTableHelper.ToList<ProductivityProfitRatioRegionRow>(ds.Tables[1]);
+
+            var all = new List<ProductivityProfitRatioRegionRow>(roots.Count + children.Count);
+            all.AddRange(roots);
+            all.AddRange(children);
+
+            return ProductivityProfitRatioRegionReportTreeFromRows(all);
+        }
+
+        var flat = DataTableHelper.ToList<ProductivityProfitRatioRegionRow>(t0);
+        return flat.Select(MapProductivityProfitRatioRegionReportItem).ToList();
+    }
+
+    private static List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem>
+    ProductivityProfitRatioRegionReportTreeFromRows(List<ProductivityProfitRatioRegionRow> rows)
+    {
+        var byId = rows
+            .GroupBy(r => r.Id)
+            .ToDictionary(g => g.Key, g => MapProductivityProfitRatioRegionReportItem(g.First()));
+
+        foreach (var r in rows)
+        {
+            if (!byId.TryGetValue(r.Id, out var node))
+            {
+                node = MapProductivityProfitRatioRegionReportItem(r);
+                byId[r.Id] = node;
+            }
+
+            var parentId = r.ParentProductId;
+            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
+                parent.SubProducts.Add(node);
+        }
+
+        var rootIds = rows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => r.Id)
+            .Distinct()
+            .ToList();
+
+        return rootIds.Select(id => byId[id]).ToList();
+    }
+
+    private static GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem
+    MapProductivityProfitRatioRegionReportItem(ProductivityProfitRatioRegionRow r)
+    {
+        return new GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem
+        {
+            Id = r.Id,
+            RatioName = r.RatioName ?? string.Empty,
+            TargetValue = r.TargetValue,
+            RegionValue = r.RegionValue,
+            RegionValueDiff = r.RegionValueDiff,
+            BankValue = r.BankValue,
+            BankValueDiff = r.BankValueDiff,
+            RetailValue = r.RetailValue,
+            KobiValue = r.KobiValue,
+            AgricultureValue = r.AgricultureValue,
+            AgricultureValueDiff = r.AgricultureValueDiff,
+            CommercialValue = r.CommercialValue,
+            CommercialValueDiff = r.CommercialValueDiff,
+            SubProducts = new List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem>()
+        };
+    }
+
+    private static List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem>
+    SortProductivityProfitRatioRegionTree(
+        List<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem> nodes,
+        int? sortBy,
+        bool isAscending)
+    {
+        Func<GetProductivityProfitRatioRegionReportResponse.GetProductivityProfitRatioRegionReportItem, object> keySelector = sortBy switch
+        {
+            1 => p => p.RatioName ?? string.Empty,
+            2 => p => p.TargetValue,
+            3 => p => p.RegionValue,
+            4 => p => p.BankValue,
+            5 => p => p.RetailValue,
+            6 => p => p.KobiValue,
+            7 => p => p.AgricultureValue,
+            8 => p => p.CommercialValue,
+            _ => p => p.Id
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProductivityProfitRatioRegionTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
+
+    private sealed class ProductivityVolumeRegionRow
+    {
+        public int Id { get; set; }
+        public int? ParentProductId { get; set; }
+
+        public string ProductName { get; set; } = string.Empty;
+
+        public decimal RealizationRegionValue { get; set; }
+        public decimal? RealizationRegionDiff { get; set; }
+
+        public decimal RealizationBankAverageValue { get; set; }
+        public decimal? RealizationBankAverageDiff { get; set; }
+
+        public decimal TargetValue { get; set; }
+        public decimal HgRate { get; set; }
+
+        public decimal NetGrowthRegionValue { get; set; }
+        public decimal? NetGrowthRegionDiff { get; set; }
+
+        public decimal NetGrowthBankAverageValue { get; set; }
+        public decimal? NetGrowthBankAverageDiff { get; set; }
+
+        public decimal YtdRegionValue { get; set; }
+        public decimal? YtdRegionDiff { get; set; }
+
+        public decimal YtdBankAverageValue { get; set; }
+        public decimal? YtdBankAverageDiff { get; set; }
+
+        public decimal QtdRegionValue { get; set; }
+        public decimal? QtdRegionDiff { get; set; }
+
+        public decimal QtdBankAverageValue { get; set; }
+        public decimal? QtdBankAverageDiff { get; set; }
+    }
+
+    private static List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem>
+    BuildProductivityVolumeRegionReportTree(DataSet ds, DateTime reportDate)
+    {
+        var t0 = ds.Tables[0];
+        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
+
+        if (hasParentInT0)
+        {
+            var rows = DataTableHelper.ToList<ProductivityVolumeRegionRow>(t0);
+            return ProductivityVolumeRegionReportTreeFromRows(rows);
+        }
+
+        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
+        {
+            var roots = DataTableHelper.ToList<ProductivityVolumeRegionRow>(ds.Tables[0]);
+            var children = DataTableHelper.ToList<ProductivityVolumeRegionRow>(ds.Tables[1]);
+
+            var all = new List<ProductivityVolumeRegionRow>(roots.Count + children.Count);
+            all.AddRange(roots);
+            all.AddRange(children);
+
+            return ProductivityVolumeRegionReportTreeFromRows(all);
+        }
+
+        var flat = DataTableHelper.ToList<ProductivityVolumeRegionRow>(t0);
+        return flat.Select(MapProductivityVolumeRegionReportItem).ToList();
+    }
+
+    private static List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem>
+    ProductivityVolumeRegionReportTreeFromRows(List<ProductivityVolumeRegionRow> rows)
+    {
+        var byId = rows
+            .GroupBy(r => r.Id)
+            .ToDictionary(g => g.Key, g => MapProductivityVolumeRegionReportItem(g.First()));
+
+        foreach (var r in rows)
+        {
+            if (!byId.TryGetValue(r.Id, out var node))
+            {
+                node = MapProductivityVolumeRegionReportItem(r);
+                byId[r.Id] = node;
+            }
+
+            var parentId = r.ParentProductId;
+            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
+                parent.SubProducts.Add(node);
+        }
+
+        var rootIds = rows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => r.Id)
+            .Distinct()
+            .ToList();
+
+        return rootIds.Select(id => byId[id]).ToList();
+    }
+
+    private static GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem
+    MapProductivityVolumeRegionReportItem(ProductivityVolumeRegionRow r)
+    {
+        return new GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem
+        {
+            Id = r.Id,
+            ProductName = r.ProductName ?? string.Empty,
+            RealizationRegionValue = r.RealizationRegionValue,
+            RealizationRegionDiff = r.RealizationRegionDiff,
+            RealizationBankAverageValue = r.RealizationBankAverageValue,
+            RealizationBankAverageDiff = r.RealizationBankAverageDiff,
+            TargetValue = r.TargetValue,
+            HgRate = r.HgRate,
+            NetGrowthRegionValue = r.NetGrowthRegionValue,
+            NetGrowthRegionDiff = r.NetGrowthRegionDiff,
+            NetGrowthBankAverageValue = r.NetGrowthBankAverageValue,
+            NetGrowthBankAverageDiff = r.NetGrowthBankAverageDiff,
+            YtdRegionValue = r.YtdRegionValue,
+            YtdRegionDiff = r.YtdRegionDiff,
+            YtdBankAverageValue = r.YtdBankAverageValue,
+            YtdBankAverageDiff = r.YtdBankAverageDiff,
+            QtdRegionValue = r.QtdRegionValue,
+            QtdRegionDiff = r.QtdRegionDiff,
+            QtdBankAverageValue = r.QtdBankAverageValue,
+            QtdBankAverageDiff = r.QtdBankAverageDiff,
+            SubProducts = new List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem>()
+        };
+    }
+
+    private static List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem>
+    SortProductivityVolumeRegionTree(
+        List<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem> nodes,
+        int? sortBy,
+        bool isAscending)
+    {
+        Func<GetProductivityVolumeRegionReportResponse.GetProductivityVolumeRegionReportItem, object> keySelector = sortBy switch
+        {
+            1 => p => p.ProductName ?? string.Empty,
+            2 => p => p.RealizationRegionValue,
+            3 => p => p.RealizationBankAverageValue,
+            4 => p => p.TargetValue,
+            5 => p => p.HgRate,
+            6 => p => p.NetGrowthRegionValue,
+            7 => p => p.NetGrowthBankAverageValue,
+            8 => p => p.YtdRegionValue,
+            9 => p => p.YtdBankAverageValue,
+            10 => p => p.QtdRegionValue,
+            11 => p => p.QtdBankAverageValue,
+            _ => p => p.Id
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProductivityVolumeRegionTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
+
+    #endregion
 }
