@@ -266,7 +266,7 @@ $(document).ready(function () {
 
   function loadMonthlyReport() {
       if (monthlyFirstLoad) {
-          $('#monthlyDataTable').hide();
+          $('#monthlyTable').hide();
           $('#monthlyTableSkeleton').show();
           showLoadingOverlay();
       }
@@ -281,7 +281,7 @@ $(document).ready(function () {
               if (monthlyFirstLoad) {
                   monthlyFirstLoad = false;
                   $('#monthlyTableSkeleton').hide();
-                  $('#monthlyDataTable').show();
+                  $('#monthlyTable').show();
                   hideLoadingOverlay();
               }
               updateStripes();
