@@ -102,7 +102,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityGeneralRegionReport")]
-    public ActionResult<IReadOnlyList<GetProductivityGeneralRegionReportItem>> GetProductivityGeneralRegionReport(
+    public ActionResult<GetProductivityGeneralRegionReportResponse> GetProductivityGeneralRegionReport(
         [FromBody] GetProductivityGeneralRegionReportRequest request)
     {
         if (request == null)
@@ -118,7 +118,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityCountCardPosRegionReport")]
-    public ActionResult<IReadOnlyList<GetProductivityCountCardPosRegionReportItem>> GetProductivityCountCardPosRegionReport(
+    public ActionResult<GetProductivityCountCardPosRegionReportResponse> GetProductivityCountCardPosRegionReport(
         [FromBody] GetProductivityCountCardPosRegionReportRequest request)
     {
         if (request == null)
@@ -150,7 +150,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityCountCardPosRatioRegionReportTableHeaders")]
-    public ActionResult<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportTableHeadersItem>> GetProductivityCountCardPosRatioRegionReportTableHeaders(
+    public ActionResult<GetProductivityCountCardPosRatioRegionReportTableHeadersItem> GetProductivityCountCardPosRatioRegionReportTableHeaders(
         [FromBody] GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request)
     {
         if (request == null)
@@ -166,7 +166,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityCountCustomerRegionReport")]
-    public ActionResult<IReadOnlyList<GetProductivityCountCustomerRegionReportItem>> GetProductivityCountCustomerRegionReport(
+    public ActionResult<GetProductivityCountCustomerRegionReportResponse> GetProductivityCountCustomerRegionReport(
         [FromBody] GetProductivityCountCustomerRegionReportRequest request)
     {
         if (request == null)
@@ -246,7 +246,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityProfitSpreadManagementBranchReport")]
-    public ActionResult<IReadOnlyList<GetProductivityProfitSpreadManagementBranchReportItem>> GetProductivityProfitSpreadManagementBranchReport(
+    public ActionResult<GetProductivityProfitSpreadManagementBranchReportResponse> GetProductivityProfitSpreadManagementBranchReport(
         [FromBody] GetProductivityProfitSpreadManagementBranchReportRequest request)
     {
         if (request == null)
@@ -262,7 +262,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityCountCardPosBranchReport")]
-    public ActionResult<IReadOnlyList<GetProductivityCountCardPosBranchReportItem>> GetProductivityCountCardPosBranchReport(
+    public ActionResult<GetProductivityCountCardPosBranchReportResponse> GetProductivityCountCardPosBranchReport(
         [FromBody] GetProductivityCountCardPosBranchReportRequest request)
     {
         if (request == null)
@@ -312,7 +312,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityProfitRatioBranchReport")]
-    public ActionResult<IReadOnlyList<GetProductivityProfitRatioBranchReportItem>> GetProductivityProfitRatioBranchReport(
+    public ActionResult<GetProductivityProfitRatioBranchReportResponse> GetProductivityProfitRatioBranchReport(
         [FromBody] GetProductivityProfitRatioBranchReportRequest request)
     {
         if (request == null)
@@ -328,7 +328,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityProfitTotalBranchReport")]
-    public ActionResult<IReadOnlyList<GetProductivityProfitTotalBranchReportItem>> GetProductivityProfitTotalBranchReport(
+    public ActionResult<GetProductivityProfitTotalBranchReportResponse> GetProductivityProfitTotalBranchReport(
         [FromBody] GetProductivityProfitTotalBranchReportRequest request)
     {
         if (request == null)
@@ -376,7 +376,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityCountCustomerBranchReport")]
-    public ActionResult<IReadOnlyList<GetProductivityCountCustomerBranchReportItem>> GetProductivityCountCustomerBranchReport(
+    public ActionResult<GetProductivityCountCustomerBranchReportResponse> GetProductivityCountCustomerBranchReport(
         [FromBody] GetProductivityCountCustomerBranchReportRequest request)
     {
         if (request == null)
@@ -392,7 +392,7 @@ public class ProductivityReportController : ControllerBase
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
     /// </summary>
     [HttpPost("GetProductivityVolumeBranchReport")]
-    public ActionResult<IReadOnlyList<GetProductivityVolumeBranchReportItem>> GetProductivityVolumeBranchReport(
+    public ActionResult<GetProductivityVolumeBranchReportResponse> GetProductivityVolumeBranchReport(
         [FromBody] GetProductivityVolumeBranchReportRequest request)
     {
         if (request == null)

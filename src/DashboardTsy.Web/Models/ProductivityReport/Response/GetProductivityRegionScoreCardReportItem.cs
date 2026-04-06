@@ -1,6 +1,6 @@
-namespace DashboardTsy.Application.ProductivityReport.Responses;
+﻿namespace DashboardTsy.Web.Models.ProductivityReport.Response;
 
-public class GetProductivityBranchScoreCardReportItem
+public class GetProductivityRegionScoreCardReportItem
 {
     public string ManagerName { get; set; } = string.Empty;
     public decimal FirstMonthScore { get; set; }
@@ -14,8 +14,6 @@ public class GetProductivityBranchScoreCardReportItem
     public decimal? MassScore { get; set; }
     public decimal? AffluentScore { get; set; }
     public decimal? PrivateBankingScore { get; set; }
-    public decimal BranchNpsScore { get; set; }
+    public decimal RegionNpsScore { get; set; }
     public decimal BankNpsScore { get; set; }
-
-    public decimal? PhoneGreetingScore { get; set; }
 }

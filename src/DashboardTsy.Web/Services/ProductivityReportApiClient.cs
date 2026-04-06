@@ -1,5 +1,6 @@
-using DashboardTsy.Application.ProductivityReport.Requests;
-using DashboardTsy.Application.ProductivityReport.Responses;
+using DashboardTsy.Web.Models.ProductivityReport;
+using DashboardTsy.Web.Models.ProductivityReport.Request;
+using DashboardTsy.Web.Models.ProductivityReport.Response;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
 using System.Threading;
@@ -64,22 +65,20 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return list ?? (IReadOnlyList<GetReportBranchFilterItem>)Array.Empty<GetReportBranchFilterItem>();
     }
 
-    public async Task<IReadOnlyList<GetProductivityGeneralRegionReportItem>> GetProductivityGeneralRegionReportAsync(GetProductivityGeneralRegionReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityGeneralRegionReportResponse?> GetProductivityGeneralRegionReportAsync(GetProductivityGeneralRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityGeneralRegionReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityGeneralRegionReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityGeneralRegionReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityGeneralRegionReportItem>)Array.Empty<GetProductivityGeneralRegionReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityGeneralRegionReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityCountCardPosRegionReportItem>> GetProductivityCountCardPosRegionReportAsync(GetProductivityCountCardPosRegionReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityCountCardPosRegionReportResponse?> GetProductivityCountCardPosRegionReportAsync(GetProductivityCountCardPosRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCardPosRegionReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityCountCardPosRegionReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityCountCardPosRegionReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityCountCardPosRegionReportItem>)Array.Empty<GetProductivityCountCardPosRegionReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityCountCardPosRegionReportResponse>(json, _jsonOptions);
     }
 
     public async Task<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem>> GetProductivityCountCardPosRatioRegionReportAsync(GetProductivityCountCardPosRatioRegionReportRequest request, CancellationToken cancellationToken = default)
@@ -99,63 +98,60 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return JsonSerializer.Deserialize<GetProductivityCountCardPosRatioRegionReportTableHeadersItem>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityCountCustomerRegionReportItem>> GetProductivityCountCustomerRegionReportAsync(GetProductivityCountCustomerRegionReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityCountCustomerRegionReportResponse?> GetProductivityCountCustomerRegionReportAsync(GetProductivityCountCustomerRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCustomerRegionReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityCountCustomerRegionReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityCountCustomerRegionReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityCountCustomerRegionReportItem>)Array.Empty<GetProductivityCountCustomerRegionReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityCountCustomerRegionReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<DashboardTsy.Web.Models.ProductivityReport.GetProductivityVolumeRegionReportResponse?> GetProductivityVolumeRegionReportAsync(DashboardTsy.Web.Models.ProductivityReport.GetProductivityVolumeRegionReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityVolumeRegionReportResponse?> GetProductivityVolumeRegionReportAsync(GetProductivityVolumeRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityVolumeRegionReport", request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        return JsonSerializer.Deserialize<DashboardTsy.Web.Models.ProductivityReport.GetProductivityVolumeRegionReportResponse>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<GetProductivityVolumeRegionReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitRatioRegionReportResponse?> GetProductivityProfitRatioRegionReportAsync(DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitRatioRegionReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityProfitRatioRegionReportResponse?> GetProductivityProfitRatioRegionReportAsync(GetProductivityProfitRatioRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityProfitRatioRegionReport", request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        return JsonSerializer.Deserialize<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitRatioRegionReportResponse>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<GetProductivityProfitRatioRegionReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitTotalRegionReportResponse?> GetProductivityProfitTotalRegionReportAsync(DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitTotalRegionReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityProfitTotalRegionReportResponse?> GetProductivityProfitTotalRegionReportAsync(GetProductivityProfitTotalRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityProfitTotalRegionReport", request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        return JsonSerializer.Deserialize<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitTotalRegionReportResponse>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<GetProductivityProfitTotalRegionReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitSpreadManagementRegionReportResponse?> GetProductivityProfitSpreadManagementRegionReportAsync(DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitSpreadManagementRegionReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityProfitSpreadManagementRegionReportResponse?> GetProductivityProfitSpreadManagementRegionReportAsync(GetProductivityProfitSpreadManagementRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityProfitSpreadManagementRegionReport", request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        return JsonSerializer.Deserialize<DashboardTsy.Web.Models.ProductivityReport.GetProductivityProfitSpreadManagementRegionReportResponse>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<GetProductivityProfitSpreadManagementRegionReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityProfitSpreadManagementBranchReportItem>> GetProductivityProfitSpreadManagementBranchReportAsync(GetProductivityProfitSpreadManagementBranchReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityProfitSpreadManagementBranchReportResponse?> GetProductivityProfitSpreadManagementBranchReportAsync(GetProductivityProfitSpreadManagementBranchReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityProfitSpreadManagementBranchReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityProfitSpreadManagementBranchReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityProfitSpreadManagementBranchReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityProfitSpreadManagementBranchReportItem>)Array.Empty<GetProductivityProfitSpreadManagementBranchReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityProfitSpreadManagementBranchReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityCountCardPosBranchReportItem>> GetProductivityCountCardPosBranchReportAsync(GetProductivityCountCardPosBranchReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityCountCardPosBranchReportResponse?> GetProductivityCountCardPosBranchReportAsync(GetProductivityCountCardPosBranchReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCardPosBranchReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityCountCardPosBranchReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityCountCardPosBranchReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityCountCardPosBranchReportItem>)Array.Empty<GetProductivityCountCardPosBranchReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityCountCardPosBranchReportResponse>(json, _jsonOptions);
     }
 
     public async Task<IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem>> GetProductivityCountCardPosRatioBranchReportAsync(GetProductivityCountCardPosRatioBranchReportRequest request, CancellationToken cancellationToken = default)
@@ -175,22 +171,20 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return JsonSerializer.Deserialize<GetProductivityCountCardPosRatioBranchReportTableHeadersItem>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityProfitRatioBranchReportItem>> GetProductivityProfitRatioBranchReportAsync(GetProductivityProfitRatioBranchReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityProfitRatioBranchReportResponse?> GetProductivityProfitRatioBranchReportAsync(GetProductivityProfitRatioBranchReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityProfitRatioBranchReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityProfitRatioBranchReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityProfitRatioBranchReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityProfitRatioBranchReportItem>)Array.Empty<GetProductivityProfitRatioBranchReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityProfitRatioBranchReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityProfitTotalBranchReportItem>> GetProductivityProfitTotalBranchReportAsync(GetProductivityProfitTotalBranchReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityProfitTotalBranchReportResponse?> GetProductivityProfitTotalBranchReportAsync(GetProductivityProfitTotalBranchReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityProfitTotalBranchReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityProfitTotalBranchReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityProfitTotalBranchReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityProfitTotalBranchReportItem>)Array.Empty<GetProductivityProfitTotalBranchReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityProfitTotalBranchReportResponse>(json, _jsonOptions);
     }
 
     public async Task<GetProductivityBranchScoreCardReportItem?> GetProductivityBranchScoreCardReportAsync(GetProductivityBranchScoreCardReportRequest request, CancellationToken cancellationToken = default)
@@ -201,29 +195,27 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return JsonSerializer.Deserialize<GetProductivityBranchScoreCardReportItem>(json, _jsonOptions);
     }
 
-    public async Task<DashboardTsy.Web.Models.ProductivityReport.GetProductivityRegionScoreCardReportItem?> GetProductivityRegionScoreCardReportAsync(DashboardTsy.Web.Models.ProductivityReport.GetProductivityRegionScoreCardReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityRegionScoreCardReportItem?> GetProductivityRegionScoreCardReportAsync(GetProductivityRegionScoreCardReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityRegionScoreCardReport", request, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        return JsonSerializer.Deserialize<DashboardTsy.Web.Models.ProductivityReport.GetProductivityRegionScoreCardReportItem>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<GetProductivityRegionScoreCardReportItem>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityCountCustomerBranchReportItem>> GetProductivityCountCustomerBranchReportAsync(GetProductivityCountCustomerBranchReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityCountCustomerBranchReportResponse?> GetProductivityCountCustomerBranchReportAsync(GetProductivityCountCustomerBranchReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCustomerBranchReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityCountCustomerBranchReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityCountCustomerBranchReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityCountCustomerBranchReportItem>)Array.Empty<GetProductivityCountCustomerBranchReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityCountCustomerBranchReportResponse>(json, _jsonOptions);
     }
 
-    public async Task<IReadOnlyList<GetProductivityVolumeBranchReportItem>> GetProductivityVolumeBranchReportAsync(GetProductivityVolumeBranchReportRequest request, CancellationToken cancellationToken = default)
+    public async Task<GetProductivityVolumeBranchReportResponse?> GetProductivityVolumeBranchReportAsync(GetProductivityVolumeBranchReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityVolumeBranchReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return Array.Empty<GetProductivityVolumeBranchReportItem>();
+        if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetProductivityVolumeBranchReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetProductivityVolumeBranchReportItem>)Array.Empty<GetProductivityVolumeBranchReportItem>();
+        return JsonSerializer.Deserialize<GetProductivityVolumeBranchReportResponse>(json, _jsonOptions);
     }
 }
