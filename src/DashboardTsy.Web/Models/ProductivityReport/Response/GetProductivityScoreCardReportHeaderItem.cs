@@ -1,4 +1,4 @@
-namespace DashboardTsy.Application.ProductivityReport.Responses;
+﻿namespace DashboardTsy.Web.Models.ProductivityReport.Response;
 
 public class GetProductivityScoreCardReportHeaderItem
 {

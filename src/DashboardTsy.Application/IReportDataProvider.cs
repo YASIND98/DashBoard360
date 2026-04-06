@@ -57,21 +57,21 @@ public interface IReportDataProvider
     /// Verimlilik ekranı için genel bölge bazlı raporu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityGeneralRegionReportItem> GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request);
+    GetProductivityGeneralRegionReportResponse? GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için KrediKartı / POS sayısal bölge raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityCountCardPosRegionReportItem> GetProductivityCountCardPosRegionReport(GetProductivityCountCardPosRegionReportRequest request);
+    GetProductivityCountCardPosRegionReportResponse? GetProductivityCountCardPosRegionReport(GetProductivityCountCardPosRegionReportRequest request);
     IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem> GetProductivityCountCardPosRatioRegionReport(GetProductivityCountCardPosRatioRegionReportRequest request);
-    GetProductivityCountCardPosRatioRegionReportTableHeadersItem GetProductivityCountCardPosRatioRegionReportTableHeaders(GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request);
+    GetProductivityCountCardPosRatioRegionReportTableHeadersItem? GetProductivityCountCardPosRatioRegionReportTableHeaders(GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için müşteri sayısı bölge raporunu döner (Tümü/Kurumsal/Ticari/KOBİ/Tarım/Bireysel).
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityCountCustomerRegionReportItem> GetProductivityCountCustomerRegionReport(GetProductivityCountCustomerRegionReportRequest request);
+    GetProductivityCountCustomerRegionReportResponse? GetProductivityCountCustomerRegionReport(GetProductivityCountCustomerRegionReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için hacim bölge raporunu döner.
@@ -101,33 +101,33 @@ public interface IReportDataProvider
     /// Verimlilik ekranı için spread yönetimi karlılık şube raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityProfitSpreadManagementBranchReportItem> GetProductivityProfitSpreadManagementBranchReport(GetProductivityProfitSpreadManagementBranchReportRequest request);
+    GetProductivityProfitSpreadManagementBranchReportResponse? GetProductivityProfitSpreadManagementBranchReport(GetProductivityProfitSpreadManagementBranchReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için KrediKartı/POS sayısal şube raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityCountCardPosBranchReportItem> GetProductivityCountCardPosBranchReport(GetProductivityCountCardPosBranchReportRequest request);
+    GetProductivityCountCardPosBranchReportResponse? GetProductivityCountCardPosBranchReport(GetProductivityCountCardPosBranchReportRequest request);
     IReadOnlyList<GetProductivityCountCardPosRatioBranchReportItem> GetProductivityCountCardPosRatioBranchReport(GetProductivityCountCardPosRatioBranchReportRequest request);
-    GetProductivityCountCardPosRatioBranchReportTableHeadersItem GetProductivityCountCardPosRatioBranchReportTableHeaders(GetProductivityCountCardPosRatioBranchReportTableHeadersRequest request);
+    GetProductivityCountCardPosRatioBranchReportTableHeadersItem? GetProductivityCountCardPosRatioBranchReportTableHeaders(GetProductivityCountCardPosRatioBranchReportTableHeadersRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için karlılık oranı şube raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityProfitRatioBranchReportItem> GetProductivityProfitRatioBranchReport(GetProductivityProfitRatioBranchReportRequest request);
+    GetProductivityProfitRatioBranchReportResponse? GetProductivityProfitRatioBranchReport(GetProductivityProfitRatioBranchReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için karlılık toplam şube raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityProfitTotalBranchReportItem> GetProductivityProfitTotalBranchReport(GetProductivityProfitTotalBranchReportRequest request);
+    GetProductivityProfitTotalBranchReportResponse? GetProductivityProfitTotalBranchReport(GetProductivityProfitTotalBranchReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için şube skor kartı raporunu döner (tek satır).
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    GetProductivityBranchScoreCardReportItem GetProductivityBranchScoreCardReport(GetProductivityBranchScoreCardReportRequest request);
+    GetProductivityBranchScoreCardReportItem? GetProductivityBranchScoreCardReport(GetProductivityBranchScoreCardReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için bölge skor kartı raporunu döner (tek satır).
@@ -139,13 +139,13 @@ public interface IReportDataProvider
     /// Verimlilik ekranı için müşteri sayısı şube raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityCountCustomerBranchReportItem> GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request);
+    GetProductivityCountCustomerBranchReportResponse? GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için hacim şube raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
-    IReadOnlyList<GetProductivityVolumeBranchReportItem> GetProductivityVolumeBranchReport(GetProductivityVolumeBranchReportRequest request);
+    GetProductivityVolumeBranchReportResponse? GetProductivityVolumeBranchReport(GetProductivityVolumeBranchReportRequest request);
 
     /// <summary>
     /// Skor kartı ekranı için header hiyerarşisini döner (bölge/şube, roller, NPS).
