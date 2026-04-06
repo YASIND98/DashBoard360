@@ -291,7 +291,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@FilterType"] = request.FilterType
         };
 
-        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "GetProductivityReportTabs", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductivityReportTabs", parameters);
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return Array.Empty<GetProductivityReportTabItem>();
 
