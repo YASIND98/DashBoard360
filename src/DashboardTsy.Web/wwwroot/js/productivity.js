@@ -18,6 +18,32 @@ function hideYieldTableLoading() {
     $('body').loading('stop');
 }
 
+// ===== Nested Response Helpers =====
+function flattenRows(items, depth) {
+    var rows = [];
+    if (!items) return rows;
+    items.forEach(function (item) {
+        item._depth = depth || 0;
+        item._hasChildren = item.SubProducts && item.SubProducts.length > 0;
+        rows.push(item);
+        if (item._hasChildren) {
+            rows = rows.concat(flattenRows(item.SubProducts, (depth || 0) + 1));
+        }
+    });
+    return rows;
+}
+
+// Response'tan asıl data array'ini çıkar (ilk array property veya direkt array)
+function extractResponseData(response) {
+    if (Array.isArray(response)) return response;
+    for (var key in response) {
+        if (response.hasOwnProperty(key) && Array.isArray(response[key])) {
+            return response[key];
+        }
+    }
+    return response;
+}
+
 // ===== Tab State =====
 var _productivityTabs = [];
 var _activeToggleId = null;
@@ -200,37 +226,30 @@ function loadGeneralRegionReport(regionCode) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            data.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var flatData = flattenRows(data, 0);
+            var hasExpandable = flatData.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
 
-            var hasChildren = {};
-            if (hasExpandable) {
-                data.forEach(function (item) {
-                    if (item.ParentId) hasChildren[item.ParentId] = true;
-                });
-            }
-
             var html = '';
-            data.forEach(function (row, i) {
+            flatData.forEach(function (row, i) {
                 var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-                var depthClass = row.LevelNo > 0 ? ' sub-row depth-' + row.LevelNo : '';
-                var expandClass = hasChildren[row.Id] ? ' expandable' : '';
+                var depthClass = row._depth > 0 ? ' sub-row depth-' + row._depth : '';
+                var expandClass = row._hasChildren ? ' expandable' : '';
 
                 html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
                 html += '<td class="col-index">' + (i + 1) + '</td>';
 
                 if (hasExpandable) {
-                    if (hasChildren[row.Id]) {
+                    if (row._hasChildren) {
                         html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
                     } else {
                         html += '<td class="col-expand"></td>';
                     }
                 }
 
-                var indent = row.LevelNo > 0 ? '<span style="padding-left:' + (row.LevelNo * 16) + 'px">' + row.BranchName + '</span>' : row.BranchName;
+                var indent = row._depth > 0 ? '<span style="padding-left:' + (row._depth * 16) + 'px">' + row.BranchName + '</span>' : row.BranchName;
                 html += '<td class="col-text">' + indent + '</td>';
                 html += '<td class="' + percentColor(row.FirstMonthRealizationRate) + '">' + formatPercent(row.FirstMonthRealizationRate) + '</td>';
                 html += '<td class="' + percentColor(row.SecondMonthRealizationRate) + '">' + formatPercent(row.SecondMonthRealizationRate) + '</td>';
@@ -365,47 +384,37 @@ function loadVolumeRegionReport(regionCode, subTabId) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            // Data'da parentId olan satır var mı?
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
-            // Header'ları expandable bilgisiyle tekrar render et
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderVolumeRegionTable(data);
+            renderVolumeRegionTable(items);
         }
     });
 }
 
 function renderVolumeRegionTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        // Product name with indent
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td class="has-diff">' + item.RealizationRegionValue + formatDiff(item.RealizationRegionDiff) + '</td>';
@@ -439,44 +448,37 @@ function loadVolumeBranchReport(branchCode, subTabId) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderVolumeBranchTable(data);
+            renderVolumeBranchTable(items);
         }
     });
 }
 
 function renderVolumeBranchTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.RealizationBranchValue + '</td>';
@@ -514,44 +516,37 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderCountCustomerRegionTable(data);
+            renderCountCustomerRegionTable(items);
         }
     });
 }
 
 function renderCountCustomerRegionTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td class="has-diff">' + item.RealizationRegion + formatDiff(item.RealizationRegionDiff) + '</td>';
@@ -581,44 +576,37 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderCountCustomerBranchTable(data);
+            renderCountCustomerBranchTable(items);
         }
     });
 }
 
 function renderCountCustomerBranchTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.RealizationBranchValue + '</td>';
@@ -651,44 +639,37 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderCountCardPosBranchTable(data);
+            renderCountCardPosBranchTable(items);
         }
     });
 }
 
 function renderCountCardPosBranchTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.CurrentPeriodBranchValue + '</td>';
@@ -718,44 +699,37 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderCountCardPosRegionTable(data);
+            renderCountCardPosRegionTable(items);
         }
     });
 }
 
 function renderCountCardPosRegionTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.CurrentMonthRegionValue + '</td>';
@@ -794,7 +768,8 @@ function loadCountCardPosRatioRegionReport(regionCode, tabId) {
                     tabId: tabId,
                     reportDate: _reportDate
                 }),
-                success: function (data) {
+                success: function (response) {
+                    var data = extractResponseData(response);
                     renderCountCardPosRatioRegionTable(data);
                     $('#dynamicTableContainer2').show();
                 }
@@ -863,7 +838,8 @@ function loadCountCardPosRatioBranchReport(branchCode, tabId) {
                     tabId: tabId,
                     reportDate: _reportDate
                 }),
-                success: function (data) {
+                success: function (response) {
+                    var data = extractResponseData(response);
                     renderCountCardPosRatioBranchTable(data);
                     $('#dynamicTableContainer2').show();
                 }
@@ -922,49 +898,42 @@ function loadProfitTotalRegionReport(regionCode) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderProfitTotalRegionTable(data);
+            renderProfitTotalRegionTable(items);
         }
     });
 }
 
 function renderProfitTotalRegionTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     // Filter top-level items to find last one for special styling
-    var topLevelItems = items.filter(function (item) { return item.LevelNo === 0; });
+    var topLevelItems = items.filter(function (item) { return item._depth === 0; });
     var lastTopLevelId = topLevelItems.length > 0 ? topLevelItems[topLevelItems.length - 1].Id : null;
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
         var lastRowClass = (item.Id === lastTopLevelId) ? ' profit-total-last' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.Description + '</span>' : item.Description;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -998,10 +967,12 @@ function loadProfitRatioRegionReport(regionCode) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderProfitRatioRegionHeaders(hasExpandable);
-            renderProfitRatioRegionTable(data);
+            renderProfitRatioRegionTable(items);
             $('#dynamicTableContainer2').show();
         }
     });
@@ -1031,34 +1002,25 @@ function renderProfitRatioRegionHeaders(hasExpandable) {
 
 function renderProfitRatioRegionTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -1088,10 +1050,12 @@ function loadProfitRatioBranchReport(branchCode) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderProfitRatioRegionHeaders(hasExpandable);
-            renderProfitRatioBranchTable(data);
+            renderProfitRatioBranchTable(items);
             $('#dynamicTableContainer2').show();
         }
     });
@@ -1099,34 +1063,25 @@ function loadProfitRatioBranchReport(branchCode) {
 
 function renderProfitRatioBranchTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -1156,48 +1111,41 @@ function loadProfitTotalBranchReport(branchCode) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderProfitTotalBranchTable(data);
+            renderProfitTotalBranchTable(items);
         }
     });
 }
 
 function renderProfitTotalBranchTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
-
-    var topLevelItems = items.filter(function (item) { return item.LevelNo === 0; });
+    var topLevelItems = items.filter(function (item) { return item._depth === 0; });
     var lastTopLevelId = topLevelItems.length > 0 ? topLevelItems[topLevelItems.length - 1].Id : null;
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
         var lastRowClass = (item.Id === lastTopLevelId) ? ' profit-total-last' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px">' + item.Description + '</span>' : item.Description;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.TargetValue + '</td>';
@@ -1232,44 +1180,37 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderProfitSpreadManagementRegionTable(data);
+            renderProfitSpreadManagementRegionTable(items);
         }
     });
 }
 
 function renderProfitSpreadManagementRegionTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.SpreadValue + '</td>';
@@ -1299,44 +1240,37 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
-        success: function (data) {
-            var hasExpandable = data.some(function (item) { return item.ParentId !== null; });
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
-            renderProfitSpreadManagementBranchTable(data);
+            renderProfitSpreadManagementBranchTable(items);
         }
     });
 }
 
 function renderProfitSpreadManagementBranchTable(items) {
     var html = '';
-    items.sort(function (a, b) { return a.SortOrder - b.SortOrder; });
-
-    var hasExpandable = items.some(function (item) { return item.ParentId !== null; });
-
-    var hasChildren = {};
-    if (hasExpandable) {
-        items.forEach(function (item) {
-            if (item.ParentId) hasChildren[item.ParentId] = true;
-        });
-    }
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item.LevelNo > 0 ? ' sub-row depth-' + item.LevelNo : '';
-        var expandClass = hasChildren[item.Id] ? ' expandable' : '';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
-            if (hasChildren[item.Id]) {
+            if (item._hasChildren) {
                 html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
             } else {
                 html += '<td class="col-expand"></td>';
             }
         }
 
-        var indent = item.LevelNo > 0 ? '<span style="padding-left:' + (item.LevelNo * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
         html += '<td>' + item.SpreadValue + '</td>';
