@@ -248,7 +248,8 @@ body {
 .filter-dropdown-wrapper {
   position: relative;
   width: 100%;
-  max-width: 170px;
+  max-width: fit-content;
+  min-width: 170px;
 }
 
 .filter-dropdown {
@@ -388,7 +389,6 @@ body {
   position: absolute;
   top: calc(100% + 5px);
   left: 0;
-  max-width: 170px;
   background: var(--bg-dropdown-panel);
   border: 1px solid var(--white);
   border-radius: var(--radius-md);
