@@ -25,7 +25,8 @@ public class ProductivityReportController : ControllerBase
 
     private static string GetRegionCode(ISession session)
     {
-        return session.GetString("RegionCode") ?? string.Empty;
+        int? regionInt = session.GetInt32("RegionCode");
+        return regionInt?.ToString() ?? string.Empty;
     }
 
     private bool HasSession() => (HttpContext.Session.GetInt32("UserId") ?? 0) > 0;
