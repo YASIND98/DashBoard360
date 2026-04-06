@@ -23,6 +23,11 @@ public class ProductivityReportController : ControllerBase
         return session.GetString("UserId") ?? string.Empty;
     }
 
+    private static string GetRegionCode(ISession session)
+    {
+        return session.GetString("RegionCode") ?? string.Empty;
+    }
+
     private bool HasSession() => (HttpContext.Session.GetInt32("UserId") ?? 0) > 0;
 
     [HttpPost("GetProductivityReportTabs")]
@@ -68,7 +73,8 @@ public class ProductivityReportController : ControllerBase
     {
         if (request == null) return BadRequest();
         if (!HasSession()) return Unauthorized();
-        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        //request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        request.SessionId = GetRegionCode(HttpContext.Session);
         var result = await _apiClient.GetReportRegionFiltersAsync(request, cancellationToken).ConfigureAwait(false);
 
         var department = (HttpContext.Session.GetString("Department") ?? string.Empty).Trim().ToUpperInvariant();
@@ -97,7 +103,8 @@ public class ProductivityReportController : ControllerBase
     {
         if (request == null) return BadRequest();
         if (!HasSession()) return Unauthorized();
-        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        //request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        request.SessionId = GetRegionCode(HttpContext.Session);
         var result = await _apiClient.GetReportBranchFiltersAsync(request, cancellationToken).ConfigureAwait(false);
 
         var department = (HttpContext.Session.GetString("Department") ?? string.Empty).Trim().ToUpperInvariant();
