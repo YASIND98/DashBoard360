@@ -68,86 +68,34 @@ public class ProductivityReportController : ControllerBase
         return Ok(result);
     }
 
-    //[HttpPost("GetReportRegionFilters")]
-    //public async Task<ActionResult<IReadOnlyList<GetReportRegionFilterItem>>> GetReportRegionFilters(
-    //    [FromBody] GetReportRegionFiltersRequest? request,
-    //    CancellationToken cancellationToken)
-    //{
-    //    if (request == null) return BadRequest();
-    //    if (!HasSession()) return Unauthorized();
-    //    //request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
-    //    request.SessionId = GetRegionCode(HttpContext.Session);
-    //    var result = await _apiClient.GetReportRegionFiltersAsync(request, cancellationToken).ConfigureAwait(false);
-
-    //    var department = (HttpContext.Session.GetString("Department") ?? string.Empty).Trim().ToUpperInvariant();
-    //    var regionCode = HttpContext.Session.GetInt32("RegionCode");
-
-    //    // GM: all regions
-    //    if (department == "GM")
-    //        return Ok(result);
-
-    //    // BOLGE / SUBE: only user's region
-    //    if (department is "BOLGE" or "SUBE")
-    //    {
-    //        var rc = regionCode?.ToString() ?? string.Empty;
-    //        var filtered = result.Where(x => string.Equals(x.Code, rc, StringComparison.OrdinalIgnoreCase)).ToList();
-    //        return Ok(filtered);
-    //    }
-
-    //    // Unknown department: be safe (no overexposure)
-    //    return Ok(Array.Empty<GetReportRegionFilterItem>());
-    //}
-
-    //[HttpPost("GetReportBranchFilters")]
-    //public async Task<ActionResult<IReadOnlyList<GetReportBranchFilterItem>>> GetReportBranchFilters(
-    //    [FromBody] GetReportBranchFiltersRequest? request,
-    //    CancellationToken cancellationToken)
-    //{
-    //    if (request == null) return BadRequest();
-    //    if (!HasSession()) return Unauthorized();
-    //    //request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
-    //    request.SessionId = GetRegionCode(HttpContext.Session);
-    //    var result = await _apiClient.GetReportBranchFiltersAsync(request, cancellationToken).ConfigureAwait(false);
-
-    //    var department = (HttpContext.Session.GetString("Department") ?? string.Empty).Trim().ToUpperInvariant();
-    //    var regionCode = HttpContext.Session.GetInt32("RegionCode");
-    //    var branchCode = HttpContext.Session.GetInt32("BranchCode");
-
-    //    // GM: all branches
-    //    if (department == "GM")
-    //        return Ok(result);
-
-    //    // BOLGE: branches in user's region
-    //    if (department == "BOLGE")
-    //    {
-    //        var rc = regionCode?.ToString() ?? string.Empty;
-    //        var filtered = result.Where(x => string.Equals(x.RegionCode, rc, StringComparison.OrdinalIgnoreCase)).ToList();
-    //        return Ok(filtered);
-    //    }
-
-    //    // SUBE: only user's branch (and region)
-    //    if (department == "SUBE")
-    //    {
-    //        var bc = branchCode?.ToString() ?? string.Empty;
-    //        var filtered = result.Where(x => string.Equals(x.Code, bc, StringComparison.OrdinalIgnoreCase)).ToList();
-    //        return Ok(filtered);
-    //    }
-
-    //    // Unknown department: be safe (no overexposure)
-    //    return Ok(Array.Empty<GetReportBranchFilterItem>());
-    //}
-
     [HttpPost("GetReportRegionFilters")]
     public async Task<ActionResult<IReadOnlyList<GetReportRegionFilterItem>>> GetReportRegionFilters(
-    [FromBody] GetReportRegionFiltersRequest? request,
-    CancellationToken cancellationToken)
+        [FromBody] GetReportRegionFiltersRequest? request,
+        CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
         if (!HasSession()) return Unauthorized();
         //request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         request.SessionId = GetRegionCode(HttpContext.Session);
         var result = await _apiClient.GetReportRegionFiltersAsync(request, cancellationToken).ConfigureAwait(false);
-        return Ok(result);
+
+        var department = (HttpContext.Session.GetString("Department") ?? string.Empty).Trim().ToUpperInvariant();
+        var regionCode = HttpContext.Session.GetInt32("RegionCode");
+
+        // GM: all regions
+        if (department == "GM")
+            return Ok(result);
+
+        // BOLGE / SUBE: only user's region
+        if (department is "BOLGE" or "SUBE")
+        {
+            var rc = regionCode?.ToString() ?? string.Empty;
+            var filtered = result.Where(x => string.Equals(x.Code, rc, StringComparison.OrdinalIgnoreCase)).ToList();
+            return Ok(filtered);
+        }
+
+        // Unknown department: be safe (no overexposure)
+        return Ok(Array.Empty<GetReportRegionFilterItem>());
     }
 
     [HttpPost("GetReportBranchFilters")]
@@ -160,7 +108,33 @@ public class ProductivityReportController : ControllerBase
         //request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         request.SessionId = GetRegionCode(HttpContext.Session);
         var result = await _apiClient.GetReportBranchFiltersAsync(request, cancellationToken).ConfigureAwait(false);
-        return Ok(result);
+
+        var department = (HttpContext.Session.GetString("Department") ?? string.Empty).Trim().ToUpperInvariant();
+        var regionCode = HttpContext.Session.GetInt32("RegionCode");
+        var branchCode = HttpContext.Session.GetInt32("BranchCode");
+
+        // GM: all branches
+        if (department == "GM")
+            return Ok(result);
+
+        // BOLGE: branches in user's region
+        if (department == "BOLGE")
+        {
+            var rc = regionCode?.ToString() ?? string.Empty;
+            var filtered = result.Where(x => string.Equals(x.RegionCode, rc, StringComparison.OrdinalIgnoreCase)).ToList();
+            return Ok(filtered);
+        }
+
+        // SUBE: only user's branch (and region)
+        if (department == "SUBE")
+        {
+            var bc = branchCode?.ToString() ?? string.Empty;
+            var filtered = result.Where(x => string.Equals(x.Code, bc, StringComparison.OrdinalIgnoreCase)).ToList();
+            return Ok(filtered);
+        }
+
+        // Unknown department: be safe (no overexposure)
+        return Ok(Array.Empty<GetReportBranchFilterItem>());
     }
 
     [HttpPost("GetProductivityGeneralRegionReport")]
