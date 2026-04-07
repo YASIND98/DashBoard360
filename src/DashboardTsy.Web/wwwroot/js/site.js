@@ -1,3 +1,52 @@
+// ===== Dynamic Sidebar =====
+function loadSidebarItems() {
+    var cached = sessionStorage.getItem('_sidebarItems');
+    if (cached) {
+        renderSidebar(JSON.parse(cached));
+        return;
+    }
+    $.ajax({
+        url: '/ProductivityReport/GetReportSidebarItems',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ sessionId: '1' }),
+        success: function (data) {
+            if (data && data.length > 0) {
+                sessionStorage.setItem('_sidebarItems', JSON.stringify(data));
+                renderSidebar(data);
+            }
+        }
+    });
+}
+
+var _sidebarIcons = {
+    'TargetReport': '/images/homepage.svg',
+    'ProductivityReport': '/images/magic-star.svg'
+};
+
+function renderSidebar(items) {
+    var $container = $('#sidebar-nav-items');
+    var currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+    var html = '';
+    items.sort(function (a, b) { return (a.OrderNo || 0) - (b.OrderNo || 0); });
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        if (!item.IsVisible) continue;
+        var itemPath = (item.Url || '/').replace(/\/$/, '') || '/';
+        var isActive = currentPath === itemPath ? ' active' : '';
+        var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
+        html += '<a href="' + item.Url + '" class="sidebar-nav' + isActive + '">';
+        html += '<img src="' + icon + '" alt="' + item.Name + '" />';
+        html += '<span class="sidebar-label">' + item.Name + '</span>';
+        html += '</a>';
+    }
+    $container.html(html);
+}
+
+$(document).ready(function () {
+    loadSidebarItems();
+});
+
 function formatPercent(ratio) {
   var rounded = Math.round(ratio * 10) / 10;
   if (rounded % 1 === 0) return rounded;

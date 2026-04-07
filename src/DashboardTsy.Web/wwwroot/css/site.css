@@ -118,6 +118,12 @@ body {
   transition: width 0.25s ease;
 }
 
+#sidebar-nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .sidebar:hover {
   width: 230px;
   align-items: flex-start;
