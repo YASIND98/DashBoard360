@@ -43,10 +43,10 @@ $(function () {
   }
 
   function buildInfoHeader(info) {
-    var lineStyle = 'color: #8b95b8; font-size: 14px; font-weight: 400; margin-bottom: 4px;';
+    var lineStyle = 'color: #000000; font-size: 14px; font-weight: 400; margin-bottom: 4px;';
 
     var $header = $('<div></div>').css({
-      'background-color': '#060b28',
+      'background-color': '#ffffff',
       'padding': '24px 20px 16px',
       'font-family': 'Inter, sans-serif'
     });
@@ -54,7 +54,7 @@ $(function () {
     // Title
     $header.append(
       $('<div></div>').text(info.title).css({
-        'color': '#ffffff',
+        'color': '#000000',
         'font-size': '24px',
         'font-weight': '700',
         'margin-bottom': '12px'
@@ -107,7 +107,8 @@ $(function () {
       'position': 'absolute',
       'left': '-9999px',
       'top': '0',
-      'background-color': '#060b28'
+      'background-color': '#ffffff',
+      'color': '#000000'
     });
 
     var $infoHeader = buildInfoHeader(info);
@@ -115,8 +116,16 @@ $(function () {
 
     // Her görünür tablo container'ını klonla ve ekle
     $visibleTable.each(function () {
-      var $tableClone = $(this).clone().css({ 'display': 'block', 'margin-bottom': '16px', 'overflow': 'visible' });
+      var $tableClone = $(this).clone().css({ 'display': 'block', 'margin-bottom': '16px', 'overflow': 'visible', 'background': '#ffffff' });
       $tableClone.find('.table-wrapper').css('overflow', 'visible');
+
+      // PDF için tablo renklerini beyaz arka plana uygun yap
+      $tableClone.find('th').css('color', '#333333');
+      $tableClone.find('td').css({ 'color': '#000000', 'border-color': '#e0e0e0' });
+      $tableClone.find('.col-text').each(function () {
+        this.style.setProperty('color', '#000000', 'important');
+      });
+      $tableClone.find('.diff-label').css('color', '#454b54');
 
       // Tüm alt kırılımları açık göster
       $tableClone.find('.sub-row').addClass('visible');
@@ -145,6 +154,10 @@ $(function () {
         if ($lastVisible) $lastVisible.addClass('last-visible-row');
       });
 
+      // Stripe renklerini beyaz tema için override et
+      $tableClone.find('.stripe-odd').css('background', '#f5f5f5');
+      $tableClone.find('.stripe-even').css('background', '#ffffff');
+
       $wrapper.append($tableClone);
     });
 
@@ -166,7 +179,7 @@ $(function () {
     html2canvas($wrapper[0], {
       scale: 2,
       useCORS: true,
-      backgroundColor: '#060b28',
+      backgroundColor: '#ffffff',
       scrollX: 0,
       scrollY: 0,
       width: $wrapper[0].scrollWidth,

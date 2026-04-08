@@ -111,8 +111,8 @@ $(document).ready(function () {
           tabId: getActiveTabId(),
           subTabId: getActiveSubTabId(),
           reportDate: _reportDate,
-          regionId: selectedRegion ? [selectedRegion.code] : [],
-          branchId: selectedBranch ? [selectedBranch.code] : [],
+          regionId: selectedRegion ? [parseInt(selectedRegion.code.replace(/\D/g, ''), 10)] : [],
+          branchId: selectedBranch ? [parseInt(selectedBranch.code.replace(/\D/g, ''), 10)] : [],
           showDifferences: showDiff || false,
           sortBy: currentSortState ? currentSortBy : 0,
           isAscending: currentSortState ? currentSortState === 'asc' : true
@@ -598,7 +598,7 @@ $(document).ready(function () {
   }
 
   function renderBranchDropdown() {
-      return renderBranchList('#indexBranchList', selectedBranch ? selectedBranch.code : null);
+      return renderBranchList('#indexBranchList', selectedBranch ? selectedBranch.code : null, selectedRegion ? selectedRegion.code : null);
   }
 
   $(document).on('click', '#indexRegionList .dropdown-item', function () {
@@ -617,6 +617,7 @@ $(document).ready(function () {
       $('#indexBranchPanel').removeClass('open');
       $('#indexRegionSearch').val('');
 
+      renderBranchDropdown();
       loadActiveReport();
   });
 

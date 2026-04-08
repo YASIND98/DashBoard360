@@ -787,7 +787,6 @@ function renderCountCardPosRatioRegionHeaders(h) {
     row += '<th>' + h.RatioNameTitle + '</th>';
     row += '<th>' + h.PreviousQuarterRegionTitle + '</th>';
     row += '<th>' + h.CurrentRegionTitle + '</th>';
-    row += '<th>' + h.CurrentRegionTitle + '</th>';
     row += '<th>' + h.CurrentBankAverageTitle + '</th>';
     row += '</tr>';
 
@@ -804,7 +803,6 @@ function renderCountCardPosRatioRegionTable(items) {
         html += '<td class="col-index">' + (i + 1) + '</td>';
         html += '<td class="col-text">' + item.RatioName + '</td>';
         html += '<td>' + item.PreviousQuarterRegionValue + '</td>';
-        html += '<td class="has-diff">' + item.CurrentRegionValue + formatDiff(item.CurrentRegionDiff) + '</td>';
         html += '<td class="has-diff">' + item.CurrentRegionValue + formatDiff(item.CurrentRegionDiff) + '</td>';
         html += '<td class="has-diff">' + item.CurrentBankAverageValue + formatDiff(item.CurrentBankAverageDiff) + '</td>';
         html += '</tr>';
