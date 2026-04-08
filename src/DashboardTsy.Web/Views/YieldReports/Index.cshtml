@@ -165,7 +165,7 @@
         }
 
         function renderBranchDropdown() {
-            return renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null);
+            return renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null, selectedRegion ? selectedRegion.code : null);
         }
 
         loadRegionFilters(function () {
@@ -201,6 +201,8 @@
             $(this).addClass('selected');
             $('#yieldBolgePanel').removeClass('open');
             $('#yieldBolgeSearch').val('');
+
+            renderBranchDropdown();
 
             updateUI();
         });
@@ -297,14 +299,14 @@
             $('#yieldBolgeLabel').text('Bölge');
             $('#yieldBolgeList .dropdown-item').removeClass('selected');
             $('#yieldSubeLabel').text('Şube');
-            $('#yieldSubeList .dropdown-item').removeClass('selected');
+            renderBranchDropdown();
             updateUI();
         });
 
         $(document).on('click', '[data-breadcrumb="region"]', function () {
             selectedBranch = null;
             $('#yieldSubeLabel').text('Şube');
-            $('#yieldSubeList .dropdown-item').removeClass('selected');
+            renderBranchDropdown();
             updateUI();
         });
 

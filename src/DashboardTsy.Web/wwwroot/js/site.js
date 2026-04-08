@@ -127,19 +127,22 @@ function renderRegionList(listSelector, selectedCode) {
   return isSingle ? _regionFilters[0] : null;
 }
 
-function renderBranchList(listSelector, selectedCode) {
+function renderBranchList(listSelector, selectedCode, regionCode) {
   var $list = $(listSelector);
-  var isSingle = _branchFilters.length === 1;
+  var filtered = regionCode
+      ? _branchFilters.filter(function (b) { return b.RegionCode === regionCode; })
+      : _branchFilters;
+  var isSingle = filtered.length === 1;
   $list.empty();
   if (!isSingle) {
       var tumuClass = !selectedCode ? ' selected' : '';
       $list.append('<div class="dropdown-item tumu-item' + tumuClass + '" data-code="">Tümü</div>');
   }
-  _branchFilters.forEach(function (b) {
+  filtered.forEach(function (b) {
       var cls = (isSingle || (selectedCode && selectedCode === b.Code)) ? ' selected' : '';
       $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.Code + '" data-region="' + b.RegionCode + '">' + b.Name + '</div>');
   });
-  return isSingle ? _branchFilters[0] : null;
+  return isSingle ? filtered[0] : null;
 }
 
 // ===== Scorecard Headers (cached per filterType in sessionStorage) =====
