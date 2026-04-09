@@ -137,6 +137,7 @@ body {
 /* ===== Sidebar ===== */
 .sidebar {
   min-height: 100vh;
+  width: 72px;
   background: var(--bg-sidebar);
   backdrop-filter: blur(120px);
   -webkit-backdrop-filter: blur(120px);
@@ -145,7 +146,14 @@ body {
   flex-direction: column;
   gap: 10px;
   align-items: center;
-  padding: 16px 12px;
+  padding: 16px 10px;
+  overflow: hidden;
+  transition: width 0.25s ease;
+}
+
+.sidebar:hover {
+  width: 230px;
+  align-items: flex-start;
 }
 
 .sidebar-logo {
@@ -153,6 +161,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 .sidebar-logo img {
@@ -160,21 +169,63 @@ body {
   height: 48px;
 }
 
+.sidebar-text-logo {
+  display: none;
+  width: auto !important;
+  height: 48px !important;
+  max-width: 0;
+  overflow: hidden;
+  transition: opacity 0.2s ease, max-width 0.25s ease;
+}
+
+.sidebar:hover .sidebar-text-logo {
+  max-width: 160px;
+  display: block;
+}
+
 .sidebar-nav {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  gap: 10px;
   cursor: pointer;
   padding: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.sidebar:hover .sidebar-nav {
+  width: 100%;
+}
+
+.sidebar-label {
+  color: var(--border-divider);
+  font-size: 14px;
+  font-weight: 500;
+  display: none;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar:hover .sidebar-label {
+  display: block;
+}
+
+.sidebar-nav.active .sidebar-label {
+  color: var(--white);
 }
 
 .sidebar-nav img {
   width: 24px;
   height: 24px;
+  filter: brightness(0) saturate(100%) invert(60%) sepia(10%) saturate(500%) hue-rotate(175deg) brightness(95%);
+}
+
+.sidebar-nav.active img {
+  filter: none;
 }
 
 .sidebar-nav.active {
-  border: 1px solid var(--border-sidebar-active);
+  background: rgba(13, 91, 156, 0.5);
   border-radius: var(--radius-sm);
 }
 
@@ -333,7 +384,7 @@ body {
 }
 
 .segmented-control .segment {
-  padding: 4px 12px;
+  padding: 6px 9.5px;
   border: none;
   background: transparent;
   color: var(--text-gray);
@@ -344,9 +395,8 @@ body {
 
 .segmented-control .segment.active {
   color: var(--white);
-  background: var(--navy-dark);
-  border: 1px solid var(--purple);
-  border-radius: 10px;
+  background: #0075FF;
+  border-radius: 12px;
 }
 
 /* Period Toggle (Günlük / Aylık) */
@@ -360,10 +410,12 @@ body {
 }
 
 .period-btn {
+  height: 36px;
+  width: 100px;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 5px 12px;
   border: 1px solid var(--white);
   background: transparent;
   color: var(--white);
@@ -373,8 +425,8 @@ body {
 }
 
 .period-btn.active {
-  background: #051B41;
-  border-color: #051B41;
+  background: #0075FF;
+  border-color: #0075FF;
   font-weight: bold;
 }
 
@@ -394,6 +446,8 @@ body {
   border-radius: var(--radius-md);
   z-index: 100;
   box-shadow: var(--shadow-dropdown);
+  overflow: hidden;
+  min-width: 100%;
 }
 
 .dropdown-panel.open {
@@ -1455,8 +1509,9 @@ body {
   }
 
   .period-btn {
+    height: 30px;
+    width: 84px;
     font-size: 13px;
-    padding: 4px 8px;
     gap: 6px;
   }
 

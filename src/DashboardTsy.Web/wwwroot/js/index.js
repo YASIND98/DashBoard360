@@ -523,74 +523,8 @@ $(document).ready(function () {
       return match ? parseInt(match[1]) : 0;
   }
 
-  // ===== Search (client-side, case-insensitive) =====
-  $('#searchInput').on('input', function () {
-      var query = $(this).val().trim();
-      var $table = $('.table-container:visible .data-table tbody');
-      if (!$table.length) return;
-
-      // Mevcut "sonuç yok" mesajını kaldır
-      $table.find('.no-result-row').remove();
-
-      var $legend = $table.closest('.table-container').find('.table-legend');
-
-      if (!query) {
-          $table.find('tr.table-row').css('display', '');
-          $legend.show();
-          reStripeTable($table);
-          return;
-      }
-
-      var normalizedQuery = normalizeTurkish(query);
-      // Önce tüm sub-row'ları gizle
-      $table.find('tr.sub-row').hide();
-      $table.find('tr.table-row').not('.sub-row').each(function () {
-          var $row = $(this);
-          var productName = normalizeTurkish($row.find('.col-text').text().trim());
-          var match = productName.indexOf(normalizedQuery) !== -1;
-          $row.toggle(match);
-          if (match) {
-              // Eşleşen satırın alt satırlarının inline style'ını temizle (CSS'e bırak)
-              $row.nextUntil('tr.table-row:not(.sub-row)').filter('.sub-row').css('display', '');
-          }
-      });
-
-      // Hiç görünür satır yoksa "Sonuç bulunamadı" göster ve legend gizle
-      if ($table.find('tr.table-row:visible').length === 0) {
-          $legend.hide();
-          var colCount = $table.closest('table').find('thead th').length || 1;
-          $table.append(
-              '<tr class="no-result-row"><td colspan="' + colCount + '" style="text-align:center;padding:48px 16px;">' +
-              '<div style="color:#8b95b8;font-size:14px;">' +
-              '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8b95b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
-              '"<strong>' + $('<span>').text(query).html() + '</strong>" ile eşleşen sonuç bulunamadı.' +
-              '</div></td></tr>'
-          );
-      } else {
-          $legend.show();
-      }
-
-      reStripeTable($table);
-  });
-
-  function normalizeTurkish(str) {
-      return str
-          .replace(/İ/g, 'i').replace(/I/g, 'i')
-          .toLowerCase()
-          .replace(/i̇/g, 'i')
-          .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
-          .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u');
-  }
-
-  function reStripeTable($tbody) {
-      var stripeIndex = 0;
-      $tbody.find('tr.table-row:visible').each(function () {
-          var $tr = $(this);
-          $tr.removeClass('stripe-odd stripe-even');
-          stripeIndex++;
-          $tr.addClass(stripeIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
-      });
-  }
+  // ===== Search =====
+  handleTableSearch('#searchInput');
 
   // ===== Region/Branch Filters =====
   function renderRegionDropdown() {

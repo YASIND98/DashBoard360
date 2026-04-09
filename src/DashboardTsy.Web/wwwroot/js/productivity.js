@@ -1344,3 +1344,8 @@ function formatDiff(val) {
     var prefix = val > 0 ? '+' : '';
     return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + val + '</div>';
 }
+
+// ===== Yield Search =====
+$(function () {
+    handleTableSearch('#yieldSearchInput');
+});
