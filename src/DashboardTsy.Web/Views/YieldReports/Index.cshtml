@@ -81,6 +81,10 @@
                 <div class="dropdown-list" id="yieldSubeList"></div>
             </div>
         </div>
+      <div class="filter-search">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Ara" id="yieldSearchInput" />
+      </div>
     </div>
     <div class="segmented-control" id="yieldToggle" style="display:none;"></div>
 </div>
@@ -405,6 +409,7 @@
 
         // ===== Table Update =====
         function updateYieldTable() {
+            $('#yieldSearchInput').val('');
             var tabIds = getActiveTabIds();
             var filterType = selectedBranch ? 2 : 1;
             var toggleId = tabIds.toggleId || 1;
