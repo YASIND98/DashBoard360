@@ -1,3 +1,4 @@
+using DashboardTsy.Web.Models.TargetReport;
 using DashboardTsy.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,7 +22,7 @@ public class TargetReportController : ControllerBase
     /// Proxies to Dashboard API SP_RP_GetTargetReportMenuTexts. SessionId can come from query or current session.
     /// </summary>
     [HttpGet("GetTargetReportMenuTexts")]
-    public async Task<ActionResult<Models.TargetReport.GetTargetReportMenuTextsResponse>> GetTargetReportMenuTexts(
+    public async Task<ActionResult<GetTargetReportMenuTextsResponse>> GetTargetReportMenuTexts(
         [FromQuery] string? sessionId,
         CancellationToken cancellationToken)
     {
@@ -37,8 +38,8 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetTargetReportFilters - proxies to Dashboard API SP_RP_GetTargetReportFilters.
     /// </summary>
     [HttpPost("GetTargetReportFilters")]
-    public async Task<ActionResult<IReadOnlyList<Models.TargetReport.GetTargetReportFiltersItem>>> GetTargetReportFilters(
-        [FromBody] Models.TargetReport.GetTargetReportFiltersRequest? request,
+    public async Task<ActionResult<IReadOnlyList<GetTargetReportFiltersItem>>> GetTargetReportFilters(
+        [FromBody] GetTargetReportFiltersRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
@@ -47,7 +48,7 @@ public class TargetReportController : ControllerBase
         var sid = request.SessionId;
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
-        var req = new Models.TargetReport.GetTargetReportFiltersRequest
+        var req = new GetTargetReportFiltersRequest
         {
             SessionId = sid,
             FilterId = request.FilterId,
@@ -61,8 +62,8 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetDailyTargetReport - proxies to Dashboard API SP_RP_GetDailyTargetReport.
     /// </summary>
     [HttpPost("GetDailyTargetReport")]
-    public async Task<ActionResult<Models.TargetReport.GetDailyTargetReportResponse>> GetDailyTargetReport(
-        [FromBody] Models.TargetReport.GetDailyTargetReportRequest? request,
+    public async Task<ActionResult<GetDailyTargetReportResponse>> GetDailyTargetReport(
+        [FromBody] GetDailyTargetReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
@@ -72,7 +73,7 @@ public class TargetReportController : ControllerBase
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
 
-        var req = new Models.TargetReport.GetDailyTargetReportRequest
+        var req = new GetDailyTargetReportRequest
         {
             SessionId = sid,
             TabId = request.TabId,
@@ -97,8 +98,8 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetDailyQuantityTargetReportTableHeaders - proxies to Dashboard API SP_RP_GetDailyQuantityTargetReportTableHeaders.
     /// </summary>
     [HttpPost("GetDailyQuantityTargetReportTableHeaders")]
-    public async Task<ActionResult<Models.TargetReport.GetDailyQuantityTargetReportTableHeadersResponse>> GetDailyQuantityTargetReportTableHeaders(
-        [FromBody] Models.TargetReport.GetDailyQuantityTargetReportTableHeadersRequest? request,
+    public async Task<ActionResult<GetDailyQuantityTargetReportTableHeadersResponse>> GetDailyQuantityTargetReportTableHeaders(
+        [FromBody] GetDailyQuantityTargetReportTableHeadersRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
@@ -108,7 +109,7 @@ public class TargetReportController : ControllerBase
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
 
-        var req = new Models.TargetReport.GetDailyQuantityTargetReportTableHeadersRequest
+        var req = new GetDailyQuantityTargetReportTableHeadersRequest
         {
             SessionId = sid
         };
@@ -123,8 +124,8 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetDailyQuantityTargetReport - proxies to Dashboard API SP_RP_GetDailyQuantityTargetReport.
     /// </summary>
     [HttpPost("GetDailyQuantityTargetReport")]
-    public async Task<ActionResult<Models.TargetReport.GetDailyQuantityTargetReportResponse>> GetDailyQuantityTargetReport(
-        [FromBody] Models.TargetReport.GetDailyQuantityTargetReportRequest? request,
+    public async Task<ActionResult<GetDailyQuantityTargetReportResponse>> GetDailyQuantityTargetReport(
+        [FromBody] GetDailyQuantityTargetReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
@@ -134,7 +135,7 @@ public class TargetReportController : ControllerBase
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
 
-        var req = new Models.TargetReport.GetDailyQuantityTargetReportRequest
+        var req = new GetDailyQuantityTargetReportRequest
         {
             SessionId = sid,
             TabId = request.TabId,
@@ -159,14 +160,14 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetProductTop10DailyAndWeeklyDifferences - proxies to Dashboard API SP_RP_GetProductTop10DailyAndWeeklyDifferences.
     /// </summary>
     [HttpPost("GetProductTop10DailyAndWeeklyDifferences")]
-    public async Task<ActionResult<Models.TargetReport.ProductTop10DifferencesResponse>> GetProductTop10DailyAndWeeklyDifferences(
-        [FromBody] Models.TargetReport.GetProductTop10DailyAndWeeklyDifferencesRequest? request,
+    public async Task<ActionResult<ProductTop10DifferencesResponse>> GetProductTop10DailyAndWeeklyDifferences(
+        [FromBody] GetProductTop10DailyAndWeeklyDifferencesRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
             return BadRequest();
 
-        var req = new Models.TargetReport.GetProductTop10DailyAndWeeklyDifferencesRequest
+        var req = new GetProductTop10DailyAndWeeklyDifferencesRequest
         {
             ProductId = request.ProductId,
             FilterType = request.FilterType
@@ -182,8 +183,8 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetDailyTargetReportTableHeaders - proxies to Dashboard API SP_RP_GetDailyTargetReportTableHeaders.
     /// </summary>
     [HttpPost("GetDailyTargetReportTableHeaders")]
-    public async Task<ActionResult<Models.TargetReport.GetDailyTargetReportTableHeadersResponse>> GetDailyTargetReportTableHeaders(
-        [FromBody] Models.TargetReport.GetDailyTargetReportTableHeadersRequest? request,
+    public async Task<ActionResult<GetDailyTargetReportTableHeadersResponse>> GetDailyTargetReportTableHeaders(
+        [FromBody] GetDailyTargetReportTableHeadersRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
@@ -193,7 +194,7 @@ public class TargetReportController : ControllerBase
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
 
-        var req = new Models.TargetReport.GetDailyTargetReportTableHeadersRequest { SessionId = sid };
+        var req = new GetDailyTargetReportTableHeadersRequest { SessionId = sid };
         var result = await _apiClient.GetDailyTargetReportTableHeadersAsync(req, cancellationToken).ConfigureAwait(false);
         if (result == null)
             return StatusCode(502);
@@ -204,8 +205,8 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetMonthlyTargetReport - proxies to Dashboard API SP_RP_GetMonthlyTargetReport.
     /// </summary>
     [HttpPost("GetMonthlyTargetReport")]
-    public async Task<ActionResult<Models.TargetReport.GetMonthlyTargetReportResponse>> GetMonthlyTargetReport(
-        [FromBody] Models.TargetReport.GetMonthlyTargetReportRequest? request,
+    public async Task<ActionResult<GetMonthlyTargetReportResponse>> GetMonthlyTargetReport(
+        [FromBody] GetMonthlyTargetReportRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
@@ -215,7 +216,7 @@ public class TargetReportController : ControllerBase
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
 
-        var req = new Models.TargetReport.GetMonthlyTargetReportRequest
+        var req = new GetMonthlyTargetReportRequest
         {
             SessionId = sid,
             TabId = request.TabId,
@@ -239,8 +240,8 @@ public class TargetReportController : ControllerBase
     /// POST /api/TargetReport/GetMonthlyTargetReportTableHeaders - proxies to Dashboard API SP_RP_GetMonthlyTargetReportTableHeaders.
     /// </summary>
     [HttpPost("GetMonthlyTargetReportTableHeaders")]
-    public async Task<ActionResult<Models.TargetReport.GetMonthlyTargetReportTableHeadersResponse>> GetMonthlyTargetReportTableHeaders(
-        [FromBody] Models.TargetReport.GetMonthlyTargetReportTableHeadersRequest? request,
+    public async Task<ActionResult<GetMonthlyTargetReportTableHeadersResponse>> GetMonthlyTargetReportTableHeaders(
+        [FromBody] GetMonthlyTargetReportTableHeadersRequest? request,
         CancellationToken cancellationToken)
     {
         if (request == null)
@@ -250,7 +251,7 @@ public class TargetReportController : ControllerBase
         if (string.IsNullOrEmpty(sid))
             sid = HttpContext.Session.GetString("UserId") ?? string.Empty;
 
-        var req = new Models.TargetReport.GetMonthlyTargetReportTableHeadersRequest
+        var req = new GetMonthlyTargetReportTableHeadersRequest
         {
             SessionId = sid,
             ReportDate = request.ReportDate

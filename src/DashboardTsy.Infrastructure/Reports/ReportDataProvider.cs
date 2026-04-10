@@ -180,7 +180,9 @@ public class ReportDataProvider : IReportDataProvider
         var parameters = new Dictionary<string, object?>
         {
             ["@ProductId"] = request.ProductId,
-            ["@FilterType"] = request.FilterType
+            ["@FilterType"] = request.FilterType,
+            ["@BranchId"] = ToCsv(request.RegionId) ?? (object)DBNull.Value,
+            ["@RegionId"] = ToCsv(request.BranchId) ?? (object)DBNull.Value,
         };
 
         var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductTop10DailyAndWeeklyDifferences", parameters);
@@ -1030,6 +1032,9 @@ public class ReportDataProvider : IReportDataProvider
     #region Helpers
 
     private static string? ToCsv(List<int>? list)
+        => list != null && list.Count > 0 ? string.Join(",", list) : null;
+
+    private static string? ToCsv(List<string>? list)
         => list != null && list.Count > 0 ? string.Join(",", list) : null;
 
     private sealed class MonthlyTargetRow
