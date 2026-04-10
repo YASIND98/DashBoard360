@@ -111,8 +111,8 @@ $(document).ready(function () {
           tabId: getActiveTabId(),
           subTabId: getActiveSubTabId(),
           reportDate: _reportDate,
-          regionId: selectedRegion ? [parseInt(selectedRegion.code.replace(/\D/g, ''), 10)] : [],
-          branchId: selectedBranch ? [parseInt(selectedBranch.code.replace(/\D/g, ''), 10)] : [],
+          regionId: selectedRegion ? [selectedRegion.code] : [],
+          branchId: selectedBranch ? [selectedBranch.code] : [],
           showDifferences: showDiff || false,
           sortBy: currentSortState ? currentSortBy : 0,
           isAscending: currentSortState ? currentSortState === 'asc' : true
@@ -630,7 +630,12 @@ $(document).ready(function () {
       url: '/TargetReport/GetProductTop10DailyAndWeeklyDifferences',
       type: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify({ ProductId: productId, FilterType: filterType }),
+      data: JSON.stringify({
+        productId,
+        filterType,
+        regionId: selectedRegion ? [selectedRegion.code] : [],
+        branchId: selectedBranch ? [selectedBranch.code] : []
+      }),
       success: function (data) {
         var firstHtml = '';
         var lastHtml = '';
