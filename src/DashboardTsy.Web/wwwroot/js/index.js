@@ -208,9 +208,9 @@ $(document).ready(function () {
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td class="text-center month-col month-col-first">' + formatNumber(p.MonthActualAmount) + '</td>';
-          html += '<td class="text-center month-col">' + formatNumber(p.MonthTargetAmount) + '</td>';
-          html += '<td class="text-center month-col month-col-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
+          html += '<td class="text-center col-selected col-selected-first">' + formatNumber(p.MonthActualAmount) + '</td>';
+          html += '<td class="text-center col-selected col-selected-mid">' + formatNumber(p.MonthTargetAmount) + '</td>';
+          html += '<td class="text-center col-selected col-selected-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
           html += '<td class="text-center">' + formatNumber(p.YearActualAmount) + '</td>';
           html += '<td class="text-center">' + formatNumber(p.YearTargetAmount) + '</td>';
           html += '<td class="text-center ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';

@@ -350,12 +350,22 @@ function renderDynamicHeaders(headers, hasExpandable) {
         var row1 = '<tr>';
         var row2 = '<tr>';
 
+        var firstGroupFound = false;
         topHeaders.forEach(function (h, i) {
             var children = childMap[h.Id];
             if (children && children.length > 0) {
-                row1 += '<th colspan="' + children.length + '" class="col-group-header">' + h.HeaderName + '</th>';
-                children.forEach(function (c) {
-                    row2 += '<th>' + c.HeaderName + sortIcon(c) + '</th>';
+                var isFirstGroup = !firstGroupFound;
+                if (isFirstGroup) firstGroupFound = true;
+                var groupCls = isFirstGroup ? 'col-group-header selected' : 'col-group-header';
+                row1 += '<th colspan="' + children.length + '" class="' + groupCls + '">' + h.HeaderName + '</th>';
+                children.forEach(function (c, cIdx) {
+                    var childCls = '';
+                    if (isFirstGroup) {
+                        if (cIdx === 0) childCls = ' class="col-selected-first"';
+                        else if (cIdx === children.length - 1) childCls = ' class="col-selected-last"';
+                        else childCls = ' class="col-selected-mid"';
+                    }
+                    row2 += '<th' + childCls + '>' + c.HeaderName + sortIcon(c) + '</th>';
                 });
             } else {
                 row1 += '<th rowspan="2"' + getClasses(h, true) + '>' + h.HeaderName + sortIcon(h) + '</th>';
@@ -367,6 +377,21 @@ function renderDynamicHeaders(headers, hasExpandable) {
         row2 += '</tr>';
         $thead.append(row1);
         $thead.append(row2);
+
+        // DOM'a eklendikten sonra ilk col-group-header'ı selected yap
+        var $groups = $thead.find('.col-group-header');
+        $groups.removeClass('selected');
+        $groups.first().addClass('selected');
+
+        // İlk grubun altındaki child th'lere col-selected-first / col-selected-last ekle
+        var $row2ths = $thead.find('tr:last th');
+        var firstColCount = parseInt($groups.first().attr('colspan')) || 1;
+        $row2ths.removeClass('col-selected-first col-selected-mid col-selected-last');
+        $row2ths.eq(0).addClass('col-selected-first');
+        for (var m = 1; m < firstColCount - 1; m++) {
+            $row2ths.eq(m).addClass('col-selected-mid');
+        }
+        $row2ths.eq(firstColCount - 1).addClass('col-selected-last');
     }
 }
 
@@ -1321,14 +1346,46 @@ function applyProductivityStripes($table) {
 
 function updateProductivityStripes2() {
     applyProductivityStripes($('#dynamicTable2'));
+    applyFirstGroupSelected($('#dynamicTable2'));
     reapplySortVisual($('#dynamicTable2'));
     hideYieldTableLoading();
 }
 
 function updateProductivityStripes() {
     applyProductivityStripes($('#dynamicTable'));
+    applyFirstGroupSelected($('#dynamicTable'));
     reapplySortVisual($('#dynamicTable'));
     hideYieldTableLoading();
+}
+
+function applyFirstGroupSelected($table) {
+    var $selectedHeader = $table.find('thead .col-group-header.selected');
+    if (!$selectedHeader.length) return;
+
+    // İlk group header'ın thead'deki kolon başlangıç indeksini bul
+    var $row1 = $selectedHeader.closest('tr');
+    var startCol = 0;
+    var colCount = 0;
+    var found = false;
+    $row1.find('th').each(function () {
+        var span = parseInt($(this).attr('colspan')) || 1;
+        if (this === $selectedHeader[0]) {
+            colCount = span;
+            found = true;
+            return false;
+        }
+        startCol += span;
+    });
+    if (!found) return;
+
+    // Body satırlarındaki td'lere col-selected-first / col-selected-mid / col-selected-last ekle
+    $table.find('tbody tr').each(function () {
+        $(this).find('td').each(function (tdIdx) {
+            if (tdIdx === startCol) $(this).addClass('col-selected-first');
+            else if (tdIdx === startCol + colCount - 1) $(this).addClass('col-selected-last');
+            else if (tdIdx > startCol && tdIdx < startCol + colCount - 1) $(this).addClass('col-selected-mid');
+        });
+    });
 }
 
 function reapplySortVisual($table) {
