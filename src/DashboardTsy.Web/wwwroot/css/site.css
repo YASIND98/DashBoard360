@@ -300,7 +300,7 @@ body {
   position: relative;
   width: 100%;
   max-width: fit-content;
-  min-width: 170px;
+  min-width: 176px;
 }
 
 .filter-dropdown {
@@ -725,11 +725,6 @@ body {
   width: 100%;
   border-spacing: 0;
   border-collapse: separate;
-  margin-bottom: 14px;
-}
-
-#dynamicTable2.data-table {
-  margin-bottom: 0;
 }
 
 /* Table Header */
@@ -1029,7 +1024,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 16px 0;
+  padding: 0 16px;
 }
 
 .legend-note {
@@ -1583,7 +1578,7 @@ body {
   }
 
   .table-legend {
-    padding: 16px 8px 0;
+    padding: 0 8px;
   }
 
   .top10-body {
