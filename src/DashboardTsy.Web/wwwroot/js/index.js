@@ -105,7 +105,7 @@ $(document).ready(function () {
   }
 
   // ===== Build Report Request =====
-  function buildRequest(showDiff) {
+  function buildRequest() {
       return {
           sessionId: '1',
           tabId: getActiveTabId(),
@@ -113,7 +113,7 @@ $(document).ready(function () {
           reportDate: _reportDate,
           regionId: selectedRegion ? [selectedRegion.code] : [],
           branchId: selectedBranch ? [selectedBranch.code] : [],
-          showDifferences: showDiff || false,
+          showDifferences: true,
           sortBy: currentSortState ? currentSortBy : 0,
           isAscending: currentSortState ? currentSortState === 'asc' : true
       };
@@ -235,13 +235,11 @@ $(document).ready(function () {
 
   // ===== Report Loaders =====
   function loadDailyReport() {
-      var showDiff = $('#diffToggle').attr('data-active') === 'true';
-
       $.ajax({
           url: '/TargetReport/GetDailyTargetReport',
           type: 'POST',
           contentType: 'application/json',
-          data: JSON.stringify(buildRequest(showDiff)),
+          data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#dailyTableBody').html(buildDailyRows(data.Products, 0, false, true));
 
@@ -252,6 +250,7 @@ $(document).ready(function () {
                   }
               });
 
+              var showDiff = $('#diffToggle').attr('data-active') === 'true';
               if (!showDiff) {
                   $('#dailyTableBody .diff-details').hide();
               }
@@ -274,7 +273,7 @@ $(document).ready(function () {
           url: '/TargetReport/GetMonthlyTargetReport',
           type: 'POST',
           contentType: 'application/json',
-          data: JSON.stringify(buildRequest(false)),
+          data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#monthlyTableBody').html(buildMonthlyRows(data.Products, 0, false));
               if (monthlyFirstLoad) {
@@ -293,8 +292,6 @@ $(document).ready(function () {
   var quantityHeadersLoaded = false;
 
   function loadQuantityReport() {
-      var showDiff = $('#quantityDiffToggle').attr('data-active') === 'true';
-
       if (!quantityHeadersLoaded) {
           quantityHeadersLoaded = true;
           loadHeaders('/TargetReport/GetDailyQuantityTargetReportTableHeaders', '_quantityHeaders', function (data) {
@@ -317,7 +314,7 @@ $(document).ready(function () {
           url: '/TargetReport/GetDailyQuantityTargetReport',
           type: 'POST',
           contentType: 'application/json',
-          data: JSON.stringify(buildRequest(showDiff)),
+          data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#quantityTableBody').html(buildQuantityRows(data.Products, 0, false));
 
@@ -328,6 +325,7 @@ $(document).ready(function () {
                   }
               });
 
+              var showDiff = $('#quantityDiffToggle').attr('data-active') === 'true';
               if (!showDiff) {
                   $('#quantityTableBody .diff-details').hide();
               }
@@ -340,7 +338,12 @@ $(document).ready(function () {
   $('#quantityDiffToggle').on('click', function () {
       var isActive = $(this).attr('data-active') === 'true';
       $(this).attr('data-active', isActive ? 'false' : 'true');
-      loadQuantityReport();
+      if (isActive) {
+          $('#quantityTableBody .diff-details').hide();
+      } else {
+          $('#quantityTableBody .diff-details').show();
+      }
+      updateStripes();
   });
   $('#quantityDiffToggle').attr('data-active', 'true');
 
@@ -463,7 +466,12 @@ $(document).ready(function () {
   $('#diffToggle').on('click', function () {
       var isActive = $(this).attr('data-active') === 'true';
       $(this).attr('data-active', isActive ? 'false' : 'true');
-      loadActiveReport();
+      if (isActive) {
+          $('#dailyTableBody .diff-details').hide();
+      } else {
+          $('#dailyTableBody .diff-details').show();
+      }
+      updateStripes();
   });
 
   $('#diffToggle').attr('data-active', 'true');
