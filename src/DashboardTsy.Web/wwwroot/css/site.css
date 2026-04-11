@@ -790,8 +790,7 @@ body {
   border-radius: 0;
 }
 
-.data-table tbody tr:first-child td:last-child,
-.data-table tbody tr:first-child td:has(+ td.col-top10[style*="display: none"]) {
+.data-table tbody tr:first-child td:last-child {
   border-radius: 0 30px 0 0;
 }
 
@@ -807,8 +806,7 @@ body {
   border-radius: 0 0 0 40px;
 }
 
-.data-table tbody tr.last-visible-row td:last-child,
-.data-table tbody tr.last-visible-row td:has(+ td.col-top10[style*="display: none"]) {
+.data-table tbody tr.last-visible-row td:last-child {
   border-radius: 0 0 30px 0;
 }
 
@@ -830,8 +828,7 @@ body {
   border-left: 1px solid var(--border-row);
 }
 
-.table-row td:last-child,
-.table-row td:has(+ td.col-top10[style*="display: none"]) {
+.table-row td:last-child {
   border-right: 1px solid var(--border-row);
 }
 
