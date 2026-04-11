@@ -167,7 +167,11 @@ $(document).ready(function () {
           html += '</div>';
           html += '</td>';
           if (showTop10) {
-              html += '<td class="col-top10"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
+              if (TOP10_PRODUCT_NAMES.indexOf(p.ProductName) !== -1) {
+                  html += '<td class="col-top10"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
+              } else {
+                  html += '<td class="col-top10"></td>';
+              }
           }
           html += '</tr>';
 
