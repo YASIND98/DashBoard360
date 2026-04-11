@@ -254,7 +254,6 @@ $(document).ready(function () {
 
               if (!showDiff) {
                   $('#dailyTableBody .diff-details').hide();
-                  $('#dailyTableBody .col-top10').hide();
               }
               updateStripes();
               hideSkeleton();
@@ -343,7 +342,7 @@ $(document).ready(function () {
       $(this).attr('data-active', isActive ? 'false' : 'true');
       loadQuantityReport();
   });
-  $('#quantityDiffToggle').attr('data-active', 'false');
+  $('#quantityDiffToggle').attr('data-active', 'true');
 
   // ===== Sorting =====
   $(document).on('click', '#dailyTable thead th, #monthlyTable thead th, #quantityTable thead th', function () {
@@ -467,9 +466,7 @@ $(document).ready(function () {
       loadActiveReport();
   });
 
-  $('#diffToggle').attr('data-active', 'false');
-  $('.diff-details').hide();
-  $('.col-top10').hide();
+  $('#diffToggle').attr('data-active', 'true');
 
   // ===== Striping =====
   function updateStripes() {
