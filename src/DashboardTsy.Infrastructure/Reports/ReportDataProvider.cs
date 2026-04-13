@@ -181,8 +181,10 @@ public class ReportDataProvider : IReportDataProvider
         {
             ["@ProductId"] = request.ProductId,
             ["@FilterType"] = request.FilterType,
-            ["@BranchId"] = ToCsv(request.RegionId) ?? (object)DBNull.Value,
-            ["@RegionId"] = ToCsv(request.BranchId) ?? (object)DBNull.Value,
+            ["@RegionId"] = ToCsv(request.RegionId) ?? (object)DBNull.Value,
+            ["@BranchId"] = ToCsv(request.BranchId) ?? (object)DBNull.Value,
+            ["@TabId"] = request.TabId,
+            ["@SubTabId"] = request.SubTabId ?? (object)DBNull.Value,
         };
 
         var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductTop10DailyAndWeeklyDifferences", parameters);
