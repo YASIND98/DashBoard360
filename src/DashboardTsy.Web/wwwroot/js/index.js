@@ -90,11 +90,11 @@ $(document).ready(function () {
       return $('.period-btn.active').data('period') || 'daily';
   }
 
-  // "Özel Bankacılık" sekmesi monthly period'da gösterilmez.
+  // "Özel Bankacılık" sekmesi yalnızca Adet tipinde gizlenir.
   function updateBireyselOzelVisibility() {
       var $ozel = $('.sub-tab[data-subtab="bireysel-ozel"]');
       if (!$ozel.length) return;
-      if (getActivePeriod() === 'monthly') {
+      if (getActiveType() === 'adet') {
           if ($ozel.hasClass('active')) {
               $ozel.removeClass('active');
               $ozel.closest('.sub-tab-bar')
@@ -422,6 +422,7 @@ $(document).ready(function () {
       $(this).addClass('active');
 
       var type = $(this).data('type');
+      updateBireyselOzelVisibility();
       if (type === 'adet') {
           $('#dailyTable').hide();
           $('#monthlyTable').hide();
@@ -453,8 +454,6 @@ $(document).ready(function () {
       // Adet seçiliyken tablo gösterme
       var activeType = $('.segment[data-type].active').data('type');
       if (activeType === 'adet') return;
-
-      updateBireyselOzelVisibility();
 
       if (period === 'monthly') {
           $('.date-text').text(trMonths[now.getMonth()] + ' ' + now.getFullYear());
@@ -663,9 +662,7 @@ $(document).ready(function () {
         productId,
         filterType,
         regionId: selectedRegion ? [selectedRegion.code] : [],
-        branchId: selectedBranch ? [selectedBranch.code] : [],
-        tabId: getActiveTabId(),
-        subTabId: getActiveSubTabId()
+        branchId: selectedBranch ? [selectedBranch.code] : []
       }),
       success: function (data) {
         var firstHtml = '';
