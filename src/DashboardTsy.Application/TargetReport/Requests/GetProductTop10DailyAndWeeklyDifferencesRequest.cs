@@ -14,7 +14,7 @@ public class GetProductTop10DailyAndWeeklyDifferencesRequest
     /// <summary>
     /// 0=Tümü, 1=Kurumsal, 2=Ticari, 3=KOBÝ, 4=Tarým, 5=Bireysel
     /// </summary>
-    public int TabId { get; set; }
+    public int? TabId { get; set; }
     /// <summary>
     /// // KOBÝ ise 0=Tümü, 1=KBÝ, 2=OBÝ; Bireysel ise 0=Tümü, 1=Genel Kitle, 2=Afili, 3=Özel Bankacýlýk
     /// </summary>

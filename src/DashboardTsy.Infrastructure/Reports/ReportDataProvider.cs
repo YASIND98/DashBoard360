@@ -183,7 +183,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@FilterType"] = request.FilterType,
             ["@RegionId"] = ToCsv(request.RegionId) ?? (object)DBNull.Value,
             ["@BranchId"] = ToCsv(request.BranchId) ?? (object)DBNull.Value,
-            ["@TabId"] = request.TabId.ToString(),
+            ["@TabId"] = request.TabId.ToString() ?? (object)DBNull.Value,
             ["@SubTabId"] = request.SubTabId?.ToString() ?? (object)DBNull.Value
         };
 
