@@ -90,6 +90,23 @@ $(document).ready(function () {
       return $('.period-btn.active').data('period') || 'daily';
   }
 
+  // "Özel Bankacılık" sekmesi monthly period'da gösterilmez.
+  function updateBireyselOzelVisibility() {
+      var $ozel = $('.sub-tab[data-subtab="bireysel-ozel"]');
+      if (!$ozel.length) return;
+      if (getActivePeriod() === 'monthly') {
+          if ($ozel.hasClass('active')) {
+              $ozel.removeClass('active');
+              $ozel.closest('.sub-tab-bar')
+                  .find('.sub-tab[data-subtab="bireysel-tumu"]')
+                  .addClass('active');
+          }
+          $ozel.hide();
+      } else {
+          $ozel.show();
+      }
+  }
+
   function getActiveType() {
       return $('.segment[data-type].active').data('type') || 'hacim';
   }
@@ -152,11 +169,11 @@ $(document).ready(function () {
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td class="text-center">' + formatNumber(p.LastYearAmount) + '</td>';
-          html += '<td class="text-center">' + formatNumber(p.LastWeekAmount) + '</td>';
-          html += '<td class="text-center">' + formatNumber(p.PrevDayAmount) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.LastYearAmount, true, p.ProductName) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.LastWeekAmount, true, p.ProductName) + '</td>';
+          html += '<td class="text-center">' + formatNumber(p.PrevDayAmount, true, p.ProductName) + '</td>';
           html += '<td class="col-diff text-center">';
-          html += '<div>' + formatNumber(p.YesterdayAmount) + '</div>';
+          html += '<div>' + formatNumber(p.YesterdayAmount, true, p.ProductName) + '</div>';
           html += '<div class="diff-details">';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0, false) + '</span></span>';
@@ -167,7 +184,7 @@ $(document).ready(function () {
           html += '</div>';
           html += '</td>';
           if (showTop10) {
-              if (TOP10_PRODUCT_NAMES.indexOf(p.ProductName) !== -1) {
+              if (TOP10_PRODUCT_NAMES.includes(p.ProductName)) {
                   html += '<td class="col-top10"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
               } else {
                   html += '<td class="col-top10"></td>';
@@ -387,6 +404,7 @@ $(document).ready(function () {
           .show()
           .find('.sub-tab').removeClass('active')
           .first().addClass('active');
+      updateBireyselOzelVisibility();
       $('#searchInput').val('');
       loadActiveReport();
   });
@@ -435,6 +453,8 @@ $(document).ready(function () {
       // Adet seçiliyken tablo gösterme
       var activeType = $('.segment[data-type].active').data('type');
       if (activeType === 'adet') return;
+
+      updateBireyselOzelVisibility();
 
       if (period === 'monthly') {
           $('.date-text').text(trMonths[now.getMonth()] + ' ' + now.getFullYear());
@@ -643,7 +663,9 @@ $(document).ready(function () {
         productId,
         filterType,
         regionId: selectedRegion ? [selectedRegion.code] : [],
-        branchId: selectedBranch ? [selectedBranch.code] : []
+        branchId: selectedBranch ? [selectedBranch.code] : [],
+        tabId: getActiveTabId(),
+        subTabId: getActiveSubTabId()
       }),
       success: function (data) {
         var firstHtml = '';

@@ -11,10 +11,11 @@ function percentColor(ratio) {
   return 'ratio-blue';
 }
 
-function formatNumber(value, isPrice) {
-  if (isPrice === undefined) isPrice = true;
+function formatNumber(value, isPrice, productName) {
   var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
-  return isPrice ? num + ' ₺' : num;
+  if (!isPrice) return num;
+  var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
+  return num + ' ' + currency;
 }
 
 // ===== Table Legend Helpers =====
