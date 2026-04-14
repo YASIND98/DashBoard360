@@ -126,14 +126,15 @@ $(function () {
         this.style.setProperty('color', '#000000', 'important');
       });
       $tableClone.find('.diff-label').css('color', '#454b54');
+      $tableClone.find('.legend-note').css('color', '#000000');
+      $tableClone.find('.legend-value').css('color', '#000000');
 
       // Tüm alt kırılımları açık göster
       $tableClone.find('.sub-row').addClass('visible');
       $tableClone.find('.expandable').addClass('expanded');
 
-      // PDF'te download-pdf-btn (PDF İndir) gizle
-      $tableClone.find('.download-pdf-btn').hide();
-      $tableClone.find('.table-legend').hide();
+      
+      $tableClone.find('.legend-actions').hide();
 
       // Stripe'ları yeniden hesapla
       $tableClone.find('.data-table').each(function () {

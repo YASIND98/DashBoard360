@@ -56,7 +56,7 @@
     #0e1f52 75%,
     #091535 100%
   );
-  --bg-sidebar: linear-gradient(180deg, rgba(6, 11, 38, 0.94) 0%, rgba(26, 31, 55, 0) 100%);
+  --bg-sidebar: linear-gradient(90deg, rgba(6, 11, 38, 0.94) 0%, rgba(26, 31, 55, 0) 100%);
   --bg-scorecard: linear-gradient(180deg, rgba(6, 11, 40, 0.74) 0%, rgba(10, 14, 35, 0.71) 100%);
   --bg-scorecard-panel: linear-gradient(180deg, rgb(6, 11, 40) 0%, rgb(10, 14, 35) 100%);
   --bg-dropdown-panel: linear-gradient(180deg, #0152DE 0%, #012C78 100%);
@@ -140,7 +140,6 @@ body {
   width: 72px;
   background: var(--bg-sidebar);
   backdrop-filter: blur(120px);
-  -webkit-backdrop-filter: blur(120px);
   border-right: 1px solid var(--border-sidebar);
   display: flex;
   flex-direction: column;
@@ -322,13 +321,13 @@ body {
   cursor: default;
 }
 
-.filter-dropdown.disabled i {
+.filter-dropdown.disabled img {
   display: none;
 }
 
-.filter-dropdown i {
-  font-size: 9px;
-  color: var(--text-light);
+.filter-dropdown img {
+  width: 16px;
+  height: 16px;
 }
 
 .filter-badge {
@@ -462,9 +461,9 @@ body {
   border-bottom: 1px solid var(--border-input);
 }
 
-.dropdown-search i {
-  color: var(--white);
-  font-size: 13px;
+.dropdown-search img {
+  width: 16px;
+  height: 16px;
 }
 
 .dropdown-search-input {
@@ -535,9 +534,9 @@ body {
   margin-left: 10px;
 }
 
-.filter-search i {
-  color: var(--bg-period);
-  font-size: 16px;
+.filter-search img {
+  width: 16px;
+  height: 16px;
 }
 
 .filter-search input {
@@ -854,6 +853,10 @@ body {
   color: var(--text-blue-light) !important;
 }
 
+.branch-link:hover {
+  text-decoration: underline;
+}
+
 .text-center {
   text-align: center !important;
 }
@@ -1144,15 +1147,16 @@ body {
   font-family: inherit;
 }
 
-.scorecard-btn i {
-  font-size: 12px;
+.scorecard-btn img {
+  width: 20px;
+  height: 20px;
 }
 
 /* ===== Scorecard Panel ===== */
 .scorecard-panel {
   display: none;
   position: absolute;
-  top: 40px;
+  top: 0;
   right: 0;
   width: 308px;
   background: var(--bg-scorecard-panel);
@@ -1163,6 +1167,18 @@ body {
 
 .scorecard-panel.open {
   display: block;
+}
+
+/* Scorecard açıkken arka planda blurlu backdrop */
+body:has(.scorecard-panel.open)::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 34, 0.6);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 999;
+  pointer-events: none;
 }
 
 .scorecard-content {

@@ -56,8 +56,6 @@
       <span class="date-badge">Bugün</span>
     </div>
     <div class="page-icons">
-      <img src="~/images/notification.svg" alt="Bildirimler" />
-      <img src="~/images/help.svg" alt="Yardım" />
       <img src="@avatarUrl" alt="Avatar" class="avatar" />
     </div>
 </div>
@@ -68,11 +66,11 @@
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="indexRegionSelect">
                 <span class="filter-label" id="indexRegionLabel">Bölge</span>
-                <i class="fas fa-chevron-down"></i>
+                <img src="~/images/down.svg" alt="" />
             </div>
             <div class="dropdown-panel" id="indexRegionPanel">
                 <div class="dropdown-search">
-                    <i class="fas fa-search"></i>
+                    <img src="~/images/search.svg" alt="" />
                     <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexRegionSearch" />
                 </div>
                 <div class="dropdown-list" id="indexRegionList"></div>
@@ -82,11 +80,11 @@
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="indexBranchSelect">
                 <span class="filter-label" id="indexBranchLabel">Şube</span>
-                <i class="fas fa-chevron-down"></i>
+                <img src="~/images/down.svg" alt="" />
             </div>
             <div class="dropdown-panel" id="indexBranchPanel">
                 <div class="dropdown-search">
-                    <i class="fas fa-search"></i>
+                    <img src="~/images/search.svg" alt="" />
                     <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexBranchSearch" />
                 </div>
                 <div class="dropdown-list" id="indexBranchList"></div>
@@ -94,7 +92,7 @@
         </div>
 
         <div class="filter-search">
-            <i class="fas fa-search"></i>
+            <img src="~/images/search.svg" alt="" />
             <input type="text" placeholder="Ara" id="searchInput" />
         </div>
     </div>
@@ -182,7 +180,7 @@
     </table>
   </div>
   <div class="table-legend">
-    <span class="legend-note">Tablodaki değerler x1000 olarak verilmektedir.</span>
+    <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
     <div class="legend-colors">
       <span class="legend-value">-</span>
       <span class="legend-bar ratio-red-bg"></span>
@@ -237,7 +235,7 @@
     </table>
   </div>
   <div class="table-legend">
-    <span class="legend-note">Tablodaki değerler x1000 olarak verilmektedir.</span>
+    <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
     <div class="legend-colors">
       <span class="legend-value">-</span>
       <span class="legend-bar ratio-red-bg"></span>
@@ -306,7 +304,7 @@
       </table>
     </div>
     <div class="table-legend">
-      <span class="legend-note">Tablodaki değerler x1000 olarak verilmektedir.</span>
+      <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
       <div class="legend-colors">
         <span class="legend-value">0</span>
         <span class="legend-bar ratio-red-bg"></span>
@@ -359,8 +357,8 @@
 </div>
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="~/assets/lib/html2canvas/html2canvas.min.js"></script>
+    <script src="~/assets/lib/jspdf/jspdf.umd.min.js"></script>
     <script src="~/js/constants.js"></script>
     <script src="~/js/index.js"></script>
     <script src="~/js/download-pdf.js"></script>

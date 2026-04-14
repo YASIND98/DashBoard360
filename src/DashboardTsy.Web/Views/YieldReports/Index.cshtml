@@ -28,8 +28,6 @@
         <span class="date-badge">Bugün</span>
     </div>
     <div class="page-icons">
-      <img src="~/images/notification.svg" alt="Bildirimler" />
-      <img src="~/images/help.svg" alt="Yardım" />
       <img src="@avatarUrl" alt="Avatar" class="avatar" />
     </div>
 </div>
@@ -39,13 +37,13 @@
     <div class="breadcrumb" id="yieldBreadcrumb"></div>
     <div class="scorecard">
         <button class="scorecard-btn" id="scorecardBtn">
-            <i class="fas fa-chevron-left"></i>
+            <img src="~/images/down.svg" alt="" style="transform: rotate(90deg);" />
             <span id="scorecardBtnLabel">Bölge Skor Kartı & NPS</span>
         </button>
         <div class="scorecard-panel" id="scorecardPanel">
             <div class="scorecard-header">
                 <span id="scorecardTitle">Bölge Skor Kartı & NPS</span>
-                <button class="scorecard-close" id="scorecardClose"><i class="fas fa-times-circle"></i></button>
+                <button class="scorecard-close" id="scorecardClose"><img src="~/images/close-circle.svg" alt="" /></button>
             </div>
             <div class="scorecard-content" id="scorecardContent"></div>
         </div>
@@ -58,11 +56,11 @@
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="yieldBolgeSelect">
                 <span class="filter-label" id="yieldBolgeLabel">Bölge</span>
-                <i class="fas fa-chevron-down"></i>
+                <img src="~/images/down.svg" alt="" />
             </div>
             <div class="dropdown-panel" id="yieldBolgePanel">
                 <div class="dropdown-search">
-                    <i class="fas fa-search"></i>
+                    <img src="~/images/search.svg" alt="" />
                     <input type="text" placeholder="Ara" class="dropdown-search-input" id="yieldBolgeSearch" />
                 </div>
                 <div class="dropdown-list" id="yieldBolgeList"></div>
@@ -71,18 +69,18 @@
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="yieldSubeSelect">
                 <span class="filter-label" id="yieldSubeLabel">Şube</span>
-                <i class="fas fa-chevron-down"></i>
+                <img src="~/images/down.svg" alt="" />
             </div>
             <div class="dropdown-panel" id="yieldSubePanel">
                 <div class="dropdown-search">
-                    <i class="fas fa-search"></i>
+                    <img src="~/images/search.svg" alt="" />
                     <input type="text" placeholder="Ara" class="dropdown-search-input" id="yieldSubeSearch" />
                 </div>
                 <div class="dropdown-list" id="yieldSubeList"></div>
             </div>
         </div>
       <div class="filter-search">
-          <i class="fas fa-search"></i>
+          <img src="~/images/search.svg" alt="" />
           <input type="text" placeholder="Ara" id="yieldSearchInput" />
       </div>
     </div>
@@ -137,8 +135,8 @@
 
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+    <script src="~/assets/lib/html2canvas/html2canvas.min.js"></script>
+    <script src="~/assets/lib/jspdf/jspdf.umd.min.js"></script>
     <script src="~/js/productivity.js"></script>
     <script src="~/js/download-pdf.js"></script>
     <script>
@@ -423,7 +421,7 @@
             // Update legend based on active tab
             var isBranch = selectedBranch !== null;
             var diffLabel = isBranch ? 'Şube ile Bölge ve Bankanın Farkı' : 'Bölge ile Bankanın Farkı';
-            var note = 'Tablodaki değerler x1000 olarak verilmektedir.';
+            var note = 'Tablodaki değerler /1000 olarak verilmektedir.';
 
             if (toggleId === 1) {
                 renderTableLegend('#tableLegend', { note: note, ratio: true });
