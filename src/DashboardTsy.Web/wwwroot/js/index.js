@@ -164,7 +164,7 @@ $(document).ready(function () {
       return html;
   }
 
-  function buildDailyRows(products, depth, isSub, showTop10, parentIndex) {
+  function buildDailyRows(products, depth, isSub, parentIndex) {
       var html = '';
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
@@ -183,17 +183,15 @@ $(document).ready(function () {
           html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0, false) + '</span></span>';
           html += '</div>';
           html += '</td>';
-          if (showTop10) {
-              if (TOP10_PRODUCT_NAMES.includes(p.ProductName)) {
-                  html += '<td class="col-top10"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
-              } else {
-                  html += '<td class="col-top10"></td>';
-              }
+          if (TOP10_PRODUCT_NAMES.includes(p.ProductName)) {
+              html += '<td class="col-top10"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
+          } else {
+              html += '<td class="col-top10"></td>';
           }
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
-              html += buildDailyRows(p.SubProducts, depth + 1, true, showTop10, indexLabel);
+              html += buildDailyRows(p.SubProducts, depth + 1, true, indexLabel);
           }
       });
       return html;
@@ -262,7 +260,7 @@ $(document).ready(function () {
           contentType: 'application/json',
           data: JSON.stringify(buildRequest()),
           success: function (data) {
-              $('#dailyTableBody').html(buildDailyRows(data.Products, 0, false, true));
+              $('#dailyTableBody').html(buildDailyRows(data.Products, 0, false));
 
               $('#dailyTableBody [data-daily-header]').each(function () {
                   var key = $(this).data('daily-header');
@@ -422,14 +420,21 @@ $(document).ready(function () {
       $(this).addClass('active');
 
       var type = $(this).data('type');
+      var now = new Date();
+      var trMonths = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
       updateBireyselOzelVisibility();
       if (type === 'adet') {
+          $('.date-text').text(trMonths[now.getMonth()] + ' ' + now.getFullYear());
+          $('.date-badge').text('Bu Ay');
           $('#dailyTable').hide();
           $('#monthlyTable').hide();
           $('.period-toggle').hide();
           $('#quantityTable').show();
           loadQuantityReport();
       } else {
+          var dd = String(now.getDate()).padStart(2, '0');
+          $('.date-text').text(dd + ' ' + trMonths[now.getMonth()] + ' ' + now.getFullYear());
+          $('.date-badge').text('Bugün');
           $('#quantityTable').hide();
           $('.period-toggle').show();
           $('.period-btn').removeClass('active');

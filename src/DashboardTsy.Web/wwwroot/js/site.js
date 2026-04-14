@@ -178,12 +178,16 @@ function normalizeTurkish(str) {
 
 function reStripeTable($tbody) {
     var stripeIndex = 0;
+    var $lastVisible = null;
+    $tbody.find('tr.table-row').removeClass('last-visible-row');
     $tbody.find('tr.table-row:visible').each(function () {
         var $tr = $(this);
         $tr.removeClass('stripe-odd stripe-even');
         stripeIndex++;
         $tr.addClass(stripeIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
+        $lastVisible = $tr;
     });
+    if ($lastVisible) $lastVisible.addClass('last-visible-row');
 }
 
 function handleTableSearch(inputSelector) {
@@ -271,10 +275,10 @@ $(document).ready(function () {
   // Search inside dropdown
   $(document).on('keyup', '.dropdown-search-input', function (e) {
       e.stopPropagation();
-      var query = $(this).val().toLowerCase();
+      var query = normalizeTurkish($(this).val());
       var $items = $(this).closest('.dropdown-panel').find('.dropdown-list .dropdown-item:not(.tumu-item)');
       $items.each(function () {
-          var text = $(this).text().toLowerCase();
+          var text = normalizeTurkish($(this).text());
           $(this).toggle(text.indexOf(query) > -1);
       });
   });

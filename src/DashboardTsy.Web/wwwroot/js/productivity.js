@@ -188,6 +188,15 @@ $(document).on('click', '#subTabBarList .sub-tab', function () {
     }
 });
 
+// Branch name click in table -> select matching branch filter
+$(document).on('click', '.branch-link', function (e) {
+    e.stopPropagation();
+    var code = $(this).attr('data-branch-code');
+    if (!code) return;
+    var $item = $('#yieldSubeList .dropdown-item[data-code="' + code + '"]').first();
+    if ($item.length) $item.trigger('click');
+});
+
 // ===== Sort Click Handler =====
 $(document).on('click', '#dynamicTable thead th, #dynamicTable2 thead th', function () {
     var $icon = $(this).find('.sort-icon[data-sort-id]');
@@ -249,7 +258,19 @@ function loadGeneralRegionReport(regionCode) {
                     }
                 }
 
-                var indent = row._depth > 0 ? '<span style="padding-left:' + (row._depth * 16) + 'px">' + row.BranchName + '</span>' : row.BranchName;
+                var matchBranch = null;
+                if (typeof _branchFilters !== 'undefined' && _branchFilters) {
+                    for (var bi = 0; bi < _branchFilters.length; bi++) {
+                        if (_branchFilters[bi].Name === row.BranchName) {
+                            matchBranch = _branchFilters[bi];
+                            break;
+                        }
+                    }
+                }
+                var nameHtml = matchBranch
+                    ? '<span class="branch-link" data-branch-code="' + matchBranch.Code + '">' + row.BranchName + '</span>'
+                    : row.BranchName;
+                var indent = row._depth > 0 ? '<span style="padding-left:' + (row._depth * 16) + 'px">' + nameHtml + '</span>' : nameHtml;
                 html += '<td class="col-text">' + indent + '</td>';
                 html += '<td class="' + percentColor(row.FirstMonthRealizationRate) + '">' + formatPercent(row.FirstMonthRealizationRate) + '</td>';
                 html += '<td class="' + percentColor(row.SecondMonthRealizationRate) + '">' + formatPercent(row.SecondMonthRealizationRate) + '</td>';
@@ -442,15 +463,15 @@ function renderVolumeRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td class="has-diff">' + item.RealizationRegionValue + formatDiff(item.RealizationRegionDiff) + '</td>';
-        html += '<td class="has-diff">' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageDiff) + '</td>';
-        html += '<td>' + item.TargetValue + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionValue) +'</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td>' + item.HgRate + '</td>';
-        html += '<td class="has-diff">' + item.NetGrowthRegionValue + formatDiff(item.NetGrowthRegionDiff) + '</td>';
-        html += '<td class="has-diff">' + item.NetGrowthBankAverageValue + formatDiff(item.NetGrowthBankAverageDiff) + '</td>';
-        html += '<td class="has-diff">' + item.YtdRegionValue + formatDiff(item.YtdRegionDiff) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
+        html += '<td class="has-diff">' + item.YtdRegionValue + '</td>';
         html += '<td class="has-diff">' + item.YtdBankAverageValue + formatDiff(item.YtdBankAverageDiff) + '</td>';
-        html += '<td class="has-diff">' + item.QtdRegionValue + formatDiff(item.QtdRegionDiff) + '</td>';
+        html += '<td class="has-diff">' + item.QtdRegionValue + '</td>';
         html += '<td class="has-diff">' + item.QtdBankAverageValue + formatDiff(item.QtdBankAverageDiff) + '</td>';
         html += '</tr>';
     });
@@ -1395,11 +1416,12 @@ function reapplySortVisual($table) {
     }
 }
 
-function formatDiff(val) {
+function formatDiff(val, useFormatNumber) {
     if (val == null) return '<div class="diff-value-for-productivity">&nbsp;</div>';
     var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
     var prefix = val > 0 ? '+' : '';
-    return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + val + '</div>';
+    var display = useFormatNumber ? formatNumber(val) : val;
+    return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + display + '</div>';
 }
 
 // ===== Yield Search =====
