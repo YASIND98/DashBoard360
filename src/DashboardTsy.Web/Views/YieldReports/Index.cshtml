@@ -28,6 +28,10 @@
         <span class="date-badge">Bugün</span>
     </div>
     <div class="page-icons">
+      @if (!string.IsNullOrEmpty(nameSurname))
+      {
+        <span class="user-name">@nameSurname</span>
+      }
       <img src="@avatarUrl" alt="Avatar" class="avatar" />
     </div>
 </div>
@@ -38,11 +42,11 @@
     <div class="scorecard">
         <button class="scorecard-btn" id="scorecardBtn">
             <img src="~/images/down.svg" alt="" style="transform: rotate(90deg);" />
-            <span id="scorecardBtnLabel">Bölge Skor Kartı & NPS</span>
+            <span id="scorecardBtnLabel">Şube Skor Kartı & NPS</span>
         </button>
         <div class="scorecard-panel" id="scorecardPanel">
             <div class="scorecard-header">
-                <span id="scorecardTitle">Bölge Skor Kartı & NPS</span>
+                <span id="scorecardTitle">Şube Skor Kartı & NPS</span>
                 <button class="scorecard-close" id="scorecardClose"><img src="~/images/close-circle.svg" alt="" /></button>
             </div>
             <div class="scorecard-content" id="scorecardContent"></div>
@@ -315,23 +319,18 @@
         // ===== Scorecard =====
         function updateScorecard() {
             var isBranch = selectedBranch !== null;
-            var filterType = isBranch ? 2 : 1;
-            var label = isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
-            $('#scorecardBtnLabel').text(label);
-            $('#scorecardTitle').text(label);
 
-            if (!selectedRegion && !selectedBranch) {
+            if (!isBranch) {
+                $('.scorecard').hide();
+                $('#scorecardPanel').removeClass('open');
                 $('#scorecardContent').html('');
                 return;
             }
+            $('.scorecard').show();
 
-            var url = isBranch
-                ? '/ProductivityReport/GetProductivityBranchScoreCardReport'
-                : '/ProductivityReport/GetProductivityRegionScoreCardReport';
-
-            var payload = isBranch
-                ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: _reportDate }
-                : { sessionId: '1', regionCode: selectedRegion.code, reportDate: _reportDate };
+            var filterType = 2;
+            var url = '/ProductivityReport/GetProductivityBranchScoreCardReport';
+            var payload = { sessionId: '1', branchCode: selectedBranch.code, reportDate: _reportDate };
 
             loadScoreCardHeaders(filterType, function (headers) {
                 $.ajax({

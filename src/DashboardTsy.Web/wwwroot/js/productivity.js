@@ -830,7 +830,7 @@ function renderCountCardPosRatioRegionHeaders(h) {
 
     var row = '<tr>';
     row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
-    row += '<th>' + h.RatioNameTitle + '</th>';
+    row += '<th class="col-text">' + h.RatioNameTitle + '</th>';
     row += '<th>' + h.PreviousQuarterRegionTitle + '</th>';
     row += '<th>' + h.CurrentRegionTitle + '</th>';
     row += '<th>' + h.CurrentBankAverageTitle + '</th>';
@@ -898,7 +898,7 @@ function renderCountCardPosRatioBranchHeaders(h) {
 
     var row = '<tr>';
     row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
-    row += '<th>' + h.RatioNameTitle + '</th>';
+    row += '<th class="col-text">' + h.RatioNameTitle + '</th>';
     row += '<th>' + h.PreviousQuarterBranchTitle + '</th>';
     row += '<th>' + h.CurrentBranchTitle + '</th>';
     row += '<th>' + h.CurrentRegionAverageTitle + '</th>';
@@ -1031,7 +1031,7 @@ function renderProfitRatioRegionHeaders(hasExpandable) {
     var row = '<tr>';
     row += '<th class="col-index">#</th>';
     row += expandTh;
-    row += '<th>Oran Adı</th>';
+    row += '<th class="col-text">Oran Adı</th>';
     row += '<th>Hedef</th>';
     row += '<th>Bölge</th>';
     row += '<th>Banka</th>';

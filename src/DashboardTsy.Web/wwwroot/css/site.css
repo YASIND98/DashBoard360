@@ -7,38 +7,6 @@
   box-sizing: border-box;
 }
 
-/* ===== Global Scrollbar ===== */
-* {
-  scrollbar-width: none;
-}
-
-*:hover {
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-  display: none;
-}
-
-*:hover::-webkit-scrollbar {
-  display: block;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
 
 :root {
   /* Background */
@@ -270,7 +238,11 @@ body {
 .page-icons {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
+}
+
+.user-name {
+  font-size: 14px;
 }
 
 .avatar {
@@ -298,8 +270,8 @@ body {
 .filter-dropdown-wrapper {
   position: relative;
   width: 100%;
-  max-width: fit-content;
-  min-width: 176px;
+  max-width: 180px;
+  min-width: 170px;
 }
 
 .filter-dropdown {
@@ -315,6 +287,12 @@ body {
   font-weight: 500;
   cursor: pointer;
   user-select: none;
+}
+
+.filter-dropdown .filter-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .filter-dropdown.disabled {
@@ -731,7 +709,7 @@ body {
   padding: 12px 16px;
   font-size: 12px;
   font-weight: 500;
-  text-align: left;
+  text-align: center;
   color: var(--text-muted);
   cursor: pointer;
   user-select: none;
@@ -817,7 +795,7 @@ body {
   padding: 12px 16px;
   font-size: 16px;
   font-weight: 500;
-  text-align: left;
+  text-align: center;
   color: var(--text-body);
   border-bottom: 1px solid var(--border-row);
   white-space: nowrap;
@@ -845,22 +823,17 @@ body {
 
 .col-expand {
   width: 36px;
-  text-align: center !important;
   padding: 12px 0 12px 16px !important;
 }
 
 .col-text {
   color: var(--text-blue-light) !important;
+  text-align: left !important;
 }
 
 .branch-link:hover {
   text-decoration: underline;
 }
-
-.text-center {
-  text-align: center !important;
-}
-
 .valign-top {
   vertical-align: top;
 }
@@ -1620,10 +1593,6 @@ body:has(.scorecard-panel.open)::before {
     font-size: 18px;
   }
 
-  .page-icons {
-    gap: 16px;
-  }
-
   .avatar {
     width: 28px;
     height: 28px;
@@ -1637,6 +1606,10 @@ body:has(.scorecard-panel.open)::before {
   .download-pdf-btn span {
     display: none;
   }
+
+  .filter-dropdown-wrapper {
+    min-width: 150px;
+  }
 }
 
 @media (max-width: 700px) {
@@ -1647,5 +1620,9 @@ body:has(.scorecard-panel.open)::before {
 
   .legend-note {
     max-width: 200px;
+  }
+
+  .filter-dropdown-wrapper {
+    min-width: 130px;
   }
 }
