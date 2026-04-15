@@ -28,6 +28,10 @@
         <span class="date-badge">Bugün</span>
     </div>
     <div class="page-icons">
+      @if (!string.IsNullOrEmpty(nameSurname))
+      {
+        <span class="user-name">@nameSurname</span>
+      }
       <img src="@avatarUrl" alt="Avatar" class="avatar" />
     </div>
 </div>

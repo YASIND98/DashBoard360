@@ -169,10 +169,10 @@ $(document).ready(function () {
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td class="text-center">' + formatNumber(p.LastYearAmount, true, p.ProductName) + '</td>';
-          html += '<td class="text-center">' + formatNumber(p.LastWeekAmount, true, p.ProductName) + '</td>';
-          html += '<td class="text-center">' + formatNumber(p.PrevDayAmount, true, p.ProductName) + '</td>';
-          html += '<td class="col-diff text-center">';
+          html += '<td>' + formatNumber(p.LastYearAmount, true, p.ProductName) + '</td>';
+          html += '<td>' + formatNumber(p.LastWeekAmount, true, p.ProductName) + '</td>';
+          html += '<td>' + formatNumber(p.PrevDayAmount, true, p.ProductName) + '</td>';
+          html += '<td class="col-diff">';
           html += '<div>' + formatNumber(p.YesterdayAmount, true, p.ProductName) + '</div>';
           html += '<div class="diff-details">';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
@@ -202,9 +202,9 @@ $(document).ready(function () {
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td class="text-center">' + formatNumber(p.LastYearAmount, false) + '</td>';
-          html += '<td class="text-center">' + formatNumber(p.LastTwoMonthEarlierAmount, false) + '</td>';
-          html += '<td class="col-diff text-center">';
+          html += '<td>' + formatNumber(p.LastYearAmount, false) + '</td>';
+          html += '<td>' + formatNumber(p.LastTwoMonthEarlierAmount, false) + '</td>';
+          html += '<td class="col-diff">';
           html += '<div>' + formatNumber(p.LastMonthAmount, false) + '</div>';
           html += '<div class="diff-details">';
           html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastYearTitle"></span>';
@@ -227,12 +227,12 @@ $(document).ready(function () {
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td class="text-center col-selected col-selected-first">' + formatNumber(p.MonthActualAmount) + '</td>';
-          html += '<td class="text-center col-selected col-selected-mid">' + formatNumber(p.MonthTargetAmount) + '</td>';
-          html += '<td class="text-center col-selected col-selected-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
-          html += '<td class="text-center">' + formatNumber(p.YearActualAmount) + '</td>';
-          html += '<td class="text-center">' + formatNumber(p.YearTargetAmount) + '</td>';
-          html += '<td class="text-center ' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';
+          html += '<td class="col-selected col-selected-first">' + formatNumber(p.MonthActualAmount) + '</td>';
+          html += '<td class="col-selected col-selected-mid">' + formatNumber(p.MonthTargetAmount) + '</td>';
+          html += '<td class="col-selected col-selected-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
+          html += '<td>' + formatNumber(p.YearActualAmount) + '</td>';
+          html += '<td>' + formatNumber(p.YearTargetAmount) + '</td>';
+          html += '<td class="' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {

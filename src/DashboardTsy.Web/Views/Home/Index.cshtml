@@ -56,6 +56,10 @@
       <span class="date-badge">Bugün</span>
     </div>
     <div class="page-icons">
+      @if (!string.IsNullOrEmpty(nameSurname))
+      {
+        <span class="user-name">@nameSurname</span>
+      }
       <img src="@avatarUrl" alt="Avatar" class="avatar" />
     </div>
 </div>
@@ -153,22 +157,22 @@
                 <th class="col-text valign-top">
                   <span data-daily-header="ProductNameTitle"></span>
                 </th>
-                <th class="text-center">
+                <th>
                     <span data-daily-header="LastYearTitle"></span>
                     <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="LastYearDate"></small>
                 </th>
-                <th class="text-center">
+                <th>
                     <span data-daily-header="LastWeekTitle"></span>
                     <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="LastWeekDate"></small>
                 </th>
-                <th class="text-center">
+                <th>
                     <span data-daily-header="PrevDayTitle"></span>
                     <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="PrevDayDate"></small>
-                </th class="text-center">
-                <th class="text-center">
+                </th>
+                <th>
                     <span data-daily-header="YesterdayTitle"></span>
                     <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-daily-header="YesterdayDate"></small>
@@ -213,17 +217,17 @@
                 <th class="col-text valign-top">
                   <span data-quantity-header="ProductNameTitle"></span>
                 </th>
-                <th class="text-center">
+                <th>
                     <span data-quantity-header="LastYearTitle"></span>
                     <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-quantity-header="LastYearDate"></small>
                 </th>
-                <th class="text-center">
+                <th>
                     <span data-quantity-header="LastTwoMonthEarlierTitle"></span>
                     <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-quantity-header="LastTwoMonthEarlierDate"></small>
                 </th>
-                <th class="text-center">
+                <th>
                     <span data-quantity-header="LastMonthTitle"></span>
                     <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
                     <small data-quantity-header="LastMonthDate"></small>
@@ -291,12 +295,12 @@
                   <th colspan="3" class="col-group-header" data-monthly-header="YearGroupTitle"></th>
               </tr>
               <tr>
-                  <th class="text-center col-selected col-selected-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                  <th class="text-center col-selected col-selected-mid"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                  <th class="text-center col-selected col-selected-last" data-monthly-header="MonthHGTitle"></th>
-                  <th class="text-center"><span data-monthly-header="YearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                  <th class="text-center"><span data-monthly-header="YearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
-                  <th class="text-center" data-monthly-header="YearHGTitle"></th>
+                  <th class="col-selected col-selected-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="col-selected col-selected-mid"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="col-selected col-selected-last" data-monthly-header="MonthHGTitle"></th>
+                  <th><span data-monthly-header="YearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th><span data-monthly-header="YearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th data-monthly-header="YearHGTitle"></th>
               </tr>
           </thead>
           <tbody id="monthlyTableBody">
