@@ -527,14 +527,14 @@ function renderVolumeBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.RealizationBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.RealizationRegionAverageValue + formatDiff(item.RealizationRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
-        html += '<td>' + item.TargetValue + '</td>';
+        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td>' + item.HgRate + '</td>';
-        html += '<td>' + item.NetGrowthBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.NetGrowthRegionAverageValue + formatDiff(item.NetGrowthRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.NetGrowthBankAverageValue + formatDiff(item.NetGrowthBankAverageValueDiff) + '</td>';
+        html += '<td>' + formatNumber(item.NetGrowthBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionAverageValue) + formatDiff(item.NetGrowthRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageValueDiff, true) + '</td>';
         html += '<td>' + item.YtdBranchValue + '</td>';
         html += '<td class="has-diff">' + item.YtdRegionValue + formatDiff(item.YtdRegionValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.YtdBankValue + formatDiff(item.YtdBankValueDiff) + '</td>';
@@ -595,12 +595,12 @@ function renderCountCustomerRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td class="has-diff">' + item.RealizationRegion + formatDiff(item.RealizationRegionDiff) + '</td>';
-        html += '<td class="has-diff">' + item.RealizationBankAverage + formatDiff(item.RealizationBankAverageDiff) + '</td>';
-        html += '<td class="has-diff">' + item.YtdChangeRegion + formatDiff(item.YtdChangeRegionDiff) + '</td>';
-        html += '<td class="has-diff">' + item.YtdChangeBankAverage + formatDiff(item.YtdChangeBankAverageDiff) + '</td>';
-        html += '<td class="has-diff">' + item.QtdChangeRegion + formatDiff(item.QtdChangeRegionDiff) + '</td>';
-        html += '<td class="has-diff">' + item.QtdChangeBankAverage + formatDiff(item.QtdChangeBankAverageDiff) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegion) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverage) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdChangeRegion) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdChangeBankAverage) + formatDiff(item.YtdChangeBankAverageDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdChangeRegion) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdChangeBankAverage) + formatDiff(item.QtdChangeBankAverageDiff, true) + '</td>';
         html += '</tr>';
     });
 
@@ -655,15 +655,15 @@ function renderCountCustomerBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.RealizationBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.RealizationRegionAverageValue + formatDiff(item.RealizationRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
-        html += '<td>' + item.YtdNominalChangeBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.YtdNominalChangeRegionAverageValue + formatDiff(item.YtdNominalChangeRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.YtdNominalChangeBankAverageValue + formatDiff(item.YtdNominalChangeBankAverageValueDiff) + '</td>';
-        html += '<td>' + item.QtdNominalChangeBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.QtdNominalChangeRegionAverageValue + formatDiff(item.QtdNominalChangeRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.QtdNominalChangeBankAverageValue + formatDiff(item.QtdNominalChangeBankAverageValueDiff) + '</td>';
+        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.YtdNominalChangeBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeRegionAverageValue) + formatDiff(item.YtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeBankAverageValue) + formatDiff(item.YtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.QtdNominalChangeBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
         html += '</tr>';
     });
 
@@ -718,9 +718,9 @@ function renderCountCardPosBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.CurrentPeriodBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.CurrentPeriodRegionAverageValue + formatDiff(item.CurrentPeriodRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.CurrentPeriodBankAverageValue + formatDiff(item.CurrentPeriodBankAverageValueDiff) + '</td>';
+        html += '<td>' + formatNumber(item.CurrentPeriodBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.CurrentPeriodRegionAverageValue) + formatDiff(item.CurrentPeriodRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.CurrentPeriodBankAverageValue) + formatDiff(item.CurrentPeriodBankAverageValueDiff, true) + '</td>';
         html += '<td>' + item.ThreeMonthHgBranchValue + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgRegionAverageValue + formatDiff(item.ThreeMonthHgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgBankAverageValue + formatDiff(item.ThreeMonthHgBankAverageValueDiff) + '</td>';
@@ -778,8 +778,8 @@ function renderCountCardPosRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.CurrentMonthRegionValue + '</td>';
-        html += '<td class="has-diff">' + item.CurrentMonthBankAverage + formatDiff(item.CurrentMonthBankAverageDiff) + '</td>';
+        html += '<td>' + formatNumber(item.CurrentMonthRegionValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.CurrentMonthBankAverage) + formatDiff(item.CurrentMonthBankAverageDiff, true) + '</td>';
         html += '<td>' + item.ThreeMonthHgRegion + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgBankAverage + formatDiff(item.ThreeMonthHgBankAverageDiff) + '</td>';
         html += '</tr>';
@@ -980,16 +980,16 @@ function renderProfitTotalRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.TargetValue + '</td>';
-        html += '<td class="has-diff">' + item.RealizationRegionValue + formatDiff(item.RealizationRegionValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
+        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionValue) + formatDiff(item.RealizationRegionValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + item.HgRegionValue + formatDiff(item.HgRegionValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
-        html += '<td>' + item.RetailValue + '</td>';
-        html += '<td>' + item.KobiValue + '</td>';
-        html += '<td>' + item.AgricultureValue + '</td>';
-        html += '<td class="has-diff">' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
-        html += '<td>' + item.PartnerValue + '</td>';
+        html += '<td>' + formatNumber(item.RetailValue) + '</td>';
+        html += '<td>' + formatNumber(item.KobiValue) + '</td>';
+        html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
         html += '</tr>';
     });
 
@@ -1192,18 +1192,18 @@ function renderProfitTotalBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.TargetValue + '</td>';
-        html += '<td>' + item.RealizationBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.RealizationRegionAverageValue + formatDiff(item.RealizationRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.RealizationBankAverageValue + formatDiff(item.RealizationBankAverageValueDiff) + '</td>';
+        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
+        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBranchValue) + '">' + formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
-        html += '<td>' + item.RetailValue + '</td>';
-        html += '<td>' + item.KobiValue + '</td>';
-        html += '<td>' + item.AgricultureValue + '</td>';
-        html += '<td class="has-diff">' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
-        html += '<td>' + item.PartnerValue + '</td>';
+        html += '<td>' + formatNumber(item.RetailValue) + '</td>';
+        html += '<td>' + formatNumber(item.KobiValue) + '</td>';
+        html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
         html += '</tr>';
     });
 
