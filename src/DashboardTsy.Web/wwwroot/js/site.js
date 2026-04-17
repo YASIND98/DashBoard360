@@ -207,14 +207,28 @@ function handleTableSearch(inputSelector) {
         }
 
         var normalizedQuery = normalizeTurkish(query);
-        $table.find('tr.sub-row').hide();
+        $table.find('tr.table-row').hide();
         $table.find('tr.table-row').not('.sub-row').each(function () {
-            var $row = $(this);
-            var productName = normalizeTurkish($row.find('.col-text').text().trim());
-            var match = productName.indexOf(normalizedQuery) !== -1;
-            $row.toggle(match);
-            if (match) {
-                $row.nextUntil('tr.table-row:not(.sub-row)').filter('.sub-row').css('display', '');
+            var $mainRow = $(this);
+            var mainName = normalizeTurkish($mainRow.find('.col-text').text().trim());
+            var mainMatch = mainName.indexOf(normalizedQuery) !== -1;
+            var $subRows = $mainRow.nextUntil('tr.table-row:not(.sub-row)').filter('.sub-row');
+
+            if (mainMatch) {
+                $mainRow.show();
+                $subRows.show();
+            } else {
+                var anySubMatch = false;
+                $subRows.each(function () {
+                    var subName = normalizeTurkish($(this).find('.col-text').text().trim());
+                    if (subName.indexOf(normalizedQuery) !== -1) {
+                        $(this).show();
+                        anySubMatch = true;
+                    }
+                });
+                if (anySubMatch) {
+                    $mainRow.show();
+                }
             }
         });
 

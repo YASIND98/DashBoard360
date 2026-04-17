@@ -667,7 +667,9 @@ $(document).ready(function () {
         productId,
         filterType,
         regionId: selectedRegion ? [selectedRegion.code] : [],
-        branchId: selectedBranch ? [selectedBranch.code] : []
+        branchId: selectedBranch ? [selectedBranch.code] : [],
+        subTabId: getActiveSubTabId(),
+        tabId: getActiveTabId()
       }),
       success: function (data) {
         var firstHtml = '';
