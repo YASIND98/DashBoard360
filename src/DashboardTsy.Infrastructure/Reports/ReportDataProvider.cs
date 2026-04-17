@@ -1036,7 +1036,7 @@ public class ReportDataProvider : IReportDataProvider
         request ??= new GetReportSidebarItemsRequest();
 
         if (MockEnabled)
-            return MockProductivityReportData.GetReportSidebarItems();
+            return MockProductivityReportData.GetReportSidebarItems(request);
 
         var parameters = new Dictionary<string, object?>
         {

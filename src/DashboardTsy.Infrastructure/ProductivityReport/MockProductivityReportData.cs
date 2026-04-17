@@ -1222,25 +1222,28 @@ public static class MockProductivityReportData
         };
     }
 
-    public static IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems() => new List<GetReportSidebarItem>
+    public static IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems(GetReportSidebarItemsRequest request)
     {
-        new()
+        return new List<GetReportSidebarItem>
         {
-            Code = "ProductivityReport",
-            Name = "Verim Raporları",
-            Url = "/ProductivityReport",
-            IsVisible = true,
-            OrderNo = 1
-        },
-        new()
-        {
-            Code = "TargetReport",
-            Name = "Hedef Raporları",
-            Url = "/TargetReport",
-            IsVisible = true,
-            OrderNo = 2
-        }
-    };
+            new()
+            {
+                Code = "ProductivityReport",
+                Name = "Verim Raporları",
+                Url = "/ProductivityReport",
+                IsVisible = true,
+                OrderNo = 1
+            },
+            new()
+            {
+                Code = "TargetReport",
+                Name = "Hedef Raporları",
+                Url = "/TargetReport",
+                IsVisible = true,
+                OrderNo = 2
+            }
+        };
+    }
 
     #region Helpers
 
