@@ -170,7 +170,11 @@ public class TargetReportController : ControllerBase
         var req = new GetProductTop10DailyAndWeeklyDifferencesRequest
         {
             ProductId = request.ProductId,
-            FilterType = request.FilterType
+            FilterType = request.FilterType,
+            RegionId = request.RegionId,
+            BranchId = request.BranchId,
+            TabId = request.TabId,
+            SubTabId = request.SubTabId
         };
 
         var result = await _apiClient.GetProductTop10DailyAndWeeklyDifferencesAsync(req, cancellationToken).ConfigureAwait(false);
