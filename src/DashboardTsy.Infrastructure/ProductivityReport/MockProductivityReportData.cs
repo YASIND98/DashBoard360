@@ -1222,6 +1222,26 @@ public static class MockProductivityReportData
         };
     }
 
+    public static IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems() => new List<GetReportSidebarItem>
+    {
+        new()
+        {
+            Code = "ProductivityReport",
+            Name = "Verim Raporları",
+            Url = "/ProductivityReport",
+            IsVisible = true,
+            OrderNo = 1
+        },
+        new()
+        {
+            Code = "TargetReport",
+            Name = "Hedef Raporları",
+            Url = "/TargetReport",
+            IsVisible = true,
+            OrderNo = 2
+        }
+    };
+
     #region Helpers
 
     private static string GetCustomerSegmentName(int subTabId) => subTabId switch

@@ -218,4 +218,13 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         return JsonSerializer.Deserialize<GetProductivityVolumeBranchReportResponse>(json, _jsonOptions);
     }
+
+    public async Task<IReadOnlyList<GetReportSidebarItem>> GetReportSidebarItemsAsync(GetReportSidebarItemsRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetReportSidebarItems", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return Array.Empty<GetReportSidebarItem>();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var list = JsonSerializer.Deserialize<List<GetReportSidebarItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<GetReportSidebarItem>)Array.Empty<GetReportSidebarItem>();
+    }
 }

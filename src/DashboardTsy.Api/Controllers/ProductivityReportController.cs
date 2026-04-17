@@ -401,5 +401,21 @@ public class ProductivityReportController : ControllerBase
         var result = _reportDataProvider.GetProductivityVolumeBranchReport(request);
         return Ok(result);
     }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetReportSidebarItems
+    /// Verim Raporları ve Hedef Raporları sayfalarına erişim sidebar menüsü üzerinden sağlandığı için, 
+    /// ilgili menülerin başlık, url ve görünürlük bilgilerinin dinamik olarak backend servisinden alınmasını sağlayan servistir.
+    /// </summary>
+    [HttpPost("GetReportSidebarItems")]
+    public ActionResult<IReadOnlyList<GetReportSidebarItem>> GetReportSidebarItems(
+        [FromBody] GetReportSidebarItemsRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetReportSidebarItems(request);
+        return Ok(result);
+    }
 }
 

@@ -152,4 +152,5 @@ public interface IReportDataProvider
     /// Şu an SP tanımlı olmadığı için mock veri üzerinden çalışır.
     /// </summary>
     IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request);
+    IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems(GetReportSidebarItemsRequest request);
 }

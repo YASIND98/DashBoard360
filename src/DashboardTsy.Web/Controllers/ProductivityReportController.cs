@@ -3,7 +3,6 @@ using DashboardTsy.Web.Models.ProductivityReport.Request;
 using DashboardTsy.Web.Models.ProductivityReport.Response;
 using DashboardTsy.Web.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
 
 namespace DashboardTsy.Web.Controllers;
 
@@ -345,6 +344,18 @@ public class ProductivityReportController : ControllerBase
         if (request == null) return BadRequest();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityVolumeBranchReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    [HttpPost("GetReportSidebarItems")]
+    public async Task<ActionResult<IReadOnlyList<GetReportSidebarItem>>> GetReportSidebarItems(
+    [FromBody] GetReportSidebarItemsRequest? request,
+    CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetReportSidebarItemsAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
 }

@@ -1031,6 +1031,29 @@ public class ReportDataProvider : IReportDataProvider
         return response;
     }
 
+    public IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems(GetReportSidebarItemsRequest request)
+    {
+        request ??= new GetReportSidebarItemsRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetReportSidebarItems();
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetSidebarReportMenus",
+            parameters);
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetReportSidebarItem>();
+
+        return DataTableHelper.ToList<GetReportSidebarItem>(ds.Tables[0]);
+    }
+
     #region Helpers
 
     private static string? ToCsv(List<int>? list)
