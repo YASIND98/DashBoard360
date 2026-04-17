@@ -1230,17 +1230,17 @@ public static class MockProductivityReportData
             {
                 Code = "ProductivityReport",
                 Name = "Verim Raporları",
-                Url = "/ProductivityReport",
+                Url = "/verim-raporlari",
                 IsVisible = true,
-                OrderNo = 1
+                OrderNo = 2
             },
             new()
             {
                 Code = "TargetReport",
-                Name = "Hedef Raporları",
-                Url = "/TargetReport",
+                Name = "Yönetici Raporları",
+                Url = "/",
                 IsVisible = true,
-                OrderNo = 2
+                OrderNo = 1
             }
         };
     }

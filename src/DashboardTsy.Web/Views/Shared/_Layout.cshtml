@@ -15,17 +15,7 @@
                 <img src="~/images/denizbank-text-logo.svg" alt="DenizBank" class="sidebar-text-logo" />
                 <img src="~/images/denizbank-logo.svg" alt="Logo" />
             </div>
-            @{
-                var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-            }
-            <a href="/" class="sidebar-nav @(currentController == "Home" ? "active" : "")">
-                <img src="~/images/homepage.svg" alt="Ana Sayfa" />
-                <span class="sidebar-label">Hedef Raporları</span>
-            </a>
-            <a href="/verim-raporlari" class="sidebar-nav @(currentController == "YieldReports" ? "active" : "")">
-                <img src="~/images/magic-star.svg" alt="Verim Raporları" />
-                <span class="sidebar-label">Verim Performans</span>
-            </a>
+            <div id="sidebar-nav-items"></div>
         </aside>
 
         <!-- Main Content -->
