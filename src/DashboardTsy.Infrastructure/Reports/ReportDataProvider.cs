@@ -413,7 +413,7 @@ public class ReportDataProvider : IReportDataProvider
         };
 
         var ds = _spExecutor.ExecuteDataSet(
-            "NorthStarMobile",
+            "YoneticiRaporu",
             "RP_SP_GetReportRegionFilters",
             parameters);
 
@@ -436,7 +436,7 @@ public class ReportDataProvider : IReportDataProvider
         };
 
         var ds = _spExecutor.ExecuteDataSet(
-            "NorthStarMobile",
+            "YoneticiRaporu",
             "RP_SP_GetReportBranchFilters",
             parameters);
 

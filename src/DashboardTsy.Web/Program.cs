@@ -17,11 +17,44 @@ CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 // Add services to the container.
-builder.Services.AddDistributedMemoryCache();
+// Session storage:
+// - Memory cache is instance-local (OK for single server).
+// - In IIS recycle / multi-instance / web garden setups it causes intermittent "lost session" -> 401.
+// Prefer Redis/SQL Server if configured; fallback to memory otherwise.
+var redisConnectionString =
+    builder.Configuration.GetConnectionString("Redis")
+    ?? builder.Configuration["Redis:ConnectionString"];
+
+var sessionSqlConnectionString =
+    builder.Configuration.GetConnectionString("SessionDb")
+    ?? builder.Configuration["SessionDb:ConnectionString"];
+
+if (!string.IsNullOrWhiteSpace(redisConnectionString))
+{
+    builder.Services.AddStackExchangeRedisCache(options =>
+    {
+        options.Configuration = redisConnectionString;
+    });
+}
+else if (!string.IsNullOrWhiteSpace(sessionSqlConnectionString))
+{
+    builder.Services.AddDistributedSqlServerCache(options =>
+    {
+        options.ConnectionString = sessionSqlConnectionString;
+        options.SchemaName = builder.Configuration["SessionDb:SchemaName"] ?? "dbo";
+        options.TableName = builder.Configuration["SessionDb:TableName"] ?? "SessionCache";
+    });
+}
+else
+{
+    builder.Services.AddDistributedMemoryCache();
+}
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(6);
     options.Cookie.IsEssential = true;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.Lax;
 });
 
 // Windows Authentication (Negotiate works for Kestrel / IIS)

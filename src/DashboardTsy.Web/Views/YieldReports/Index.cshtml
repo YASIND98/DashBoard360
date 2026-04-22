@@ -148,10 +148,8 @@
 
         // Data field mapping per section (by section index in OrderNo)
         var _sectionFields = [
-            // Section 0: Manager scorecard
-            ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
-            // Section 1: Role scorecard
-            ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
+            // Section 0: Role scorecard
+            ['ManagerName','CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
             // Section 2: NPS
             null // handled dynamically based on isBranch
         ];
@@ -368,7 +366,7 @@
                     : getNpsFields(isBranch);
 
                 html += '<div class="scorecard-section">';
-                html += '<div class="scorecard-section-title">' + section.HeaderName + ' %</div>';
+                html += '<div class="scorecard-section-title">' + section.HeaderName + '</div>';
                 html += '<table class="scorecard-table">';
 
                 children.forEach(function (child, cIdx) {
