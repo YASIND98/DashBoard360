@@ -844,13 +844,15 @@ function renderCountCardPosRatioRegionTable(items) {
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+        var isPercent = item.RatioName.indexOf('%') !== -1;
+        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
         html += '<td class="col-text">' + item.RatioName + '</td>';
-        html += '<td>' + item.PreviousQuarterRegionValue + '</td>';
-        html += '<td class="has-diff">' + item.CurrentRegionValue + formatDiff(item.CurrentRegionDiff) + '</td>';
-        html += '<td class="has-diff">' + item.CurrentBankAverageValue + formatDiff(item.CurrentBankAverageDiff) + '</td>';
+        html += '<td>' + fmt(item.PreviousQuarterRegionValue) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CurrentRegionValue) + formatDiff(item.CurrentRegionDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CurrentBankAverageValue) + formatDiff(item.CurrentBankAverageDiff, !isPercent) + '</td>';
         html += '</tr>';
     });
 
@@ -913,14 +915,16 @@ function renderCountCardPosRatioBranchTable(items) {
 
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+        var isPercent = item.RatioName.indexOf('%') !== -1;
+        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
         html += '<td class="col-text">' + item.RatioName + '</td>';
-        html += '<td>' + item.PreviousQuarterBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.CurrentBranchValue + formatDiff(item.CurrentBranchValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.CurrentRegionAverageValue + formatDiff(item.CurrentRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.CurrentBankAverageValue + formatDiff(item.CurrentBankAverageValueDiff) + '</td>';
+        html += '<td>' + fmt(item.PreviousQuarterBranchValue) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CurrentBranchValue) + formatDiff(item.CurrentBranchValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CurrentRegionAverageValue) + formatDiff(item.CurrentRegionAverageValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CurrentBankAverageValue) + formatDiff(item.CurrentBankAverageValueDiff, !isPercent) + '</td>';
         html += '</tr>';
     });
 
@@ -1052,6 +1056,8 @@ function renderProfitRatioRegionTable(items) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
+        var isPercent = item.RatioName.indexOf('%') !== -1;
+        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1067,13 +1073,13 @@ function renderProfitRatioRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.TargetValue + '</td>';
-        html += '<td class="has-diff">' + item.RegionValue + formatDiff(item.RegionValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.BankValue + formatDiff(item.BankValueDiff) + '</td>';
-        html += '<td>' + item.RetailValue + '</td>';
-        html += '<td>' + item.KobiValue + '</td>';
-        html += '<td class="has-diff">' + item.AgricultureValue + formatDiff(item.AgricultureValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
+        html += '<td>' + fmt(item.TargetValue) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent) + '</td>';
+        html += '<td>' + fmt(item.RetailValue) + '</td>';
+        html += '<td>' + fmt(item.KobiValue) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent) + '</td>';
         html += '</tr>';
     });
 
@@ -1113,6 +1119,8 @@ function renderProfitRatioBranchTable(items) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
+        var isPercent = item.RatioName.indexOf('%') !== -1;
+        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1128,13 +1136,13 @@ function renderProfitRatioBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + item.TargetValue + '</td>';
-        html += '<td class="has-diff">' + item.RegionValue + formatDiff(item.RegionValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.BankValue + formatDiff(item.BankValueDiff) + '</td>';
-        html += '<td>' + item.RetailValue + '</td>';
-        html += '<td>' + item.KobiValue + '</td>';
-        html += '<td class="has-diff">' + item.AgricultureValue + formatDiff(item.AgricultureValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.CommercialValue + formatDiff(item.CommercialValueDiff) + '</td>';
+        html += '<td>' + fmt(item.TargetValue) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent) + '</td>';
+        html += '<td>' + fmt(item.RetailValue) + '</td>';
+        html += '<td>' + fmt(item.KobiValue) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent) + '</td>';
         html += '</tr>';
     });
 
