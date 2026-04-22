@@ -2,6 +2,7 @@ using DashboardTsy.Application;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
 using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace DashboardTsy.Api.Controllers;
 
@@ -415,6 +416,17 @@ public class ProductivityReportController : ControllerBase
             return BadRequest();
 
         var result = _reportDataProvider.GetReportSidebarItems(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetReportDates
+    /// Rapor ekranlarında kullanılacak tarih bilgisini getirir.
+    /// </summary>
+    [HttpPost("GetReportDates")]
+    public ActionResult<IReadOnlyList<GetReportDatesItem>> GetReportDates()
+    {
+        var result = _reportDataProvider.GetReportDates();
         return Ok(result);
     }
 }

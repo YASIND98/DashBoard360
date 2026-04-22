@@ -358,4 +358,12 @@ public class ProductivityReportController : ControllerBase
         var result = await _apiClient.GetReportSidebarItemsAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
+
+    [HttpPost("GetReportDates")]
+    public async Task<ActionResult<IReadOnlyList<GetReportDatesItem>>> GetReportDates(CancellationToken cancellationToken)
+    {
+        if (!HasSession()) return Unauthorized();
+        var result = await _apiClient.GetReportDatesAsync(cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
 }

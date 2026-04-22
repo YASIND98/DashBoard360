@@ -153,4 +153,5 @@ public interface IReportDataProvider
     /// </summary>
     IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request);
     IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems(GetReportSidebarItemsRequest request);
+    IReadOnlyList<GetReportDatesItem> GetReportDates();
 }

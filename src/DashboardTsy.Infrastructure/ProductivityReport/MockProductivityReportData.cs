@@ -1245,6 +1245,23 @@ public static class MockProductivityReportData
         };
     }
 
+    public static IReadOnlyList<GetReportDatesItem> GetReportDates()
+    {
+        return new List<GetReportDatesItem>
+        {
+            new()
+            {
+                ReportDate = DateTime.Today,
+                IsDefault = true
+            },
+            new()
+            {
+                ReportDate = DateTime.Today.AddDays(-1),
+                IsDefault = false
+            }
+        };
+    }
+
     #region Helpers
 
     private static string GetCustomerSegmentName(int subTabId) => subTabId switch

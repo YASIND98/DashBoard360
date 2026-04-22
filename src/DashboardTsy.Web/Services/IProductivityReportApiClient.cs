@@ -31,4 +31,5 @@ public interface IProductivityReportApiClient
     Task<GetProductivityCountCustomerBranchReportResponse?> GetProductivityCountCustomerBranchReportAsync(GetProductivityCountCustomerBranchReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityVolumeBranchReportResponse?> GetProductivityVolumeBranchReportAsync(GetProductivityVolumeBranchReportRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<GetReportSidebarItem>> GetReportSidebarItemsAsync(GetReportSidebarItemsRequest request, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<GetReportDatesItem>> GetReportDatesAsync(CancellationToken cancellationToken = default);
 }

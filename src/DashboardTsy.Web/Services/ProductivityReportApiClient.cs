@@ -3,7 +3,6 @@ using DashboardTsy.Web.Models.ProductivityReport.Request;
 using DashboardTsy.Web.Models.ProductivityReport.Response;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
-using System.Threading;
 
 namespace DashboardTsy.Web.Services;
 
@@ -226,5 +225,14 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var list = JsonSerializer.Deserialize<List<GetReportSidebarItem>>(json, _jsonOptions);
         return list ?? (IReadOnlyList<GetReportSidebarItem>)Array.Empty<GetReportSidebarItem>();
+    }
+
+    public async Task<IReadOnlyList<GetReportDatesItem>> GetReportDatesAsync(CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetReportDates", cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return Array.Empty<GetReportDatesItem>();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var list = JsonSerializer.Deserialize<List<GetReportDatesItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<GetReportDatesItem>)Array.Empty<GetReportDatesItem>();
     }
 }

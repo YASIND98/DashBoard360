@@ -1054,6 +1054,21 @@ public class ReportDataProvider : IReportDataProvider
         return DataTableHelper.ToList<GetReportSidebarItem>(ds.Tables[0]);
     }
 
+    public IReadOnlyList<GetReportDatesItem> GetReportDates()
+    {
+        if (MockEnabled)
+            return MockProductivityReportData.GetReportDates();
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetReportDates");
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetReportDatesItem>();
+
+        return DataTableHelper.ToList<GetReportDatesItem>(ds.Tables[0]);
+    }
+
     #region Helpers
 
     private static string? ToCsv(List<int>? list)
