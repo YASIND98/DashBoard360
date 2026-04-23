@@ -845,7 +845,7 @@ function renderCountCardPosRatioRegionTable(items) {
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -886,7 +886,121 @@ function loadCountCardPosRatioBranchReport(branchCode, tabId) {
                 }),
                 success: function (response) {
                     var data = extractResponseData(response);
-                    renderCountCardPosRatioBranchTable(data);
+                    const deneme = [
+
+                      {
+                  
+                          "Id": 1,
+                  
+                          "RatioName": "Toplam Kredi Kart Adedi",
+                  
+                          "PreviousQuarterBranchValue": 20852.00,
+                  
+                          "CurrentBranchValue": 21766.00,
+                  
+                          "CurrentRegionAverageValue": 14126.45,
+                  
+                          "CurrentBankAverageValue": 11209.57,
+                  
+                          "CurrentBranchValueDiff": 914.00,
+                  
+                          "CurrentRegionAverageValueDiff": 7639.55,
+                  
+                          "CurrentBankAverageValueDiff": 10556.43
+                  
+                      },
+                  
+                      {
+                  
+                          "Id": 2,
+                  
+                          "RatioName": "Aktif Kredi Kartı Müşteri Adedi",
+                  
+                          "PreviousQuarterBranchValue": 10406.00,
+                  
+                          "CurrentBranchValue": 10753.00,
+                  
+                          "CurrentRegionAverageValue": 7220.27,
+                  
+                          "CurrentBankAverageValue": 5972.96,
+                  
+                          "CurrentBranchValueDiff": 347.00,
+                  
+                          "CurrentRegionAverageValueDiff": 3532.73,
+                  
+                          "CurrentBankAverageValueDiff": 4780.04
+                  
+                      },
+                  
+                      {
+                  
+                          "Id": 3,
+                  
+                          "RatioName": "Anında Kart Şifre Alım %",
+                  
+                          "PreviousQuarterBranchValue": 0.60,
+                  
+                          "CurrentBranchValue": 0.52,
+                  
+                          "CurrentRegionAverageValue": 0.65,
+                  
+                          "CurrentBankAverageValue": 0.66,
+                  
+                          "CurrentBranchValueDiff": -0.08,
+                  
+                          "CurrentRegionAverageValueDiff": -0.13,
+                  
+                          "CurrentBankAverageValueDiff": -0.14
+                  
+                      },
+                  
+                      {
+                  
+                          "Id": 4,
+                  
+                          "RatioName": "Emekli Müşteri Adedi",
+                  
+                          "PreviousQuarterBranchValue": 18449.00,
+                  
+                          "CurrentBranchValue": 19735.00,
+                  
+                          "CurrentRegionAverageValue": 12013.67,
+                  
+                          "CurrentBankAverageValue": 10333.30,
+                  
+                          "CurrentBranchValueDiff": 1286.00,
+                  
+                          "CurrentRegionAverageValueDiff": 7721.33,
+                  
+                          "CurrentBankAverageValueDiff": 9401.70
+                  
+                      },
+                  
+                      {
+                  
+                          "Id": 5,
+                  
+                          "RatioName": "Aktiflik Oranı %",
+                  
+                          "PreviousQuarterBranchValue": 0.50,
+                  
+                          "CurrentBranchValue": 0.49,
+                  
+                          "CurrentRegionAverageValue": 0.51,
+                  
+                          "CurrentBankAverageValue": 0.46,
+                  
+                          "CurrentBranchValueDiff": -0.01,
+                  
+                          "CurrentRegionAverageValueDiff": -0.02,
+                  
+                          "CurrentBankAverageValueDiff": 0.03
+                  
+                      }
+                  
+                  ]
+                   
+                    renderCountCardPosRatioBranchTable(deneme);
                     $('#dynamicTableContainer2').show();
                 }
             });
@@ -916,7 +1030,7 @@ function renderCountCardPosRatioBranchTable(items) {
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1057,7 +1171,7 @@ function renderProfitRatioRegionTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1120,7 +1234,7 @@ function renderProfitRatioBranchTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1428,7 +1542,7 @@ function formatDiff(val, useFormatNumber) {
     if (val == null) return '<div class="diff-value-for-productivity">&nbsp;</div>';
     var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
     var prefix = val > 0 ? '+' : '';
-    var display = useFormatNumber ? formatNumber(val) : val;
+    var display = useFormatNumber ? formatNumber(val * 100) : formatPercent(val);
     return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + display + '</div>';
 }
 
