@@ -463,15 +463,15 @@ function renderVolumeRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionValue) +'</td>';
+        html += '<td>' + formatNumber(item.RealizationRegionValue) +'</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td>' + item.HgRate + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionValue) + '</td>';
+        html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
-        html += '<td class="has-diff">' + item.YtdRegionValue + '</td>';
+        html += '<td>' + item.YtdRegionValue + '</td>';
         html += '<td class="has-diff">' + item.YtdBankAverageValue + formatDiff(item.YtdBankAverageDiff) + '</td>';
-        html += '<td class="has-diff">' + item.QtdRegionValue + '</td>';
+        html += '<td>' + item.QtdRegionValue + '</td>';
         html += '<td class="has-diff">' + item.QtdBankAverageValue + formatDiff(item.QtdBankAverageDiff) + '</td>';
         html += '</tr>';
     });
@@ -595,11 +595,11 @@ function renderCountCustomerRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td class="has-diff">' + formatNumber(item.RealizationRegion) + '</td>';
+        html += '<td>' + formatNumber(item.RealizationRegion) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverage) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.YtdChangeRegion) + '</td>';
+        html += '<td>' + formatNumber(item.YtdChangeRegion) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.YtdChangeBankAverage) + formatDiff(item.YtdChangeBankAverageDiff, true) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.QtdChangeRegion) + '</td>';
+        html += '<td>' + formatNumber(item.QtdChangeRegion) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.QtdChangeBankAverage) + formatDiff(item.QtdChangeBankAverageDiff, true) + '</td>';
         html += '</tr>';
     });
@@ -1425,7 +1425,7 @@ function reapplySortVisual($table) {
 }
 
 function formatDiff(val, useFormatNumber) {
-    if (val == null) return '<div class="diff-value-for-productivity">&nbsp;</div>';
+    if (!val) return '<div class="diff-value-for-productivity">&nbsp;</div>';
     var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
     var prefix = val > 0 ? '+' : '';
     var display = useFormatNumber ? formatNumber(val * 100) : formatPercent(val);
