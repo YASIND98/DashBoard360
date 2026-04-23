@@ -845,7 +845,7 @@ function renderCountCardPosRatioRegionTable(items) {
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -916,7 +916,7 @@ function renderCountCardPosRatioBranchTable(items) {
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1057,7 +1057,7 @@ function renderProfitRatioRegionTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1120,7 +1120,7 @@ function renderProfitRatioBranchTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v * 100) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1428,7 +1428,7 @@ function formatDiff(val, useFormatNumber) {
     if (!val) return '<div class="diff-value-for-productivity">&nbsp;</div>';
     var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
     var prefix = val > 0 ? '+' : '';
-    var display = useFormatNumber ? formatNumber(val * 100) : formatPercent(val);
+    var display = useFormatNumber ? formatNumber(val) : formatPercent(val);
     return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + display + '</div>';
 }
 
