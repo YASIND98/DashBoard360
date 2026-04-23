@@ -62,12 +62,23 @@ function percentColor(ratio) {
 }
 
 function formatNumber(value, isPrice, productName) {
-  if(!value) return "-";
-  if(productName.indexOf('%') !== -1) return formatPercent(value);
-  var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
-  if (!isPrice) return num;
-  var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
-  return num + ' ' + currency;
+  if (!value) return "-";
+
+  var name = productName || "";
+  var isPercentMetric = name.indexOf('%') !== -1;
+
+  if (isPercentMetric) {
+    var digitalPenetrationIndex = name.indexOf("Dijital Penetrasyon");
+    return digitalPenetrationIndex
+      ? formatPercent(value * 100)
+      : formatPercent(value);
+  }
+
+  var formatted = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
+  if (!isPrice) return formatted;
+
+  var currency = name.indexOf('YP') !== -1 ? '$' : '₺';
+  return formatted + ' ' + currency;
 }
 
 // ===== Table Legend Helpers =====
