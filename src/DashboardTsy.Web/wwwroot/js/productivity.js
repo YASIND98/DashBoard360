@@ -580,6 +580,8 @@ function renderCountCustomerRegionTable(items) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
+        var isPercent = item.ProductName.indexOf('%') !== -1;
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v)};
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -595,12 +597,12 @@ function renderCountCustomerRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-text">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.RealizationRegion) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverage) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.YtdChangeRegion) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.YtdChangeBankAverage) + formatDiff(item.YtdChangeBankAverageDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.QtdChangeRegion) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.QtdChangeBankAverage) + formatDiff(item.QtdChangeBankAverageDiff, true) + '</td>';
+        html += '<td>' + fmt(item.RealizationRegion) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.RealizationBankAverage) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
+        html += '<td>' + fmt(item.YtdChangeRegion) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.YtdChangeBankAverage) + formatDiff(item.YtdChangeBankAverageDiff, true) + '</td>';
+        html += '<td>' + fmt(item.QtdChangeRegion) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.QtdChangeBankAverage) + formatDiff(item.QtdChangeBankAverageDiff, true) + '</td>';
         html += '</tr>';
     });
 
@@ -845,7 +847,7 @@ function renderCountCardPosRatioRegionTable(items) {
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v)};
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -916,7 +918,7 @@ function renderCountCardPosRatioBranchTable(items) {
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v)};
 
         html += '<tr class="table-row ' + cls + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1057,7 +1059,7 @@ function renderProfitRatioRegionTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v)};
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1120,7 +1122,7 @@ function renderProfitRatioBranchTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v) };
+        var fmt = function (v) { return isPercent ? formatPercent(v) : formatNumber(v)};
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
