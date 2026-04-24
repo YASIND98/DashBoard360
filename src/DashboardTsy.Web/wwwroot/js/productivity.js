@@ -1430,7 +1430,7 @@ function formatDiff(val, useFormatNumber) {
     if (!val) return '<div class="diff-value-for-productivity">&nbsp;</div>';
     var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
     var prefix = val > 0 ? '+' : '';
-    var display = useFormatNumber ? formatNumber(val) : formatPercent(val);
+    var display = useFormatNumber ? formatNumber(val) : val;
     return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + display + '</div>';
 }
 
