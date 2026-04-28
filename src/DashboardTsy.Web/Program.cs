@@ -1,6 +1,9 @@
 using System.Globalization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 using DashboardTsy.Web.Services;
+using DashboardTsy.Web.DataProtection;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,6 +52,21 @@ else
 {
     builder.Services.AddDistributedMemoryCache();
 }
+
+// DataProtection keys MUST be shared across instances; otherwise session cookies cannot be decrypted
+// when load balancer routes requests to a different server (intermittent 401 / lost session).
+// Store keys in the same DB used for SessionDb (requires manual table creation if you don't use EF migrations).
+var dpBuilder = builder.Services.AddDataProtection()
+    .SetApplicationName(builder.Configuration["DataProtection:ApplicationName"] ?? "DashboardTsy");
+
+if (!string.IsNullOrWhiteSpace(sessionSqlConnectionString))
+{
+    builder.Services.AddDbContext<DashboardTsyDataProtectionKeyContext>(options =>
+        options.UseSqlServer(sessionSqlConnectionString));
+
+    dpBuilder.PersistKeysToDbContext<DashboardTsyDataProtectionKeyContext>();
+}
+
 builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromHours(6);
