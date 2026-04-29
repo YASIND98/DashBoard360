@@ -619,17 +619,19 @@ $(document).ready(function () {
   });
 
   // ===== Init =====
-  loadRegionFilters(function () {
-      var single = renderRegionDropdown();
-      if (single) {
-          selectedRegion = { code: single.Code, name: single.Name };
-      }
-      loadBranchFilters(function () {
-          var singleBranch = renderBranchDropdown();
-          if (singleBranch) {
-              selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+  loadReportDates(function () {
+      loadRegionFilters(function () {
+          var single = renderRegionDropdown();
+          if (single) {
+              selectedRegion = { code: single.Code, name: single.Name };
           }
-          loadDailyReport();
+          loadBranchFilters(function () {
+              var singleBranch = renderBranchDropdown();
+              if (singleBranch) {
+                  selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+              }
+              loadDailyReport();
+          });
       });
   });
 
