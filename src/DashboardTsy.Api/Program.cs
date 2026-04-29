@@ -16,7 +16,9 @@ CultureInfo.DefaultThreadCurrentCulture = cultureInfo;
 CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
 
 var mainConn = builder.Configuration["DbConnectionStrings:Main"] ?? builder.Configuration.GetConnectionString("Main");
-var referansConn = builder.Configuration["DbConnectionStrings:Referans"] ?? builder.Configuration.GetConnectionString("Referans");
+// SSO_USERVIEW için NorthStarMobile DB kullanılacak (Referans fallback kaldırıldı).
+var referansConn = builder.Configuration["DbConnectionStrings:NorthStarMobile"]
+                   ?? throw new InvalidOperationException("Missing DbConnectionStrings:NorthStarMobile connection string.");
 
 builder.Services.AddDbContext<DashboardTsyDbContext>(o => o.UseSqlServer(mainConn));
 builder.Services.AddScoped<IWindowsAuthService, WindowsAuthService>();
