@@ -1,6 +1,7 @@
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using DashboardTsy.Api.Data;
 using DashboardTsy.Api.Models;
@@ -50,38 +51,11 @@ public class WindowsAuthService : IWindowsAuthService
                 return response;
             }
 
-            var existing = await _db.Users.FirstOrDefaultAsync(x => x.DomainName == username, cancellationToken).ConfigureAwait(false);
-
-            if (existing != null)
-            {
-                existing.NameSurname = $"{windowsUser.FIRSTNAME} {windowsUser.SURNAME}".Trim();
-                existing.RegionCode = int.Parse(windowsUser.REGIONCODE);
-                existing.BranchCode = int.Parse(windowsUser.BRANCHCODE);
-                existing.Email = windowsUser.EMAIL;
-                existing.ProfilePhoto = windowsUser.Resim;
-                existing.Department = MapDepartment(windowsUser.GROUPNAME);
-                await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                existing.Password = GenerateJwt(existing);
-                response.Result = MapToDto(existing);
-            }
-            else
-            {
-                var newUser = new User
-                {
-                    DomainName = username,
-                    NameSurname = $"{windowsUser.FIRSTNAME} {windowsUser.SURNAME}".Trim(),
-                    RegionCode = int.Parse(windowsUser.REGIONCODE),
-                    BranchCode = int.Parse(windowsUser.BRANCHCODE),
-                    Email = windowsUser.EMAIL,
-                    ProfilePhoto = windowsUser.Resim,
-                    Department = MapDepartment(windowsUser.GROUPNAME),
-                    CreatedDate = DateTime.UtcNow
-                };
-                _db.Users.Add(newUser);
-                await _db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
-                newUser.Password = GenerateJwt(newUser);
-                response.Result = MapToDto(newUser);
-            }
+            // SSO_USERVIEW is the source of truth. Do not touch _db.Users for SSO flows.
+            var dto = MapToDtoFromWindowsUser(username, windowsUser);
+            // Generate a JWT for downstream calls; UserId is a stable per-user surrogate (not persisted).
+            dto.Password = GenerateJwt(new User { UserId = dto.UserId, Email = dto.Email });
+            response.Result = dto;
 
             response.Message!.message = "Başarılı";
             response.Message.message2 = "Giriş başarılı.";
@@ -108,15 +82,17 @@ public class WindowsAuthService : IWindowsAuthService
 
         try
         {
-            var user = await _db.Users.FirstOrDefaultAsync(x => x.DomainName == domainName, cancellationToken).ConfigureAwait(false);
-            if (user == null)
+            var windowsUser = await GetWindowsUserAsync(domainName, cancellationToken).ConfigureAwait(false);
+            if (windowsUser == null || string.IsNullOrEmpty(windowsUser.EMAIL) || string.IsNullOrEmpty(windowsUser.FIRSTNAME))
             {
                 response.Message!.message = "Hata";
                 response.Message.message2 = "Kullanıcı kaydı bulunamadı.";
                 return response;
             }
 
-            response.Result = MapToDto(user);
+            var dto = MapToDtoFromWindowsUser(domainName, windowsUser);
+            dto.Password = GenerateJwt(new User { UserId = dto.UserId, Email = dto.Email });
+            response.Result = dto;
             response.Message!.message = "Başarılı";
             response.Message.message2 = "Giriş başarılı.";
         }
@@ -133,50 +109,18 @@ public class WindowsAuthService : IWindowsAuthService
     {
         var response = NewResponse();
 
+        // This application uses SSO_USERVIEW as the source of truth.
+        // Username/password verification cannot be performed without _db.Users (stored password hash),
+        // so this flow is intentionally disabled to avoid hitting the Users table.
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
             response.Message!.message = "Hata";
-            response.Message.message2 = "Hatalı kullanıcı adı veya şifre.";
+            response.Message.message2 = "Kullanıcı adı ve şifre zorunludur.";
             return response;
         }
 
-        try
-        {
-            var dbUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == username, cancellationToken).ConfigureAwait(false);
-            if (dbUser == null)
-            {
-                response.Message!.message = "Hata";
-                response.Message.message2 = "Hatalı kullanıcı adı veya şifre.";
-                return response;
-            }
-
-            if (dbUser.IsBlock == true)
-            {
-                response.Message!.message = "Hata";
-                response.Message.message2 = "Platforma giriş yetkiniz bulunmamaktadır. Lütfen yöneticinizle iletişime geçiniz.";
-                return response;
-            }
-
-            var verified = PasswordHasher.CheckPassword(dbUser.Password ?? string.Empty, password);
-            if (!verified)
-            {
-                response.Message!.message = "Hata";
-                response.Message.message2 = "Hatalı kullanıcı adı veya şifre.";
-                return response;
-            }
-
-            // Return a JWT for downstream calls but DO NOT overwrite stored password hash.
-            var dto = MapToDto(dbUser);
-            dto.Password = GenerateJwt(dbUser);
-            response.Result = dto;
-            response.Message!.message = "Başarılı";
-            response.Message.message2 = "Giriş başarılı.";
-        }
-        catch (Exception)
-        {
-            response.Message!.message = "Hata";
-            response.Message.message2 = "İşlemler sırasında bir hata oluştu.";
-        }
+        response.Message!.message = "Hata";
+        response.Message.message2 = "Kullanıcı adı/şifre ile giriş devre dışı. Lütfen domain/SSO ile giriş yapınız.";
 
         return response;
     }
@@ -213,6 +157,31 @@ public class WindowsAuthService : IWindowsAuthService
         if (groupName.Contains("Genel Müdürlük")) return "GM";
         if (groupName.Contains("Bölge")) return "BOLGE";
         return "SUBE";
+    }
+
+    private static int StableUserId(string domainNameOrLogin)
+    {
+        // Produce a stable positive 32-bit int from the user's login.
+        // This avoids relying on _db.Users for an identity value.
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(domainNameOrLogin.Trim().ToUpperInvariant()));
+        var value = BitConverter.ToInt32(bytes, 0) & 0x7fffffff;
+        return value == 0 ? 1 : value;
+    }
+
+    private static UsersDto MapToDtoFromWindowsUser(string domainName, WindowsUserInfo windowsUser)
+    {
+        return new UsersDto
+        {
+            UserId = StableUserId(domainName),
+            NameSurname = $"{windowsUser.FIRSTNAME} {windowsUser.SURNAME}".Trim(),
+            Email = windowsUser.EMAIL,
+            DomainName = domainName,
+            Department = MapDepartment(windowsUser.GROUPNAME),
+            BranchCode = int.TryParse(windowsUser.BRANCHCODE, out var bc) ? bc : null,
+            RegionCode = int.TryParse(windowsUser.REGIONCODE, out var rc) ? rc : null,
+            ProfilePhoto = windowsUser.Resim,
+            CreatedDate = DateTime.UtcNow
+        };
     }
 
     private static string GenerateJwt(User user)
