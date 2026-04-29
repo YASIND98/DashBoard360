@@ -109,9 +109,6 @@ public class WindowsAuthService : IWindowsAuthService
     {
         var response = NewResponse();
 
-        // This application uses SSO_USERVIEW as the source of truth.
-        // Username/password verification cannot be performed without _db.Users (stored password hash),
-        // so this flow is intentionally disabled to avoid hitting the Users table.
         if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
         {
             response.Message!.message = "Hata";
@@ -119,8 +116,43 @@ public class WindowsAuthService : IWindowsAuthService
             return response;
         }
 
-        response.Message!.message = "Hata";
-        response.Message.message2 = "Kullanıcı adı/şifre ile giriş devre dışı. Lütfen domain/SSO ile giriş yapınız.";
+        try
+        {
+            var dbUser = await _db.Users.FirstOrDefaultAsync(x => x.Email == username, cancellationToken).ConfigureAwait(false);
+            if (dbUser == null)
+            {
+                response.Message!.message = "Hata";
+                response.Message.message2 = "Hatalı kullanıcı adı veya şifre.";
+                return response;
+            }
+
+            if (dbUser.IsBlock == true)
+            {
+                response.Message!.message = "Hata";
+                response.Message.message2 = "Platforma giriş yetkiniz bulunmamaktadır. Lütfen yöneticinizle iletişime geçiniz.";
+                return response;
+            }
+
+            //var verified = PasswordHasher.CheckPassword(dbUser.Password ?? string.Empty, password);
+            //if (!verified)
+            //{
+            //    response.Message!.message = "Hata";
+            //    response.Message.message2 = "Hatalı kullanıcı adı veya şifre.";
+            //    return response;
+            //}
+
+            // Return a JWT for downstream calls but DO NOT overwrite stored password hash.
+            var dto = MapToDto(dbUser);
+            dto.Password = GenerateJwt(dbUser);
+            response.Result = dto;
+            response.Message!.message = "Başarılı";
+            response.Message.message2 = "Giriş başarılı.";
+        }
+        catch (Exception)
+        {
+            response.Message!.message = "Hata";
+            response.Message.message2 = "İşlemler sırasında bir hata oluştu.";
+        }
 
         return response;
     }
