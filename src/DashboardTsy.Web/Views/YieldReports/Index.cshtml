@@ -172,21 +172,23 @@
             return renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null, selectedRegion ? selectedRegion.code : null);
         }
 
-        loadRegionFilters(function () {
-            var single = renderRegionDropdown();
-            if (single) {
-                selectedRegion = { code: single.Code, name: single.Name };
-            }
-            loadBranchFilters(function () {
-                var singleBranch = renderBranchDropdown();
-                if (singleBranch) {
-                    selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+        loadReportDates(function () {
+            loadRegionFilters(function () {
+                var single = renderRegionDropdown();
+                if (single) {
+                    selectedRegion = { code: single.Code, name: single.Name };
                 }
-                if (selectedRegion || selectedBranch) {
-                    updateUI();
-                } else {
-                    updateYieldTable();
-                }
+                loadBranchFilters(function () {
+                    var singleBranch = renderBranchDropdown();
+                    if (singleBranch) {
+                        selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+                    }
+                    if (selectedRegion || selectedBranch) {
+                        updateUI();
+                    } else {
+                        updateYieldTable();
+                    }
+                });
             });
         });
 

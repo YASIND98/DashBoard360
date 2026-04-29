@@ -88,7 +88,55 @@ function renderTableLegend(containerId, options) {
 
 
 // ===== Shared Report Date =====
-var _reportDate = new Date().toISOString();
+var _reportDateTtlMs = 4 * 60 * 60 * 1000; // 4 saat
+var _reportDate = sessionStorage.getItem('_reportDate') || new Date().toISOString();
+
+var _trMonths = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+function formatReportDateTr(iso) {
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return '';
+    return d.getDate() + ' ' + _trMonths[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function applyReportDate() {
+    var formatted = formatReportDateTr(_reportDate);
+    if (formatted) $('.date-text').text(formatted);
+}
+
+function _isReportDateCacheFresh() {
+    if (!sessionStorage.getItem('_reportDate')) return false;
+    var fetchedAt = parseInt(sessionStorage.getItem('_reportDateFetchedAt') || '0', 10);
+    if (!fetchedAt) return false;
+    return (Date.now() - fetchedAt) < _reportDateTtlMs;
+}
+
+function loadReportDates(callback) {
+    if (_isReportDateCacheFresh()) {
+        applyReportDate();
+        if (callback) callback();
+        return;
+    }
+    $.ajax({
+        url: '/ProductivityReport/GetReportDates',
+        type: 'POST',
+        contentType: 'application/json',
+        data: '{}',
+        success: function (data) {
+            if (data && data.length > 0) {
+                var picked = data.find(function (d) { return d.IsDefault; }) || data[0];
+                _reportDate = new Date(picked.ReportDate).toISOString();
+                sessionStorage.setItem('_reportDate', _reportDate);
+                sessionStorage.setItem('_reportDateFetchedAt', Date.now().toString());
+                applyReportDate();
+            }
+            if (callback) callback();
+        },
+        error: function () { if (callback) callback(); }
+    });
+}
+
+$(document).ready(function () { applyReportDate(); });
 
 // ===== Filter Data (shared across pages, cached in sessionStorage) =====
 var _regionFilters = JSON.parse(sessionStorage.getItem('_regionFilters') || '[]');

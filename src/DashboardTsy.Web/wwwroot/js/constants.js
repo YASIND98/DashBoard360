@@ -25,4 +25,5 @@ var TOP10_PRODUCT_NAMES = [
     "Vadesiz YP",
     "Vadeli TL",
     "Vadeli YP",
+    "Mevduat"
 ];
