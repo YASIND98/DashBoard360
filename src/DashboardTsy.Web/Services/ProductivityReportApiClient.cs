@@ -229,7 +229,7 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
 
     public async Task<IReadOnlyList<GetReportDatesItem>> GetReportDatesAsync(CancellationToken cancellationToken = default)
     {
-        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetReportDates", cancellationToken).ConfigureAwait(false);
+        var response = await _httpClient.PostAsync(BasePath + "GetReportDates", content: null, cancellationToken).ConfigureAwait(false);
         if (!response.IsSuccessStatusCode) return Array.Empty<GetReportDatesItem>();
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         var list = JsonSerializer.Deserialize<List<GetReportDatesItem>>(json, _jsonOptions);
