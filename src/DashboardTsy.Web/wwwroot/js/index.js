@@ -404,6 +404,7 @@ $(document).ready(function () {
           .first().addClass('active');
       updateBireyselOzelVisibility();
       $('#searchInput').val('');
+      showLoadingOverlay();
       loadActiveReport();
   });
 
@@ -411,6 +412,7 @@ $(document).ready(function () {
       $(this).closest('.sub-tab-bar').find('.sub-tab').removeClass('active');
       $(this).addClass('active');
       $('#searchInput').val('');
+      showLoadingOverlay();
       loadActiveReport();
   });
 
@@ -423,6 +425,7 @@ $(document).ready(function () {
       var now = new Date();
       var trMonths = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
       updateBireyselOzelVisibility();
+      showLoadingOverlay();
       if (type === 'adet') {
           $('.date-text').text(trMonths[now.getMonth()] + ' ' + now.getFullYear());
           $('.date-badge').text('Bu Ay');
@@ -460,6 +463,7 @@ $(document).ready(function () {
       var activeType = $('.segment[data-type].active').data('type');
       if (activeType === 'adet') return;
 
+      showLoadingOverlay();
       if (period === 'monthly') {
           $('.date-text').text(trMonths[now.getMonth()] + ' ' + now.getFullYear());
           $('.date-badge').text('Bu Ay');
@@ -585,6 +589,7 @@ $(document).ready(function () {
       $('#indexRegionSearch').val('');
 
       renderBranchDropdown();
+      showLoadingOverlay();
       loadActiveReport();
   });
 
@@ -615,6 +620,7 @@ $(document).ready(function () {
       $('#indexBranchPanel').removeClass('open');
       $('#indexBranchSearch').val('');
 
+      showLoadingOverlay();
       loadActiveReport();
   });
 
