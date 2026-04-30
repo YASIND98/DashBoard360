@@ -162,7 +162,7 @@ public class WindowsAuthService : IWindowsAuthService
         if (string.IsNullOrEmpty(_referansOptions.ConnectionString))
             return null;
 
-        const string sql = "SELECT FIRSTNAME, SURNAME, EMAIL, BRANCHCODE, REGIONCODE, GROUPNAME, '' AS Resim FROM SSO_USERVIEW WHERE FULLLOGINNAME = @fullName";
+        const string sql = "SELECT FIRSTNAME, SURNAME, EMAIL, BRANCHCODE, REGIONCODE, GROUPNAME, URL FROM SSO_USERVIEW WHERE FULLLOGINNAME = @fullName";
         await using var conn = new SqlConnection(_referansOptions.ConnectionString);
         await using var cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@fullName", fullLoginName);
