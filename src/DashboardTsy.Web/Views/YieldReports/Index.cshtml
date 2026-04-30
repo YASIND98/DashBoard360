@@ -147,11 +147,16 @@
     $(document).ready(function () {
 
         // Data field mapping per section (by section index in OrderNo)
-        var _sectionFields = [
-            // Section 0: Role scorecard
-            ['ManagerName','CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
-            // Section 2: NPS
-            null // handled dynamically based on isBranch
+        // Region returns 2 sections (manager+roles, NPS); Branch returns 3 sections (manager+months, roles, NPS).
+        var _sectionFieldsRegion = [
+            ['ManagerName', 'CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
+            null // NPS via getNpsFields
+        ];
+
+        var _sectionFieldsBranch = [
+            ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
+            ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
+            null // NPS via getNpsFields
         ];
 
         function getNpsFields(isBranch) {
@@ -356,6 +361,7 @@
                 .filter(function (h) { return h.ParentId === 0; })
                 .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
 
+            var sectionFields = isBranch ? _sectionFieldsBranch : _sectionFieldsRegion;
             var html = '';
 
             sections.forEach(function (section, sIdx) {
@@ -363,8 +369,8 @@
                     .filter(function (h) { return h.ParentId === section.Id; })
                     .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
 
-                var fields = (sIdx < _sectionFields.length && _sectionFields[sIdx])
-                    ? _sectionFields[sIdx]
+                var fields = (sIdx < sectionFields.length && sectionFields[sIdx])
+                    ? sectionFields[sIdx]
                     : getNpsFields(isBranch);
 
                 html += '<div class="scorecard-section">';
