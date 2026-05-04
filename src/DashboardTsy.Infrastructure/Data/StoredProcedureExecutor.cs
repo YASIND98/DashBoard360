@@ -53,7 +53,6 @@ public class StoredProcedureExecutor : IStoredProcedureExecutor
         }
 
         connection.Open();
-        cmd.ExecuteNonQuery();
         using var adapter = new SqlDataAdapter(cmd);
         adapter.Fill(ds);
 
