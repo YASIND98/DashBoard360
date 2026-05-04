@@ -1,6 +1,8 @@
 using System.Net;
 using System.Text.Json;
 using DashboardTsy.Web.Models;
+using DashboardTsy.Web.Models.Activity;
+using DashboardTsy.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Web.Controllers;
@@ -13,12 +15,17 @@ public class AuthController : Controller
 {
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly IConfiguration _configuration;
+    private readonly IUserActivityLogService _activityLog;
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
-    public AuthController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+    public AuthController(
+        IHttpClientFactory httpClientFactory,
+        IConfiguration configuration,
+        IUserActivityLogService activityLog)
     {
         _httpClientFactory = httpClientFactory;
         _configuration = configuration;
+        _activityLog = activityLog;
     }
 
     private bool AuthMockEnabled => _configuration.GetValue<bool>("AuthMock:Enabled");
@@ -94,6 +101,7 @@ public class AuthController : Controller
         if (result?.Result != null && result.Result.UserId > 0 && result.Result.IsBlock != true)
         {
             SetSession(result.Result);
+            await LogLoginSuccessAsync("Windows", result.Result, cancellationToken).ConfigureAwait(false);
 
             return RedirectToAction("Index", "Home");
         }
@@ -136,6 +144,7 @@ public class AuthController : Controller
         if (result.Result != null && result.Result.UserId > 0 && result.Result.IsBlock != true)
         {
             SetSession(result.Result);
+            await LogLoginSuccessAsync("Domain", result.Result, cancellationToken).ConfigureAwait(false);
         }
 
         return Json(result);
@@ -148,7 +157,11 @@ public class AuthController : Controller
         {
             var mock = MockOkUser(model.Email);
             if (mock.Result != null)
+            {
                 SetSession(mock.Result);
+                await LogLoginSuccessAsync("Form(Mock)", mock.Result, cancellationToken).ConfigureAwait(false);
+            }
+
             return Json(mock);
         }
 
@@ -176,16 +189,29 @@ public class AuthController : Controller
         if (result.Result != null && result.Result.UserId > 0 && result.Result.IsBlock != true)
         {
             SetSession(result.Result);
+            await LogLoginSuccessAsync("Form", result.Result, cancellationToken).ConfigureAwait(false);
         }
 
         return Json(result);
     }
 
     [HttpGet]
-    public IActionResult Logout()
+    public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
+        var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+        if (userId > 0)
+        {
+            await _activityLog.LogAsync(new UserActivityLogEntry
+            {
+                UserId = userId,
+                UserDisplayName = HttpContext.Session.GetString("NameSurname"),
+                EventType = "Logout",
+                ActionName = "SessionEnd"
+            }, cancellationToken).ConfigureAwait(false);
+        }
+
         HttpContext.Session.Clear();
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Login", "Auth");
     }
 
     private void SetSession(UsersDto user)
@@ -211,5 +237,16 @@ public class AuthController : Controller
         HttpContext.Session.SetString("User", JsonSerializer.Serialize(user));
         if (!string.IsNullOrEmpty(user.Password))
             HttpContext.Session.SetString("token", user.Password);
+    }
+
+    private Task LogLoginSuccessAsync(string loginMethod, UsersDto user, CancellationToken cancellationToken)
+    {
+        return _activityLog.LogAsync(new UserActivityLogEntry
+        {
+            UserId = user.UserId,
+            UserDisplayName = user.NameSurname,
+            EventType = "Login",
+            ActionName = loginMethod
+        }, cancellationToken);
     }
 }

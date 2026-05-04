@@ -1,11 +1,29 @@
 using System.Globalization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Authentication.Negotiate;
+using DashboardTsy.Web.Data;
 using DashboardTsy.Web.Services;
 using DashboardTsy.Web.DataProtection;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+static string? ResolveActivityLogConnection(IConfiguration configuration)
+{
+    var cs = configuration["ActivityLog:ConnectionString"];
+    if (!string.IsNullOrWhiteSpace(cs))
+        return cs;
+
+    cs = configuration["ConnectionStrings:Main"];
+    if (!string.IsNullOrWhiteSpace(cs))
+        return cs;
+
+    cs = configuration["DbConnectionStrings:Main"];
+    if (!string.IsNullOrWhiteSpace(cs))
+        return cs;
+
+    return configuration.GetConnectionString("SessionDb");
+}
 
 var cultureInfo = new CultureInfo("tr-TR")
 {
@@ -82,6 +100,19 @@ builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 builder.Services.Configure<DashboardApiOptions>(builder.Configuration.GetSection(DashboardApiOptions.SectionName));
+builder.Services.Configure<ActivityLogOptions>(builder.Configuration.GetSection(ActivityLogOptions.SectionName));
+
+var activityLogConnection = ResolveActivityLogConnection(builder.Configuration);
+var activityLogEnabled = builder.Configuration.GetValue("ActivityLog:Enabled", true);
+if (activityLogEnabled && !string.IsNullOrWhiteSpace(activityLogConnection))
+{
+    builder.Services.AddDbContext<UserActivityLogDbContext>(o => o.UseSqlServer(activityLogConnection));
+    builder.Services.AddScoped<IUserActivityLogService, UserActivityLogService>();
+}
+else
+{
+    builder.Services.AddSingleton<IUserActivityLogService, NoOpUserActivityLogService>();
+}
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<ITargetReportApiClient, TargetReportApiClient>();
 builder.Services.AddHttpClient<IProductivityReportApiClient, ProductivityReportApiClient>();

@@ -35,7 +35,8 @@ function renderSidebar(items) {
         var itemPath = (item.Url || '/').replace(/\/$/, '') || '/';
         var isActive = currentPath === itemPath ? ' active' : '';
         var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
-        html += '<a href="' + item.Url + '" class="sidebar-nav' + isActive + '">';
+        var sideCode = String(item.Code || '').replace(/"/g, '');
+        html += '<a href="' + item.Url + '" class="sidebar-nav' + isActive + '" data-sidebar-code="' + sideCode + '">';
         html += '<img src="' + icon + '" alt="' + item.Name + '" />';
         html += '<span class="sidebar-label">' + item.Name + '</span>';
         html += '</a>';
@@ -396,3 +397,52 @@ $(document).ready(function () {
       });
   });
 });
+
+// ===== Client activity (sayfa görüntüleme, sidebar, data-activity butonları) =====
+(function () {
+    if (typeof $ === 'undefined') return;
+
+    function postClientActivity(payload) {
+        if (!window._activityLogEnabled || !window._activityLogUrl) return;
+        try {
+            $.ajax({
+                url: window._activityLogUrl,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    EventType: payload.eventType,
+                    ActionName: payload.actionName || null,
+                    PageUrl: payload.pageUrl || (window.location.pathname + window.location.search),
+                    Details: payload.details || null
+                })
+            });
+        } catch (e) { /* ignore */ }
+    }
+
+    $(document).ready(function () {
+        if (!window._activityLogEnabled) return;
+
+        postClientActivity({
+            eventType: 'PageView',
+            actionName: (document.title || '').trim() || null,
+            pageUrl: window.location.pathname + window.location.search
+        });
+
+        $(document).on('click', '[data-activity]', function () {
+            var code = ($(this).attr('data-activity') || '').trim() || $(this).text().trim().slice(0, 200);
+            postClientActivity({ eventType: 'ButtonClick', actionName: code });
+        });
+
+        $(document).on('click', 'a.sidebar-nav', function () {
+            var label = $(this).find('.sidebar-label').first().text().trim();
+            var code = ($(this).attr('data-sidebar-code') || '').trim();
+            var href = ($(this).attr('href') || '').trim();
+            var name = label || code || 'Sidebar';
+            postClientActivity({
+                eventType: 'Navigation',
+                actionName: 'Sidebar:' + name,
+                details: href ? 'href:' + href : null
+            });
+        });
+    });
+})();
