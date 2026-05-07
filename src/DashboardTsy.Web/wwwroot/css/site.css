@@ -28,7 +28,7 @@
   --bg-scorecard: linear-gradient(180deg, rgba(6, 11, 40, 0.74) 0%, rgba(10, 14, 35, 0.71) 100%);
   --bg-scorecard-panel: linear-gradient(180deg, rgb(6, 11, 40) 0%, rgb(10, 14, 35) 100%);
   --bg-dropdown-panel: linear-gradient(180deg, #0152DE 0%, #012C78 100%);
-  --bg-stripe: rgba(246, 247, 249, 0.08);
+  --bg-stripe: rgb(25,54,100);
   --bg-period: #eceef2;
   --bg-subtab: #7db4f3;
   --bg-hover: linear-gradient(180deg, rgba(5, 108, 194, 0.15) 0%, rgba(5, 108, 194, 0.75) 100%);
@@ -685,7 +685,7 @@ body {
 
 /* ===== Data Table ===== */
 .table-container {
-  background: var(--bg-card);
+  background: rgb(21 32 88);
   padding: 12px 16px 24px;
   margin: 0 16px;
   border-radius: var(--radius-xl);
@@ -702,6 +702,9 @@ body {
 
 .table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 280px);
+  min-height: 240px;
   padding-bottom: 14px;
 }
 
@@ -713,14 +716,24 @@ body {
 
 /* Table Header */
 .data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   padding: 12px 16px;
   font-size: 12px;
   font-weight: 500;
   text-align: center;
   color: var(--text-muted);
+  background: rgb(21 32 88);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+}
+
+/* Two-row headers (e.g. Monthly table) — second row sticks below the first */
+#monthlyDataTable thead tr:nth-child(2) th,
+.yield-table thead tr:nth-child(2) th {
+  top: 40px;
 }
 
 .data-table thead th small {
