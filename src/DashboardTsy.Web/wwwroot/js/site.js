@@ -396,6 +396,44 @@ $(document).ready(function () {
           $(this).toggle(text.indexOf(query) > -1);
       });
   });
+
+  // ===== Info-icon tooltip (rendered into body to escape overflow ancestors) =====
+  var $infoTooltip = null;
+
+  function showInfoTooltip($icon) {
+      var text = $icon.attr('data-tooltip');
+      if (!text) return;
+      if (!$infoTooltip) {
+          $infoTooltip = $('<div class="info-tooltip" role="tooltip"></div>').appendTo('body');
+      }
+      $infoTooltip.text(text).removeClass('below');
+      var rect = $icon[0].getBoundingClientRect();
+      $infoTooltip.css({ visibility: 'hidden', left: 0, top: 0 }).addClass('visible');
+      var tw = $infoTooltip.outerWidth();
+      var th = $infoTooltip.outerHeight();
+      var pad = 8;
+      var iconCenter = rect.left + rect.width / 2;
+      var left = iconCenter - tw / 2;
+      if (left < pad) left = pad;
+      if (left + tw > window.innerWidth - pad) left = window.innerWidth - tw - pad;
+      var top = rect.top - th - 10;
+      if (top < pad) {
+          top = rect.bottom + 10;
+          $infoTooltip.addClass('below');
+      }
+      $infoTooltip.css({ left: left + 'px', top: top + 'px', visibility: 'visible' });
+  }
+
+  function hideInfoTooltip() {
+      if ($infoTooltip) $infoTooltip.removeClass('visible');
+  }
+
+  $(document).on('mouseenter focusin', '.info-icon[data-tooltip]', function () {
+      showInfoTooltip($(this));
+  });
+  $(document).on('mouseleave focusout', '.info-icon[data-tooltip]', hideInfoTooltip);
+  $(window).on('scroll resize', hideInfoTooltip);
+  $(document).on('scroll', '.table-wrapper, .table-container', hideInfoTooltip);
 });
 
 // ===== Client activity (sayfa görüntüleme, sidebar, data-activity butonları) =====

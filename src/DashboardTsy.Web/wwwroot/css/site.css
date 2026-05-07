@@ -918,6 +918,74 @@ body {
   cursor: pointer;
 }
 
+.col-group-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.info-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+.info-icon:hover {
+  opacity: 1;
+}
+
+.info-icon img {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+/* Tooltip is rendered into <body> via JS (see site.js) to avoid clipping by
+   overflow:auto ancestors like .table-wrapper / .table-container. */
+.info-tooltip {
+  position: fixed;
+  background: var(--text-gray);
+  color: var(--white);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  text-align: center;
+  box-shadow: var(--shadow-dropdown);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.info-tooltip.visible {
+  opacity: 1;
+}
+
+.info-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  background: var(--text-gray);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.info-tooltip.below::after {
+  bottom: auto;
+  top: -5px;
+}
+
 .col-group-header::after {
   content: '';
   position: absolute;
@@ -1041,8 +1109,8 @@ body {
 .ratio-green-bg { background: var(--ratio-green); }
 .ratio-blue-bg { background: var(--ratio-blue); }
 
-/* Profit Total Last Row */
-.profit-total-last td {
+/* Custom Last Row */
+.custom-last-row td {
   background: linear-gradient(180deg, #0070CB 30%, #0062B2 60%, #00467F 100%) !important;
   font-size: 20px !important;
 }
