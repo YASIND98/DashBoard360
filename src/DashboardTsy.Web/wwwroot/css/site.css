@@ -28,7 +28,7 @@
   --bg-scorecard: linear-gradient(180deg, rgba(6, 11, 40, 0.74) 0%, rgba(10, 14, 35, 0.71) 100%);
   --bg-scorecard-panel: linear-gradient(180deg, rgb(6, 11, 40) 0%, rgb(10, 14, 35) 100%);
   --bg-dropdown-panel: linear-gradient(180deg, #0152DE 0%, #012C78 100%);
-  --bg-stripe: rgba(246, 247, 249, 0.08);
+  --bg-stripe: rgb(25,54,100);
   --bg-period: #eceef2;
   --bg-subtab: #7db4f3;
   --bg-hover: linear-gradient(180deg, rgba(5, 108, 194, 0.15) 0%, rgba(5, 108, 194, 0.75) 100%);
@@ -685,7 +685,7 @@ body {
 
 /* ===== Data Table ===== */
 .table-container {
-  background: var(--bg-card);
+  background: rgb(21 32 88);
   padding: 12px 16px 24px;
   margin: 0 16px;
   border-radius: var(--radius-xl);
@@ -702,6 +702,9 @@ body {
 
 .table-wrapper {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(100vh - 280px);
+  min-height: 240px;
   padding-bottom: 14px;
 }
 
@@ -713,14 +716,24 @@ body {
 
 /* Table Header */
 .data-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   padding: 12px 16px;
   font-size: 12px;
   font-weight: 500;
   text-align: center;
   color: var(--text-muted);
+  background: rgb(21 32 88);
   cursor: pointer;
   user-select: none;
   white-space: nowrap;
+}
+
+/* Two-row headers (e.g. Monthly table) — second row sticks below the first */
+#monthlyDataTable thead tr:nth-child(2) th,
+.yield-table thead tr:nth-child(2) th {
+  top: 40px;
 }
 
 .data-table thead th small {
@@ -918,6 +931,74 @@ body {
   cursor: pointer;
 }
 
+.col-group-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.info-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  opacity: 0.7;
+}
+
+.info-icon:hover {
+  opacity: 1;
+}
+
+.info-icon img {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+/* Tooltip is rendered into <body> via JS (see site.js) to avoid clipping by
+   overflow:auto ancestors like .table-wrapper / .table-container. */
+.info-tooltip {
+  position: fixed;
+  background: var(--text-gray);
+  color: var(--white);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+  width: max-content;
+  max-width: 240px;
+  text-align: center;
+  box-shadow: var(--shadow-dropdown);
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.info-tooltip.visible {
+  opacity: 1;
+}
+
+.info-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  background: var(--text-gray);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.info-tooltip.below::after {
+  bottom: auto;
+  top: -5px;
+}
+
 .col-group-header::after {
   content: '';
   position: absolute;
@@ -1041,8 +1122,8 @@ body {
 .ratio-green-bg { background: var(--ratio-green); }
 .ratio-blue-bg { background: var(--ratio-blue); }
 
-/* Profit Total Last Row */
-.profit-total-last td {
+/* Custom Last Row */
+.custom-last-row td {
   background: linear-gradient(180deg, #0070CB 30%, #0062B2 60%, #00467F 100%) !important;
   font-size: 20px !important;
 }

@@ -444,12 +444,16 @@ function renderVolumeRegionTable(items) {
     var html = '';
     var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
+    var topLevelItems = items.filter(function (item) { return item._depth === 0; });
+    var lastTopLevelId = topLevelItems.length > 0 ? topLevelItems[topLevelItems.length - 1].Id : null;
+
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
+        var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
 
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
@@ -508,12 +512,16 @@ function renderVolumeBranchTable(items) {
     var html = '';
     var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
+    var topLevelItems = items.filter(function (item) { return item._depth === 0; });
+    var lastTopLevelId = topLevelItems.length > 0 ? topLevelItems[topLevelItems.length - 1].Id : null;
+
     items.forEach(function (item, i) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
+        var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
 
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
@@ -970,7 +978,7 @@ function renderProfitTotalRegionTable(items) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
-        var lastRowClass = (item.Id === lastTopLevelId) ? ' profit-total-last' : '';
+        var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1186,7 +1194,7 @@ function renderProfitTotalBranchTable(items) {
         var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
-        var lastRowClass = (item.Id === lastTopLevelId) ? ' profit-total-last' : '';
+        var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
