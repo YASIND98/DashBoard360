@@ -12,7 +12,7 @@
     <title>Yönetici Raporu</title>
     <link href="~/assets/lib/bootstrap/bootstrap-grid.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/assets/lib/loadingjs/loading.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/loading.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/assets/lib/jqueryconfirm/jquery-confirm.css" rel="stylesheet" asp-append-version="true" />
 </head>
 
@@ -78,7 +78,7 @@
                     } else {
                         $('body').loading({
                             stoppable: false,
-                            message: '<div><img src="../assets/img/loader.gif" style="width: 60px;" /><p>Oturumunuz açılıyor...</p></div>'
+                            message: '<div><div class="brand-spinner"></div><p>Oturumunuz açılıyor...</p></div>'
                         });
                         setInterval(function () {
                             $("body").loading('destroy');
@@ -114,7 +114,7 @@
                             } else {
                                 $('body').loading({
                                     stoppable: false,
-                                    message: '<div><img src="../assets/img/loader.gif" style="width: 60px;" /><p>Oturumunuz açılıyor...</p></div>'
+                                    message: '<div><div class="brand-spinner"></div><p>Oturumunuz açılıyor...</p></div>'
                                 });
                                 setInterval(function () {
                                     $("body").loading('destroy');
@@ -152,7 +152,7 @@
 
                         $('body').loading({
                             stoppable: false,
-                            message: '<div><img src="../assets/img/loader.gif" style="width: 60px;" /></div>'
+                            message: '<div><div class="brand-spinner"></div><p>Oturumunuz açılıyor...</p></div>'
                         });
                         setInterval(function () {
                             $("body").loading('destroy');

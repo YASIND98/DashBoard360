@@ -1,0 +1,85 @@
+.loading-overlay {
+    background-color: #111519;
+    color: #fff;
+    display: table;
+    opacity: 0.8;
+    z-index: 150001 !important;
+}
+
+.loading-overlay-content {
+    font-size: 20px;
+    font-weight: 100;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    z-index: 150001 !important;
+}
+
+/* ----- Marka spinner'ı (loader.gif yerine, proje renk paletinde) ----- */
+.brand-spinner {
+    display: inline-block;
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(78, 153, 237, 0.18);
+    border-top-color: #196CFC;
+    border-radius: 50%;
+    animation: brand-spin 0.9s linear infinite;
+}
+
+@keyframes brand-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ----- Skeleton Loading ----- */
+@keyframes skeleton-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+.skeleton-bar {
+    height: 16px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.5s infinite ease-in-out;
+}
+
+.page-skeleton {
+    padding: 0 24px;
+}
+
+.skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.skeleton-filters {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.skeleton-table {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 16px;
+}
+
+.skeleton-table-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 8px;
+}
+
+.skeleton-table-row:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.table-skeleton {
+    padding: 16px;
+}

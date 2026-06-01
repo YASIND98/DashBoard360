@@ -142,18 +142,16 @@ body {
   height: 48px;
 }
 
-.sidebar-text-logo {
+.sidebar-text {
+  font-size: 20px;
+  font-weight: 700;
   display: none;
-  width: auto !important;
-  height: 48px !important;
-  max-width: 0;
   overflow: hidden;
   transition: opacity 0.2s ease, max-width 0.25s ease;
   margin-left: 8px;
 }
 
-.sidebar:hover .sidebar-text-logo {
-  max-width: 160px;
+.sidebar:hover .sidebar-text {
   display: block;
 }
 
@@ -837,7 +835,6 @@ body {
 
 .sub-index {
   font-size: 14px;
-  color: var(--text-body);
   margin-right: 8px;
 }
 
@@ -1085,7 +1082,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 16px;
+  padding: 14px 16px 0;
 }
 
 .legend-note {
@@ -1348,60 +1345,6 @@ body:has(.scorecard-panel.open)::before {
   font-weight: 600;
 }
 
-/* ===== Skeleton Loading ===== */
-@keyframes skeleton-shimmer {
-  0% { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
-}
-
-.skeleton-bar {
-  height: 16px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
-  background-size: 800px 100%;
-  animation: skeleton-shimmer 1.5s infinite ease-in-out;
-}
-
-.page-skeleton {
-  padding: 0 24px;
-}
-
-.skeleton-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.skeleton-filters {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.skeleton-table {
-  background: var(--bg-card);
-  border-radius: var(--radius-xl);
-  padding: 16px;
-}
-
-.skeleton-table-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 8px;
-}
-
-.skeleton-table-row:nth-child(odd) {
-  background: rgba(255,255,255,0.03);
-  border-radius: 12px;
-}
-
-.table-skeleton {
-  padding: 16px;
-}
-
 /* Top 10 icon column */
 .col-top10 {
   padding: 12px !important;
@@ -1652,7 +1595,7 @@ body:has(.scorecard-panel.open)::before {
   }
 
   .table-legend {
-    padding: 0 8px;
+    padding: 14px 8px 0;
   }
 
   .top10-body {
