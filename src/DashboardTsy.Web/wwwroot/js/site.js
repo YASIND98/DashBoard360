@@ -20,8 +20,9 @@ function loadSidebarItems() {
 }
 
 var _sidebarIcons = {
-    'TargetReport': '/images/homepage.svg',
-    'ProductivityReport': '/images/magic-star.svg'
+    'TargetReport': '/images/target-report.svg',
+    'ProductivityReport': '/images/productivity.svg',
+    'ScoreCard': '/images/score-card.svg',
 };
 
 function renderSidebar(items) {
