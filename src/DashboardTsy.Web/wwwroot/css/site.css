@@ -201,6 +201,21 @@ body {
   border-radius: var(--radius-sm);
 }
 
+/* Dış link (yeni sekme) öğelerindeki export ikonu — sağda, yalnızca açıkken */
+.sidebar-export {
+  display: none;
+  margin-left: auto;
+}
+
+.sidebar-nav img.sidebar-export {
+  width: 18px;
+  height: 18px;
+}
+
+.sidebar:hover .sidebar-export {
+  display: block;
+}
+
 /* ===== Main Content ===== */
 .main-content {
   width: 100%;

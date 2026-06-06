@@ -23,6 +23,7 @@ var _sidebarIcons = {
     'TargetReport': '/images/target-report.svg',
     'ProductivityReport': '/images/productivity.svg',
     'ScoreCard': '/images/score-card.svg',
+    'FinancialMap': '/images/financial-map.svg',
 };
 
 function renderSidebar(items) {
@@ -33,13 +34,18 @@ function renderSidebar(items) {
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
         if (!item.IsVisible) continue;
+        var isFinancialMap = item.Code === 'FinancialMap';
         var itemPath = (item.Url || '/').replace(/\/$/, '') || '/';
-        var isActive = currentPath === itemPath ? ' active' : '';
+        var isActive = (!isFinancialMap && currentPath === itemPath) ? ' active' : '';
         var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
         var sideCode = String(item.Code || '').replace(/"/g, '');
-        html += '<a href="' + item.Url + '" class="sidebar-nav' + isActive + '" data-sidebar-code="' + sideCode + '">';
+        var targetAttr = isFinancialMap ? ' target="_blank" rel="noopener noreferrer"' : '';
+        html += '<a href="' + item.Url + '" class="sidebar-nav' + isActive + '" data-sidebar-code="' + sideCode + '"' + targetAttr + '>';
         html += '<img src="' + icon + '" alt="' + item.Name + '" />';
         html += '<span class="sidebar-label">' + item.Name + '</span>';
+        if (isFinancialMap) {
+            html += '<img class="sidebar-export" src="/images/export.svg" alt="" />';
+        }
         html += '</a>';
     }
     $container.html(html);

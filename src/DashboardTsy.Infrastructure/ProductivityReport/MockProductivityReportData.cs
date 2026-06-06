@@ -1236,12 +1236,28 @@ public static class MockProductivityReportData
             },
             new()
             {
+                Code = "ScoreCard",
+                Name = "Skor Kart",
+                Url = "/skor-kart",
+                IsVisible = true,
+                OrderNo = 3
+            },
+            new()
+            {
                 Code = "TargetReport",
-                Name = "Yönetici Raporları",
+                Name = "Hedef Raporları",
                 Url = "/",
                 IsVisible = true,
                 OrderNo = 1
-            }
+            },
+            new()
+            {
+                Code = "FinancialMap",
+                Name = "Finalsal Harita",
+                Url = "https://dashboard-iam.v3.dev.intertech.com.tr/",
+                IsVisible = true,
+                OrderNo = 4
+            },
         };
     }
 
