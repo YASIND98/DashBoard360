@@ -15,19 +15,51 @@
     z-index: 150001 !important;
 }
 
-/* ----- Marka spinner'ı (loader.gif yerine, proje renk paletinde) ----- */
+/* ----- Marka loader'ı: logo üzerinde soldan sağa kayan ışık (shimmer) ----- */
 .brand-spinner {
+    position: relative;
     display: inline-block;
-    width: 60px;
-    height: 60px;
-    border: 5px solid rgba(78, 153, 237, 0.18);
-    border-top-color: #196CFC;
-    border-radius: 50%;
-    animation: brand-spin 0.9s linear infinite;
+    width: 74px;
+    height: 74px;
+    background: url('/images/denizbank-logo.svg') center / contain no-repeat;
 }
 
-@keyframes brand-spin {
-    to { transform: rotate(360deg); }
+.brand-spinner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.85) 50%, transparent 65%);
+    background-size: 250% 100%;
+    /* ışığı logonun şekliyle sınırla */
+    -webkit-mask: url('/images/denizbank-logo.svg') center / contain no-repeat;
+    mask: url('/images/denizbank-logo.svg') center / contain no-repeat;
+    animation: brand-shimmer 1.4s linear infinite;
+}
+
+@keyframes brand-shimmer {
+    0%   { background-position: 150% 0; }
+    100% { background-position: -150% 0; }
+}
+
+/* ----- Yükleniyor / Oturum açılıyor metni + tek tek yüklenen noktalar ----- */
+.loading-text {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+
+.loading-dots span {
+    opacity: 0;
+    animation: loading-dot 1.4s infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.25s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes loading-dot {
+    0%       { opacity: 0; }
+    40%, 100% { opacity: 1; }
 }
 
 /* ----- Skeleton Loading ----- */
