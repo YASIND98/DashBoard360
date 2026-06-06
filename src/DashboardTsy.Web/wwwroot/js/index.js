@@ -80,7 +80,7 @@ $(document).ready(function () {
       if (!$active.length) return 0;
       var subTabMap = {
           'kobi-tumu': 0, 'kobi-kbi': 1, 'kobi-obi': 2,
-          'bireysel-tumu': 0, 'bireysel-genel': 1, 'bireysel-afili': 2, 'bireysel-ozel': 3
+          'bireysel-tumu': 0, 'bireysel-genel': 1, 'bireysel-afili': 2, 'bireysel-ozel': 3, 'bireysel-adet': 3
       };
       var key = $active.data('subtab') || '';
       return subTabMap[key] !== undefined ? subTabMap[key] : 0;
@@ -90,19 +90,32 @@ $(document).ready(function () {
       return $('.period-btn.active').data('period') || 'daily';
   }
 
-  // "Özel Bankacılık" sekmesi yalnızca Adet tipinde gizlenir.
+  // Adet tipinde: "Özel Bankacılık" gizlenir, yerine Afili yanında "AmountSubTabTitle"
+  // sekmesi (subTabId=3) gösterilir. Hacim tipinde tam tersi geçerlidir.
   function updateBireyselOzelVisibility() {
       var $ozel = $('.sub-tab[data-subtab="bireysel-ozel"]');
-      if (!$ozel.length) return;
+      var $adet = $('.sub-tab[data-subtab="bireysel-adet"]');
+      if (!$ozel.length && !$adet.length) return;
+
+      function resetActiveTo(needle) {
+          $(needle).closest('.sub-tab-bar')
+              .find('.sub-tab[data-subtab="bireysel-tumu"]')
+              .addClass('active');
+      }
+
       if (getActiveType() === 'adet') {
           if ($ozel.hasClass('active')) {
               $ozel.removeClass('active');
-              $ozel.closest('.sub-tab-bar')
-                  .find('.sub-tab[data-subtab="bireysel-tumu"]')
-                  .addClass('active');
+              resetActiveTo($ozel);
           }
           $ozel.hide();
+          $adet.show();
       } else {
+          if ($adet.hasClass('active')) {
+              $adet.removeClass('active');
+              resetActiveTo($adet);
+          }
+          $adet.hide();
           $ozel.show();
       }
   }
@@ -655,7 +668,7 @@ $(document).ready(function () {
   function showLoadingOverlay() {
     $('body').loading({
       stoppable: false,
-      message: '<div><div class="brand-spinner"></div><p>Yükleniyor...</p></div>'
+      message: '<div><div class="brand-spinner"></div><p class="loading-text">Yükleniyor<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p></div>'
     });
   }
 

@@ -8,7 +8,7 @@ function showYieldTableLoading() {
     $('#pageSkeleton').show();
     $('body').loading({
         stoppable: false,
-        message: '<div><div class="brand-spinner"></div><p>Yükleniyor...</p></div>'
+        message: '<div><div class="brand-spinner"></div><p class="loading-text">Yükleniyor<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p></div>'
     });
 }
 
