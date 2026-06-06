@@ -34,7 +34,6 @@ function renderSidebar(items) {
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
         if (!item.IsVisible) continue;
-        // FinancialMap öğesi dış link kabul edilir, iframe yerine yeni sekmede açılır
         var isFinancialMap = item.Code === 'FinancialMap';
         var itemPath = (item.Url || '/').replace(/\/$/, '') || '/';
         var isActive = (!isFinancialMap && currentPath === itemPath) ? ' active' : '';
