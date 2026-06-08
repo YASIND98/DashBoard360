@@ -16,4 +16,5 @@ public class GetTargetReportMenuTextsResponse
     public string RetailSubTabGeneralTitle { get; set; } = string.Empty;
     public string RetailSubTabAffiliateTitle { get; set; } = string.Empty;
     public string RetailSubTabPrivateTitle { get; set; } = string.Empty;
+    public string AmountSubTabTitle { get; set; } = string.Empty;
 }

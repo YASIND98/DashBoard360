@@ -21,7 +21,8 @@ public static class MockTargetReportData
             RetailSubTabAllTitle = "Tümü",
             RetailSubTabGeneralTitle = "Genel Kitle",
             RetailSubTabAffiliateTitle = "Afili",
-            RetailSubTabPrivateTitle = "Özel Bankacılık"
+            RetailSubTabPrivateTitle = "Özel Bankacılık",
+            AmountSubTabTitle = "Test"
         };
 
     public static IReadOnlyList<GetTargetReportFiltersItem> GetFilters(int filterId)

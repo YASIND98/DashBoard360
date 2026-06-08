@@ -16,4 +16,5 @@ public class GetTargetReportMenuTextsResponse
     public string RetailSubTabGeneralTitle { get; set; } = string.Empty;   // "Genel Kitle"
     public string RetailSubTabAffiliateTitle { get; set; } = string.Empty; // "Afili"
     public string RetailSubTabPrivateTitle { get; set; } = string.Empty;    // "Özel Bankacılık"
+    public string AmountSubTabTitle { get; set; } = string.Empty; 
 }
