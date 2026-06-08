@@ -3,6 +3,8 @@ using DashboardTsy.Application.TargetReport.Requests;
 using DashboardTsy.Application.TargetReport.Responses;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
+using DashboardTsy.Application.AiInsight.Requests;
+using DashboardTsy.Application.AiInsight.Responses;
 
 namespace DashboardTsy.Application;
 
@@ -154,4 +156,6 @@ public interface IReportDataProvider
     IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request);
     IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems(GetReportSidebarItemsRequest request);
     IReadOnlyList<GetReportDatesItem> GetReportDates();
+
+    GetBranchAiInsightResponse GetBranchAiInsights(GetBranchAiInsightRequest request);
 }

@@ -4,6 +4,8 @@ using DashboardTsy.Application.TargetReport.Requests;
 using DashboardTsy.Application.TargetReport.Responses;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
+using DashboardTsy.Application.AiInsight.Requests;
+using DashboardTsy.Application.AiInsight.Responses;
 using DashboardTsy.Infrastructure.Data;
 using DashboardTsy.Infrastructure.TargetReport;
 using DashboardTsy.Infrastructure.ProductivityReport;
@@ -3316,6 +3318,29 @@ public class ReportDataProvider : IReportDataProvider
         }
 
         return ordered;
+    }
+
+    #endregion
+
+    #region AiInsight
+
+    public GetBranchAiInsightResponse GetBranchAiInsights(GetBranchAiInsightRequest request)
+    {
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@RegionCode"] = request.RegionCode,
+            ["@BranchCode"] = request.BranchCode
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetBranchAiInsights", parameters);
+
+        if (ds.Tables.Count == 0)
+            return new GetBranchAiInsightResponse();
+
+        return new GetBranchAiInsightResponse
+        {
+            Items = DataTableHelper.ToList<GetBranchAiInsightItem>(ds.Tables[0])
+        };
     }
 
     #endregion

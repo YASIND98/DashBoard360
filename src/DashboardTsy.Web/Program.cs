@@ -116,6 +116,7 @@ else
 builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<ITargetReportApiClient, TargetReportApiClient>();
 builder.Services.AddHttpClient<IProductivityReportApiClient, ProductivityReportApiClient>();
+builder.Services.AddHttpClient<IAiInsightApiClient, AiInsightApiClient>();
 builder.Services.AddControllersWithViews()
     .AddJsonOptions(o =>
     {
