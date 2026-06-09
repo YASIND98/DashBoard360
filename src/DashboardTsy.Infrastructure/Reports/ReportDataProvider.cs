@@ -9,6 +9,7 @@ using DashboardTsy.Application.AiInsight.Responses;
 using DashboardTsy.Infrastructure.Data;
 using DashboardTsy.Infrastructure.TargetReport;
 using DashboardTsy.Infrastructure.ProductivityReport;
+using DashboardTsy.Infrastructure.AiInsight;
 using Microsoft.Extensions.Configuration;
 
 namespace DashboardTsy.Infrastructure.Reports;
@@ -3326,6 +3327,9 @@ public class ReportDataProvider : IReportDataProvider
 
     public GetBranchAiInsightResponse GetBranchAiInsights(GetBranchAiInsightRequest request)
     {
+        if (MockEnabled)
+            return MockAiInsightData.GetBranchAiInsights(request.RegionCode, request.BranchCode);
+
         var parameters = new Dictionary<string, object?>
         {
             ["@RegionCode"] = request.RegionCode,
