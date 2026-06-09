@@ -20,6 +20,8 @@
         : $"https://ui-avatars.com/api/?name={initialsEncoded}&background=c44&color=fff&size=36&rounded=true";
 }
 
+<link rel="stylesheet" href="~/css/ai.css" asp-append-version="true" />
+
 <!-- Page Title & Date -->
 <div class="page-header">
     <h1 class="page-title">Verim Performans Raporları</h1>
@@ -137,12 +139,73 @@
     <div class="table-legend" id="tableLegend"></div>
 </div>
 
+<!-- AI İçgörüleri (Floating Button) -->
+<div class="ai-insights">
+    <a href="#" class="ai-insights-btn" id="aiInsightsBtn">
+        <img src="~/images/ai-logo.svg" alt="AI" />
+        <span class="ai-insights-label">AI İçgörüleri</span>
+    </a>
+</div>
+
+<!-- AI İçgörüleri (Drawer) -->
+<div class="ai-drawer-overlay" id="aiDrawerOverlay"></div>
+<aside class="ai-drawer" id="aiDrawer">
+    <div class="ai-drawer-header">
+      <img id="aiDrawerClose" class="ai-drawer-close" src="~/images/close-circle.svg" alt="Kapat" />
+      <span class="ai-drawer-title">AI İçgörüleri</span>
+    </div>
+    <div class="ai-drawer-body">
+        <p class="ai-drawer-desc">
+          Tabloya ait AI içgörüsünü görmek için bölge ve şube seçmelisiniz.
+        </p>
+
+        <div class="ai-notice" id="aiNotice"></div>
+
+        <div class="ai-filter-bar">
+            <span class="ai-filter-tag">Seçili sorgu</span>
+
+            <div class="filter-dropdown-wrapper">
+                <div class="filter-dropdown" id="aiBolgeSelect">
+                    <span class="filter-label" id="aiBolgeLabel">Bölge Seçiniz</span>
+                    <img src="~/images/down.svg" alt="" />
+                </div>
+                <div class="dropdown-panel" id="aiBolgePanel">
+                    <div class="dropdown-search">
+                        <img src="~/images/search.svg" alt="" />
+                        <input type="text" placeholder="Ara" class="dropdown-search-input" id="aiBolgeSearch" />
+                    </div>
+                    <div class="dropdown-list" id="aiBolgeList"></div>
+                </div>
+            </div>
+
+            <div class="filter-dropdown-wrapper">
+                <div class="filter-dropdown" id="aiSubeSelect">
+                    <span class="filter-label" id="aiSubeLabel">Şube Seçiniz</span>
+                    <img src="~/images/down.svg" alt="" />
+                </div>
+                <div class="dropdown-panel" id="aiSubePanel">
+                    <div class="dropdown-search">
+                        <img src="~/images/search.svg" alt="" />
+                        <input type="text" placeholder="Ara" class="dropdown-search-input" id="aiSubeSearch" />
+                    </div>
+                    <div class="dropdown-list" id="aiSubeList"></div>
+                </div>
+            </div>
+
+            <button class="ai-drawer-submit" id="aiDrawerSubmit" type="button" disabled>AI İçgörüsü Oluştur</button>
+        </div>
+
+        <div class="ai-result" id="aiResult"></div>
+    </div>
+</aside>
+
 
 @section Scripts {
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/productivity.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+    <script src="~/js/ai-insights.js" asp-append-version="true"></script>
     <script>
     $(document).ready(function () {
 
