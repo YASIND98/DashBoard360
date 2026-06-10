@@ -377,12 +377,14 @@
 }
 
 .ai-thinking-status {
-    display: flex;
-    align-items: baseline;
-    justify-content: center;
     min-height: 18px;
     color: #68788F;
     font-size: 13px;
+    text-align: center;
+}
+
+.ai-thinking-dots {
+    white-space: nowrap;
 }
 
 .ai-thinking-dots span {
