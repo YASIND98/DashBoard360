@@ -22,22 +22,50 @@ $(document).ready(function () {
         $('#aiDrawerSubmit').prop('disabled', !(aiSelectedRegion && aiSelectedBranch));
     }
 
+    // Sayfadaki (Verim Raporları) filtrelerde seçili bölge/şubeyi oku
+    function getPageSelection() {
+        var $r = $('#yieldBolgeList .dropdown-item.selected');
+        var rcode = $r.attr('data-code');
+        var $b = $('#yieldSubeList .dropdown-item.selected');
+        var bcode = $b.attr('data-code');
+        return {
+            region: rcode ? { code: rcode, name: $r.text() } : null,
+            branch: bcode ? { code: bcode, name: $b.text() } : null
+        };
+    }
+
     // ===== Open / Close =====
     function openAiDrawer() {
+        var pre = getPageSelection();
+
         loadRegionFilters(function () {
             var single = aiRenderRegionDropdown();
-            if (single) {
+            // Öncelik: sayfada seçili bölge; yoksa tek seçenek varsa o
+            if (pre.region) {
+                aiSelectedRegion = pre.region;
+            } else if (single) {
                 aiSelectedRegion = { code: single.Code, name: single.Name };
-                $('#aiBolgeLabel').text(single.Name);
-                $('#aiBolgeSelect').addClass('ai-has-value');
             }
+            if (aiSelectedRegion) {
+                $('#aiBolgeLabel').text(aiSelectedRegion.name);
+                $('#aiBolgeSelect').addClass('ai-has-value');
+                aiRenderRegionDropdown();
+            }
+
             loadBranchFilters(function () {
-                var singleBranch = aiRenderBranchDropdown();
-                if (singleBranch) {
-                    aiSelectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
-                    $('#aiSubeLabel').text(singleBranch.Name);
+                if (pre.branch) {
+                    aiSelectedBranch = pre.branch;
+                } else {
+                    var singleBranch = aiRenderBranchDropdown();
+                    if (singleBranch) {
+                        aiSelectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+                    }
+                }
+                if (aiSelectedBranch) {
+                    $('#aiSubeLabel').text(aiSelectedBranch.name);
                     $('#aiSubeSelect').addClass('ai-has-value');
                 }
+                aiRenderBranchDropdown();
                 aiUpdateSubmitState();
             });
         });
@@ -131,8 +159,47 @@ $(document).ready(function () {
 
         $btn.prop('disabled', true);
         aiHideNotice();
-        // Geniş ekran yalnızca servisten geçerli veri dönerse açılır
         $btn.text('Oluşturuluyor...');
+        // AI "düşünüyor" loader'ı (sonuç gelene kadar)
+        $result.html(aiThinkingHtml());
+
+        // Aşamalı durum metni (AI gerçekten çalışıyormuş hissi)
+        var statusMsgs = [
+            'Şube verileri toplanıyor',
+            'Ürün, hacim ve karlılık metrikleri analiz ediliyor',
+            'Bölge ve banka ortalamalarıyla karşılaştırılıyor',
+            'Güçlü ve zayıf yönler belirleniyor',
+            'Yönetici özeti hazırlanıyor'
+        ];
+        var msgIdx = 0;
+        $('#aiThinkStatus').text(statusMsgs[0]);
+        var statusTimer = setInterval(function () {
+            msgIdx = (msgIdx + 1) % statusMsgs.length;
+            $('#aiThinkStatus').text(statusMsgs[msgIdx]);
+        }, 1400);
+
+        // AI'nin gerçekten düşündüğü hissi için 3-5 sn'lik bekleme
+        var delay = 3000 + Math.floor(Math.random() * 2000);
+        var captured = null; // { summary } | { error: true }
+
+        function finish() {
+            clearInterval(statusTimer);
+            $btn.text('AI İçgörüsü Oluştur');
+            aiUpdateSubmitState();
+
+            if (!captured) return;
+            if (captured.error) {
+                aiShowNotice('İçgörü alınırken bir hata oluştu. Lütfen tekrar deneyin.');
+                return;
+            }
+            if (!captured.summary) {
+                aiShowNotice('Bu bölge ve şubeye ait AI içgörüsü bulunmamaktadır.');
+                return;
+            }
+            $('#aiNotice').empty();
+            $('#aiDrawer').addClass('has-result');
+            $result.html('<div class="ai-result-content">' + renderMarkdown(captured.summary) + '</div>');
+        }
 
         $.ajax({
             url: '/AiInsight/GetBranchAiInsights',
@@ -141,28 +208,35 @@ $(document).ready(function () {
             data: JSON.stringify(payload),
             success: function (data) {
                 var items = (data && data.Items) || (data && data.items) || [];
-                var summary = items.length ? (items[0].Summary || items[0].summary || '') : '';
-
-                if (!summary) {
-                    // Veri yok: geniş ekrandaysa orada kal ve mesajı sonuç alanında göster,
-                    // küçük ekrandaysa mesajı filtrelerin üstünde göster.
-                    aiShowNotice('Bu bölge ve şubeye ait AI içgörüsü bulunmamaktadır.');
-                    return;
-                }
-
-                $('#aiNotice').empty();
-                $('#aiDrawer').addClass('has-result');
-                $result.html('<div class="ai-result-content">' + renderMarkdown(summary) + '</div>');
+                captured = { summary: items.length ? (items[0].Summary || items[0].summary || '') : '' };
             },
             error: function () {
-                aiShowNotice('İçgörü alınırken bir hata oluştu. Lütfen tekrar deneyin.');
+                captured = { error: true };
             },
             complete: function () {
-                $btn.text('AI İçgörüsü Oluştur');
-                aiUpdateSubmitState();
+                // Cevap hızlı gelse bile loader en az `delay` kadar görünür
+                setTimeout(finish, delay);
             }
         });
     });
+
+    // AI "düşünüyor" göstergesi (cam efektli kart + dönen gradient halka + ilerleme)
+    function aiThinkingHtml() {
+        return '<div class="ai-thinking">' +
+                '<div class="ai-thinking-card">' +
+                    '<div class="ai-orb">' +
+                        '<span class="ai-orb-ring"></span>' +
+                        '<span class="ai-orb-core"><img src="/images/ai-logo.svg" alt="" /></span>' +
+                    '</div>' +
+                    '<div class="ai-thinking-title">Yapay Zeka İçgörünüzü Hazırlıyor</div>' +
+                    '<div class="ai-thinking-status">' +
+                        '<span id="aiThinkStatus">Veriler analiz ediliyor</span>' +
+                        '<span class="ai-thinking-dots"><span>.</span><span>.</span><span>.</span></span>' +
+                    '</div>' +
+                    '<div class="ai-thinking-bar"><span></span></div>' +
+                '</div>' +
+            '</div>';
+    }
 
     // ===== Bildirim (hata / veri yok) =====
     function aiNoticeHtml(message) {
