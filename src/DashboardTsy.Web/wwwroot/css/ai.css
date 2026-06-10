@@ -1,7 +1,10 @@
 /* ===== AI İçgörüleri (Floating Button) ===== */
+/* Viewport'a sabit; tablo içeriğiyle kaymaz, ekran ortasına yakın daima görünür */
 .ai-insights {
     position: fixed;
     right: 0;
+    bottom: 30%;
+    transform: translateY(-50%);
     z-index: 1000;
 }
 
@@ -284,6 +287,140 @@
     background: #eef4ff;
     color: #0075FF;
     font-weight: 500;
+}
+
+/* ===== AI "düşünüyor" loader (drawer içeriğini bulanıklaştıran overlay) ===== */
+.ai-thinking {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(246, 249, 253, 0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Cam efektli kart */
+.ai-thinking-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    max-width: 340px;
+    padding: 32px 28px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    box-shadow: 0 24px 60px rgba(16, 69, 112, 0.18);
+    text-align: center;
+}
+
+/* Dönen gradient halka + ortada logo */
+.ai-orb {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-orb-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, #00BBA7, #008CEB, #5647F0, #00BBA7);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 4px));
+    animation: ai-orb-spin 1.1s linear infinite;
+}
+
+.ai-orb-core {
+    position: relative;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(86, 71, 240, 0.18);
+    animation: ai-think-pulse 1.8s ease-in-out infinite;
+}
+
+.ai-orb-core img {
+    width: 30px;
+    height: 30px;
+}
+
+@keyframes ai-orb-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes ai-think-pulse {
+    0%, 100% { transform: scale(1); }
+    50%      { transform: scale(1.06); }
+}
+
+.ai-thinking-title {
+    font-size: 15px;
+    font-weight: 700;
+    background: linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.ai-thinking-status {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    min-height: 18px;
+    color: #68788F;
+    font-size: 13px;
+}
+
+.ai-thinking-dots span {
+    opacity: 0;
+    color: #5647F0;
+    animation: ai-think-dot 1.4s infinite both;
+}
+
+.ai-thinking-dots span:nth-child(1) { animation-delay: 0s; }
+.ai-thinking-dots span:nth-child(2) { animation-delay: 0.25s; }
+.ai-thinking-dots span:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes ai-think-dot {
+    0%        { opacity: 0; }
+    40%, 100% { opacity: 1; }
+}
+
+/* Belirsiz (indeterminate) ilerleme çubuğu */
+.ai-thinking-bar {
+    width: 100%;
+    height: 4px;
+    border-radius: 4px;
+    background: rgba(86, 71, 240, 0.12);
+    overflow: hidden;
+}
+
+.ai-thinking-bar span {
+    display: block;
+    width: 40%;
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%);
+    animation: ai-think-bar 1.3s ease-in-out infinite;
+}
+
+@keyframes ai-think-bar {
+    0%   { transform: translateX(-120%); }
+    100% { transform: translateX(320%); }
 }
 
 /* ===== AI İçgörü Sonucu (Markdown -> HTML) ===== */
