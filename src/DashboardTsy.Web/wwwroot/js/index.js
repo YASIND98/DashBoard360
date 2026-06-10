@@ -90,6 +90,11 @@ $(document).ready(function () {
       return $('.period-btn.active').data('period') || 'daily';
   }
 
+  // Ürün adı "oran" içeriyorsa (ör. aktiflik oranı) değerler % ile gösterilir.
+  function isRatioProduct(name) {
+      return (name || '').toLocaleLowerCase('tr').indexOf('oran') > -1;
+  }
+
   // Adet tipinde: "Özel Bankacılık" gizlenir, yerine Afili yanında "AmountSubTabTitle"
   // sekmesi (subTabId=3) gösterilir. Hacim tipinde tam tersi geçerlidir.
   function updateBireyselOzelVisibility() {
@@ -212,18 +217,22 @@ $(document).ready(function () {
 
   function buildQuantityRows(products, depth, isSub, parentIndex) {
       var html = '';
+      // "%" yalnızca gerçek sayılarda eklenir ("-" değerinde eklenmez)
+      function qVal(v, pct) { return formatNumber(v, false) + (v ? pct : ''); }
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
+          // Ürün adı "oran" içeriyorsa bu satırın değerleri % ile gösterilir
+          var pct = isRatioProduct(p.ProductName) ? '%' : '';
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td>' + formatNumber(p.LastYearAmount, false) + '</td>';
-          html += '<td>' + formatNumber(p.LastTwoMonthEarlierAmount, false) + '</td>';
+          html += '<td>' + qVal(p.LastYearAmount, pct) + '</td>';
+          html += '<td>' + qVal(p.LastTwoMonthEarlierAmount, pct) + '</td>';
           html += '<td class="col-diff">';
-          html += '<div>' + formatNumber(p.LastMonthAmount, false) + '</div>';
+          html += '<div>' + qVal(p.LastMonthAmount, pct) + '</div>';
           html += '<div class="diff-details">';
           html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastYearTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0, false) + '</span></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + qVal(p.DiffByLastYearAmount || 0, pct) + '</span></span>';
           html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastTwoMonthEarlierTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByLastTwoMonthEarlierAmount < 0 ? 'negative' : (p.DiffByLastTwoMonthEarlierAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastTwoMonthEarlierAmount || 0, false) + '</span></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastTwoMonthEarlierAmount < 0 ? 'negative' : (p.DiffByLastTwoMonthEarlierAmount > 0 ? 'positive' : '')) + '">' + qVal(p.DiffByLastTwoMonthEarlierAmount || 0, pct) + '</span></span>';
           html += '</div>';
           html += '</td>';
           html += '</tr>';
