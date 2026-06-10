@@ -165,11 +165,10 @@ $(document).ready(function () {
 
         // Aşamalı durum metni (AI gerçekten çalışıyormuş hissi)
         var statusMsgs = [
-            'Şube verileri toplanıyor',
-            'Ürün, hacim ve karlılık metrikleri analiz ediliyor',
-            'Bölge ve banka ortalamalarıyla karşılaştırılıyor',
-            'Güçlü ve zayıf yönler belirleniyor',
-            'Yönetici özeti hazırlanıyor'
+            'Veriler analiz ediliyor',
+            'Metrikler değerlendiriliyor',
+            'Bölge ve banka ortalamaları karşılaştırılıyor',
+            'İçgörüler derleniyor'
         ];
         var msgIdx = 0;
         $('#aiThinkStatus').text(statusMsgs[0]);
