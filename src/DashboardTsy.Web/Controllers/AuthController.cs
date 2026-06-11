@@ -100,7 +100,7 @@ public class AuthController : Controller
 
         if (result?.Result != null && result.Result.UserId > 0 && result.Result.IsBlock != true)
         {
-            SetSession(result.Result);
+            SetSession(result.Result, userName);
             await LogLoginSuccessAsync("Windows", result.Result, cancellationToken).ConfigureAwait(false);
 
             return RedirectToAction("Index", "Home");
@@ -143,7 +143,7 @@ public class AuthController : Controller
 
         if (result.Result != null && result.Result.UserId > 0 && result.Result.IsBlock != true)
         {
-            SetSession(result.Result);
+            SetSession(result.Result, userName);
             await LogLoginSuccessAsync("Domain", result.Result, cancellationToken).ConfigureAwait(false);
         }
 
@@ -158,7 +158,7 @@ public class AuthController : Controller
             var mock = MockOkUser(model.Email);
             if (mock.Result != null)
             {
-                SetSession(mock.Result);
+                SetSession(mock.Result, model.Email);
                 await LogLoginSuccessAsync("Form(Mock)", mock.Result, cancellationToken).ConfigureAwait(false);
             }
 
@@ -188,7 +188,7 @@ public class AuthController : Controller
 
         if (result.Result != null && result.Result.UserId > 0 && result.Result.IsBlock != true)
         {
-            SetSession(result.Result);
+            SetSession(result.Result, model.Email);
             await LogLoginSuccessAsync("Form", result.Result, cancellationToken).ConfigureAwait(false);
         }
 
@@ -214,9 +214,14 @@ public class AuthController : Controller
         return RedirectToAction("Login", "Auth");
     }
 
-    private void SetSession(UsersDto user)
+    private void SetSession(UsersDto user, string? username = null)
     {
+        var sessionUsername = !string.IsNullOrWhiteSpace(username)
+            ? username
+            : user.DomainName ?? user.Email ?? string.Empty;
+
         HttpContext.Session.SetInt32("UserId", user.UserId);
+        HttpContext.Session.SetString("Username", sessionUsername);
         HttpContext.Session.SetString("NameSurname", user.NameSurname ?? string.Empty);
 
         if (!string.IsNullOrEmpty(user.Authority))
