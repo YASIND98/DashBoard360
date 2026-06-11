@@ -160,44 +160,29 @@ $(document).ready(function () {
         $btn.prop('disabled', true);
         aiHideNotice();
         $btn.text('Oluşturuluyor...');
-        // AI "düşünüyor" loader'ı (sonuç gelene kadar)
-        $result.html(aiThinkingHtml());
+        // Önce ekranı geniş (sonuç) layout'una al; orb yazının başlayacağı yerde yüklensin
+        $('#aiNotice').empty();
+        $('#aiDrawer').addClass('has-result');
+        $result.html(aiLoaderHtml());
+        var thinkStart = Date.now();
 
-        // Aşamalı durum metni (AI gerçekten çalışıyormuş hissi)
-        var statusMsgs = [
-            'Veriler analiz ediliyor',
-            'Metrikler değerlendiriliyor',
-            'Bölge ve banka ortalamaları karşılaştırılıyor',
-            'İçgörüler derleniyor'
-        ];
-        var msgIdx = 0;
-        $('#aiThinkStatus').text(statusMsgs[0]);
-        var statusTimer = setInterval(function () {
-            msgIdx = (msgIdx + 1) % statusMsgs.length;
-            $('#aiThinkStatus').text(statusMsgs[msgIdx]);
-        }, 1400);
-
-        // AI'nin gerçekten düşündüğü hissi için 3-5 sn'lik bekleme
-        var delay = 3000 + Math.floor(Math.random() * 2000);
-        var captured = null; // { summary } | { error: true }
-
-        function finish() {
-            clearInterval(statusTimer);
+        function finish(captured) {
             $btn.text('AI İçgörüsü Oluştur');
             aiUpdateSubmitState();
 
-            if (!captured) return;
             if (captured.error) {
+                $('#aiDrawer').removeClass('has-result');
                 aiShowNotice('İçgörü alınırken bir hata oluştu. Lütfen tekrar deneyin.');
                 return;
             }
             if (!captured.summary) {
+                $('#aiDrawer').removeClass('has-result');
                 aiShowNotice('Bu bölge ve şubeye ait AI içgörüsü bulunmamaktadır.');
                 return;
             }
             $('#aiNotice').empty();
-            $('#aiDrawer').addClass('has-result');
-            $result.html('<div class="ai-result-content">' + renderMarkdown(captured.summary) + '</div>');
+            // Servis cevabını doğrudan "AI yazıyormuş" gibi kademeli olarak ekrana yaz
+            aiTypeMarkdown($result, captured.summary);
         }
 
         $.ajax({
@@ -207,34 +192,135 @@ $(document).ready(function () {
             data: JSON.stringify(payload),
             success: function (data) {
                 var items = (data && data.Items) || (data && data.items) || [];
-                captured = { summary: items.length ? (items[0].Summary || items[0].summary || '') : '' };
+                var captured = { summary: items.length ? (items[0].Summary || items[0].summary || '') : '' };
+                aiAfterThinking(thinkStart, function () { finish(captured); });
             },
             error: function () {
-                captured = { error: true };
-            },
-            complete: function () {
-                // Cevap hızlı gelse bile loader en az `delay` kadar görünür
-                setTimeout(finish, delay);
+                aiAfterThinking(thinkStart, function () { finish({ error: true }); });
             }
         });
     });
 
-    // AI "düşünüyor" göstergesi (cam efektli kart + dönen gradient halka + ilerleme)
-    function aiThinkingHtml() {
-        return '<div class="ai-thinking">' +
-                '<div class="ai-thinking-card">' +
-                    '<div class="ai-orb">' +
-                        '<span class="ai-orb-ring"></span>' +
-                        '<span class="ai-orb-core"><img src="/images/ai-logo.svg" alt="" /></span>' +
-                    '</div>' +
-                    '<div class="ai-thinking-title">Yapay Zeka İçgörünüzü Hazırlıyor</div>' +
-                    '<div class="ai-thinking-status">' +
-                        '<span id="aiThinkStatus">Veriler analiz ediliyor</span>' +
-                        '<span class="ai-thinking-dots"><span>.</span><span>.</span><span>.</span></span>' +
-                    '</div>' +
-                    '<div class="ai-thinking-bar"><span></span></div>' +
-                '</div>' +
-            '</div>';
+    // "Düşünüyor" orb'u en az bu kadar görünür (hızlı cevap gelse bile efekt fark edilir)
+    function aiAfterThinking(startedAt, cb) {
+        var minThink = 900;
+        var wait = Math.max(0, minThink - (Date.now() - startedAt));
+        setTimeout(cb, wait);
+    }
+
+    // Yazının başlayacağı yerde beliren, nefes alıp dönen "yükleniyor" yuvarlağı
+    function aiLoaderHtml() {
+        return '<div class="ai-loader"><span class="ai-loader-orb"></span></div>';
+    }
+
+    // Servis cevabını gerçek bir AI yazıyormuş gibi kademeli olarak ekrana yansıtır.
+    // Markdown bir kez nihai HTML'e çevrilir (biçim/sözdizimi asla ekranda görünmez);
+    // ardından metin, doğru yapı içine akıtılır: bloklar yazıya ulaşıldıkça belirir.
+    // Zaman güdümlüdür: tüm cevap en fazla ~5 saniyede tamamlanır.
+    var AI_TYPE_BUDGET = 8500; // ms — tüm metnin yazılacağı azami süre (gerçekten yazıyor hissi)
+
+    function aiTypeMarkdown($container, md, onDone) {
+        var full = md || '';
+        var $content = $('<div class="ai-result-content ai-typing"></div>');
+        $container.empty().append($content);
+
+        function complete() {
+            if (caret && caret.parentNode) caret.parentNode.removeChild(caret);
+            $content.removeClass('ai-typing');
+            $content.find('.ai-pending').removeClass('ai-pending');
+            if (typeof onDone === 'function') onDone();
+        }
+
+        var caret = null;
+        if (!full) { complete(); return; }
+
+        // 1) Nihai HTML'i tek seferde oluştur — kalın/renk/tablo ilk karakterden itibaren doğru
+        $content.html(renderMarkdown(full));
+        var root = $content[0];
+
+        // 2) Kademeli belirecek blokları başta gizle (yazıya ulaşınca açılırlar)
+        var blocks = root.querySelectorAll('p, h1, h2, h3, h4, h5, h6, hr, table, li, tr');
+        for (var b = 0; b < blocks.length; b++) blocks[b].classList.add('ai-pending');
+
+        // 3) Belge sırasına göre işlem listesi kur; metin düğümlerini boşalt
+        var ops = [];
+        var typedTotal = 0;
+        (function walk(node) {
+            for (var i = 0; i < node.childNodes.length; i++) {
+                var child = node.childNodes[i];
+                if (child.nodeType === 1) {
+                    if (child.classList && child.classList.contains('ai-pending')) {
+                        ops.push({ kind: 'show', el: child });
+                    }
+                    walk(child);
+                } else if (child.nodeType === 3 && child.nodeValue.length) {
+                    ops.push({ kind: 'text', node: child, text: child.nodeValue, start: typedTotal });
+                    typedTotal += child.nodeValue.length;
+                    child.nodeValue = '';
+                }
+            }
+        })(root);
+
+        if (!typedTotal) { // sadece blok/çizgi varsa: hepsini göster
+            ops.forEach(function (o) { if (o.kind === 'show') o.el.classList.remove('ai-pending'); });
+            complete();
+            return;
+        }
+
+        caret = document.createElement('span');
+        caret.className = 'ai-caret';
+
+        function caretAfter(node) {
+            if (node.parentNode) node.parentNode.insertBefore(caret, node.nextSibling);
+        }
+
+        // Kaydırma kabı drawer gövdesidir (#aiResult'ın overflow'u yok)
+        var scroller = $container.closest('.ai-drawer-body')[0] || $container[0];
+        function autoScroll() {
+            if (scroller.scrollHeight > scroller.clientHeight) {
+                scroller.scrollTop = scroller.scrollHeight;
+            }
+        }
+
+        // 4) Zaman güdümlü akış: her karede geçen süreye göre kaç karakter görünmeli hesaplanır.
+        //    Böylece metnin uzunluğundan bağımsız olarak toplam süre ~AI_TYPE_BUDGET'tir.
+        var start = Date.now();
+        var opIdx = 0;
+
+        function frame() {
+            // Drawer kapandıysa / yeniden gönderildiyse içerik DOM'dan koptu: döngüyü durdur
+            if (!root.isConnected) return;
+
+            var progress = (Date.now() - start) / AI_TYPE_BUDGET;
+            if (progress > 1) progress = 1;
+            var revealCount = Math.ceil(typedTotal * progress);
+
+            while (opIdx < ops.length) {
+                var op = ops[opIdx];
+
+                if (op.kind === 'show') {
+                    op.el.classList.remove('ai-pending');
+                    op.el.classList.add('ai-reveal');
+                    opIdx++;
+                    continue;
+                }
+
+                var need = revealCount - op.start;        // bu düğümden kaç karakter görünmeli
+                if (need <= 0) break;                     // sıra henüz bu metne gelmedi
+                var show = op.text.length < need ? op.text.length : need;
+                op.node.nodeValue = op.text.slice(0, show);
+                caretAfter(op.node);
+                if (show < op.text.length) break;         // bu düğüm henüz bitmedi
+                opIdx++;                                  // tamamlandı, sonrakine geç
+            }
+
+            autoScroll();
+
+            if (progress >= 1 || opIdx >= ops.length) { complete(); return; }
+            requestAnimationFrame(frame);
+        }
+
+        requestAnimationFrame(frame);
     }
 
     // ===== Bildirim (hata / veri yok) =====
