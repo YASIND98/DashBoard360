@@ -1,0 +1,59 @@
+#nplDataTable .table-row td {
+    font-size: 14px;
+    padding: 14px 16px;
+}
+
+#nplDataTable .table-row td.col-text {
+    font-weight: 600;
+    color: var(--white) !important;
+    white-space: nowrap;
+}
+
+#nplDataTable .table-row td,
+#nplDataTable .table-row td:first-child,
+#nplDataTable .table-row td:last-child {
+    border-radius: 0 !important;
+}
+
+#nplDataTable .col-group-header::after {
+    display: none;
+}
+
+#nplDataTable .col-group-header {
+    border-left: 1px solid rgba(212, 230, 252, 0.2);
+}
+
+#nplDataTable thead tr:nth-child(2) th.col-group-start{
+    border-left: 1px solid rgba(212, 230, 252, 0.2) !important;
+}
+
+/* Hücreler arası dikey ayraç (tasarımdaki gibi) - başlıkla aynı kenarda (border-left) hizalı */
+#nplDataTable .table-row td:not(.col-text) {
+    border-left: 1px solid rgba(212, 230, 252, 0.2);
+}
+
+#nplDataTable thead th {
+    background: transparent;
+    text-align: left;
+}
+
+#nplTableContainer.table-container {
+    background: var(--bg-table2);
+    border-radius: 40px;
+    padding: 0;
+}
+
+#nplTableContainer .data-table tbody tr.stripe-odd {
+    background: rgba(246, 247, 249, 0.2);
+}
+
+#nplTableContainer .data-table tbody tr:first-child td:first-child,
+#nplTableContainer .data-table tbody tr:first-child td:last-child {
+    border-radius: 0;
+}
+#nplTableContainer .data-table tbody tr.last-visible-row td:first-child {
+    border-radius: 0 0 0 40px;
+}
+#nplTableContainer .data-table tbody tr.last-visible-row td:last-child {
+    border-radius: 0 0 40px 0;
+}
