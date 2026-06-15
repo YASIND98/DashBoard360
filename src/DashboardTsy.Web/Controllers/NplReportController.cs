@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Web.Controllers
 {
-    public class YieldReportsController : Controller
+    public class NplReportController : Controller
     {
-        [Route("/verim-raporlari")]
+        [Route("/npl-raporlari")]
         public IActionResult Index()
         {
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
@@ -13,7 +13,7 @@ namespace DashboardTsy.Web.Controllers
                 return RedirectToAction("Login", "Auth");
 
             var model = new ReportViewModel();
-            return View("~/Views/ProductivityReport/Index.cshtml", model);
+            return View("~/Views/NplReport/Index.cshtml", model);
         }
     }
 }

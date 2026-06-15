@@ -1,0 +1,109 @@
+@model ReportViewModel
+
+<link rel="stylesheet" href="~/css/npl-report.css" asp-append-version="true" />
+
+@{
+    var profilePhoto = Context?.Session?.GetString("ProfilePhoto") ?? string.Empty;
+    var nameSurname = Context?.Session?.GetString("NameSurname") ?? string.Empty;
+    var parts = nameSurname
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    var initials = parts.Length switch
+    {
+        >= 2 => $"{parts[0][0]}{parts[1][0]}",
+        1 => $"{parts[0][0]}",
+        _ => "AD"
+    };
+
+    initials = initials.ToUpperInvariant();
+    var initialsEncoded = System.Net.WebUtility.UrlEncode(initials);
+    var avatarUrl = !string.IsNullOrEmpty(profilePhoto)
+        ? profilePhoto
+        : $"https://ui-avatars.com/api/?name={initialsEncoded}&background=c44&color=fff&size=36&rounded=true";
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">NPL ve Gecikmeli Krediler Raporu</h1>
+    <div class="page-date">
+        <span class="date-text">Rapor Tarihi: <span id="nplReportDate">19 Şubat 2026</span></span>
+    </div>
+    <div class="page-icons">
+        <img src="@avatarUrl" alt="Avatar" class="avatar" />
+        @if (!string.IsNullOrEmpty(nameSurname))
+        {
+            <span class="user-name">@nameSurname</span>
+        }
+    </div>
+</div>
+
+<!-- Breadcrumb -->
+<div class="breadcrumb-bar">
+    <div class="breadcrumb" id="nplBreadcrumb">
+        <span class="breadcrumb-item active">Tüm Bölgeler</span>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="nplRegionSelect">
+                <span class="filter-label" id="nplRegionLabel">Bölge</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="nplRegionPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="nplRegionSearch" />
+                </div>
+                <div class="dropdown-list" id="nplRegionList"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="nplBranchSelect">
+                <span class="filter-label" id="nplBranchLabel">Şube</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="nplBranchPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="nplBranchSearch" />
+                </div>
+                <div class="dropdown-list" id="nplBranchList"></div>
+            </div>
+        </div>
+
+        <div class="filter-search">
+            <img src="~/images/search.svg" alt="" />
+            <input type="text" placeholder="Ara" id="nplSearchInput" />
+        </div>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+    <div class="tab-list" id="nplTabList">
+        <button class="tab active" data-npltab="tumu">Tümü</button>
+        <button class="tab" data-npltab="kurumsal">Kurumsal</button>
+        <button class="tab" data-npltab="ticari">Ticari</button>
+        <button class="tab" data-npltab="kobi">KOBİ</button>
+        <button class="tab" data-npltab="tarim">Tarım</button>
+        <button class="tab" data-npltab="bireysel">Bireysel</button>
+    </div>
+</div>
+
+<!-- NPL Report Table -->
+<div class="table-container" id="nplTableContainer">
+    <div class="table-wrapper">
+        <table class="data-table" id="nplDataTable">
+            <thead id="nplReportHead"></thead>
+            <tbody id="nplReportBody"></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/npl-report.js" asp-append-version="true"></script>
+}
