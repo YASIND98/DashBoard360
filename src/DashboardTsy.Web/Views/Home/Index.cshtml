@@ -1,0 +1,386 @@
+@model ReportViewModel
+
+@{
+    var profilePhoto = Context?.Session?.GetString("ProfilePhoto") ?? string.Empty;
+    var nameSurname = Context?.Session?.GetString("NameSurname") ?? string.Empty;
+    var parts = nameSurname
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    var initials = parts.Length switch
+    {
+        >= 2 => $"{parts[0][0]}{parts[1][0]}",
+        1 => $"{parts[0][0]}",
+        _ => "AD"
+    };
+
+    initials = initials.ToUpperInvariant();
+    var initialsEncoded = System.Net.WebUtility.UrlEncode(initials);
+    var avatarUrl = !string.IsNullOrEmpty(profilePhoto)
+        ? profilePhoto
+        : $"https://ui-avatars.com/api/?name={initialsEncoded}&background=c44&color=fff&size=36&rounded=true";
+}
+
+<!-- Skeleton Loading -->
+<div id="pageSkeleton" class="page-skeleton">
+    <div class="skeleton-header">
+        <div class="skeleton-bar" style="width:100%;height:40px"></div>
+    </div>
+    <div class="skeleton-filters">
+        <div class="skeleton-bar" style="width:140px;height:32px;border-radius:6px"></div>
+        <div class="skeleton-bar" style="width:140px;height:32px;border-radius:6px"></div>
+        <div class="skeleton-bar" style="width:180px;height:32px;border-radius:6px;margin-left:10px"></div>
+    </div>
+    <div class="skeleton-table">
+        @for (int i = 0; i < 12; i++)
+        {
+            <div class="skeleton-table-row">
+                <div class="skeleton-bar" style="width:30px;height:16px"></div>
+                <div class="skeleton-bar" style="width:55%;height:16px"></div>
+                <div class="skeleton-bar" style="width:45%;height:16px"></div>
+                <div class="skeleton-bar" style="width:45%;height:16px"></div>
+                <div class="skeleton-bar" style="width:45%;height:16px"></div>
+                <div class="skeleton-bar" style="width:45%;height:16px"></div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Page Content (hidden until loaded) -->
+<div id="pageContent" style="display:none;">
+
+<!-- Page Title & Date -->
+<div class="page-header">
+    <h1 class="page-title" data-menu="ScreenTitle"></h1>
+    <div class="page-date">
+      <span class="date-text">@Model.Tarih</span>
+      <span class="date-badge">Bugün</span>
+    </div>
+    <div class="page-icons">
+      @if (!string.IsNullOrEmpty(nameSurname))
+      {
+        <span class="user-name">@nameSurname</span>
+      }
+      <img src="@avatarUrl" alt="Avatar" class="avatar" />
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="indexRegionSelect">
+                <span class="filter-label" id="indexRegionLabel">Bölge</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="indexRegionPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexRegionSearch" />
+                </div>
+                <div class="dropdown-list" id="indexRegionList"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="indexBranchSelect">
+                <span class="filter-label" id="indexBranchLabel">Şube</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="indexBranchPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="indexBranchSearch" />
+                </div>
+                <div class="dropdown-list" id="indexBranchList"></div>
+            </div>
+        </div>
+
+        <div class="filter-search">
+            <img src="~/images/search.svg" alt="" />
+            <input type="text" placeholder="Ara" id="searchInput" />
+        </div>
+    </div>
+    <div class="segmented-control">
+      <button class="segment active" data-type="hacim">Hacim</button>
+      <div class="divider"></div>
+      <button class="segment" data-type="adet">Adet</button>
+    </div>
+</div>
+
+<!-- Tabs -->
+<div class="tab-bar">
+  <div class="tab-list">
+    <button class="tab active" data-tab="tumu" data-menu="TabAllTitle"></button>
+    <button class="tab" data-tab="kurumsal" data-menu="TabCorporateTitle"></button>
+    <button class="tab" data-tab="ticari" data-menu="TabCommercialTitle"></button>
+    <button class="tab has-subtabs" data-tab="kobi" data-menu="TabSmeTitle"></button>
+    <button class="tab" data-tab="tarim" data-menu="TabAgricultureTitle"></button>
+    <button class="tab has-subtabs" data-tab="bireysel" data-menu="TabRetailTitle"></button>
+  </div>
+  <div class="period-toggle">
+    <button class="period-btn active" data-period="daily">
+      <img src="~/images/balance.svg" alt="" class="period-icon" /> Bakiye
+    </button>
+    <button class="period-btn" data-period="monthly">
+      <img src="~/images/percentage.svg" alt="" class="period-icon" /> H / G
+    </button>
+  </div>
+</div>
+
+<!-- Sub Tabs - KOBİ -->
+<div class="sub-tab-bar" data-parent-tab="kobi" style="display:none;">
+    <div class="tab-list">
+        <button class="sub-tab active" data-subtab="kobi-tumu" data-menu="SmeSubTabAllTitle"></button>
+        <button class="sub-tab" data-subtab="kobi-kbi" data-menu="SmeSubTabKbiTitle"></button>
+        <button class="sub-tab" data-subtab="kobi-obi" data-menu="SmeSubTabObiTitle"></button>
+    </div>
+</div>
+
+<!-- Sub Tabs - Bireysel -->
+<div class="sub-tab-bar" data-parent-tab="bireysel" style="display:none;">
+    <div class="tab-list">
+        <button class="sub-tab active" data-subtab="bireysel-tumu" data-menu="RetailSubTabAllTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-genel" data-menu="RetailSubTabGeneralTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-afili" data-menu="RetailSubTabAffiliateTitle"></button>
+        <button class="sub-tab" data-subtab="bireysel-adet" data-menu="AmountSubTabTitle" style="display:none;"></button>
+        <button class="sub-tab" data-subtab="bireysel-ozel" data-menu="RetailSubTabPrivateTitle"></button>
+    </div>
+</div>
+
+<!-- Daily Table -->
+<div class="table-container" id="dailyTable">
+  <div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="col-index"></th>
+                <th class="col-expand"></th>
+                <th class="col-text valign-top">
+                  <span data-daily-header="ProductNameTitle"></span>
+                </th>
+                <th>
+                    <span data-daily-header="LastYearTitle"></span>
+                    <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="LastYearDate"></small>
+                </th>
+                <th>
+                    <span data-daily-header="LastWeekTitle"></span>
+                    <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="LastWeekDate"></small>
+                </th>
+                <th>
+                    <span data-daily-header="PrevDayTitle"></span>
+                    <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="PrevDayDate"></small>
+                </th>
+                <th>
+                    <span data-daily-header="YesterdayTitle"></span>
+                    <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-daily-header="YesterdayDate"></small>
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="dailyTableBody">
+        </tbody>
+    </table>
+  </div>
+  <div class="table-legend">
+    <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
+    <div class="legend-colors">
+      <span class="legend-value">-</span>
+      <span class="legend-bar ratio-red-bg"></span>
+      <span class="legend-value">0</span>
+      <span class="legend-bar ratio-green-bg"></span>
+      <span class="legend-value">+</span>
+    </div>
+    <div class="legend-actions">
+      <div class="diff-toggle" id="diffToggle">
+        <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+        <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+        <span>Farkları Göster</span>
+      </div>
+      <div class="download-pdf-btn" id="downloadPdfBtn" style="cursor:pointer;">
+        <img src="~/images/download.svg" alt="PDF İndir" />
+        <span>PDF İndir</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quantity Table -->
+<div class="table-container" id="quantityTable" style="display:none;">
+  <div class="table-wrapper">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th class="col-index"></th>
+                <th class="col-expand"></th>
+                <th class="col-text valign-top">
+                  <span data-quantity-header="ProductNameTitle"></span>
+                </th>
+                <th>
+                    <span data-quantity-header="LastYearTitle"></span>
+                    <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-quantity-header="LastYearDate"></small>
+                </th>
+                <th>
+                    <span data-quantity-header="LastTwoMonthEarlierTitle"></span>
+                    <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-quantity-header="LastTwoMonthEarlierDate"></small>
+                </th>
+                <th>
+                    <span data-quantity-header="LastMonthTitle"></span>
+                    <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>
+                    <small data-quantity-header="LastMonthDate"></small>
+                </th>
+            </tr>
+        </thead>
+        <tbody id="quantityTableBody">
+        </tbody>
+    </table>
+  </div>
+  <div class="table-legend">
+    <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
+    <div class="legend-colors">
+      <span class="legend-value">-</span>
+      <span class="legend-bar ratio-red-bg"></span>
+      <span class="legend-value">0</span>
+      <span class="legend-bar ratio-green-bg"></span>
+      <span class="legend-value">+</span>
+    </div>
+    <div class="legend-actions">
+      <div class="diff-toggle" id="quantityDiffToggle">
+        <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+        <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+        <span>Farkları Göster</span>
+      </div>
+      <div class="download-pdf-btn" style="cursor:pointer;">
+        <img src="~/images/download.svg" alt="PDF İndir" />
+        <span>PDF İndir</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Monthly Skeleton -->
+<div id="monthlyTableSkeleton" class="page-skeleton" style="display:none;">
+    <div class="skeleton-table">
+        @for (int i = 0; i < 12; i++)
+        {
+            <div class="skeleton-table-row">
+                <div class="skeleton-bar" style="width:30px;height:16px"></div>
+                <div class="skeleton-bar" style="width:55%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:15%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:20%;height:16px"></div>
+                <div class="skeleton-bar" style="width:15%;height:16px"></div>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Monthly Table -->
+<div class="table-container" id="monthlyTable" style="display:none;">
+    <div class="table-wrapper">
+      <table class="data-table" id="monthlyDataTable">
+          <thead>
+              <tr>
+                  <th class="col-index" rowspan="2"></th>
+                  <th class="col-expand" rowspan="2"></th>
+                  <th class="col-text valign-bottom" rowspan="2">
+                    <span data-monthly-header="ProductNameTitle"></span>
+                  </th>
+                  <th colspan="3" class="col-group-header selected">
+                    <div class="col-group-header-content">
+                      <span data-monthly-header="MonthGroupTitle"></span>
+                      <span class="info-icon" data-tooltip="Aylık kolon, içinde bulunulan ayın ortalama bakiyelerini gösterir.">
+                          <img src="~/images/info.svg" alt="" asp-append-version="true" />
+                      </span>
+                    </div>
+                  </th>
+                  <th colspan="3" class="col-group-header">
+                    <div class="col-group-header-content">
+                      <span data-monthly-header="YearGroupTitle"></span>
+                      <span class="info-icon" data-tooltip="Yıllık kolon içinde bulunulan yılın gün bazlı kümülatif ortalama bakiyelerini gösterir.">
+                          <img src="~/images/info.svg" alt="" asp-append-version="true" />
+                      </span>
+                    </div>
+                  </th>
+              </tr>
+              <tr>
+                  <th class="col-selected col-selected-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="col-selected"><span data-monthly-header="MonthTargetTitle"></span> <i class="sort-icon" data-sort-by="3"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th class="col-selected col-selected-last" data-monthly-header="MonthHGTitle"></th>
+                  <th><span data-monthly-header="YearActualTitle"></span> <i class="sort-icon" data-sort-by="4"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th><span data-monthly-header="YearTargetTitle"></span> <i class="sort-icon" data-sort-by="5"><span class="sort-up">▲</span><span class="sort-down">▼</span></i></th>
+                  <th data-monthly-header="YearHGTitle"></th>
+              </tr>
+          </thead>
+          <tbody id="monthlyTableBody">
+          </tbody>
+      </table>
+    </div>
+    <div class="table-legend">
+      <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
+      <div class="legend-colors">
+        <span class="legend-value">0</span>
+        <span class="legend-bar ratio-red-bg"></span>
+        <span class="legend-value">75</span>
+        <span class="legend-bar ratio-orange-bg"></span>
+        <span class="legend-value">100</span>
+        <span class="legend-bar ratio-green-bg"></span>
+        <span class="legend-value">120</span>
+        <span class="legend-bar ratio-blue-bg"></span>
+      </div>
+      <div class="legend-actions">
+        <div class="download-pdf-btn" style="cursor:pointer;">
+          <img src="~/images/download.svg" alt="PDF İndir" />
+          <span>PDF İndir</span>
+        </div>
+      </div>
+    </div>
+</div>
+
+<!-- Top 10 Modal -->
+<div class="top10-overlay" id="top10Overlay">
+  <div class="top10-modal">
+    <div class="top10-header">
+      <h2 class="top10-title"></h2>
+      <div class="top10-header-right">
+        <div class="top10-period-toggle">
+          <button class="toggle-btn active" data-top10-period="daily">
+            <img src="~/images/calendar.svg" alt="calendar" class="top10-toggle-icon" /> Günlük
+          </button>
+          <button class="toggle-btn" data-top10-period="weekly">
+            <img src="~/images/weekly-calendar.svg" alt="calendar" class="top10-toggle-icon" /> Haftalık
+          </button>
+        </div>
+        <button class="top10-close" id="top10Close">
+          <img src="~/images/close-circle.svg" alt="Kapat" />
+        </button>
+      </div>
+    </div>
+    <div class="top10-body">
+      <div class="top10-column">
+        <h3 class="top10-column-title">İlk 10</h3>
+        <div class="top10-list" id="top10First"></div>
+      </div>
+      <div class="top10-column">
+        <h3 class="top10-column-title">Son 10</h3>
+        <div class="top10-list" id="top10Last"></div>
+      </div>
+    </div>
+    <span class="legend-note" style="display:inline-block;margin-top:16px">Tablodaki değerler /1000 olarak verilmektedir.</span>
+  </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
+    <script src="~/js/constants.js" asp-append-version="true"></script>
+    <script src="~/js/index.js" asp-append-version="true"></script>
+    <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+}

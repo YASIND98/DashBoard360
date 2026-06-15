@@ -1,0 +1,427 @@
+/* ===== AI İçgörüleri (Floating Button) ===== */
+/* Viewport'a sabit; tablo içeriğiyle kaymaz, ekran ortasına yakın daima görünür */
+.ai-insights {
+    position: fixed;
+    right: 0;
+    bottom: 30%;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+
+.ai-insights-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 22px 0 0 22px;
+    border: 1px solid transparent;
+    background:
+        linear-gradient(rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0.75)) padding-box,
+        linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%) border-box;
+    box-shadow: 0 0 12px 1px rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    text-decoration: none;
+    transition: box-shadow 0.3s ease;
+}
+
+
+.ai-insights-btn img {
+    width: 24px;
+    height: 24px;
+}
+
+.ai-insights-label {
+    display: none;
+    font-weight: 500;
+    margin-left: 4px;
+    background: linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    transition: max-width 0.3s ease, margin-left 0.3s ease, opacity 0.25s ease;
+}
+
+/* Hover: open to the left */
+.ai-insights:hover .ai-insights-btn {
+    background:
+        linear-gradient(white, white) padding-box,
+        linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%) border-box;
+}
+
+.ai-insights:hover .ai-insights-label {
+    display: block;
+}
+
+/* ===== AI İçgörüleri Drawer ===== */
+.ai-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 20, 40, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 1100;
+}
+
+.ai-drawer-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ai-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 440px;
+    max-width: 80vw;
+    background: white;
+    box-shadow: -8px 0 30px rgba(0, 0, 0, 0.18);
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    z-index: 1101;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+}
+
+.ai-drawer.open {
+    transform: translateX(0);
+}
+
+.ai-drawer-header {
+    display: grid;
+    grid-template-columns: 24px 1fr;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.ai-drawer-title {
+    color: #104570;
+    font-weight: 600;
+    text-align: center;
+}
+
+.ai-drawer-close {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.ai-drawer-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    /* overflow-y:auto yatayda da kırpıyor; açık dropdown'un mavi focus halkası
+       sağ/sol kenarda kesilmesin diye yatay pay (negatif margin ile hiza korunur) */
+    padding: 2px 6px;
+    margin: -2px -6px;
+}
+
+.ai-drawer-desc {
+    color: #68788F;
+    font-weight: 400;
+}
+
+.ai-drawer-submit {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 6px;
+    background: #0573CC;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.ai-drawer-submit:disabled {
+    background: #7DB4F3;
+    cursor: not-allowed;
+}
+
+/* ===== Bildirim (hata / veri yok) ===== */
+.ai-notice:empty {
+    display: none;
+}
+
+.ai-notice-error {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    background: #FFECE9;
+    color: #F53C2B;
+    font-size: 13px;
+}
+
+.ai-notice-icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+}
+
+.ai-notice-text {
+    flex: 1;
+}
+
+/* ===== Filtre alanı: seçim öncesi (dikey form) ===== */
+.ai-filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* "Seçim yapıldı" etiketi yalnızca sonuç görünümünde gösterilir */
+.ai-filter-tag {
+    display: none;
+    color: #68788F;
+    font-size: 14px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+/* ===== Filtre alanı: sonuç görünümü (yatay kompakt bar) ===== */
+.ai-drawer.has-result {
+    width: 820px;
+    max-width: 90vw;
+}
+
+.ai-drawer.has-result .ai-drawer-desc {
+    display: none;
+}
+
+.ai-drawer.has-result .ai-filter-bar {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    padding: 12px;
+    background: #F6F7F9;
+    border-radius: 12px;
+}
+
+.ai-drawer.has-result .ai-filter-tag {
+    display: block;
+}
+
+.ai-drawer.has-result .ai-filter-bar .filter-dropdown-wrapper {
+    width: 100%;
+}
+
+.ai-drawer.has-result .ai-filter-bar .ai-drawer-submit {
+    width: 100%;
+}
+
+/* Light-theme overrides for reused filter dropdowns inside the drawer */
+.ai-drawer .filter-dropdown-wrapper {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+.ai-drawer .filter-dropdown {
+    padding: 6px 12px;
+    border-color: rgba(134, 143, 160, 0.15);
+    border-radius: 6px;
+    color: #8795A9;
+    font-weight: 400;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Seçim yapıldığında: filter-dropdown text + border rengi değişir */
+.ai-drawer .filter-dropdown.ai-has-value {
+    color: #3B4351;
+    border-color: #B1BAC8;
+}
+
+/* Focus / açık durum: tasarıma uygun mavi border + soft ring */
+.ai-drawer .filter-dropdown-wrapper:has(.dropdown-panel.open) .filter-dropdown {
+    border-color: #4B91F7;
+    box-shadow: 0 0 0 4px rgba(75, 145, 247, 0.18);
+}
+
+.ai-drawer .filter-dropdown img,
+.ai-drawer .dropdown-search img {
+    filter: brightness(0) opacity(0.6);
+}
+
+.ai-drawer .dropdown-panel {
+    background: #fff;
+    border-color: #e5e8ef;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(16, 69, 112, 0.12);
+    margin-top: 6px;
+    width: 100%;
+}
+
+/* Tasarımda arama alanı yok — gizle */
+.ai-drawer .dropdown-search {
+    display: none;
+}
+
+.ai-drawer .dropdown-item {
+    padding: 6px 12px;
+    color: #8795A9;
+    font-weight: 400;
+    border-bottom: none;
+}
+
+/* Zebra striping (tasarıma uygun) */
+.ai-drawer .dropdown-item:nth-child(even) {
+    background: #FBFBFD;
+}
+
+.ai-drawer .dropdown-item:hover {
+    background: #eef2f8;
+}
+
+.ai-drawer .dropdown-item.selected {
+    background: #eef4ff;
+    color: #0075FF;
+    font-weight: 500;
+}
+
+/* ===== "Yükleniyor" yuvarlağı: yazının başlayacağı yerde, sol üstte beliren orb ===== */
+.ai-loader {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 14px 0;
+}
+
+.ai-loader-orb {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%);
+    box-shadow: 0 6px 18px rgba(86, 71, 240, 0.32);
+    animation: ai-orb-breathe 1.3s ease-in-out infinite;
+}
+
+/* Yazıya başlanıncaya kadar küçülüp büyüyen nabız efekti */
+@keyframes ai-orb-breathe {
+    0%, 100% { transform: scale(0.7); box-shadow: 0 4px 12px rgba(86, 71, 240, 0.25); }
+    50%      { transform: scale(1); box-shadow: 0 8px 22px rgba(0, 140, 235, 0.42); }
+}
+
+/* ===== AI İçgörü Sonucu (Markdown -> HTML) ===== */
+.ai-result-loading,
+.ai-result-empty,
+.ai-result-error {
+    padding: 16px;
+    border-radius: 10px;
+    background: #f5f8fc;
+    color: #68788F;
+    font-size: 13px;
+    text-align: center;
+}
+
+.ai-result-error {
+    background: #fdeef0;
+    color: #c0392b;
+}
+
+.ai-result-content {
+    color: #3B4351;
+    font-size: 13px;
+    line-height: 1.55;
+    word-break: break-word;
+}
+
+.ai-result-content h1,
+.ai-result-content h2,
+.ai-result-content h3,
+.ai-result-content h4 {
+    color: #104570;
+    font-weight: 600;
+    margin: 16px 0 8px;
+}
+
+.ai-result-content h1 { font-size: 16px; }
+.ai-result-content h2 { font-size: 15px; }
+.ai-result-content h3 { font-size: 14px; }
+.ai-result-content h4 { font-size: 13px; }
+
+.ai-result-content p {
+    margin: 0 0 10px;
+}
+
+.ai-result-content ul {
+    margin: 0 0 12px;
+    padding-left: 18px;
+}
+
+.ai-result-content li {
+    margin-bottom: 6px;
+}
+
+.ai-result-content hr {
+    border: none;
+    border-top: 1px solid #e5e8ef;
+    margin: 16px 0;
+}
+
+.ai-result-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 8px 0 14px;
+    font-size: 12px;
+}
+
+.ai-result-content th,
+.ai-result-content td {
+    border: 1px solid #e5e8ef;
+    padding: 5px 7px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.ai-result-content th {
+    background: #f5f8fc;
+    color: #104570;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ai-result-content tbody tr:nth-child(even) {
+    background: #fbfbfd;
+}
+
+/* "AI yazıyor" imleci — metni takip eden ince, hafif parlayan kalem ucu */
+.ai-caret {
+    display: inline-block;
+    width: 2.5px;
+    height: 1.05em;
+    margin: 0 1px -0.12em 1px;
+    border-radius: 2px;
+    background: linear-gradient(180deg, #008CEB, #5647F0);
+    box-shadow: 0 0 6px rgba(86, 71, 240, 0.5);
+    animation: ai-caret-pulse 1s ease-in-out infinite;
+}
+
+@keyframes ai-caret-pulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.3; }
+}
+
+/* Kademeli blok açılışı: bloklar yazıya ulaşıldıkça yumuşakça belirir */
+.ai-result-content.ai-typing .ai-pending {
+    display: none;
+}
+
+.ai-result-content .ai-reveal {
+    animation: ai-block-in 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+@keyframes ai-block-in {
+    from { opacity: 0; transform: translateY(5px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

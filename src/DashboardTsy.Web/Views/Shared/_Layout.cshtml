@@ -1,0 +1,44 @@
+﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+@{
+    var activityUserId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId") ?? 0;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yönetici Raporu</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="~/assets/lib/google-fonts/inter/inter.css" rel="stylesheet" asp-append-version="true" />
+</head>
+<body>
+    <div class="app-wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <img src="~/images/denizbank-logo.svg" alt="Logo" />
+                <p class="sidebar-text">Yönetici Raporları</p>
+            </div>
+            <div id="sidebar-nav-items"></div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            @RenderBody()
+        </div>
+    </div>
+
+    @if (activityUserId > 0)
+    {
+        <script>
+            window._activityLogEnabled = true;
+            window._activityLogUrl = '@Url.Content("~/api/ActivityLog/client")';
+        </script>
+    }
+    <script src="~/assets/lib/jquery/jquery-3.7.1.min.js" asp-append-version="true"></script>
+    <link href="~/css/loading.css" rel="stylesheet" asp-append-version="true" />
+    <script src="~/assets/lib/loadingjs/loading.js" asp-append-version="true"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

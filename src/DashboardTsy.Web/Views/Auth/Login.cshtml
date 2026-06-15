@@ -1,0 +1,178 @@
+@{
+    ViewData["Title"] = "Login";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yönetici Raporu</title>
+    <link href="~/assets/lib/bootstrap/bootstrap-grid.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/loading.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/assets/lib/jqueryconfirm/jquery-confirm.css" rel="stylesheet" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="~/images/denizbank-logo.svg" alt="DenizBank" />
+                <h2>Yönetici Rapor Platformu</h2>
+            </div>
+
+            <div class="login-card">
+                <div class="login-visual">
+                    <div class="visual-overlay"></div>
+                    <img src="~/assets/img/reportbg.jpg" alt="" />
+                </div>
+
+                <div class="login-form">
+                    <h3>Giriş Yap</h3>
+
+                    <div class="input-group">
+                        <input type="text" id="username" placeholder="Email / Kullanıcı Adı" autocomplete="new-password" />
+                    </div>
+
+                    <div class="input-group">
+                        <input type="password" id="password" placeholder="Şifre" autocomplete="new-password" />
+                    </div>
+
+                    <label class="remember-check">
+                        <input type="checkbox" id="customCheck1" />
+                        <span>Oturumumu açık tut</span>
+                    </label>
+
+                    <button class="login-btn" onclick="Login();">Giriş Yap</button>
+
+                    <div class="login-footer">
+                        Hesabınız yoksa <a href="#" onclick="RegisterTab(); return false;">buradan</a> kayıt olun.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/assets/lib/jquery/jquery-3.7.1.min.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/jquery/jquery.cookie.min.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/jqueryconfirm/jquery-confirm.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/loadingjs/loading.js" asp-append-version="true"></script>
+
+    <script>
+        const loginDomainUrl = '@Url.Action("LoginDomain", "Auth")';
+        const loginUserUrl = '@Url.Action("LoginUser", "Auth")';
+        const homeIndexUrl = '@Url.Action("Index", "Home")';
+
+        $(document).ready(function () {
+            $.ajax({
+                type: "GET",
+                url: loginDomainUrl,
+                cache: false,
+                success: function (res) {
+                    const result = res?.Result ?? res?.result;
+                    if (!res || !result || result.UserId <= 0) {
+                        LocalLogin();
+                    } else {
+                        $('body').loading({
+                            stoppable: false,
+                            message: '<div><div class="brand-spinner"></div><p class="loading-text">Oturumunuz açılıyor<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p></div>'
+                        });
+                        setInterval(function () {
+                            $("body").loading('destroy');
+                            window.location.href = homeIndexUrl;
+                        }, 2000);
+                    }
+                }
+            });
+        });
+
+        function LocalLogin() {
+            if (localStorage.getItem("loginCheck") == "true") {
+                $("#customCheck1").prop('checked', true);
+                if (localStorage.userName && localStorage.password) {
+                    $("#username").val(localStorage.getItem("userName"));
+
+                    $.ajax({
+                        type: "POST",
+                        url: loginUserUrl,
+                        cache: false,
+                        data: { "Email": localStorage.getItem("userName"), "Pass": localStorage.getItem("password") },
+                        success: function (res) {
+                            const result = res?.Result ?? res?.result;
+                            const msg = res?.Message ?? res?.message;
+                            if (!res || !result || result.UserId <= 0) {
+                                $.confirm({
+                                    title: msg?.message ?? "Hata",
+                                    content: msg?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
+                                    buttons: {
+                                        TAMAM: function () { }
+                                    }
+                                });
+                            } else {
+                                $('body').loading({
+                                    stoppable: false,
+                                    message: '<div><div class="brand-spinner"></div><p class="loading-text">Oturumunuz açılıyor<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p></div>'
+                                });
+                                setInterval(function () {
+                                    $("body").loading('destroy');
+                                    window.location.href = homeIndexUrl;
+                                }, 2000);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        function Login() {
+            $.ajax({
+                type: "POST",
+                url: loginUserUrl,
+                cache: false,
+                data: { "Email": $("#username").val(), "Pass": $("#password").val() },
+                success: function (res) {
+                    const result = res?.Result ?? res?.result;
+                    const msg = res?.Message ?? res?.message;
+                    if (!res || !result || result.UserId <= 0) {
+                        $.confirm({
+                            title: msg?.message ?? "Hata",
+                            content: msg?.message2 ?? "Hatalı kullanıcı adı veya şifre.",
+                            buttons: {
+                                TAMAM: function () { }
+                            }
+                        });
+                    } else {
+                        localStorage.setItem("userName", $("#username").val());
+                        localStorage.setItem("password", $("#password").val());
+                        var check = $("#customCheck1").is(':checked') ? "true" : "false";
+                        localStorage.setItem("loginCheck", check);
+
+                        $('body').loading({
+                            stoppable: false,
+                            message: '<div><div class="brand-spinner"></div><p class="loading-text">Oturumunuz açılıyor<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p></div>'
+                        });
+                        setInterval(function () {
+                            $("body").loading('destroy');
+                            window.location.href = homeIndexUrl;
+                        }, 2000);
+                    }
+                }
+            });
+        }
+
+        function RegisterTab() {
+            $.confirm({
+                title: 'Uyarı',
+                content: 'Kayıt için yöneticinizle iletişime geçiniz.',
+                buttons: {
+                    TAMAM: function () { }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>

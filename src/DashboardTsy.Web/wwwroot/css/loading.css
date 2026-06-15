@@ -1,0 +1,117 @@
+.loading-overlay {
+    background-color: #111519;
+    color: #fff;
+    display: table;
+    opacity: 0.8;
+    z-index: 150001 !important;
+}
+
+.loading-overlay-content {
+    font-size: 20px;
+    font-weight: 100;
+    text-align: center;
+    display: table-cell;
+    vertical-align: middle;
+    z-index: 150001 !important;
+}
+
+/* ----- Marka loader'ı: logo üzerinde soldan sağa kayan ışık (shimmer) ----- */
+.brand-spinner {
+    position: relative;
+    display: inline-block;
+    width: 74px;
+    height: 74px;
+    background: url('/images/denizbank-logo.svg') center / contain no-repeat;
+}
+
+.brand-spinner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.85) 50%, transparent 65%);
+    background-size: 250% 100%;
+    /* ışığı logonun şekliyle sınırla */
+    -webkit-mask: url('/images/denizbank-logo.svg') center / contain no-repeat;
+    mask: url('/images/denizbank-logo.svg') center / contain no-repeat;
+    animation: brand-shimmer 1.4s linear infinite;
+}
+
+@keyframes brand-shimmer {
+    0%   { background-position: 150% 0; }
+    100% { background-position: -150% 0; }
+}
+
+/* ----- Yükleniyor / Oturum açılıyor metni + tek tek yüklenen noktalar ----- */
+.loading-text {
+    font-size: 16px;
+    font-weight: 500;
+    margin-top: 6px;
+}
+
+.loading-dots span {
+    opacity: 0;
+    animation: loading-dot 1.4s infinite both;
+}
+
+.loading-dots span:nth-child(1) { animation-delay: 0s; }
+.loading-dots span:nth-child(2) { animation-delay: 0.25s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.5s; }
+
+@keyframes loading-dot {
+    0%       { opacity: 0; }
+    40%, 100% { opacity: 1; }
+}
+
+/* ----- Skeleton Loading ----- */
+@keyframes skeleton-shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+}
+
+.skeleton-bar {
+    height: 16px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.1) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 800px 100%;
+    animation: skeleton-shimmer 1.5s infinite ease-in-out;
+}
+
+.page-skeleton {
+    padding: 0 24px;
+}
+
+.skeleton-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.skeleton-filters {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.skeleton-table {
+    background: var(--bg-card);
+    border-radius: var(--radius-xl);
+    padding: 16px;
+}
+
+.skeleton-table-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 8px;
+}
+
+.skeleton-table-row:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+}
+
+.table-skeleton {
+    padding: 16px;
+}
