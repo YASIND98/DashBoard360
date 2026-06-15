@@ -23,6 +23,7 @@ var _sidebarIcons = {
     'TargetReport': '/images/target-report.svg',
     'ProductivityReport': '/images/productivity.svg',
     'ScoreCard': '/images/score-card.svg',
+    'NplReport': '/images/npl.svg',
     'FinancialMap': '/images/financial-map.svg',
 };
 
@@ -305,9 +306,11 @@ function handleTableSearch(inputSelector) {
 
         $table.find('.no-result-row').remove();
         var $legend = $table.closest('.table-container').find('.table-legend');
+        var $thead = $table.closest('table').find('thead');
 
         if (!query) {
             $table.find('tr.table-row').css('display', '');
+            $thead.show();
             $legend.show();
             reStripeTable($table);
             return;
@@ -340,16 +343,19 @@ function handleTableSearch(inputSelector) {
         });
 
         if ($table.find('tr.table-row:visible').length === 0) {
+            var colCount = $thead.find('th').length || 1;
+            // Boş durumda kolon başlıklarını gizle
+            $thead.hide();
             $legend.hide();
-            var colCount = $table.closest('table').find('thead th').length || 1;
             $table.append(
                 '<tr class="no-result-row"><td colspan="' + colCount + '" style="text-align:center;padding:48px 16px;">' +
-                '<div style="color:#8b95b8;font-size:14px;">' +
-                '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8b95b8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;display:block;margin-left:auto;margin-right:auto;"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>' +
-                '"<strong>' + $('<span>').text(query).html() + '</strong>" ile eşleşen sonuç bulunamadı.' +
+                '<div class="table-empty-state">' +
+                '<img src="/images/empty-state-seach.svg" alt="" />' +
+                '<span>"<strong>' + $('<span>').text(query).html() + '</strong>" ile eşleşen sonuç bulunamadı.</span>' +
                 '</div></td></tr>'
             );
         } else {
+            $thead.show();
             $legend.show();
         }
 
@@ -413,7 +419,7 @@ $(document).ready(function () {
       if (!$infoTooltip) {
           $infoTooltip = $('<div class="info-tooltip" role="tooltip"></div>').appendTo('body');
       }
-      $infoTooltip.text(text).removeClass('below');
+      $infoTooltip.text(text).addClass('below');
       var rect = $icon[0].getBoundingClientRect();
       $infoTooltip.css({ visibility: 'hidden', left: 0, top: 0 }).addClass('visible');
       var tw = $infoTooltip.outerWidth();
@@ -423,11 +429,15 @@ $(document).ready(function () {
       var left = iconCenter - tw / 2;
       if (left < pad) left = pad;
       if (left + tw > window.innerWidth - pad) left = window.innerWidth - tw - pad;
-      var top = rect.top - th - 10;
-      if (top < pad) {
-          top = rect.bottom + 10;
-          $infoTooltip.addClass('below');
+      // Tasarımdaki gibi varsayılan altta; altta yer yoksa üste dön
+      var top = rect.bottom + 10;
+      if (top + th > window.innerHeight - pad) {
+          top = rect.top - th - 10;
+          $infoTooltip.removeClass('below');
       }
+      // Ok, kutu ortasına değil ikonun gerçek merkezine hizalansın (kenara clamp olunca kaymayı önler)
+      var arrowLeft = Math.max(14, Math.min(tw - 14, iconCenter - left));
+      $infoTooltip[0].style.setProperty('--arrow-left', arrowLeft + 'px');
       $infoTooltip.css({ left: left + 'px', top: top + 'px', visibility: 'visible' });
   }
 

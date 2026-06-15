@@ -1228,22 +1228,6 @@ public static class MockProductivityReportData
         {
             new()
             {
-                Code = "ProductivityReport",
-                Name = "Verim Raporları",
-                Url = "/verim-raporlari",
-                IsVisible = true,
-                OrderNo = 2
-            },
-            new()
-            {
-                Code = "ScoreCard",
-                Name = "Skor Kart",
-                Url = "/skor-kart",
-                IsVisible = true,
-                OrderNo = 3
-            },
-            new()
-            {
                 Code = "TargetReport",
                 Name = "Hedef Raporları",
                 Url = "/",
@@ -1252,11 +1236,35 @@ public static class MockProductivityReportData
             },
             new()
             {
+                Code = "ProductivityReport",
+                Name = "Verim Raporları",
+                Url = "/verim-raporlari",
+                IsVisible = true,
+                OrderNo = 2
+            },
+            new()
+            {
+                Code = "NplReport",
+                Name = "NPL ve Gecikmeli Krediler Raporu",
+                Url = "/npl-raporlari",
+                IsVisible = true,
+                OrderNo = 3
+            },
+            new()
+            {
+                Code = "ScoreCard",
+                Name = "Skor Kart",
+                Url = "/skor-kart",
+                IsVisible = true,
+                OrderNo = 4
+            },
+            new()
+            {
                 Code = "FinancialMap",
                 Name = "Finalsal Harita",
                 Url = "https://dashboard-iam.v3.dev.intertech.com.tr/",
                 IsVisible = true,
-                OrderNo = 4
+                OrderNo = 5
             },
         };
     }
