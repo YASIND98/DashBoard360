@@ -387,6 +387,7 @@ body {
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .segmented-control .segment.active {
@@ -395,7 +396,6 @@ body {
   border-radius: 12px;
 }
 
-/* Period Toggle (Günlük / Aylık) */
 .period-toggle {
   margin-left: auto;
   display: flex;
@@ -627,7 +627,7 @@ body {
 }
 
 .sub-tab.active {
-  background: var(--bg-card);
+  background: rgb(21 32 88);
   color: var(--white);
   font-weight: 700;
   backdrop-filter: blur(120px);

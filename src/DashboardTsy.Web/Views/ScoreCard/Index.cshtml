@@ -1,0 +1,198 @@
+@model ReportViewModel
+
+
+@{
+    var profilePhoto = Context?.Session?.GetString("ProfilePhoto") ?? string.Empty;
+    var nameSurname = Context?.Session?.GetString("NameSurname") ?? string.Empty;
+    var parts = nameSurname
+        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+    var initials = parts.Length switch
+    {
+        >= 2 => $"{parts[0][0]}{parts[1][0]}",
+        1 => $"{parts[0][0]}",
+        _ => "AD"
+    };
+
+    initials = initials.ToUpperInvariant();
+    var initialsEncoded = System.Net.WebUtility.UrlEncode(initials);
+    var avatarUrl = !string.IsNullOrEmpty(profilePhoto)
+        ? profilePhoto
+        : $"https://ui-avatars.com/api/?name={initialsEncoded}&background=c44&color=fff&size=36&rounded=true";
+}
+
+<link rel="stylesheet" href="~/css/score-card.css" asp-append-version="true" />
+
+<!-- Page Header -->
+<div class="page-header">
+    <h1 class="page-title">Skor Kart</h1>
+    <div class="page-date">
+        <span class="date-text" id="scMonthLabel">Mayıs 2026</span>
+        <span class="date-badge">Bu Ay</span>
+    </div>
+    <div class="page-icons">
+      <img src="@avatarUrl" alt="Avatar" class="avatar" />
+      @if (!string.IsNullOrEmpty(nameSurname))
+      {
+        <span class="user-name">@nameSurname</span>
+      }
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="scRegionSelect">
+                <span class="filter-label" id="scRegionLabel">Bölge</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="scRegionPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="scRegionSearch" />
+                </div>
+                <div class="dropdown-list" id="scRegionList"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="scBranchSelect">
+                <span class="filter-label" id="scBranchLabel">Şube</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="scBranchPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="scBranchSearch" />
+                </div>
+                <div class="dropdown-list" id="scBranchList"></div>
+            </div>
+        </div>
+
+        <div class="filter-search">
+            <img src="~/images/search.svg" alt="" />
+            <input type="text" placeholder="Ara" id="scSearchInput" />
+        </div>
+    </div>
+
+    <div class="segmented-control" id="scChannels">
+        <button type="button" class="segment active" data-channel="pazarlama">Pazarlama</button>
+        <div class="divider"></div>
+        <button type="button" class="segment" data-channel="operasyon">Operasyon</button>
+        <div class="divider"></div>
+        <button type="button" class="segment" data-channel="sdk">SDK</button>
+        <div class="divider"></div>
+        <button type="button" class="segment" data-channel="ozel">Özel Bankacılık</button>
+    </div>
+</div>
+
+<!-- Tabs + Period -->
+<div class="tab-bar">
+    <div class="tab-list" id="scTabList">
+        <button class="tab active" data-sctab="genel">Genel Bakış</button>
+        <button class="tab" data-sctab="kurumsal">Kurumsal</button>
+        <button class="tab" data-sctab="ticari">Ticari</button>
+        <button class="tab" data-sctab="kobi">KOBİ</button>
+        <button class="tab" data-sctab="tarim">Tarım</button>
+        <button class="tab" data-sctab="bireysel">Bireysel</button>
+    </div>
+    <div class="period-toggle" id="scPeriod">
+        <button class="period-btn active" data-period="aylik">
+            <img src="~/images/calendar.svg" alt="monthly" class="period-icon" /> Aylık
+        </button>
+        <button class="period-btn" data-period="ceyreklik">
+            <img src="~/images/quarterly-calendar.svg" alt="" class="period-icon" /> Çeyreklik
+        </button>
+        <button class="period-btn" data-period="yillik">
+            <img src="~/images/yearly-calendar.svg" alt="" class="period-icon" /> Yıllık
+        </button>
+    </div>
+</div>
+
+<!-- Skor kart grubu (ör. Bireysel) seçilince alt sekmeler -->
+<div class="sub-tab-bar" id="scSubTabBar" style="display:none;">
+    <div class="tab-list" id="scSubTabList"></div>
+</div>
+
+<!-- Score Card Report Table -->
+<div class="table-container">
+    <div class="table-wrapper">
+        <table class="data-table">
+            <thead id="scReportHead"></thead>
+            <tbody id="scReportBody"></tbody>
+        </table>
+    </div>
+    <div class="table-legend" id="scReportLegend"></div>
+</div>
+
+<!-- Skor Kart Detay Modal (satırdaki Detay ikonundan açılır) -->
+<div class="sc-overlay" id="scOverlay" role="dialog" aria-modal="true" aria-labelledby="scModalTitle">
+    <div class="sc-modal">
+
+        <div class="sc-header">
+          <img src="~/images/close-circle.svg" alt="close" />
+          <span class="sc-title" id="scModalTitle">Aktif Kredi Kartı Performansı</span>
+        </div>
+
+        <div class="sc-tabs" id="scTabs">
+            <button type="button" class="sc-tab active" data-tab="hedef">Hedef Detayı</button>
+            <button type="button" class="sc-tab" data-tab="trend">Trend Analizi</button>
+        </div>
+
+        <!-- Hedef Detayı Tabı -->
+        <div class="sc-target-detail" id="scTargetDetail">
+          <div class="sc-filters" id="scFilters">
+              <button type="button" class="sc-filter active" data-filter="realized">
+                  <img class="sc-filter-icon" src="~/images/realized.svg" alt="" />
+                  <span>Gerçekleşen</span>
+              </button>
+              <button type="button" class="sc-filter" data-filter="pending">
+                  <img class="sc-filter-icon" src="~/images/pending.svg" alt="" />
+                  <span>Bekleyen</span>
+              </button>
+              <button type="button" class="sc-filter" data-filter="unrealized">
+                  <img class="sc-filter-icon" src="~/images/unrealized.svg" alt="" />
+                  <span>Gerçekleşmeyen</span>
+              </button>
+              <button type="button" class="sc-filter" data-filter="offtarget">
+                  <img class="sc-filter-icon" src="~/images/off-target-sales.svg" alt="" />
+                  <span>Hedef Dışı Satışlar</span>
+              </button>
+          </div>
+
+          <div class="sc-table-wrapper" id="scTableSection">
+              <table class="sc-table">
+                  <thead id="scTableHead"></thead>
+                  <tbody id="scTableBody"></tbody>
+              </table>
+          </div>
+
+          <div class="sc-footer">
+              <button type="button" class="sc-excel-btn" data-activity="ScoreCard:ExcelIndir">
+                  <img src="~/images/download.svg" alt="" />
+                  <span>Excel İndir</span>
+              </button>
+              <div class="sc-pagination" id="scPagination"></div>
+          </div>
+        </div>
+
+        <!-- Trend Analizi Tabı -->
+        <div class="sc-trend" id="scTrend" style="display: none;">
+            <div class="sc-trend-tabs" id="scTrendTabs">
+                <button type="button" class="sc-trend-tab active" data-trend-period="bu-ay">Bu Ay</button>
+                <button type="button" class="sc-trend-tab" data-trend-period="son-3-ay">Son 3 Ay</button>
+                <button type="button" class="sc-trend-tab" data-trend-period="son-6-ay">Son 6 Ay</button>
+                <button type="button" class="sc-trend-tab" data-trend-period="son-12-ay">Son 12 Ay</button>
+            </div>
+            <div id="scTrendChart"></div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/constants.js" asp-append-version="true"></script>
+    <script src="~/js/mock.js" asp-append-version="true"></script>
+    <script src="~/js/score-card.js" asp-append-version="true"></script>
+}
