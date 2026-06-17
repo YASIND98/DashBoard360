@@ -1,7 +1,473 @@
-// ===== Skor Kart - Aktif Kredi Kartı Performansı (mock) =====
+// Skor Kart: ana rapor tablosu + detay modalı (tek dosya)
 $(function () {
-    // Satır/ürün durumu -> hücre içi ikon
-    // realized = yeşil, pending = turuncu, unrealized = kırmızı, offtarget = hedef dışı
+
+    if (!document.getElementById('scReportBody')) return;
+
+    var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
+
+    // Ürün Tipi sütun filtresi
+    var selectedType = '';
+
+    // Sıralama (client-side)
+    var sortKey = null;
+    var sortAsc = true;
+
+    // Rapor tablosu verisi (mock.js -> window.MOCK.scoreCardReport)
+    var SC_RESPONSE = (typeof getScoreCardReportMock === 'function')
+        ? getScoreCardReportMock()
+        : { mainTableData: [] };
+    var ROWS = SC_RESPONSE.mainTableData;
+
+    // Seçili filtre durumu
+    let _regionCode;
+    let _branchCode;
+    let _registerId;
+    let _userRoleCode;
+    let _dateNumber;
+    let _scoreCardId;
+    var _tabModel = [];
+
+    // Kullanıcı yetki/bağlam servisi (users/authorities). userCode/applicationCode sabittir.
+    // Gerçek servise POST atılır; hata (örn. 500) olursa mock cevaba düşülür.
+    function fetchUserAuthorities(callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/users/authorities',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ userCode: PUPA_USER_CODE, applicationCode: PUPA_APPLICATION_CODE })
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback(typeof getUserAuthoritiesMock === 'function' ? getUserAuthoritiesMock() : null);
+        });
+    }
+
+    // Servis cevabını sakla; kullanıcı bağlamını (sicil/bölge/şube/rol) istek değişkenlerine al.
+    // cumulatives'e regionCode/branchCode -1 yerine kullanıcının bölge/şubesi gider; roleCode = userRoleCode.
+    function applyUserAuthorities(auth) {
+        if (!auth) return;
+        let _userInfo = auth.userInfo;
+        function num(v) { var n = parseInt(v, 10); return isNaN(n) ? -1 : n; }
+        if (_userInfo) {
+            _registerId = num(_userInfo.registerId);
+            _regionCode = num(_userInfo.regionCode);
+            _branchCode = num(_userInfo.branchCode);
+            _userRoleCode = num(_userInfo.userRoleCode);
+        }
+    }
+
+    // Gerçek servise istek atılır; hata olursa mock cevaba düşülür.
+    function fetchPrimMonitoringPeriods(periodType, callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/prim-monitoring/periods',
+            type: 'GET',
+            data: { periodTypes: periodType }
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback(getPrimMonitoringPeriodsMock(periodType));
+        });
+    }
+
+    function fetchPupaTypes(dateNumber, callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/sales-target-monitoring/pupa-types',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode })
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback(getPupaTypesMock());
+        });
+    }
+
+    // Pupa tipi (kanal): Key -> statik etiket (PUPA_TYPE_LABELS)
+    function renderPupaChannels(pupaRes) {
+        var kv = (pupaRes && pupaRes.KeyValues) || [];
+        if (!kv.length) return;
+        var html = '';
+        kv.forEach(function (item, i) {
+            var key = item.Key;
+            var label = PUPA_TYPE_LABELS[key];
+            if (i > 0) html += '<div class="divider"></div>';
+            html += '<button type="button" class="segment' + (i === 0 ? ' active' : '') +
+                    '" data-channel="' + key + '">' + label + '</button>';
+        });
+        $('#scChannels').html(html);
+    }
+
+    function activePupaType() {
+        var p = parseInt($('#scChannels .segment.active').data('channel'), 10);
+        return isNaN(p) ? 1 : p;
+    }
+
+    function loadPupaFilters(period) {
+        var periodType = PUPA_PERIOD_TYPE[period] || PUPA_PERIOD_TYPE.aylik;
+        fetchPrimMonitoringPeriods(periodType, function (periodsRes) {
+            var kv = (periodsRes && periodsRes.keyValues) || [];
+            _dateNumber = kv.length ? kv[0].key : -1;
+            fetchPupaTypes(_dateNumber, function (pupaRes) {
+                renderPupaChannels(pupaRes);
+                loadScoreCardTypes();
+            });
+        });
+    }
+
+    // Skor kart Tipleri
+    function fetchScoreCards(dateNumber, pupaType, callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/dashboard/score-cards',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: PUPA_SCORECARDS_ROLE_CODE })
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback(getScoreCardsMock());
+        });
+    }
+
+    // key'in bağlı olduğu grup (SCORE_CARD_GROUPS); yoksa null
+    function findScoreCardGroup(key) {
+        var groups = (typeof SCORE_CARD_GROUPS !== 'undefined') ? SCORE_CARD_GROUPS : [];
+        return groups.filter(function (g) { return g.keys.indexOf(key) > -1; })[0] || null;
+    }
+
+    // Servis Key'lerinden sekme modeli: gruba ait key'ler tek üst sekmede (sub-tab) toplanır
+    function buildScoreCardTabModel(kv) {
+        var model = [], byGroup = {};
+        kv.forEach(function (item) {
+            var key = item.Key;
+            var label = SCORE_CARD_LABELS[key];
+            var group = findScoreCardGroup(key);
+            if (!group) return void model.push({ type: 'single', key: key, label: label });
+            if (byGroup[group.label] == null) {
+                byGroup[group.label] = model.push({ type: 'group', label: group.label, subs: [] }) - 1;
+            }
+            model[byGroup[group.label]].subs.push({ key: key, label: label });
+        });
+        return model;
+    }
+
+    // Alt sekmeleri çiz (ilk sub aktif)
+    function renderSubTabs(subs) {
+        $('#scSubTabList').html(subs.map(function (s, i) {
+            return '<button class="sub-tab' + (i ? '' : ' active') +
+                   '" data-scorecard="' + s.key + '">' + s.label + '</button>';
+        }).join(''));
+        $('#scSubTabBar').show();
+    }
+
+    // Üst sekmeyi aktifle: grup ise sub-tab'ları aç, değilse gizle; scoreCardId'yi seç
+    function activateMainTab($tab, reload) {
+        $('#scTabList .tab').removeClass('active');
+        $tab.addClass('active');
+        var t = _tabModel[$tab.data('tabindex')];
+        if (t && t.type === 'group') {
+            renderSubTabs(t.subs);
+            _scoreCardId = t.subs.length ? t.subs[0].key : -1; // ilk sub-tab
+        } else {
+            $('#scSubTabBar').hide();
+            _scoreCardId = t ? t.key : -1;
+        }
+        if (reload) loadScoreCardTable();
+    }
+
+    function renderScoreCardTabs(scRes) {
+        var kv = (scRes && scRes.KeyValues) || [];
+        _tabModel = buildScoreCardTabModel(kv);
+        $('#scTabList').html(_tabModel.map(function (t, i) {
+            var attr = (t.type === 'single') ? ' data-scorecard="' + t.key + '"' : '';
+            return '<button class="tab" data-tabindex="' + i + '"' + attr + '>' + t.label + '</button>';
+        }).join(''));
+        if (_tabModel.length) {
+            activateMainTab($('#scTabList .tab').first(), false); // reload loadScoreCardTypes'te
+        } else {
+            $('#scSubTabBar').hide();
+            _scoreCardId = -1;
+        }
+    }
+
+    // Pupa tipi / period tipi değişince: score-cards iste -> sekmeleri çiz -> tabloyu doldur
+    function loadScoreCardTypes() {
+        fetchScoreCards(_dateNumber, activePupaType(), function (scRes) {
+            renderScoreCardTabs(scRes);
+            loadScoreCardTable();
+        });
+    }
+
+    // scorecards/cumulatives: ana rapor tablosunu doldurur
+    // İstek gövdesi ekrandaki seçimlerden kurulur; hata olursa mock rapora düşülür.
+    // session _reportDate (site.js, ISO) -> { year, month }
+    function reportDateParts() {
+        var d = (typeof _reportDate !== 'undefined' && _reportDate) ? new Date(_reportDate) : new Date();
+        if (isNaN(d.getTime())) d = new Date();
+        return { year: d.getFullYear(), month: d.getMonth() + 1 };
+    }
+
+    function buildCumulativesRequest() {
+        var rd = reportDateParts();
+        var period = $('#scPeriod .period-btn.active').data('period') || 'aylik';
+        return {
+            year: rd.year,                                  // session _reportDate yılı
+            month: rd.month,                                // session _reportDate ayı (4, 5 ...)
+            quarter: (period === 'ceyreklik') ? 1 : -1,     // çeyreklik seçiliyse 1, değilse -1
+            cumulativeFlag: (period === 'yillik') ? 1 : 0,  // yıllık seçiliyse 1, değilse 0
+            registerId: _registerId,                        // users/authorities -> kullanıcı sicili (yoksa -1)
+            regionCode: _regionCode,                        // seçili bölge; varsayılan kullanıcının bölgesi (users/authorities)
+            branchCode: _branchCode,                        // seçili şube; varsayılan kullanıcının şubesi (users/authorities)
+            pupaType: activePupaType(),                     // pupa-types seçimi (aktif kanal)
+            scoreCardId: _scoreCardId,                      // seçili skor kart (aktif sekme)
+            scoreCardTypeId: -1
+        };
+    }
+
+    function fetchScoreCardCumulatives(body, callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/scorecards/cumulatives',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(body)
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback(getScoreCardReportMock());
+        });
+    }
+
+    // Tabloyu cumulatives servisinden (mock fallback) doldur ve yeniden çiz
+    function loadScoreCardTable() {
+        fetchScoreCardCumulatives(buildCumulativesRequest(), function (res) {
+            ROWS = (res && res.mainTableData) ? res.mainTableData : [];
+            renderReportBody();
+        });
+    }
+
+    // HTML attribute içine güvenli yerleştirme (tooltip metni)
+    function escapeAttr(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+    // "Ürün Tipi" filtre seçenekleri: tablo verisindeki unique productType'lar
+    function getTypeOptions() {
+        var seen = {};
+        var opts = [{ label: 'Tümü', value: '' }];
+        ROWS.forEach(function (r) {
+            if (r.productType && !seen[r.productType]) {
+                seen[r.productType] = true;
+                opts.push({ label: r.productType, value: r.productType });
+            }
+        });
+        return opts;
+    }
+
+    // "Ürün Tipi" başlığı: tıklanınca açılan  filtre menüsü
+    function typeFilterHtml() {
+        var items = getTypeOptions().map(function (o) {
+            var sel = (o.value === selectedType) ? ' selected' : '';
+            return '<div class="sc-type-option' + sel + '" data-type="' + o.value + '">' + o.label + '</div>';
+        }).join('');
+        // Tip seçiliyse (Tümü hariç) başlıkta "Ürün Tipi (<seçim>)" göster
+        var triggerText = selectedType ? ('Ürün Tipi (' + selectedType + ')') : 'Ürün Tipi';
+        return '' +
+            '<div class="sc-type-filter">' +
+                '<button type="button" class="sc-type-trigger">' +
+                    '<span class="sc-type-trigger-text">' + triggerText + '</span>' +
+                    '<img src="/images/sort-dec.svg" alt="" />' +
+                '</button>' +
+                '<div class="sc-type-menu">' + items + '</div>' +
+            '</div>';
+    }
+
+    // Sort ikonu (mevcut .sort-icon deseni); aktif sütunda asc/desc yansıtılır
+    function sortIconHtml(key) {
+        var cls = (sortKey === key) ? (sortAsc ? ' asc' : ' desc') : '';
+        return ' <i class="sort-icon' + cls + '"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>';
+    }
+
+    function renderReportHead() {
+        var html = '<tr>';
+        COLUMNS.forEach(function (c) {
+            if (c === 'Ürün Tipi') {
+                html += '<th class="sc-type-th">' + typeFilterHtml() + '</th>';
+            } else if (c === 'Ürün / Hedef Adı') {
+                html += '<th class="col-text" data-sort-key="productName">' + c + sortIconHtml('productName') + '</th>';
+            } else {
+                html += '<th>' + c + '</th>';
+            }
+        });
+        html += '</tr>';
+        $('#scReportHead').html(html);
+    }
+
+    function renderReportBody() {
+        var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
+        var rows = ROWS.filter(function (r) {
+            var matchesQuery = !query || (r.productName || '').toLowerCase().indexOf(query) > -1;
+            var matchesType = !selectedType || (r.productType || '') === selectedType;
+            return matchesQuery && matchesType;
+        });
+
+        // Client-side sıralama (aktifse). filter zaten yeni dizi döndürür.
+        if (sortKey) {
+            rows.sort(function (a, b) {
+                var cmp = String(a[sortKey] || '').localeCompare(String(b[sortKey] || ''), 'tr', { sensitivity: 'base' });
+                return sortAsc ? cmp : -cmp;
+            });
+        }
+
+        // Başlık (ve Ürün Tipi filtresi) sonuç boş olsa da görünür kalsın
+        renderReportHead();
+
+        if (!rows.length) {
+            $('#scReportBody').html(
+                '<tr class="no-result-row"><td colspan="' + COLUMNS.length + '" style="text-align:center;padding:48px 16px;">' +
+                    '<div class="table-empty-state">' +
+                        '<img src="/images/empty-state-seach.svg" alt="" />' +
+                        '<span>Seçili döneme ait veri bulunmamaktadır.</span>' +
+                    '</div>' +
+                '</td></tr>'
+            );
+            return;
+        }
+
+        var html = '';
+        rows.forEach(function (r) {
+            html += '<tr class="table-row">';
+            // ProductInfo varsa info ikonu + hover tooltip; yoksa hücre boş
+            var infoCell = r.productInfo
+                ? '<img class="info-icon" tabindex="0" data-tooltip="' + escapeAttr(r.productInfo) + '" src="/images/table-info.svg" alt="Bilgi" />'
+                : '';
+            html += '<td class="col-info">' + infoCell + '</td>';
+            html += '<td class="col-text sc-product-name">' + r.productName + '</td>';
+            html += '<td>' + r.productType + '</td>';
+            html += '<td>' + formatNumber(r.targetValue) + '</td>';
+            html += '<td>' + formatNumber(r.realizedValue) + '</td>';
+            html += '<td class="' + percentColor(r.targetRealizationPercentage) + '">' + formatPercent(r.targetRealizationPercentage) + '</td>';
+            html += '<td>' + formatPercent(r.productWeight) + '</td>';
+            html += '<td>' + formatPercent(r.weightedPercentage) + '</td>';
+            html += '<td>' + formatNumber(r.pending) + '</td>';
+            // Detay drill-down bağlamı (scorecards/details): productId satırdan, productType aktif kanaldan,
+            // dateNumber seçili periyottan. Gerçek cumulatives cevabında alanlar farklıysa burası güncellenir.
+            html += '<td><img class="sc-detail-icon" src="/images/detail.svg" alt="Detay"' +
+                ' data-name="' + r.productName + '"' +
+                ' data-product-id="' + (r.productId != null ? r.productId : -1) + '"' +
+                ' data-product-type="' + activePupaType() + '"' +
+                ' data-date-number="' + _dateNumber + '" /></td>';
+            html += '</tr>';
+        });
+        var $body = $('#scReportBody').html(html);
+        if (typeof reStripeTable === 'function') reStripeTable($body);
+    }
+
+    function renderLegend() {
+        if (typeof renderTableLegend === 'function') {
+            renderTableLegend('#scReportLegend', {
+                note: 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.',
+                ratio: true
+            });
+        }
+    }
+
+    // Skor kart tipi sekmeleri
+    // Üst sekme: grup ise sub-tab'ları açar (ilk sub aktif), tekil ise skor kartı seçer
+    $('#scTabList').on('click', '.tab', function () {
+        activateMainTab($(this), true);
+    });
+
+    // Alt sekme (ör. Bireysel -> SY / BD): scoreCardId aynı parametre, tabloyu yenile
+    $('#scSubTabList').on('click', '.sub-tab', function () {
+        $('#scSubTabList .sub-tab').removeClass('active');
+        $(this).addClass('active');
+        _scoreCardId = parseInt($(this).data('scorecard'), 10);
+        if (isNaN(_scoreCardId)) _scoreCardId = -1;
+        loadScoreCardTable();
+    });
+
+    // Pupa tipi (kanal) seçimi
+    $('#scChannels').on('click', '.segment', function () {
+        $('#scChannels .segment').removeClass('active');
+        $(this).addClass('active');
+        // pupaType değişti -> skor kart tipleri (sekmeler) + tablo yenilensin
+        loadScoreCardTypes();
+    });
+
+    // Period tipi (Aylık / Çeyreklik / Yıllık)
+    $('#scPeriod').on('click', '.period-btn', function () {
+        $('#scPeriod .period-btn').removeClass('active');
+        $(this).addClass('active');
+        // Her periyot değişiminde periods + pupa-types + cumulatives zinciri tetiklenir
+        loadPupaFilters($(this).data('period'));
+    });
+
+    // Arama
+    $('#scSearchInput').on('input', renderReportBody);
+
+    // Sıralama (başlığa tıkla: asc -> desc -> sırasız)
+    $(document).on('click', '#scReportHead th[data-sort-key]', function () {
+        var key = $(this).data('sort-key');
+        if (sortKey === key) {
+            if (sortAsc) { sortAsc = false; }
+            else { sortKey = null; sortAsc = true; }
+        } else {
+            sortKey = key;
+            sortAsc = true;
+        }
+        renderReportBody();
+    });
+
+    // Ürün Tipi sütun filtresi menüsü
+    $(document).on('click', '.sc-type-trigger', function (e) {
+        e.stopPropagation();
+        $(this).closest('.sc-type-filter').toggleClass('open');
+    });
+    // Seçim (renderReportBody başlığı yeniden kurar -> menü kapanır)
+    $(document).on('click', '.sc-type-option', function () {
+        selectedType = $(this).attr('data-type') || '';
+        renderReportBody();
+    });
+    // Dışarı tıklayınca kapat
+    $(document).on('click', function (e) {
+        if (!$(e.target).closest('.sc-type-filter').length) {
+            $('.sc-type-filter').removeClass('open');
+        }
+    });
+
+    // Bölge / Şube filtreleri
+    if (typeof loadRegionFilters === 'function') {
+        loadRegionFilters(function () { renderRegionList('#scRegionList', null); });
+    }
+    if (typeof loadBranchFilters === 'function') {
+        loadBranchFilters(function () { renderBranchList('#scBranchList', null, null); });
+    }
+    $(document).on('click', '#scRegionList .dropdown-item', function () {
+        $('#scRegionLabel').text($(this).text());
+        $('#scRegionPanel').removeClass('open');
+        _regionCode = ($(this).data('code') != null) ? $(this).data('code') : -1;
+        loadScoreCardTable();
+    });
+    $(document).on('click', '#scBranchList .dropdown-item', function () {
+        $('#scBranchLabel').text($(this).text());
+        $('#scBranchPanel').removeClass('open');
+        _branchCode = ($(this).data('code') != null) ? $(this).data('code') : -1;
+        loadScoreCardTable();
+    });
+
+    // İlk render: önce kullanıcı yetki/bağlamı (users/authorities) çekilir, sonra filtre zinciri kurulur
+    fetchUserAuthorities(function (auth) {
+        applyUserAuthorities(auth);
+        loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
+    });
+    renderLegend();
+    renderReportBody();
+
+    // Detay modalı (satırdaki Detay ikonundan açılır)
+
+    // Satır/ürün durumu -> hücre içi ikon (eski tablo: Gerçekleşmeyen / Hedef Dışı)
     var STATUS_ICON = {
         realized: '/images/realized.svg',
         pending: '/images/pending.svg',
@@ -19,126 +485,92 @@ $(function () {
 
     var PAGE_SIZE = 13;
 
-    // ===== Mock servis cevapları =====
-    // Her sekme/filtre kendi ayrı response'una sahip: { columns: [...], rows: [...] }
-    // İleride her biri ayrı bir servis çağrısının cevabı olacak.
-
-    // ----- Gerçekleşen -----
-    var REALIZED_COLUMNS = ['Açılış Tarihi', 'Ürün 1', 'Ürün 2', 'Ürün 3', 'Hesap No', 'Müşteri Adı', 'Kazanım', 'Müşteri Durumu'];
-    var REALIZED_ROWS = [
-        { date: '03.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052701', customerName: 'Kerim Kumbaracı', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '03.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052702', customerName: 'Ahmet Nedim Paksoy', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '03.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052703', customerName: 'Selin Yıldırım', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '03.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052704', customerName: 'Murat Can Özdemir', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '03.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052705', customerName: 'Zeynep Ece Şahin', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '03.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052706', customerName: 'Emre Deniz Yılmaz', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052707', customerName: 'Aylin Kaya', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052708', customerName: 'Barış Tuncer', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052709', customerName: 'Elif Su Acar', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052710', customerName: 'Deniz Arslan', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052711', customerName: 'Seda Yılmaz', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052712', customerName: 'Onur Çelik', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052713', customerName: 'Melis Karaca', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052714', customerName: 'Kerim Kumbaracı', kazanim: 'Ürün', customerStatus: 'Yeni' }
-    ];
-
-    // ----- Bekleyen (Kalan Gün kolonlu) -----
-    var PENDING_COLUMNS = ['Açılış Tarihi', 'Ürün 1', 'Ürün 2', 'Ürün 3', 'Kalan Gün', 'Hesap No', 'Müşteri Adı', 'Kazanım', 'Müşteri Durumu'];
-    var PENDING_ROWS = [
-        { date: '03.04.2026', remainingDays: 12, products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052731', customerName: 'Hande Selvi', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '03.04.2026', remainingDays: 8,  products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052732', customerName: 'Cenk Aydın', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '03.04.2026', remainingDays: 5,  products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052733', customerName: 'Pelin Korkmaz', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', remainingDays: 20, products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052734', customerName: 'Tarık Demir', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', remainingDays: 3,  products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052735', customerName: 'Buse Aksoy', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '04.04.2026', remainingDays: 15, products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052736', customerName: 'Kaan Eren', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '05.04.2026', remainingDays: 7,  products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052737', customerName: 'Nazlı Şen', kazanim: 'Ürün', customerStatus: 'Yeni' }
-    ];
-
-    // ----- Gerçekleşmeyen (satırlar expand edilir; detayda ürün + sebep) -----
-    // summary  : satır kapalıyken görünen özet metin
-    // details  : expand edilince ürün bazında durum + sebep (reason code)
-    //   detail.status: 'realized' | 'unrealized'  (bir satırın içinde ikisi de olabilir)
-    var UNREALIZED_COLUMNS = ['Açılış Tarihi', 'Gerçekleşme Durumu', 'Hesap No', 'Müşteri Adı', 'Kazanım', 'Müşteri Durumu', ''];
-    var UNREALIZED_ROWS = [
-        {
-            date: '03.04.2026', accountNo: '26052751', customerName: 'Gökhan Ulus', kazanim: 'Ürün', customerStatus: 'Yeni',
-            summary: 'Ürün Satışı Gerçekleşmedi / Süre Açıldı',
-            details: [
-                { product: 'GSM Fatura', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Süre Açıldı' },
-                { product: 'Deniz Bonus', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Müşteri Talebi Yok' }
-            ]
-        },
-        {
-            date: '03.04.2026', accountNo: '26052752', customerName: 'İrem Doğan', kazanim: 'Ürün', customerStatus: 'Yeni',
-            summary: 'Ürün Satışı Gerçekleşmedi / Süre Açıldı',
-            details: [
-                { product: 'GSM Fatura', status: 'realized', reasonCode: 'Reason Code', reasonText: 'Satış Tamamlandı' },
-                { product: 'Nakit KMH', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Süre Açıldı' }
-            ]
-        },
-        {
-            date: '03.04.2026', accountNo: '26052753', customerName: 'Serkan Aktaş', kazanim: 'Ürün', customerStatus: 'Yeni',
-            summary: 'Ürün Satışı Gerçekleşmedi / Süre Açıldı',
-            details: [
-                { product: 'GSM Fatura', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Süre Açıldı' }
-            ]
-        },
-        {
-            date: '04.04.2026', accountNo: '26052754', customerName: 'Ece Polat', kazanim: 'Ürün', customerStatus: 'Yeni',
-            summary: 'Ürün Satışı Gerçekleşmedi / Süre Açıldı',
-            details: [
-                { product: 'Deniz Bonus', status: 'realized', reasonCode: 'Reason Code', reasonText: 'Satış Tamamlandı' },
-                { product: 'Nakit KMH', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Müşteri Talebi Yok' }
-            ]
-        },
-        {
-            date: '04.04.2026', accountNo: '26052755', customerName: 'Mert Güneş', kazanim: 'Ürün', customerStatus: 'Yeni',
-            summary: 'Ürün Satışı Gerçekleşmedi / Süre Açıldı',
-            details: [
-                { product: 'GSM Fatura', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Süre Açıldı' },
-                { product: 'Deniz Bonus', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Süre Açıldı' }
-            ]
-        },
-        {
-            date: '04.04.2026', accountNo: '26052756', customerName: 'Derya Çetin', kazanim: 'Ürün', customerStatus: 'Yeni',
-            summary: 'Ürün Satışı Gerçekleşmedi / Süre Açıldı',
-            details: [
-                { product: 'Nakit KMH', status: 'unrealized', reasonCode: 'Reason Code', reasonText: 'Süre Açıldı' }
-            ]
-        }
-    ];
-
-    // ----- Hedef Dışı Satışlar -----
-    var OFFTARGET_COLUMNS = ['Açılış Tarihi', 'Ürün 1', 'Ürün 2', 'Ürün 3', 'Hesap No', 'Müşteri Adı', 'Kazanım', 'Müşteri Durumu'];
-    var OFFTARGET_ROWS = [
-        { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052771', customerName: 'Burak Yalçın', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052772', customerName: 'Sena Aydın', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052773', customerName: 'Tolga Acar', kazanim: 'Ürün', customerStatus: 'Yeni' },
-        { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052774', customerName: 'Ceren Köse', kazanim: 'Ürün', customerStatus: 'Yeni' }
-    ];
-
-    // Sekme/filtre başına ayrı mock response
-    var SC_MOCK_RESPONSES = {
-        realized:   { columns: REALIZED_COLUMNS,   rows: REALIZED_ROWS },
-        pending:    { columns: PENDING_COLUMNS,    rows: PENDING_ROWS },
-        unrealized: { columns: UNREALIZED_COLUMNS, rows: UNREALIZED_ROWS, expandable: true },
-        offtarget:  { columns: OFFTARGET_COLUMNS,  rows: OFFTARGET_ROWS }
-    };
-
     var _currentPage = 1;
     var _statusFilter = 'realized';
-    var _response = SC_MOCK_RESPONSES.realized; // o anki (mock) servis cevabı
+    var _response = { columns: [], rows: [] }; // o anki (mock) servis cevabı
 
-    // ===== Mock servis isteği =====
-    // Her sekme/filtre için ayrı response döner. İleride setTimeout yerine $.ajax:
-    //   $.ajax({ url: '/ScoreCard/GetCardDetail', type: 'POST',
-    //     contentType: 'application/json', data: JSON.stringify({ status: status }),
-    //     success: callback });
-    // Dönen yapı: { columns: [...], rows: [...] }
+    // Hedef Detayı (scorecards/details) bağlamı — tıklanan ürün satırından (.sc-detail-icon data-*)
+    // doldurulur; modal açıldığında bu değerlerle istek atılır.
+    var _detailCtx = { dateNumber: -1, registerId: -1, productId: -1, productType: -1 };
+
+    // HTML metnini güvenli hale getir (hücre içeriği)
+    function escapeHtml(s) {
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+    }
+
+    // ISO tarih ("2026-05-05T00:00:00") -> "05.05.2026"
+    function fmtIsoDate(v) {
+        if (!v) return '';
+        var datePart = String(v).split('T')[0];
+        var p = datePart.split('-');
+        return p.length === 3 ? (p[2] + '.' + p[1] + '.' + p[0]) : String(v);
+    }
+
+    // Servis (ScoreCardDetail) cevabını dinamik kolonlu tabloya çevirir.
+    // Kolonlar SCORE_CARD_DETAIL_COLUMN_LABELS sırasından, veride var olan alanlarla kurulur.
+    function buildDynamicResponse(scoreCardDetail) {
+        var rows = [];
+        try {
+            rows = JSON.parse(scoreCardDetail) || [];
+        } catch (e) {
+            rows = [];
+        }
+        var labels = (typeof SCORE_CARD_DETAIL_COLUMN_LABELS !== 'undefined')
+            ? SCORE_CARD_DETAIL_COLUMN_LABELS : [];
+        var sample = rows.length ? rows[0] : {};
+        var columns = labels.filter(function (c) {
+            return Object.prototype.hasOwnProperty.call(sample, c.key);
+        });
+        return { columns: columns, rows: rows, dynamic: true };
+    }
+
+    // Dinamik tabloda tek hücreyi alan adına göre biçimlendir
+    function formatDetailCell(key, value) {
+        if (value == null) return '';
+        if (key === 'ACILIS_TARIHI') return fmtIsoDate(value);
+        if (key === 'ACCOUNT_NUMBER') return '<span class="sc-account">' + escapeHtml(String(value)) + '</span>';
+        return escapeHtml(String(value).trim());
+    }
+
+    // Hedef Detayı servisi (scorecards/details)
+    // Gerçekleşen / Bekleyen: servis -> { ScoreCardDetail: "<json string>" } -> dinamik kolonlu tablo.
+    // Gerçekleşmeyen / Hedef Dışı: eski tablo -> { columns:[...], rows:[...], expandable? } olduğu gibi kullanılır.
+    // status (filtre anahtarı) SCORE_CARD_DETAIL_STATUS ile sayısal koda çevrilir
+    //   (Gerçekleşen 1, Bekleyen 0, Gerçekleşmeyen -1, Hedef Dışı Satış 2).
+    // dateNumber/productId/productType, tıklanan ürün satırından gelen _detailCtx'ten beslenir
+    // (registerId şimdilik -1). Hata olursa mock cevaba düşer.
     function requestScoreCardDetail(status, callback) {
-        setTimeout(function () {
-            callback(SC_MOCK_RESPONSES[status] || { columns: REALIZED_COLUMNS, rows: [] });
-        }, 250);
+        var statusCode = (typeof SCORE_CARD_DETAIL_STATUS !== 'undefined' && SCORE_CARD_DETAIL_STATUS[status] != null)
+            ? SCORE_CARD_DETAIL_STATUS[status] : 0;
+
+        // Servis/mock cevabını ortak işle: dinamik (ScoreCardDetail) ya da eski tablo
+        function handle(raw) {
+            if (raw && raw.ScoreCardDetail != null) {
+                callback(buildDynamicResponse(raw.ScoreCardDetail));
+            } else {
+                callback(raw || { columns: [], rows: [] });
+            }
+        }
+
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/scorecards/details',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                dateNumber: _detailCtx.dateNumber,
+                registerId: _detailCtx.registerId,
+                productId: _detailCtx.productId,
+                status: statusCode,
+                productType: _detailCtx.productType
+            })
+        }).done(function (res) {
+            handle(res);
+        }).fail(function () {
+            handle((typeof getScoreCardDetailMock === 'function') ? getScoreCardDetailMock(status) : null);
+        });
     }
 
     function totalPages() {
@@ -147,24 +579,29 @@ $(function () {
 
     // Kolonlar servis cevabından gelir
     function getColumns() {
-        return _response.columns || REALIZED_COLUMNS;
+        return _response.columns || [];
     }
 
-    function renderHead() {
+    function renderDetailHead() {
         // Veri yoksa kolon başlıkları gösterilmez
         if (!_response.rows.length) {
             $('#scTableHead').empty();
             return;
         }
         var html = '<tr>';
-        getColumns().forEach(function (c) { html += '<th>' + c + '</th>'; });
+        if (_response.dynamic) {
+            // Yeni servis: kolon başlıkları dinamik (constants.js eşlemesiyle)
+            _response.columns.forEach(function (c) { html += '<th>' + c.label + '</th>'; });
+        } else {
+            // Eski tablo: kolon başlıkları düz metin
+            getColumns().forEach(function (c) { html += '<th>' + c + '</th>'; });
+        }
         html += '</tr>';
         $('#scTableHead').html(html);
     }
 
-    function renderBody() {
+    function renderDetailBody() {
         var rows = _response.rows;
-        var hasDays = getColumns().indexOf('Kalan Gün') > -1;
         var start = (_currentPage - 1) * PAGE_SIZE;
         var pageRows = rows.slice(start, start + PAGE_SIZE);
 
@@ -181,26 +618,27 @@ $(function () {
             return;
         }
 
+        if (_response.dynamic) {
+            renderDynamicBody(pageRows);
+            return;
+        }
+
         if (_response.expandable) {
             renderExpandableBody(pageRows, start);
             return;
         }
 
+        // Eski düz tablo (Hedef Dışı): durum ikonu + ürün adı
         var html = '';
         var icon = STATUS_ICON[_statusFilter] || '';
         pageRows.forEach(function (r, i) {
             html += '<tr class="' + (i % 2 === 0 ? 'sc-zebra' : '') + '">';
             html += '<td>' + r.date + '</td>';
-            // Ürün 1-2-3: durum ikonu + ürün adı
             for (var pi = 0; pi < 3; pi++) {
                 var pname = r.products[pi] || '';
                 html += '<td><span class="sc-prod">' +
                     (icon ? '<img class="sc-prod-icon" src="' + icon + '" alt="" />' : '') +
                     '<span>' + pname + '</span></span></td>';
-            }
-            // Kalan Gün rozeti (kolon varsa)
-            if (hasDays) {
-                html += '<td><span class="sc-days">' + (r.remainingDays != null ? r.remainingDays + ' Gün' : '-') + '</span></td>';
             }
             html += '<td><span class="sc-account">' + r.accountNo + '</span></td>';
             html += '<td>' + r.customerName + '</td>';
@@ -252,6 +690,20 @@ $(function () {
         $('#scTableBody').html(html);
     }
 
+    // Dinamik kolonlu (ScoreCardDetail) servis cevabını render et
+    function renderDynamicBody(pageRows) {
+        var cols = _response.columns;
+        var html = '';
+        pageRows.forEach(function (r, i) {
+            html += '<tr class="' + (i % 2 === 0 ? 'sc-zebra' : '') + '">';
+            cols.forEach(function (c) {
+                html += '<td>' + formatDetailCell(c.key, r[c.key]) + '</td>';
+            });
+            html += '</tr>';
+        });
+        $('#scTableBody').html(html);
+    }
+
     function renderPagination() {
         var pages = totalPages();
         var html = '';
@@ -262,8 +714,8 @@ $(function () {
     }
 
     function renderTable() {
-        renderHead();
-        renderBody();
+        renderDetailHead();
+        renderDetailBody();
         renderPagination();
     }
 
@@ -281,66 +733,57 @@ $(function () {
         });
     }
 
-    // ===== Trend Analizi (mock response) =====
-    // Gerçekte API'den gelecek ham response. Grafik realizedValue'yu (mavi alan)
-    // period'a (x ekseni) göre çizer.
-    var RAW_TREND = [
-        { period: '2022-11', realizedValue: 1900,  pendingValue: 20000, hgRatio: 66.6762 },
-        { period: '2022-2',  realizedValue: 14600, pendingValue: 3400,  hgRatio: 0 },
-        { period: '2022-3',  realizedValue: 12000, pendingValue: 6700,  hgRatio: 0 },
-        { period: '2022-4',  realizedValue: 4000,  pendingValue: 11000, hgRatio: 0 },
-        { period: '2022-5',  realizedValue: 23000, pendingValue: 23000, hgRatio: 60.9542 },
-        { period: '2022-6',  realizedValue: 5000,  pendingValue: 8700,  hgRatio: 39.3332 },
-        { period: '2022-7',  realizedValue: 10000, pendingValue: 10400, hgRatio: 33.3381 },
-        { period: '2023-1',  realizedValue: 4500,  pendingValue: 4500,  hgRatio: 50.4363 },
-        { period: '2023-2',  realizedValue: 9800,  pendingValue: 14300, hgRatio: 51.592 },
-        { period: '2023-3',  realizedValue: 8700,  pendingValue: 0,     hgRatio: 55.423 },
-        { period: '2023-5',  realizedValue: 13000, pendingValue: 0,     hgRatio: 57.2878 },
-        { period: '2023-6',  realizedValue: 21000, pendingValue: 0,     hgRatio: 66.6167 },
-        { period: '2023-7',  realizedValue: 6500,  pendingValue: 0,     hgRatio: 65.4677 },
-        { period: '2023-8',  realizedValue: 3450,  pendingValue: 0,     hgRatio: 60.2166 },
-        { period: '2023-9',  realizedValue: 16720, pendingValue: 0,     hgRatio: 68.3704 },
-        { period: '2023-10', realizedValue: 3000,  pendingValue: 0,     hgRatio: 58.7095 },
-        { period: '2023-11', realizedValue: 5000,  pendingValue: 0,     hgRatio: 66.5489 },
-        { period: '2023-12', realizedValue: 1800,  pendingValue: 0,     hgRatio: 104.4513 },
-        { period: '2024-1',  realizedValue: 18000, pendingValue: 0,     hgRatio: 44.5902 }
-    ];
+    // Trend Analizi (scorecards/trends/product-sale-realized)
+    var _trendData = { labels: [], values: [], points: [] };
 
-    // "2022-11" -> kronolojik sıralama anahtarı
-    function periodKey(period) {
-        var p = period.split('-');
-        return parseInt(p[0], 10) * 12 + (parseInt(p[1], 10) - 1);
-    }
-
-    // Ham veriyi kronolojik sıralayıp son `count` ayı seç (count yoksa tümü)
-    function buildTrend(count) {
-        var sorted = RAW_TREND.slice().sort(function (a, b) {
-            return periodKey(a.period) - periodKey(b.period);
-        });
-        var sliced = count ? sorted.slice(-count) : sorted;
+    // Servis cevabı kronolojik sırada gelir; doğrudan grafik verisine çevir
+    function buildTrend(raw) {
+        var list = raw || [];
         return {
-            labels: sliced.map(function (d) { return d.period; }),
-            values: sliced.map(function (d) { return d.hgRatio; }),
-            points: sliced
+            labels: list.map(function (d) { return d.period; }),
+            values: list.map(function (d) { return d.hgRatio; }),
+            points: list
         };
     }
 
-    // Periyot sekmeleri -> kaç aylık dilim gösterilecek
-    var TREND_DATA = {
-        'bu-ay': buildTrend(1),
-        'son-3-ay': buildTrend(3),
-        'son-6-ay': buildTrend(6),
-        'son-12-ay': buildTrend(12)
-    };
+    // Trend servisi: seçili trendPeriod ile istek at; hata olursa mock cevaba düş
+    function fetchScoreCardTrend(trendPeriod, callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/scorecards/trends/product-sale-realized',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                productId: 237,
+                registerId: _registerId,
+                branchCode: 3580,
+                regionCode: 1,
+                trendPeriod: trendPeriod,
+                scoreCardId: 21
+            })
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback(getScoreCardTrendMock());
+        });
+    }
+
+    // Aktif trend sekmesine göre servisi tetikle -> grafiği çiz
+    function loadTrend() {
+        var tabKey = $('#scTrendTabs .sc-trend-tab.active').data('trend-period') || 'bu-ay';
+        var trendPeriod = (typeof SCORE_CARD_TREND_PERIOD !== 'undefined' && SCORE_CARD_TREND_PERIOD[tabKey]) || 1;
+        fetchScoreCardTrend(trendPeriod, function (res) {
+            _trendData = buildTrend(res);
+            renderTrendChart();
+        });
+    }
 
     function formatDecimal(v) {
         return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
     }
 
     function renderTrendChart() {
-        var period = $('#scTrendTabs .sc-trend-tab.active').data('trend-period') || 'bu-ay';
-        var data = TREND_DATA[period];
-        if (!data) return;
+        var data = _trendData;
+        if (!data || !data.values.length) return;
 
         var W = 700, H = 320;
         var ml = 60, mr = 20, mt = 20, mb = 40;
@@ -457,7 +900,7 @@ $(function () {
         if (tab === 'trend') {
             $('#scTargetDetail').hide();
             $('#scTrend').show();
-            renderTrendChart();
+            loadTrend();
         } else {
             $('#scTrend').hide();
             $('#scTargetDetail').show();
@@ -465,7 +908,7 @@ $(function () {
         }
     }
 
-    // ===== Modal aç/kapat =====
+    // Modal aç/kapat
     function openModal() {
         // Aktif sekmeye göre doğru bölümü göster (Hedef Detayı varsayılan)
         var activeTab = $('#scTabs .sc-tab.active').data('tab') || 'hedef';
@@ -480,8 +923,16 @@ $(function () {
     $('#scOpenBtn').on('click', openModal);
     // Rapor tablosundaki "Detay" ikonu modalı açar (başlık satır adından)
     $(document).on('click', '.sc-detail-icon', function () {
-        var name = $(this).data('name');
+        var $i = $(this);
+        var name = $i.data('name');
         if (name) $('#scModalTitle').text(name);
+        // Tıklanan ürünün detay bağlamını al (satırdan data-* ile gelir)
+        _detailCtx = {
+            dateNumber: ($i.data('date-number') != null) ? $i.data('date-number') : -1,
+            registerId: _registerId,
+            productId: ($i.data('product-id') != null) ? $i.data('product-id') : -1,
+            productType: ($i.data('product-type') != null) ? $i.data('product-type') : -1
+        };
         openModal();
     });
     $('#scClose').on('click', closeModal);
@@ -496,18 +947,18 @@ $(function () {
         if (e.key === 'Escape') closeModal();
     });
 
-    // ===== Sekmeler =====
+    // Modal sekmeleri (Hedef Detayı / Trend)
     $('#scTabs').on('click', '.sc-tab', function () {
         $('#scTabs .sc-tab').removeClass('active');
         $(this).addClass('active');
         showTab($(this).data('tab'));
     });
 
-    // ===== Trend periyot sekmeleri =====
+    // Trend periyot sekmeleri
     $('#scTrendTabs').on('click', '.sc-trend-tab', function () {
         $('#scTrendTabs .sc-trend-tab').removeClass('active');
         $(this).addClass('active');
-        renderTrendChart();
+        loadTrend();
     });
 
     // Aktif çipte seçili ikonu (-selected.svg), diğerlerinde normal ikonu göster
@@ -520,7 +971,7 @@ $(function () {
         });
     }
 
-    // ===== Filtre çipleri =====
+    // Filtre çipleri
     $('#scFilters').on('click', '.sc-filter', function () {
         $('#scFilters .sc-filter').removeClass('active');
         $(this).addClass('active');
@@ -532,7 +983,7 @@ $(function () {
 
     updateFilterIcons();
 
-    // ===== Sayfalama =====
+    // Sayfalama
     $('#scPagination').on('click', '.sc-page-arrow', function () {
         var page = $(this).data('page');
         if (page === 'prev') {
@@ -540,11 +991,11 @@ $(function () {
         } else if (page === 'next') {
             if (_currentPage < totalPages()) _currentPage++;
         }
-        renderBody();
+        renderDetailBody();
         renderPagination();
     });
 
-    // ===== Satır expand/collapse (Gerçekleşmeyen) =====
+    // Satır expand/collapse (Gerçekleşmeyen)
     $('#scTableBody').on('click', '.sc-expand-icon', function () {
         var rid = $(this).data('row');
         var $detail = $('#scTableBody .sc-detail-row[data-row="' + rid + '"]');

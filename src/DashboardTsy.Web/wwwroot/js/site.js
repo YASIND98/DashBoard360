@@ -75,7 +75,7 @@ function formatNumber(value, isPrice, productName) {
   var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
   if (!isPrice) return num;
   var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
-  return num + ' ' + currency;
+  return currency + ' ' +  num;
 }
 
 // ===== Table Legend Helpers =====

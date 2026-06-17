@@ -69,28 +69,25 @@
 }
 
 .sort-icon {
-  font-size: 8px;
   margin-left: 4px;
   cursor: pointer;
   display: inline-flex;
   flex-direction: column;
-  line-height: 1;
+  gap: 2px;
   vertical-align: middle;
-  font-style: normal;
 }
 
+/* Sort okları img (sort-asc.svg / sort-dec.svg) */
 .sort-icon .sort-up,
 .sort-icon .sort-down {
-  opacity: 0.3;
-  color: var(--white);
+  width: 8px;
+  height: 5px;
 }
 
-.sort-icon.asc .sort-up {
-  opacity: 1;
-}
-
-.sort-icon.desc .sort-down {
-  opacity: 1;
+/* Sıralanan yönün tersi pasif (disabled) */
+.sort-icon.asc .sort-down,
+.sort-icon.desc .sort-up {
+  opacity: 0;
 }
 
 .data-table tbody tr.stripe-odd {

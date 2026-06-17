@@ -251,10 +251,10 @@ $(document).ready(function () {
           html += buildRowStart(p, depth, isSub, indexLabel);
           html += '<td class="col-selected col-selected-first">' + formatNumber(p.MonthActualAmount) + '</td>';
           html += '<td class="col-selected col-selected-mid">' + formatNumber(p.MonthTargetAmount) + '</td>';
-          html += '<td class="col-selected col-selected-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '%</td>';
+          html += '<td class="col-selected col-selected-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '</td>';
           html += '<td>' + formatNumber(p.YearActualAmount) + '</td>';
           html += '<td>' + formatNumber(p.YearTargetAmount) + '</td>';
-          html += '<td class="' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '%</td>';
+          html += '<td class="' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '</td>';
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {

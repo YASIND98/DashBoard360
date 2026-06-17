@@ -327,7 +327,7 @@ function loadTableHeaders(toggleId, tabId, subTabId, filterType, callback) {
 // hasExpandable: data'da parentId olan satır varsa true
 function sortIcon(h) {
     if (!h.Sortable) return '';
-    return ' <i class="sort-icon" data-sort-id="' + h.Id + '"><span class="sort-up">▲</span><span class="sort-down">▼</span></i>';
+    return ' <i class="sort-icon" data-sort-id="' + h.Id + '"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>';
 }
 
 function renderDynamicHeaders(headers, hasExpandable) {
