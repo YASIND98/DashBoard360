@@ -42,6 +42,7 @@
 .sc-header img {
   width: 20px;
   height: 20px;
+  cursor: pointer;
 }
 
 /* ===== Tabs ===== */
@@ -557,12 +558,12 @@
   border-radius: 10px;
   color: var(--text-muted);
   font-size: 12px;
+  cursor: pointer;
 }
 
 .sc-type-trigger img {
   width: 8px;
   height: 5px;
-  flex-shrink: 0;
 }
 
 /* Seçili tip uzunsa metni "..." ile kısalt (trigger max-width'i içinde) */

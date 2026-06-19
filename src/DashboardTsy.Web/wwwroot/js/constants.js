@@ -69,11 +69,9 @@ var PUPA_TYPE_LABELS = {
     4: "Özel Bankacılık"
 };
 
-// dashboard/score-cards statik roleCode
-var PUPA_SCORECARDS_ROLE_CODE = 1038;
-
 // dashboard/score-cards Key -> ön yüzde gösterilecek skor kart etiketi
 var SCORE_CARD_LABELS = {
+    "-1": "Genel Bakış",
     1: "SY",
     2: "BD",
     3: "KB",
@@ -122,6 +120,13 @@ var SCORE_CARD_GROUPS = [
 
 // Skor kart tablosu kolon başlıkları
 var SCORE_CARD_REPORT_COLUMNS = ['', 'Ürün / Hedef Adı', 'Ürün Tipi', 'Hedef', 'Gerçekleşen', 'H/G %', 'Ağırlık %', 'Ağırlıklı H/G %', 'Bekleyen', 'Detay'];
+
+// Genel Bakış (scoreCardId = -1) + birden fazla bölge: bölge özet tablosu kolon başlıkları
+var SCORE_CARD_OVERVIEW_COLUMNS = ['Bölge Adı', 'Kurumsal %', 'Ticari %', 'KBİ %', 'OBİ %', 'Tarım %', 'SY', 'BD', 'Gişe'];
+
+// Genel Bakış (scoreCardId = -1) + tek bölge + birden fazla şube: şube özet tablosu kolon başlıkları.
+// '3 Aylık Gerçekleşen %' üst başlıktır; response.months'taki 3 ay etiketiyle 3 alt kolona açılır.
+var SCORE_CARD_BRANCH_OVERVIEW_COLUMNS = ['Sıralama', 'Şube Adı', '3 Aylık Gerçekleşen %', 'Kurumsal %', 'Ticari %', 'KBİ %', 'OBİ %', 'Tarım %', 'Kitle %', 'Afili %', 'ÖB %'];
 
 // Trend analizi sekmesi -> scorecards/trends trendPeriod parametresi
 var SCORE_CARD_TREND_PERIOD = {

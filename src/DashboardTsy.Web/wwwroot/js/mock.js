@@ -78,8 +78,10 @@ window.getScoreCardDetailMock = function (status) {
 window.MOCK.scoreCardReport = {
     mainTableData: [
         {
+            productId: 237,
             productName: 'Müşteri Kazanımı (Bireysel + Mikro + Emekli Maaş Transferi)',
             productType: 'SATIŞ',
+            productTypeId: 1,
             targetValue: 20042,
             realizedValue: 5198,
             targetRealizationPercentage: 25.9355,
@@ -89,8 +91,10 @@ window.MOCK.scoreCardReport = {
             productInfo: 'Bireysel, mikro ve emekli maaş transferi müşteri kazanımlarını kapsar.'
         },
         {
+            productId: 238,
             productName: 'Aktif Kredi Kartı Performansı + Aktif Bonus Business Performansı',
             productType: 'KART SATIŞ',
+            productTypeId: 2,
             targetValue: 18976,
             realizedValue: 5472,
             targetRealizationPercentage: 28.8364,
@@ -100,8 +104,10 @@ window.MOCK.scoreCardReport = {
             productInfo: 'Aktif kredi kartı ve aktif Bonus Business performansını kapsar.'
         },
         {
+            productId: 239,
             productName: 'Tüketici Kredileri',
             productType: 'HACİM',
+            productTypeId: 3,
             targetValue: 554555778444,
             realizedValue: 554555778999,
             targetRealizationPercentage: 101.0023,
@@ -111,8 +117,10 @@ window.MOCK.scoreCardReport = {
             productInfo: 'İhtiyaç Kredisinde 10.000 TL ve üzeri bakiye kullandırımlarında skorkarta yansır.Konut ve taşıtta sınır bulunmamaktadır.(Taksitli İhtiyaç Kredinsman Kredisi,İhtiyaç Kredisi Yapılandırma,İhtiyaç,Kredisi Bayii,Bayi Kazanımı,İhtiyaç Kredisi Modifikasyon,Konut Kredilerı,Taşıt Kredileri)'
         },
         {
+            productId: 240,
             productName: 'Vadeli Mevduat',
             productType: 'HACİM',
+            productTypeId: 3,
             targetValue: 2038,
             realizedValue: 1029,
             targetRealizationPercentage: 50.4906,
@@ -121,8 +129,10 @@ window.MOCK.scoreCardReport = {
             pending: 1009
         },
         {
+            productId: 241,
             productName: 'Otomatik Ödeme',
             productType: 'SATIŞ',
+            productTypeId: 1,
             targetValue: 8500,
             realizedValue: 7480,
             targetRealizationPercentage: 88.0,
@@ -131,8 +141,10 @@ window.MOCK.scoreCardReport = {
             pending: 1020
         },
         {
+            productId: 242,
             productName: 'Nakit KMH',
             productType: 'KART SATIŞ',
+            productTypeId: 2,
             targetValue: 6400,
             realizedValue: 7808,
             targetRealizationPercentage: 122.0,
@@ -141,8 +153,10 @@ window.MOCK.scoreCardReport = {
             pending: 0
         },
         {
+            productId: 243,
             productName: 'Sigorta + BES',
             productType: 'SATIŞ',
+            productTypeId: 1,
             targetValue: 9200,
             realizedValue: 5888,
             targetRealizationPercentage: 64.0,
@@ -151,8 +165,10 @@ window.MOCK.scoreCardReport = {
             pending: 3312
         },
         {
+            productId: 244,
             productName: 'Konut Kredisi',
             productType: 'HACİM',
+            productTypeId: 3,
             targetValue: 12500,
             realizedValue: 9125,
             targetRealizationPercentage: 73.0,
@@ -213,14 +229,14 @@ window.getPupaTypesMock = function () {
 // Skor Kart - dashboard/score-cards örnek cevabı (Key = skor kart tipi id)
 window.MOCK.scoreCards = {
     KeyValues: [
-        { Key: 1, Value: { Key: 1, Value: 1 } },
-        { Key: 2, Value: { Key: 2, Value: 1 } },
-        { Key: 5, Value: { Key: 5, Value: 1 } },
-        { Key: 13, Value: { Key: 13, Value: 1 } },
-        { Key: 6, Value: { Key: 6, Value: 1 } },
-        { Key: 28, Value: { Key: 28, Value: 1 } },
-        { Key: 14, Value: { Key: 14, Value: 1 } },
-        { Key: 15, Value: { Key: 15, Value: 1 } },
+        { Key: -1, Value: { Key: -1, Value: 1 } }, // Genel Bakış
+        { Key: 15, Value: { Key: 15, Value: 1 } }, // Kurumsal
+        { Key: 14, Value: { Key: 14, Value: 1 } }, // Ticari
+        { Key: 5,  Value: { Key: 5,  Value: 1 } }, // KOBİ (KBİ)
+        { Key: 13, Value: { Key: 13, Value: 1 } }, // KOBİ (OBI)
+        { Key: 6,  Value: { Key: 6,  Value: 1 } }, // Tarım
+        { Key: 1,  Value: { Key: 1,  Value: 1 } }, // Bireysel (SY)
+        { Key: 2,  Value: { Key: 2,  Value: 1 } }  // Bireysel (BD)
     ]
 };
 
@@ -253,10 +269,10 @@ window.getScoreCardTrendMock = function () {
 window.MOCK.userAuthorities = {
     warningMessageMultiLanguageCode: "",
     userInfo: {
-        registerId: "57943",
+        registerId: 57943,
         branchCode: 9142,
         branchName: "Zincirlikuyu Şubesi",
-        regionCode: 1,
+        regionCode: 345,
         regionName: "Avrupa-1",
         groupCode: 1,
         divisionCode: 900,
@@ -303,4 +319,95 @@ window.MOCK.userAuthorities = {
 
 window.getUserAuthoritiesMock = function () {
     return window.MOCK.userAuthorities;
+};
+
+// Skor Kart - Bölge filtresi (dashboard/regions) örnek cevabı.
+window.MOCK.regions = [
+    { regionName: "Akdeniz",           regionCode: 5 },
+    { regionName: "Avrupa-1",          regionCode: 1 },
+    { regionName: "Avrupa-2",          regionCode: 3 },
+    { regionName: "Başkent-1",         regionCode: 22 },
+    { regionName: "Başkent-2",         regionCode: 23 },
+    { regionName: "Batı Anadolu",      regionCode: 14 },
+    { regionName: "BatıAnadolu+Ege",   regionCode: 714 },
+    { regionName: "Çukurova",          regionCode: 6 },
+    { regionName: "Ege",               regionCode: 7 },
+    { regionName: "Genel Müdürlük",    regionCode: 4 },
+    { regionName: "Genel Müdürlük",    regionCode: 9019 },
+    { regionName: "Güneydoğu Anadolu", regionCode: 17 },
+    { regionName: "İstanbul Anadolu",  regionCode: 19 },
+    { regionName: "Karadeniz",         regionCode: 18 },
+    { regionName: "Marmara",           regionCode: 10 },
+    { regionName: "Özel Bankacılık",   regionCode: 30 },
+    { regionName: "Trakya",            regionCode: 24 }
+];
+
+window.getRegionsMock = function () {
+    return window.MOCK.regions;
+};
+
+// Skor Kart - Şube filtresi (dashboard/branches) örnek cevabı (seçili bölgenin şubeleri).
+window.MOCK.branches = [
+    { branchName: "ŞEHZADEBAŞI", branchCode: 1075, regionCode: 1 },
+    { branchName: "İSTANBUL BÜYÜKŞEHİR BELEDİYESİ OFİS", branchCode: 1165, regionCode: 1 }
+];
+
+window.getBranchesMock = function () {
+    return window.MOCK.branches;
+};
+
+// Skor Kart - Sicil filtresi (dashboard/registers) örnek cevabı (seçili bölge/şube sicilleri).
+// branchCode/regionCode, branches mock'undaki ŞEHZADEBAŞI (1075 / bölge 1) ile hizalı -> sicil↔şube eşleşir.
+window.MOCK.registers =  [
+  { registerName: "Güven İmre",   registerId: 49981, pupaTypeId: 1, scoreCardId: 1, branchCode: 1075, branchName: "ŞEHZADEBAŞI", regionCode: 1, scoreCardTypeId: 0 },
+  { registerName: "Ali",   registerId: 49453, pupaTypeId: 1, scoreCardId: 1, branchCode: 1075, branchName: "ŞEHZADEBAŞI", regionCode: 1, scoreCardTypeId: 0 },
+];
+
+window.getRegistersMock = function () {
+    return window.MOCK.registers;
+};
+
+// Skor Kart - Genel Bakış bölge özeti (scorecards/region-overview) örnek cevabı.
+// Genel Bakış seçili + birden fazla bölge varsa bu servis çalışır.
+window.MOCK.scoreCardRegionOverview = [
+    { regionName: 'Akdeniz',           corporate: 105.1, commercial: 52.9,  kbi: 80.6,  obi: 100.5, agriculture: 88.0,  sy: 40.4,  bd: 35.1, gise: 56.8 },
+    { regionName: 'Avrupa-1',          corporate: 112.3, commercial: 64.2,  kbi: 78.1,  obi: 95.4,  agriculture: 120.6, sy: 55.0,  bd: 48.7, gise: 73.2 },
+    { regionName: 'Avrupa-2',          corporate: 98.7,  commercial: 71.5,  kbi: 102.3, obi: 88.9,  agriculture: 67.4,  sy: 130.2, bd: 61.8, gise: 44.5 },
+    { regionName: 'Başkent-1',         corporate: 124.6, commercial: 49.3,  kbi: 85.7,  obi: 111.2, agriculture: 93.5,  sy: 38.9,  bd: 72.4, gise: 101.7 },
+    { regionName: 'Başkent-2',         corporate: 76.4,  commercial: 118.9, kbi: 69.2,  obi: 104.8, agriculture: 82.1,  sy: 91.6,  bd: 33.5, gise: 58.3 },
+    { regionName: 'Çukurova',          corporate: 101.9, commercial: 57.6,  kbi: 96.4,  obi: 73.1,  agriculture: 128.7, sy: 46.2,  bd: 67.9, gise: 88.4 },
+    { regionName: 'Doğu Anadolu',      corporate: 69.3,  commercial: 84.2,  kbi: 113.5, obi: 99.0,  agriculture: 74.6,  sy: 52.8,  bd: 40.1, gise: 62.7 },
+    { regionName: 'Ege',               corporate: 118.2, commercial: 73.4,  kbi: 90.8,  obi: 122.5, agriculture: 101.3, sy: 64.7,  bd: 55.9, gise: 79.1 },
+    { regionName: 'Güney Ege',         corporate: 95.5,  commercial: 61.8,  kbi: 77.3,  obi: 86.4,  agriculture: 110.9, sy: 48.3,  bd: 71.2, gise: 53.6 },
+    { regionName: 'Güneydoğu Anadolu', corporate: 82.7,  commercial: 104.6, kbi: 68.9,  obi: 97.2,  agriculture: 79.5,  sy: 121.4, bd: 43.8, gise: 66.3 },
+    { regionName: 'İç Anadolu',        corporate: 109.4, commercial: 55.1,  kbi: 99.7,  obi: 115.8, agriculture: 87.2,  sy: 59.6,  bd: 38.4, gise: 91.0 },
+    { regionName: 'Karadeniz',         corporate: 73.8,  commercial: 92.7,  kbi: 106.1, obi: 81.5,  agriculture: 124.3, sy: 44.9,  bd: 69.5, gise: 57.2 },
+    { regionName: 'Marmara',           corporate: 127.1, commercial: 66.3,  kbi: 84.0,  obi: 103.7, agriculture: 96.8,  sy: 51.2,  bd: 73.6, gise: 85.9 }
+];
+
+window.getScoreCardRegionOverviewMock = function () {
+    return window.MOCK.scoreCardRegionOverview;
+};
+
+// Skor Kart - Genel Bakış şube özeti (scorecards/region-overview) örnek cevabı.
+// Genel Bakış seçili + tek bölge + birden fazla şube varsa bu cevap döner.
+// months: '3 Aylık Gerçekleşen %' alt başlıkları; rows alanları SCORE_CARD_BRANCH_OVERVIEW_COLUMNS ile eşleşir.
+window.MOCK.scoreCardBranchOverview = {
+    months: ["Mart '25", "Nis '26", "May '26"],
+    rows: [
+        { rank: 1,  branchName: 'Burdur',   month1: 90.7,  month2: 123.5, month3: 88.0,  corporate: 105.1, commercial: 52.9,  kbi: 80.6,  obi: 100.5, agriculture: 88.0,  mass: 40.4,  afili: 35.1, privateBanking: 56.8 },
+        { rank: 2,  branchName: 'Demre',    month1: 78.3,  month2: 95.2,  month3: 112.6, corporate: 96.4,  commercial: 61.7,  kbi: 73.2,  obi: 88.9,  agriculture: 121.5, mass: 47.8,  afili: 69.3, privateBanking: 50.1 },
+        { rank: 3,  branchName: 'Aksu',     month1: 124.1, month2: 67.4,  month3: 93.8,  corporate: 118.7, commercial: 70.3,  kbi: 101.4, obi: 74.6,  agriculture: 66.9,  mass: 129.2, afili: 58.5, privateBanking: 81.7 },
+        { rank: 4,  branchName: 'Bucak',    month1: 69.5,  month2: 110.8, month3: 84.2,  corporate: 82.6,  commercial: 117.9, kbi: 68.1,  obi: 104.3, agriculture: 79.4,  mass: 91.0,  afili: 44.7, privateBanking: 63.2 },
+        { rank: 5,  branchName: 'Antalya',  month1: 101.6, month2: 88.9,  month3: 100.4, corporate: 109.8, commercial: 55.4,  kbi: 95.7,  obi: 116.2, agriculture: 87.3,  mass: 60.9,  afili: 72.6, privateBanking: 90.5 },
+        { rank: 6,  branchName: 'Fener',    month1: 73.2,  month2: 128.6, month3: 76.9,  corporate: 74.1,  commercial: 84.8,  kbi: 113.6, obi: 81.7,  agriculture: 124.8, mass: 45.3,  afili: 67.1, privateBanking: 57.4 },
+        { rank: 7,  branchName: 'Yalvaç',   month1: 116.4, month2: 72.1,  month3: 105.3, corporate: 127.2, commercial: 66.5,  kbi: 84.9,  obi: 103.1, agriculture: 96.7,  mass: 51.8,  afili: 73.9, privateBanking: 85.6 },
+        { rank: 8,  branchName: 'Kepez',    month1: 85.9,  month2: 99.7,  month3: 67.8,  corporate: 95.3,  commercial: 73.6,  kbi: 77.5,  obi: 86.4,  agriculture: 110.2, mass: 48.6,  afili: 71.4, privateBanking: 53.9 },
+        { rank: 9,  branchName: 'Lara',     month1: 108.2, month2: 64.8,  month3: 119.5, corporate: 124.9, commercial: 49.7,  kbi: 99.1,  obi: 111.8, agriculture: 93.6,  mass: 38.7,  afili: 72.2, privateBanking: 101.3 },
+        { rank: 10, branchName: 'Konyaaltı', month1: 76.1, month2: 92.4,  month3: 88.6,  corporate: 101.7, commercial: 57.9,  kbi: 96.8,  obi: 73.4,  agriculture: 128.1, mass: 46.5,  afili: 68.2, privateBanking: 88.9 }
+    ]
+};
+
+window.getScoreCardBranchOverviewMock = function () {
+    return window.MOCK.scoreCardBranchOverview;
 };
