@@ -118,6 +118,7 @@ builder.Services.AddHttpClient<ITargetReportApiClient, TargetReportApiClient>();
 builder.Services.AddHttpClient<IProductivityReportApiClient, ProductivityReportApiClient>();
 builder.Services.AddHttpClient<IAiInsightApiClient, AiInsightApiClient>();
 builder.Services.AddControllersWithViews()
+    .AddRazorRuntimeCompilation()
     .AddJsonOptions(o =>
     {
         // Login page JS expects "Result"/"Message" (PascalCase), not "result"/"message".
