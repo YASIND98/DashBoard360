@@ -323,23 +323,7 @@ window.getUserAuthoritiesMock = function () {
 
 // Skor Kart - Bölge filtresi (dashboard/regions) örnek cevabı.
 window.MOCK.regions = [
-    { regionName: "Akdeniz",           regionCode: 5 },
-    { regionName: "Avrupa-1",          regionCode: 1 },
-    { regionName: "Avrupa-2",          regionCode: 3 },
-    { regionName: "Başkent-1",         regionCode: 22 },
-    { regionName: "Başkent-2",         regionCode: 23 },
-    { regionName: "Batı Anadolu",      regionCode: 14 },
-    { regionName: "BatıAnadolu+Ege",   regionCode: 714 },
-    { regionName: "Çukurova",          regionCode: 6 },
-    { regionName: "Ege",               regionCode: 7 },
-    { regionName: "Genel Müdürlük",    regionCode: 4 },
-    { regionName: "Genel Müdürlük",    regionCode: 9019 },
-    { regionName: "Güneydoğu Anadolu", regionCode: 17 },
-    { regionName: "İstanbul Anadolu",  regionCode: 19 },
-    { regionName: "Karadeniz",         regionCode: 18 },
-    { regionName: "Marmara",           regionCode: 10 },
-    { regionName: "Özel Bankacılık",   regionCode: 30 },
-    { regionName: "Trakya",            regionCode: 24 }
+    { regionName: "Avrupa-1",          regionCode: 1 }
 ];
 
 window.getRegionsMock = function () {
