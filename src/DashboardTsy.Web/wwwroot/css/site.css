@@ -406,8 +406,7 @@ body {
 }
 
 .period-btn {
-  height: 36px;
-  width: 100px;
+  padding: 5.5px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1096,8 +1095,6 @@ body:has(.scorecard-panel.open)::before {
   }
 
   .period-btn {
-    height: 30px;
-    width: 84px;
     font-size: 13px;
     gap: 6px;
   }

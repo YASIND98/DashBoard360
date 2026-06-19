@@ -70,6 +70,20 @@
             </div>
         </div>
 
+        <div class="filter-dropdown-wrapper" id="scRegisterWrapper">
+            <div class="filter-dropdown" id="scRegisterSelect">
+                <span class="filter-label" id="scRegisterLabel">Sicil No</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="scRegisterPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="scRegisterSearch" />
+                </div>
+                <div class="dropdown-list" id="scRegisterList"></div>
+            </div>
+        </div>
+
         <div class="filter-search">
             <img src="~/images/search.svg" alt="" />
             <input type="text" placeholder="Ara" id="scSearchInput" />
@@ -131,7 +145,7 @@
     <div class="sc-modal">
 
         <div class="sc-header">
-          <img src="~/images/close-circle.svg" alt="close" />
+          <img id="scClose" src="~/images/close-circle.svg" alt="close" />
           <span class="sc-title" id="scModalTitle">Aktif Kredi Kartı Performansı</span>
         </div>
 
@@ -194,5 +208,6 @@
 @section Scripts {
     <script src="~/js/constants.js" asp-append-version="true"></script>
     <script src="~/js/mock.js" asp-append-version="true"></script>
-    <script src="~/js/score-card.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/index.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/detail-modal.js" asp-append-version="true"></script>
 }

@@ -64,6 +64,7 @@ function formatPercent(ratio) {
 }
 
 function percentColor(ratio) {
+  if (!ratio) return '';
   if (ratio < 75) return 'ratio-red';
   if (ratio < 100) return 'ratio-orange';
   if (ratio < 120) return 'ratio-green';
