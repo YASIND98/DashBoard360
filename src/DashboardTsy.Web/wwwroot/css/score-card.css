@@ -613,6 +613,116 @@
   background: rgba(212, 230, 252, 0.1)
 }
 
+/* ===== Ranking Bar ===== */
+.sc-ranking-bar {
+  display: flex;
+  gap: 24px;
+  padding: 8px 24px 16px;
+}
+
+.sc-ranking-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(#3281fb 0%, #3488f1 100%);
+  backdrop-filter: blur(20px);
+}
+
+.sc-ranking-card--brown {
+  background: linear-gradient(#6e615d 0%, #78787d 100%);
+  border-color: rgba(195, 145, 60, 0.45);
+}
+
+.sc-ranking-card--brown .sc-ranking-value .first-number {
+  color: var(--ratio-orange);
+}
+
+.sc-ranking-card--green {
+  background: linear-gradient(#1276a3 0%, #306f96 100%);
+  border-color: rgba(80, 200, 130, 0.45);
+}
+
+.sc-ranking-card--green .sc-ranking-value .first-number {
+  color: var(--ratio-green);
+}
+
+.sc-ranking-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.sc-ranking-info {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.sc-info-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.sc-info-tooltip {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  color: #1a1f37;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 8px 14px;
+  border-radius: 10px;
+  white-space: nowrap;
+  z-index: 200;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+.sc-info-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-bottom-color: #ffffff;
+}
+
+.sc-info-wrap:hover .sc-info-tooltip {
+  display: block;
+}
+
+.sc-ranking-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+.sc-ranking-value .first-number {
+    position: relative;
+    top: 3px;
+    right: 1px;
+}
+
+.sc-ranking-value .second-number {
+    font-size: 18px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.55);
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .sc-header {
