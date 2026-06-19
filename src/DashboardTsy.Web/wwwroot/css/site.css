@@ -55,6 +55,7 @@
   --purple: #5e5adb;
   --green: #27b857;
   --red: #f12831;
+  --disabled: #8795A9;
 
   /* Ratio */
   --ratio-red: #F63C4C;
@@ -316,10 +317,12 @@ body {
 
 .filter-dropdown.disabled {
   cursor: default;
+  color: var(--disabled);
+  border-color: var(--disabled);
 }
 
 .filter-dropdown.disabled img {
-  display: none;
+  filter: brightness(0) saturate(100%) invert(57%) sepia(10%) saturate(430%) hue-rotate(185deg) brightness(101%);
 }
 
 .filter-dropdown img {
