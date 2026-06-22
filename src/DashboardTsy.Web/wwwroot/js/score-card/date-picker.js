@@ -107,7 +107,9 @@ $(function () {
             html += '</div>';
         }
 
-        $('#scDpPanel').html(html);
+        $('#scDpPanel')
+            .html(html)
+            .toggleClass('sc-dp-panel--yearly', state.periodType === PERIOD.yillik);
     }
 
     // ── Panel açma / kapama ───────────────────────────────────────────────────

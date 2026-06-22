@@ -765,7 +765,7 @@
   align-items: center;
   gap: 8px;
   padding: 7px 14px;
-  background: rgba(255, 255, 255, 0.14);
+  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
   border: 1px solid rgba(255, 255, 255, 0.3);
   border-radius: 10px;
   color: white;
@@ -802,12 +802,13 @@
   display: none;
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
+  left: 50%;
+  transform: translateX(-50%);
   min-width: 300px;
-  background: linear-gradient(160deg, #1a3a8a 0%, #0d1e60 100%);
-  border-radius: 14px;
+  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
+  border-radius: 8px;
   z-index: 500;
-  padding: 16px;
+  padding: 6px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
@@ -828,7 +829,7 @@
 .sc-dp-year-btn {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: white;
   font-size: 22px;
   cursor: pointer;
   padding: 0 4px;
@@ -841,7 +842,7 @@
 }
 
 .sc-dp-year-label {
-  color: white;
+  color: rgba(255, 255, 255, 0.6);
   font-size: 15px;
   font-weight: 600;
   min-width: 48px;
@@ -874,8 +875,8 @@
 }
 
 .sc-dp-cell.sc-dp-active {
-  background: rgba(100, 150, 255, 0.5);
-  color: white;
+  background: #7db5f3;
+  color: #0f4570;
   font-weight: 600;
 }
 
@@ -889,6 +890,11 @@
 .sc-dp-year-btn:disabled {
   opacity: 0.25;
   cursor: not-allowed;
+}
+
+.sc-dp-panel.sc-dp-panel--yearly {
+  min-width: unset;
+  width: fit-content;
 }
 
 .sc-dp-year-list {
