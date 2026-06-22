@@ -55,6 +55,7 @@
   --purple: #5e5adb;
   --green: #27b857;
   --red: #f12831;
+  --disabled: #8795A9;
 
   /* Ratio */
   --ratio-red: #F63C4C;
@@ -316,10 +317,12 @@ body {
 
 .filter-dropdown.disabled {
   cursor: default;
+  color: var(--disabled);
+  border-color: var(--disabled);
 }
 
 .filter-dropdown.disabled img {
-  display: none;
+  filter: brightness(0) saturate(100%) invert(57%) sepia(10%) saturate(430%) hue-rotate(185deg) brightness(101%);
 }
 
 .filter-dropdown img {
@@ -406,8 +409,7 @@ body {
 }
 
 .period-btn {
-  height: 36px;
-  width: 100px;
+  padding: 5.5px 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1096,8 +1098,6 @@ body:has(.scorecard-panel.open)::before {
   }
 
   .period-btn {
-    height: 30px;
-    width: 84px;
     font-size: 13px;
     gap: 6px;
   }
@@ -1186,4 +1186,55 @@ body:has(.scorecard-panel.open)::before {
   .filter-dropdown-wrapper {
     min-width: 130px;
   }
+}
+
+.info-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.info-icon img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.info-tooltip {
+  position: fixed;
+  background: #ECF1FB;
+  color: #1B2A4A;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: normal;
+  width: max-content;
+  max-width: 250px;
+  text-align: center;
+  box-shadow: 0px 5px 15px -3px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  opacity: 0;
+}
+
+.info-tooltip.visible {
+  opacity: 1;
+}
+
+.info-tooltip::after {
+  content: '';
+  position: absolute;
+  left: var(--arrow-left, 50%);
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  background: #ECF1FB;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.info-tooltip.below::after {
+  bottom: auto;
+  top: -5px;
 }

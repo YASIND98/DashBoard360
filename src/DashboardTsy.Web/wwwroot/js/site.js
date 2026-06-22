@@ -56,27 +56,6 @@ $(document).ready(function () {
     loadSidebarItems();
 });
 
-function formatPercent(ratio) {
-  if(!ratio) return "-"
-  var rounded = Math.round(ratio * 10) / 10;
-  if (rounded % 1 === 0) return rounded;
-  return rounded.toFixed(1).replace('.', '.<small>') + '</small>';
-}
-
-function percentColor(ratio) {
-  if (ratio < 75) return 'ratio-red';
-  if (ratio < 100) return 'ratio-orange';
-  if (ratio < 120) return 'ratio-green';
-  return 'ratio-blue';
-}
-
-function formatNumber(value, isPrice, productName) {
-  if(!value) return "-";
-  var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
-  if (!isPrice) return num;
-  var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
-  return currency + ' ' +  num;
-}
 
 // ===== Table Legend Helpers =====
 var LEGEND_RATIO = '<span class="legend-value">0</span><span class="legend-bar ratio-red-bg"></span><span class="legend-value">75</span><span class="legend-bar ratio-orange-bg"></span><span class="legend-value">100</span><span class="legend-bar ratio-green-bg"></span><span class="legend-value">120</span><span class="legend-bar ratio-blue-bg"></span>';
@@ -99,14 +78,6 @@ function renderTableLegend(containerId, options) {
 // ===== Shared Report Date =====
 var _reportDateTtlMs = 4 * 60 * 60 * 1000; // 4 saat
 var _reportDate = sessionStorage.getItem('_reportDate') || new Date().toISOString();
-
-var _trMonths = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-
-function formatReportDateTr(iso) {
-    var d = new Date(iso);
-    if (isNaN(d.getTime())) return '';
-    return d.getDate() + ' ' + _trMonths[d.getMonth()] + ' ' + d.getFullYear();
-}
 
 function applyReportDate() {
     var formatted = formatReportDateTr(_reportDate);
@@ -445,10 +416,10 @@ $(document).ready(function () {
       if ($infoTooltip) $infoTooltip.removeClass('visible');
   }
 
-  $(document).on('mouseenter focusin', '.info-icon[data-tooltip]', function () {
+  $(document).on('mouseenter focusin', '[data-tooltip]', function () {
       showInfoTooltip($(this));
   });
-  $(document).on('mouseleave focusout', '.info-icon[data-tooltip]', hideInfoTooltip);
+  $(document).on('mouseleave focusout', '[data-tooltip]', hideInfoTooltip);
   $(window).on('scroll resize', hideInfoTooltip);
   $(document).on('scroll', '.table-wrapper, .table-container', hideInfoTooltip);
 });

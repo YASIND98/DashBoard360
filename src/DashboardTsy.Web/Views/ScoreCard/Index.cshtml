@@ -39,6 +39,11 @@
     </div>
 </div>
 
+<!-- Breadcrumb: Bölge / Şube / Sicil -->
+<div class="breadcrumb-bar" id="scBreadcrumbBar" style="display:none;">
+    <div class="breadcrumb" id="scBreadcrumb"></div>
+</div>
+
 <!-- Filters -->
 <div class="filters-row">
     <div class="filters-left">
@@ -67,6 +72,20 @@
                     <input type="text" placeholder="Ara" class="dropdown-search-input" id="scBranchSearch" />
                 </div>
                 <div class="dropdown-list" id="scBranchList"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper" id="scRegisterWrapper">
+            <div class="filter-dropdown" id="scRegisterSelect">
+                <span class="filter-label" id="scRegisterLabel">Sicil No</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="scRegisterPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="scRegisterSearch" />
+                </div>
+                <div class="dropdown-list" id="scRegisterList"></div>
             </div>
         </div>
 
@@ -110,6 +129,28 @@
     </div>
 </div>
 
+<!-- Banka/Bölge sıralaması (dashboard/employee-order-summaries) yalnızca şube seçiliyken gösterilir-->
+<div class="sc-ranking-bar" style="display:none;">
+    <div class="sc-ranking-card">
+        <span class="sc-ranking-label">Banka Sıralaması
+            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Bankada ilgili skorkart tipi arasındaki sıralama" />
+        </span>
+        <div class="sc-ranking-value"><strong class="first-number" id="scBankRank">238</strong><span class="second-number" id="scBankRankTotal">/812</span></div>
+    </div>
+    <div class="sc-ranking-card">
+        <span class="sc-ranking-label">Bölge Sıralaması
+            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Bölgede ilgili skorkart tipi arasındaki sıralama" />
+        </span>
+        <div class="sc-ranking-value"><strong class="first-number" id="scRegionRank">38</strong><span class="second-number" id="scRegionRankTotal">/82</span></div>
+    </div>
+    <div class="sc-ranking-card">
+        <span class="sc-ranking-label">Toplam Skor
+            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Info Message" />
+        </span>
+        <div class="sc-ranking-value"><strong class="first-number" id="scTotalScore">82</strong><span class="second-number" id="scTotalScoreMax">/100</span></div>
+    </div>
+</div>
+
 <!-- Skor kart grubu (ör. Bireysel) seçilince alt sekmeler -->
 <div class="sub-tab-bar" id="scSubTabBar" style="display:none;">
     <div class="tab-list" id="scSubTabList"></div>
@@ -131,7 +172,7 @@
     <div class="sc-modal">
 
         <div class="sc-header">
-          <img src="~/images/close-circle.svg" alt="close" />
+          <img id="scClose" src="~/images/close-circle.svg" alt="close" />
           <span class="sc-title" id="scModalTitle">Aktif Kredi Kartı Performansı</span>
         </div>
 
@@ -192,7 +233,9 @@
 </div>
 
 @section Scripts {
-    <script src="~/js/constants.js" asp-append-version="true"></script>
-    <script src="~/js/mock.js" asp-append-version="true"></script>
-    <script src="~/js/score-card.js" asp-append-version="true"></script>
+    <script src="~/js/shared/mock.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/index.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/filters.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/target-detail.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/trend-analize.js" asp-append-version="true"></script>
 }
