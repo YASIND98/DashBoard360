@@ -262,7 +262,7 @@ $(function () {
             loadDetail();
         }
     }
--
+
     function openModal() {
         // Aktif sekmeye göre doğru bölümü göster (Hedef Detayı varsayılan)
         var activeTab = $('#scTabs .sc-tab.active').data('tab') || 'hedef';

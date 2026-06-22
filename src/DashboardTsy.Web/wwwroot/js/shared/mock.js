@@ -86,7 +86,7 @@ window.MOCK.scoreCardReport = {
             realizedValue: 5198,
             targetRealizationPercentage: 25.9355,
             productWeight: 20,
-            weightedPercentage: 5.19,
+            weightedPercentage: 84.19,
             pending: 13984,
             productInfo: 'Bireysel, mikro ve emekli maaş transferi müşteri kazanımlarını kapsar.'
         },
@@ -229,7 +229,6 @@ window.getPupaTypesMock = function () {
 // Skor Kart - dashboard/score-cards örnek cevabı (Key = skor kart tipi id)
 window.MOCK.scoreCards = {
     KeyValues: [
-        { Key: -1, Value: { Key: -1, Value: 1 } }, // Genel Bakış
         { Key: 15, Value: { Key: 15, Value: 1 } }, // Kurumsal
         { Key: 14, Value: { Key: 14, Value: 1 } }, // Ticari
         { Key: 5,  Value: { Key: 5,  Value: 1 } }, // KOBİ (KBİ)
@@ -349,6 +348,31 @@ window.MOCK.registers =  [
 
 window.getRegistersMock = function () {
     return window.MOCK.registers;
+};
+
+// dashboard/employee-order-summaries
+// Banka Sıralaması = orderBankOrderNo / orderByBankCodeCount; Bölge Sıralaması = orderRegionOrderNo / orderByRegionCodeCount.
+window.MOCK.employeeOrderSummaries = [
+    {
+        orderDateNumber: 8552,
+        orderBranchCode: 1940,
+        orderRegisterId: 62886,
+        orderBranchOrderNo: 2,
+        orderByBranchCodeCount: 2,
+        orderRegionOrderNo: 85,
+        orderByRegionCodeCount: 108,
+        orderBankOrderNo: 875,
+        orderByBankCodeCount: 1221,
+        orderSegmentBankOrder: 63,
+        orderBySegmentBankCodeCount: 75,
+        orderSegmentRegionOrderNo: 12,
+        orderBySegmentRegionCodeCount: 39,
+        scoreCardId: 16
+    }
+];
+
+window.getEmployeeOrderSummariesMock = function () {
+    return window.MOCK.employeeOrderSummaries;
 };
 
 // Skor Kart - Genel Bakış bölge özeti (scorecards/region-overview) örnek cevabı.
