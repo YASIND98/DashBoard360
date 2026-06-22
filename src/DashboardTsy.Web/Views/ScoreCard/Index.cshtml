@@ -39,6 +39,11 @@
     </div>
 </div>
 
+<!-- Breadcrumb: Bölge / Şube / Sicil -->
+<div class="breadcrumb-bar" id="scBreadcrumbBar" style="display:none;">
+    <div class="breadcrumb" id="scBreadcrumb"></div>
+</div>
+
 <!-- Filters -->
 <div class="filters-row">
     <div class="filters-left">
@@ -124,32 +129,23 @@
     </div>
 </div>
 
-<!-- Banka, bölge sıralama ve toplam skor alanı sadece tasarımsal -->
-<div class="sc-ranking-bar">
+<!-- Banka/Bölge sıralaması (dashboard/employee-order-summaries) yalnızca şube seçiliyken gösterilir-->
+<div class="sc-ranking-bar" style="display:none;">
     <div class="sc-ranking-card">
         <span class="sc-ranking-label">Banka Sıralaması
-            <span class="sc-info-wrap">
-                <img src="~/images/info.svg" alt="" class="sc-ranking-info" />
-                <span class="sc-info-tooltip" id="scBankRankTooltip">Info Message</span>
-            </span>
+            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Bankada ilgili skorkart tipi arasındaki sıralama" />
         </span>
         <div class="sc-ranking-value"><strong class="first-number" id="scBankRank">238</strong><span class="second-number" id="scBankRankTotal">/812</span></div>
     </div>
     <div class="sc-ranking-card">
         <span class="sc-ranking-label">Bölge Sıralaması
-            <span class="sc-info-wrap">
-                <img src="~/images/info.svg" alt="" class="sc-ranking-info" />
-                <span class="sc-info-tooltip" id="scRegionRankTooltip">Info Message</span>
-            </span>
+            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Bölgede ilgili skorkart tipi arasındaki sıralama" />
         </span>
         <div class="sc-ranking-value"><strong class="first-number" id="scRegionRank">38</strong><span class="second-number" id="scRegionRankTotal">/82</span></div>
     </div>
-    <div class="sc-ranking-card sc-ranking-card--green">
+    <div class="sc-ranking-card">
         <span class="sc-ranking-label">Toplam Skor
-            <span class="sc-info-wrap">
-                <img src="~/images/info.svg" alt="" class="sc-ranking-info" />
-                <span class="sc-info-tooltip" id="scTotalScoreTooltip">Info Message</span>
-            </span>
+            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Info Message" />
         </span>
         <div class="sc-ranking-value"><strong class="first-number" id="scTotalScore">82</strong><span class="second-number" id="scTotalScoreMax">/100</span></div>
     </div>
