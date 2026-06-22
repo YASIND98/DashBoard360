@@ -1,3 +1,185 @@
+/* ----- Sıralama kartları (Banka / Bölge Sıralaması & Toplam Skor) ----- */
+.sc-ranking-bar {
+  display: flex;
+  gap: 24px;
+  padding: 8px 24px 16px;
+}
+
+.sc-ranking-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 24px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(#3281fb 0%, #3488f1 100%);
+  backdrop-filter: blur(20px);
+}
+
+/* Toplam Skor kartı renk varyantları — H/G % (percentColor) kuralıyla aynı:
+   <%75 kırmızı, %75–%100 turuncu, %100–%120 yeşil, %120+ mavi. */
+.sc-ranking-card--red {
+  background: linear-gradient(270deg, rgba(253, 179, 182, 0.3) 0.48%, rgba(250, 120, 129, 0.255) 21.15%, rgba(246, 60, 76, 0.21) 41.83%, rgba(246, 60, 76, 0.255) 73.08%, rgba(246, 60, 76, 0.3) 100%);
+  border-color: rgba(250, 120, 129, 0.85);
+}
+
+.sc-ranking-card--red .sc-ranking-value .first-number {
+  color: var(--ratio-red);
+}
+
+.sc-ranking-card--orange {
+  background: linear-gradient(270deg, rgba(248, 204, 164, 0.5) 0%, rgba(198, 109, 28, 0.5) 68.27%, rgba(251, 138, 36, 0.5) 100%);
+  border-color: rgb(235, 192, 153);
+}
+
+.sc-ranking-card--orange .sc-ranking-value .first-number {
+  color: var(--ratio-orange);
+}
+
+.sc-ranking-card--green {
+  background: linear-gradient(90deg, rgba(39, 184, 87, 0.3) 0.08%, rgba(198, 201, 199, 0.3) 100%);
+  border-color: rgb(124, 171, 140);
+}
+
+.sc-ranking-card--green .sc-ranking-value .first-number {
+  color: var(--ratio-green);
+}
+
+.sc-ranking-card--blue {
+  background: linear-gradient(270deg, rgba(1, 82, 222, 0.5) 0%, rgba(1, 44, 120, 0.5) 100%);
+  border-color: rgb(24, 75, 163);
+}
+
+.sc-ranking-card--blue .sc-ranking-value .first-number {
+  color: var(--ratio-blue);
+}
+
+.sc-ranking-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.sc-ranking-info {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  cursor: pointer;
+}
+
+.sc-ranking-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1;
+}
+.sc-ranking-value .first-number {
+    position: relative;
+    top: 3px;
+    right: 1px;
+}
+
+.sc-ranking-value .second-number {
+    font-size: 14px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* ----- Rapor tablosu ----- */
+.col-text.sc-product-name {
+  white-space: normal;
+  min-width: 220px;
+  max-width: 340px;
+}
+
+.sc-detail-icon {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.data-table thead th.sc-type-th {
+  overflow: visible;
+}
+
+.sc-type-filter {
+  position: relative;
+  display: inline-block;
+  text-align: center;
+}
+
+.sc-type-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  max-width: 150px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.sc-type-trigger img {
+  width: 8px;
+  height: 5px;
+}
+
+.sc-type-trigger-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sc-type-filter.open .sc-type-trigger {
+  background: #1B366F;
+  color: var(--white);
+}
+
+.sc-type-filter.open .sc-type-trigger img {
+  filter: brightness(0) invert(1);
+}
+.sc-type-menu {
+  display: none;
+  width: 100%;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  background: #1B366F;
+  box-shadow: 0px 4px 20px 0px rgba(3, 40, 70, 0.7);
+  border-radius: 8px;
+  z-index: 200;
+  overflow: hidden;
+}
+
+.sc-type-filter.open .sc-type-menu {
+  display: block;
+}
+
+.sc-type-option {
+  padding: 10px 7.5px;
+  text-align: center;
+  color: white;
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(212, 230, 252, 0.1)
+}
+
+.sc-type-option:hover,
+.sc-type-option.selected {
+  background: rgba(212, 230, 252, 0.1)
+}
+
+/* ----- Detay Modalı ----- */
 .sc-overlay {
   display: none;
   position: fixed;
@@ -25,8 +207,6 @@
   max-width: 1300px;
   padding: 24px;
 }
-
-/* ===== Header ===== */
 .sc-header {
   display: flex;
   align-items: center;
@@ -45,7 +225,6 @@
   cursor: pointer;
 }
 
-/* ===== Tabs ===== */
 .sc-tabs {
   display: flex;
   gap: 16px;
@@ -71,7 +250,7 @@
   border-bottom: 2px solid var(--white);
 }
 
-/* ===== Filtre çipleri ===== */
+/* ===== Hedef Detayı ===== */
 .sc-filters {
   display: flex;
   align-items: center;
@@ -104,160 +283,6 @@
   width: 24px;
   height: 24px;
 }
-
-/* ===== Trend Analizi ===== */
-.sc-trend {
-  display: flex;
-  flex-direction: column;
-}
-
-.sc-trend-tabs {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin: 12px auto;
-}
-
-.sc-trend-tab {
-  width: 120px;
-  height: 32px;
-  background: transparent;
-  border: 1px solid #F6F7F9;
-  border-radius: 20px;
-  color: #F6F7F9;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-.sc-trend-tab.active {
-  background: white;
-  color: #052560;
-  border-color: white;
-}
-
-
-/* SVG grafik elemanları */
-.sc-trend-axis {
-  fill: #FFFFFF;
-  font-size: 10px;
-}
-
-.sc-trend-dot {
-  fill: #B1BAC8;
-}
-
-.sc-trend-grid {
-  stroke: #8795A9;
-  stroke-width: 1;
-  stroke-dasharray: 2 4;
-}
-
-/* %75 eşik çizgisi/nokta/yazı vurgusu */
-.sc-trend-grid.sc-trend-hl {
-  stroke: #8FDA9B;
-}
-
-.sc-trend-dot.sc-trend-hl {
-  fill: #8FDA9B;
-}
-
-.sc-trend-axis.sc-trend-hl {
-  fill: #8FDA9B;
-}
-
-.sc-trend-plot-bg {
-  fill: rgba(255, 255, 255, 0.02);
-}
-
-.sc-trend-area {
-  fill: #17345D;
-}
-
-.sc-trend-line {
-  fill: none;
-  stroke: #0573CC;
-  stroke-width: 2;
-  stroke-linejoin: round;
-}
-
-/* Veri noktası işareti + üzerine gelme hedefi */
-.sc-trend-marker {
-  fill: #14BEDD;
-  pointer-events: none;
-  opacity: 0;
-}
-
-/* Hover'da çıkan tam boy dikey çizgi */
-.sc-trend-vline {
-  stroke: #14BEDD;
-  stroke-width: 1;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.sc-trend-hover {
-  fill: transparent;
-  cursor: pointer;
-}
-
-/* Çizgi ve nokta yalnızca hedefin üzerine gelince görünsün */
-.sc-trend-point:hover .sc-trend-vline,
-.sc-trend-point:hover .sc-trend-marker {
-  opacity: 1;
-}
-
-/* ===== Trend tooltip ===== */
-#scTrendChart {
-  position: relative;
-}
-
-.sc-trend-tooltip {
-  display: none;
-  position: absolute;
-  z-index: 10;
-  min-width: 160px;
-  padding: 12px 16px;
-  background: #14BEDD;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  pointer-events: none;
-  font-size: 13px;
-}
-
-/* Yandan çıkan üçgen (varsayılan: tooltip noktanın sağında, ok sola bakar) */
-.sc-trend-tooltip::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -7px;
-  transform: translateY(-50%);
-  border-style: solid;
-  border-width: 8px 8px 8px 0;
-  border-color: transparent #14BEDD transparent transparent;
-}
-
-/* Tooltip noktanın soluna alındığında ok sağa baksın */
-.sc-trend-tooltip.sc-tt-left::before {
-  left: auto;
-  right: -7px;
-  border-width: 8px 0 8px 8px;
-  border-color: transparent transparent transparent #14BEDD;
-}
-
-.sc-tt-title {
-  color: #FFFFFF;
-  font-weight: 700;
-  font-size: 16px;
-  margin-bottom: 4px;
-}
-
-.sc-tt-row {
-  margin-top: 4px;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.92);
-}
-
-/* ===== Table ===== */
 .sc-table-wrapper {
   flex: 1;
   overflow: auto;
@@ -304,12 +329,10 @@
   border-bottom: none;
 }
 
-/* Zebra: ilk satırdan başlayarak (1., 3., 5. ...) hafif arka plan */
 .sc-table tbody tr.sc-zebra {
   background: #E9F3FE0F;
 }
 
-/* Ürün hücresi: durum ikonu + ürün adı (eski tablo: Hedef Dışı) */
 .sc-prod {
   display: inline-flex;
   align-items: center;
@@ -322,13 +345,10 @@
   flex-shrink: 0;
 }
 
-/* Hesap No (link görünümü) */
 .sc-account {
   color: #4E99ED;
   text-decoration: underline;
 }
-
-/* ===== Gerçekleşmeyen: expand satırları ===== */
 .sc-summary {
   color: #FBFBFD;
 }
@@ -350,7 +370,6 @@
   transform: rotate(0deg);
 }
 
-/* Expanded ana satır: detayla tek parça olsun (alt çizgi yok, zebra yok) */
 .sc-table tbody tr.sc-main-row.expanded {
   background: rgba(18, 55, 92, 0.7);
 }
@@ -360,7 +379,6 @@
   border-top: 1px solid #68788F;
 }
 
-/* Detay satırı (ürün + sebep kırılımı) */
 .sc-detail-row > td {
   padding: 0 12px 10px;
   border-bottom: 1px solid #536076;
@@ -374,7 +392,6 @@
   gap: 8px;
 }
 
-/* Her ürün kırılımı: yatay gradient bar (sol durum rengi -> sağ koyu) */
 .sc-detail {
   display: flex;
   align-items: center;
@@ -407,7 +424,6 @@
   border-radius: 6px;
 }
 
-/* Dikey ayraç çizgisi */
 .sc-detail-sep {
   width: 1px;
   align-self: stretch;
@@ -435,37 +451,6 @@
   color: #FBFBFD;
 }
 
-.sc-table tbody tr.sc-empty-row:hover {
-  filter: none;
-}
-
-.sc-empty-row td {
-  text-align: center;
-  color: var(--text-muted);
-  padding: 64px 16px;
-  border-right: none;
-  border-bottom: none;
-}
-
-/* Veri yok durumu: ikon + metin */
-.sc-empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.sc-empty-state img {
-  width: 40px;
-  height: 40px;
-}
-
-.sc-empty-state span {
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-/* ===== Footer ===== */
 .sc-footer {
   display: flex;
   align-items: center;
@@ -519,213 +504,145 @@
   font-size: 12px;
 }
 
-/* Uzun ürün/hedef adı 2. satıra sarsın */
-.col-text.sc-product-name {
-  white-space: normal;
-  min-width: 220px;
-  max-width: 340px;
-}
-
-/* Satırdaki Detay ikonu */
-.sc-detail-icon {
-  width: 24px;
-  height: 24px;
-  vertical-align: middle;
-  cursor: pointer;
-}
-
-/* ===== Ürün Tipi sütun başlığı filtresi (tasarıma özel) ===== */
-/* Başlık hücresi menünün taşmasını kırpmasın */
-.data-table thead th.sc-type-th {
-  overflow: visible;
-}
-
-.sc-type-filter {
-  position: relative;
-  display: inline-block;
-  text-align: center;
-}
-
-/* Kapalı hâl: düz başlık metni gibi (arka plan yok) */
-.sc-type-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 16px;
-  max-width: 150px;
-  background: transparent;
-  border: none;
-  border-radius: 10px;
-  color: var(--text-muted);
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.sc-type-trigger img {
-  width: 8px;
-  height: 5px;
-}
-
-/* Seçili tip uzunsa metni "..." ile kısalt (trigger max-width'i içinde) */
-.sc-type-trigger-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sc-type-filter.open .sc-type-trigger {
-  background: #1B366F;
-  color: var(--white);
-}
-
-.sc-type-filter.open .sc-type-trigger img {
-  filter: brightness(0) invert(1);
-}
-.sc-type-menu {
-  display: none;
-  width: 100%;
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  background: #1B366F;
-  box-shadow: 0px 4px 20px 0px rgba(3, 40, 70, 0.7);
-  border-radius: 8px;
-  z-index: 200;
-  overflow: hidden;
-}
-
-.sc-type-filter.open .sc-type-menu {
-  display: block;
-}
-
-.sc-type-option {
-  padding: 10px 7.5px;
-  text-align: center;
-  color: white;
-  font-size: 12px;
-  white-space: nowrap;
-  cursor: pointer;
-  border-bottom: 1px solid rgba(212, 230, 252, 0.1)
-}
-
-.sc-type-option:hover,
-.sc-type-option.selected {
-  background: rgba(212, 230, 252, 0.1)
-}
-
-/* ===== Ranking Bar ===== */
-.sc-ranking-bar {
-  display: flex;
-  gap: 24px;
-  padding: 8px 24px 16px;
-}
-
-.sc-ranking-card {
-  flex: 1;
+/* ----- Trend Analizi ----- */
+.sc-trend {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 24px;
-  border-radius: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: linear-gradient(#3281fb 0%, #3488f1 100%);
-  backdrop-filter: blur(20px);
 }
 
-.sc-ranking-card--brown {
-  background: linear-gradient(#6e615d 0%, #78787d 100%);
-  border-color: rgba(195, 145, 60, 0.45);
-}
-
-.sc-ranking-card--brown .sc-ranking-value .first-number {
-  color: var(--ratio-orange);
-}
-
-.sc-ranking-card--green {
-  background: linear-gradient(#1276a3 0%, #306f96 100%);
-  border-color: rgba(80, 200, 130, 0.45);
-}
-
-.sc-ranking-card--green .sc-ranking-value .first-number {
-  color: var(--ratio-green);
-}
-
-.sc-ranking-label {
+.sc-trend-tabs {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.65);
+  justify-content: center;
+  gap: 12px;
+  margin: 12px auto;
 }
 
-.sc-ranking-info {
-  width: 16px;
-  height: 16px;
-  opacity: 0.7;
+.sc-trend-tab {
+  width: 120px;
+  height: 32px;
+  background: transparent;
+  border: 1px solid #F6F7F9;
+  border-radius: 20px;
+  color: #F6F7F9;
+  font-weight: bold;
   cursor: pointer;
 }
 
-.sc-info-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
+.sc-trend-tab.active {
+  background: white;
+  color: #052560;
+  border-color: white;
 }
 
-.sc-info-tooltip {
+.sc-trend-axis {
+  fill: #FFFFFF;
+  font-size: 10px;
+}
+
+.sc-trend-dot {
+  fill: #B1BAC8;
+}
+
+.sc-trend-grid {
+  stroke: #8795A9;
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.sc-trend-grid.sc-trend-hl {
+  stroke: #8FDA9B;
+}
+
+.sc-trend-dot.sc-trend-hl {
+  fill: #8FDA9B;
+}
+
+.sc-trend-axis.sc-trend-hl {
+  fill: #8FDA9B;
+}
+
+.sc-trend-plot-bg {
+  fill: rgba(255, 255, 255, 0.02);
+}
+
+.sc-trend-area {
+  fill: #17345D;
+}
+
+.sc-trend-line {
+  fill: none;
+  stroke: #0573CC;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.sc-trend-marker {
+  fill: #14BEDD;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.sc-trend-vline {
+  stroke: #14BEDD;
+  stroke-width: 1;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.sc-trend-hover {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.sc-trend-point:hover .sc-trend-vline,
+.sc-trend-point:hover .sc-trend-marker {
+  opacity: 1;
+}
+
+#scTrendChart {
+  position: relative;
+}
+
+.sc-trend-tooltip {
   display: none;
   position: absolute;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #ffffff;
-  color: #1a1f37;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 14px;
-  border-radius: 10px;
-  white-space: nowrap;
-  z-index: 200;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  z-index: 10;
+  min-width: 160px;
+  padding: 12px 16px;
+  background: #14BEDD;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   pointer-events: none;
+  font-size: 13px;
 }
 
-.sc-info-tooltip::before {
+.sc-trend-tooltip::before {
   content: '';
   position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 7px solid transparent;
-  border-bottom-color: #ffffff;
+  top: 50%;
+  left: -7px;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent #14BEDD transparent transparent;
 }
 
-.sc-info-wrap:hover .sc-info-tooltip {
-  display: block;
+.sc-trend-tooltip.sc-tt-left::before {
+  left: auto;
+  right: -7px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent #14BEDD;
 }
 
-.sc-ranking-value {
-  font-size: 26px;
+.sc-tt-title {
+  color: #FFFFFF;
   font-weight: 700;
-  color: var(--white);
-  line-height: 1;
-}
-.sc-ranking-value .first-number {
-    position: relative;
-    top: 3px;
-    right: 1px;
+  font-size: 16px;
+  margin-bottom: 4px;
 }
 
-.sc-ranking-value .second-number {
-    font-size: 18px;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.55);
-}
-
-/* ===== Responsive ===== */
-@media (max-width: 900px) {
-  .sc-header {
-    flex-wrap: wrap;
-  }
+.sc-tt-row {
+  margin-top: 4px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
 }

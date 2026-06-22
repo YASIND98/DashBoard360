@@ -1187,3 +1187,54 @@ body:has(.scorecard-panel.open)::before {
     min-width: 130px;
   }
 }
+
+.info-icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.info-icon img {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+.info-tooltip {
+  position: fixed;
+  background: #ECF1FB;
+  color: #1B2A4A;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: normal;
+  width: max-content;
+  max-width: 250px;
+  text-align: center;
+  box-shadow: 0px 5px 15px -3px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  opacity: 0;
+}
+
+.info-tooltip.visible {
+  opacity: 1;
+}
+
+.info-tooltip::after {
+  content: '';
+  position: absolute;
+  left: var(--arrow-left, 50%);
+  bottom: -5px;
+  width: 10px;
+  height: 10px;
+  background: #ECF1FB;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.info-tooltip.below::after {
+  bottom: auto;
+  top: -5px;
+}
