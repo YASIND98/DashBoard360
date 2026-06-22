@@ -27,9 +27,6 @@ $(function () {
     var _tabModel = [];
     var _overview = null;
 
-    var _scRegions = [];
-    var _scBranches = [];
-
     //users/authorities: kullanıcı rolü + başlangıç bölge/şube/sicil bağlamı. userCode/applicationCode sabittir.
     function fetchUserAuthorities(callback) {
         $.ajax({
@@ -112,7 +109,7 @@ $(function () {
             _dateNumber = kv.length ? kv[0].key : -1;
             fetchPupaTypes(_dateNumber, function (pupaRes) {
                 renderPupaChannels(pupaRes);
-                loadRegions(loadScoreCardTypes);
+                ScoreCard.filters.loadRegions(loadScoreCardTypes);   // filters.js
             });
         });
     }
@@ -198,175 +195,10 @@ $(function () {
             renderScoreCardTabs(scRes);                 // _scoreCardId set edilir
             // branches gövdesi scoreCardId + pupaType ister -> score-cards'tan SONRA, sicil/tablodan ÖNCE.
             // (pupa/period değişiminde loadScoreCardTypes tekrar çağrıldığından branches de yenilenir.)
-            loadBranches(function () {
-                loadRegisters(loadScoreCardTable);
+            ScoreCard.filters.loadBranches(function () {            // filters.js
+                ScoreCard.filters.loadRegisters(loadScoreCardTable);
             });
         });
-    }
-
-    // dashboard/regions: kullanıcının görebildiği bölgelerin listesi.
-    function fetchRegions(callback) {
-        $.ajax({
-            url: SCORE_CARD_BASE_URL + '/dashboard/regions',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                regionCode: _regionCode,
-                branchCode: _branchCode,
-                dateNumber: _dateNumber,
-                registerId: _registerId
-            })
-        }).done(function (res) {
-            callback(Array.isArray(res) ? res : ((res && res.rows) || []));
-        }).fail(function () {
-            callback(typeof getRegionsMock === 'function' ? getRegionsMock() : []);
-        });
-    }
-
-    //dashboard/branches: seçili bölgenin şubeleri -> şube dropdown listesi.
-    function fetchBranches(callback) {
-        $.ajax({
-            url: SCORE_CARD_BASE_URL + '/dashboard/branches',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                pupaType: activePupaType(),
-                branchCode: _branchCode,
-                dateNumber: _dateNumber,
-                registerId: _registerId,
-                scoreCardTypeId: 0,
-                regionCode: _regionCode,
-                scoreCardId: _scoreCardId
-            })
-        }).done(function (res) {
-            callback(Array.isArray(res) ? res : ((res && res.rows) || []));
-        }).fail(function () {
-            callback(typeof getBranchesMock === 'function' ? getBranchesMock() : []);
-        });
-    }
-
-    // Bölge listesini doldur (#scRegionList); tek bölge ise "Tümü" gösterilmez (otomatik seçili).
-    function renderScRegionList() {
-        var $list = $('#scRegionList');
-        $list.empty();
-        var single = _scRegions.length === 1;
-        if (!single) {
-            var tumuCls = (_regionCode === -1) ? ' selected' : '';
-            $list.append('<div class="dropdown-item tumu-item' + tumuCls + '" data-code="-1">Tümü</div>');
-        }
-        _scRegions.forEach(function (r) {
-            var cls = (single || r.regionCode === _regionCode) ? ' selected' : '';
-            $list.append('<div class="dropdown-item' + cls + '" data-code="' + r.regionCode + '">' + r.regionName + '</div>');
-        });
-    }
-
-    // Şube listesini doldur (#scBranchList); liste servisten seçili bölgeye göre gelir.
-    function renderScBranchList() {
-        var $list = $('#scBranchList');
-        $list.empty();
-        var single = _scBranches.length === 1;
-        if (!single) {
-            var tumuCls = (_branchCode === -1) ? ' selected' : '';
-            $list.append('<div class="dropdown-item tumu-item' + tumuCls + '" data-code="-1">Tümü</div>');
-        }
-        _scBranches.forEach(function (b) {
-            var cls = (single || b.branchCode === _branchCode) ? ' selected' : '';
-            $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.branchCode + '" data-region="' + b.regionCode + '">' + b.branchName + '</div>');
-        });
-    }
-
-    // Bölgeleri yükle; tek bölge dönerse otomatik seçili setlenir.
-    function loadRegions(done) {
-        fetchRegions(function (regions) {
-            _scRegions = regions || [];
-            var single = _scRegions.length === 1;
-            if (single) {
-                _regionCode = _scRegions[0].regionCode;
-                $('#scRegionLabel').text(_scRegions[0].regionName);
-            }
-            // Tek bölge dönerse dropdown kilitlenir (hedef ekranındaki gibi disabled)
-            $('#scRegionSelect').toggleClass('disabled', single);
-            renderScRegionList();
-            if (done) done();
-        });
-    }
-
-    // Şubeleri yükle; tek şube dönerse otomatik seçili setlenir.
-    function loadBranches(done) {
-        fetchBranches(function (branches) {
-            _scBranches = branches || [];
-            var single = _scBranches.length === 1;
-            if (single) {
-                _branchCode = _scBranches[0].branchCode;
-                $('#scBranchLabel').text(_scBranches[0].branchName);
-            }
-            // Tek şube dönerse dropdown kilitlenir (hedef ekranındaki gibi disabled)
-            $('#scBranchSelect').toggleClass('disabled', single);
-            renderScBranchList();
-            if (done) done();
-        });
-    }
-
-    //dashboard/registers: seçili bölge/şube + bağlam (tarih/skor kart/pupa) için sicillerin (PY) listesi.
-    function fetchRegisters(callback) {
-        $.ajax({
-            url: SCORE_CARD_BASE_URL + '/dashboard/registers',
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify({
-                regionCode: _regionCode,
-                branchCode: _branchCode,
-                registerId: _registerId,
-                scoreCardId: _scoreCardId,
-                dateNumber: _dateNumber,
-                pupaTypeId: activePupaType(),
-                registerText: -1,
-                scoreCardTypeId: 0
-            })
-        }).done(function (res) {
-            callback(res);
-        }).fail(function () {
-            callback(typeof getRegistersMock === 'function' ? getRegistersMock() : []);
-        });
-    }
-
-    // Sicil listesini doldur (#scRegisterList); ilk eleman "Tümü" (seçim yok), seçili olan işaretlenir.
-    function renderRegisterList(registers) {
-        let $list = $('#scRegisterList');
-        $list.empty();
-        let tumuCls = (_registerId === -1) ? ' selected' : '';
-        $list.append('<div class="dropdown-item tumu-item' + tumuCls + '" data-code="-1">Tümü</div>');
-        (registers || []).forEach(function (r) {
-            let cls = (r.registerId === _registerId) ? ' selected' : '';
-            $list.append('<div class="dropdown-item' + cls + '" data-code="' + r.registerId + '" data-branch="' + r.branchCode + '" data-region="' + r.regionCode + '">' + r.registerName + '</div>');
-        });
-    }
-
-    // Liste, seçili bölge/şube bağlamına göre yüklenir; şube değişince o şubenin sicilleri gelir.
-    // Servis tek sicil dönerse otomatik seçili setlenir.
-    function loadRegisters(done) {
-        if (_dateNumber == null) {
-            if (done) done();
-            return;
-        }
-        fetchRegisters(function (res) {
-            let registers = Array.isArray(res) ? res : ((res && res.rows) || []);
-            var single = registers.length === 1;
-            if (single) {
-                _registerId = registers[0].registerId;
-                $('#scRegisterLabel').text(registers[0].registerName);
-            }
-            // Tek sicil dönerse dropdown kilitlenir (hedef ekranındaki gibi disabled)
-            $('#scRegisterSelect').toggleClass('disabled', single);
-            renderRegisterList(registers);
-            if (done) done();
-        });
-    }
-
-    // Seçili sicili sıfırla (bölge/şube değişince): -1 (Tümü), etiket varsayılana döner.
-    function resetRegisterFilter() {
-        _registerId = -1;
-        $('#scRegisterLabel').text('Sicil No');
     }
 
     // scorecards/cumulatives: ana rapor tablosunu doldurur
@@ -441,8 +273,8 @@ $(function () {
 
     // Tabloyu doldur:
     //  - Genel Bakış sekmesi (scoreCardId === -1): seçili bölge/şube seviyesine göre özet
-    //       • bölge seçili değil (regionCode -1, genel müdür)        -> bölge özeti
-    //       • bölge seçili, şube seçili değil (branchCode -1, bölge müdürü) -> şube özeti
+    //       • bölge seçili değil -> bölge özeti
+    //       • bölge seçili, şube seçili değil -> şube özeti
     //       • şube seçili (şube müdürü / py) -> cumulatives ürün tablosu
     //  - Genel Bakış dışı sekme (scoreCardId !== -1) -> doğrudan cumulatives ürün tablosu
     function loadScoreCardTable() {
@@ -784,9 +616,6 @@ $(function () {
         loadPupaFilters($(this).data('period'));
     });
 
-    // Arama
-    $('#scSearchInput').on('input', renderReportBody);
-
     // Sıralama (başlığa tıkla: asc -> desc -> sırasız)
     $(document).on('click', '#scReportHead th[data-sort-key]', function () {
         var key = $(this).data('sort-key');
@@ -817,69 +646,6 @@ $(function () {
         }
     });
 
-    // Bölge / Şube / Sicil dropdown seçim handler'ları (kodlar number; -1 = Tümü).
-    // Init: bölgeler loadPupaFilters'ta, şubeler loadScoreCardTypes'ta (scoreCardId hazır olunca) yüklenir.
-    $(document).on('click', '#scRegionList .dropdown-item', function () {
-        var code = parseInt($(this).attr('data-code'), 10);   // number; -1 = Tümü
-        $('#scRegionLabel').text(code === -1 ? 'Bölge' : $(this).text());
-        $('#scRegionPanel').removeClass('open');
-        $('#scRegionList .dropdown-item').removeClass('selected');
-        $(this).addClass('selected');
-        _regionCode = code;
-
-        // Bölge değişti -> şube sıfırla, şubeleri bu bölge için yeniden yükle, sonra sicil + tablo
-        _branchCode = -1;
-        $('#scBranchLabel').text('Şube');
-        resetRegisterFilter();
-        loadBranches(function () {
-            loadRegisters(loadScoreCardTable);
-        });
-    });
-    $(document).on('click', '#scBranchList .dropdown-item', function () {
-        var code = parseInt($(this).attr('data-code'), 10);   // number; -1 = Tümü
-        $('#scBranchLabel').text(code === -1 ? 'Şube' : $(this).text());
-        $('#scBranchPanel').removeClass('open');
-        $('#scBranchList .dropdown-item').removeClass('selected');
-        $(this).addClass('selected');
-        _branchCode = code;
-
-        // Şube seçilince bağlı bölge otomatik setlensin (data-region number)
-        if (code !== -1) {
-            _regionCode = parseInt($(this).attr('data-region'), 10);
-            var region = _scRegions.filter(function (r) { return r.regionCode === _regionCode; })[0];
-            $('#scRegionLabel').text(region ? region.regionName : 'Bölge');
-            renderScRegionList();
-        }
-
-        resetRegisterFilter();                       // şube değişti -> seçili sicil geçersiz
-        loadRegisters(loadScoreCardTable);           // o şubenin sicilleri + tablo
-    });
-    $(document).on('click', '#scRegisterList .dropdown-item', function () {
-        var code = parseInt($(this).attr('data-code'), 10);   // number; -1 = Tümü
-        $('#scRegisterLabel').text(code === -1 ? 'Sicil No' : $(this).text());
-        $('#scRegisterPanel').removeClass('open');
-        $('#scRegisterList .dropdown-item').removeClass('selected');
-        $(this).addClass('selected');
-        _registerId = code;
-
-        // Sicil seçilince bağlı şube (ve bölge) seçili gelsin: register.branchCode == branch.branchCode (tip kontrolü yok)
-        if (code !== -1) {
-            var branchCode = $(this).data('branch');
-            var branch = _scBranches.filter(function (b) { return b.branchCode == branchCode; })[0];
-            if (branch) {
-                _branchCode = branch.branchCode;
-                $('#scBranchLabel').text(branch.branchName);
-                renderScBranchList();
-                _regionCode = branch.regionCode;
-                var region = _scRegions.filter(function (r) { return r.regionCode === branch.regionCode; })[0];
-                $('#scRegionLabel').text(region ? region.regionName : 'Bölge');
-                renderScRegionList();
-            }
-        }
-
-        loadScoreCardTable();
-    });
-
     // İlk render: önce kullanıcı yetki/bağlamı (users/authorities) çekilir, sonra filtre zinciri kurulur
     fetchUserAuthorities(function (auth) {
         applyUserAuthorities(auth);
@@ -888,8 +654,24 @@ $(function () {
     renderLegend();
     renderReportBody();
 
-    // Detay modalı (score-card/detail-modal.js) ana raporun seçili filtre bağlamını buradan okur.
     window.ScoreCard = window.ScoreCard || {};
+
+    // Filtre modülü (filters.js) bu accessor üzerinden rapor durumunu okur/yazar ve aksiyon tetikler.
+    window.ScoreCard.report = {
+        get regionCode()  { return _regionCode; },
+        set regionCode(v) { _regionCode = v; },
+        get branchCode()  { return _branchCode; },
+        set branchCode(v) { _branchCode = v; },
+        get registerId()  { return _registerId; },
+        set registerId(v) { _registerId = v; },
+        get dateNumber()  { return _dateNumber; },
+        get scoreCardId() { return _scoreCardId; },
+        activePupaType: activePupaType,
+        loadTable: loadScoreCardTable,
+        renderBody: renderReportBody
+    };
+
+    // Detay modalı (target-detail.js / trend-analize.js) ana raporun seçili filtre bağlamını buradan okur.
     window.ScoreCard.getContext = function () {
         return {
             dateNumber: _dateNumber,
