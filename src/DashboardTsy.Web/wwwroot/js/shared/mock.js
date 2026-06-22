@@ -191,6 +191,10 @@ window.MOCK.primMonitoringPeriods = {
     1: {
         keyValues: [
         {
+            "key": 8918,
+            "value": "2026 - AY6"
+        },
+        {
             "key": 8917,
             "value": "2026 - AY5"
         },
@@ -238,7 +242,7 @@ window.MOCK.primMonitoringPeriods = {
     },
     2: {
         keyValues: [
-            {
+        {
             "key": 8947,
             "value": "2026 - CEYREK2"
         },

@@ -71,13 +71,13 @@ $(function () {
         var html = '';
 
         if (state.periodType === PERIOD.aylik) {
-            // ── Aylık: yıl navigasyonu + 4x3 ay grid
+            // ── Aylık: yıl navigasyonu + 4x3 ay grid (sadece mock'ta olan aylar aktif)
+            var panelAvail = _aylikAvailMap[state.panelYear] || {};
             html += buildYearNav(state.panelYear <= MIN_AYLIK_YEAR, state.panelYear >= CUR_YEAR);
             html += '<div class="sc-dp-grid">';
             for (var m = 1; m <= 12; m++) {
                 var active   = (state.panelYear === state.year && m === state.month);
-                var disabled = (state.panelYear > CUR_YEAR) ||
-                               (state.panelYear === CUR_YEAR && m > CUR_MONTH);
+                var disabled = !panelAvail[m];
                 var cls = 'sc-dp-cell' + (active ? ' sc-dp-active' : '') + (disabled ? ' sc-dp-disabled' : '');
                 html += '<div class="' + cls + '"' +
                         (disabled ? '' : ' data-dp-month="' + m + '"') +
@@ -86,20 +86,24 @@ $(function () {
             html += '</div>';
 
         } else if (state.periodType === PERIOD.ceyreklik) {
-            // ── Çeyreklik: yıl navigasyonu + 2x2 çeyrek grid
+            // ── Çeyreklik: yıl navigasyonu + 2x2 çeyrek grid (sadece mock'ta olan çeyrekler aktif)
+            var panelCeyrekAvail = _ceyrekAvailMap[state.panelYear] || {};
             html += buildYearNav(state.panelYear <= MIN_CEYREK_YEAR, state.panelYear >= CUR_YEAR);
             html += '<div class="sc-dp-grid sc-dp-grid-2">';
             for (var q = 1; q <= 4; q++) {
-                var activeQ = (state.panelYear === state.year && q === state.quarter);
-                html += '<div class="sc-dp-cell' + (activeQ ? ' sc-dp-active' : '') +
-                        '" data-dp-quarter="' + q + '">' + q + '. Çeyrek</div>';
+                var activeQ   = (state.panelYear === state.year && q === state.quarter);
+                var disabledQ = !panelCeyrekAvail[q];
+                html += '<div class="sc-dp-cell' + (activeQ ? ' sc-dp-active' : '') + (disabledQ ? ' sc-dp-disabled' : '') + '"' +
+                        (disabledQ ? '' : ' data-dp-quarter="' + q + '"') +
+                        '>' + q + '. Çeyrek</div>';
             }
             html += '</div>';
 
         } else {
-            // ── Yıllık: CUR_YEAR → MIN_YEAR (type-3 keyValues sırası: yeniden eskiye)
+            // ── Yıllık: mock type-3 keyValues'taki benzersiz yıllar (yeniden eskiye)
             html += '<div class="sc-dp-year-list">';
-            for (var y = CUR_YEAR; y >= MIN_YEAR; y--) {
+            for (var _yyi = 0; _yyi < _yillikYears.length; _yyi++) {
+                var y = _yillikYears[_yyi];
                 var activeY = (y === state.year);
                 html += '<div class="sc-dp-year-item' + (activeY ? ' sc-dp-active' : '') +
                         '" data-dp-year="' + y + '">' + y + '</div>';
@@ -131,11 +135,24 @@ $(function () {
     // ── İleri / Geri navigasyon ───────────────────────────────────────────────
 
     function isMonthDisabled(year, month) {
-        return year > CUR_YEAR || (year === CUR_YEAR && month > CUR_MONTH);
+        return !(_aylikAvailMap[year] && _aylikAvailMap[year][month]);
     }
 
     var _yearData      = (typeof getPrimMonitoringPeriodsMock === 'function') ? getPrimMonitoringPeriodsMock(PERIOD.yillik) : null;
-    var _lastYearKv    = _yearData && _yearData.keyValues && _yearData.keyValues[_yearData.keyValues.length - 1];
+    var _yillikKVs     = _yearData ? (_yearData.keyValues || []) : [];
+
+    // Yıllık için benzersiz yıllar listesi (yeniden eskiye) ve yıl→key haritası (mock'tan)
+    var _yillikYears      = [];
+    var _yillikYearKeyMap = {};
+    for (var _yi = 0; _yi < _yillikKVs.length; _yi++) {
+        var _yyear = parseInt(_yillikKVs[_yi].value.split(' - ')[0], 10);
+        if (!_yillikYearKeyMap[_yyear]) {
+            _yillikYears.push(_yyear);
+            _yillikYearKeyMap[_yyear] = _yillikKVs[_yi].key;
+        }
+    }
+
+    var _lastYearKv    = _yillikKVs.length ? _yillikKVs[_yillikKVs.length - 1] : null;
     var MIN_YEAR       = _lastYearKv ? parseInt(_lastYearKv.value, 10) : CUR_YEAR - 4;
     var MAX_YEAR       = CUR_YEAR;
 
@@ -143,9 +160,31 @@ $(function () {
     var _lastAylikKv    = _aylikData && _aylikData.keyValues && _aylikData.keyValues[_aylikData.keyValues.length - 1];
     var MIN_AYLIK_YEAR  = _lastAylikKv ? parseInt(_lastAylikKv.value, 10) : CUR_YEAR - 4;
 
+    // Aylık için yıl→ay available map (mock'tan)
+    var _aylikAvailMap = {};
+    var _aylikKVs = _aylikData ? (_aylikData.keyValues || []) : [];
+    for (var _ai = 0; _ai < _aylikKVs.length; _ai++) {
+        var _ap = _aylikKVs[_ai].value.split(' - ');
+        var _ay = parseInt(_ap[0], 10);
+        var _am = parseInt(_ap[1].replace(/[^0-9]/g, ''), 10);
+        if (!_aylikAvailMap[_ay]) _aylikAvailMap[_ay] = {};
+        _aylikAvailMap[_ay][_am] = true;
+    }
+
     var _ceyrekData     = (typeof getPrimMonitoringPeriodsMock === 'function') ? getPrimMonitoringPeriodsMock(PERIOD.ceyreklik) : null;
     var _lastCeyrekKv   = _ceyrekData && _ceyrekData.keyValues && _ceyrekData.keyValues[_ceyrekData.keyValues.length - 1];
     var MIN_CEYREK_YEAR = _lastCeyrekKv ? parseInt(_lastCeyrekKv.value, 10) : CUR_YEAR - 4;
+
+    // Çeyreklik için yıl→çeyrek available map (mock'tan)
+    var _ceyrekAvailMap = {};
+    var _ceyrekKVs = _ceyrekData ? (_ceyrekData.keyValues || []) : [];
+    for (var _ci = 0; _ci < _ceyrekKVs.length; _ci++) {
+        var _cp = _ceyrekKVs[_ci].value.split(' - ');
+        var _cy = parseInt(_cp[0], 10);
+        var _cq = parseInt(_cp[1].replace(/[^0-9]/g, ''), 10);
+        if (!_ceyrekAvailMap[_cy]) _ceyrekAvailMap[_cy] = {};
+        _ceyrekAvailMap[_cy][_cq] = _ceyrekKVs[_ci].key;
+    }
 
     function refreshNavBtns() {
         $('#scDpPrev').prop('disabled', false);
@@ -169,13 +208,27 @@ $(function () {
             state.quarter = nextQ;
             state.year    = nextYc;
         } else {
-            state.year += dir;
+            // _yillikYears yeniden eskiye sıralı; dir=-1 (önceki=eski) → idx artar
+            var _curYIdx  = _yillikYears.indexOf(state.year);
+            var _nextYIdx = _curYIdx - dir;
+            if (_nextYIdx < 0 || _nextYIdx >= _yillikYears.length) return;
+            state.year = _yillikYears[_nextYIdx];
         }
         refreshHeader();
         refreshNavBtns();
         notify();
-        console.log(state.month);
-        console.log(state.year);
+        if (state.periodType === PERIOD.aylik) {
+            var _navKv = null;
+            for (var _ni = 0; _ni < _aylikKVs.length; _ni++) {
+                var _np = _aylikKVs[_ni].value.split(' - ');
+                if (parseInt(_np[0], 10) === state.year &&
+                    parseInt(_np[1].replace(/[^0-9]/g, ''), 10) === state.month) {
+                    _navKv = _aylikKVs[_ni];
+                    break;
+                }
+            }
+            console.log('Seçilen ay key:', _navKv ? _navKv.key : null);
+        }
     }
 
     // ── Event yayımla ─────────────────────────────────────────────────────────
@@ -229,8 +282,16 @@ $(function () {
         state.month = +$(this).data('dp-month');
         state.year  = state.panelYear;
         closePanel(); refreshHeader(); notify();
-        console.log(state.month);
-        console.log(state.year);
+        var matchedKv = null;
+        for (var _mi = 0; _mi < _aylikKVs.length; _mi++) {
+            var _mp = _aylikKVs[_mi].value.split(' - ');
+            if (parseInt(_mp[0], 10) === state.year &&
+                parseInt(_mp[1].replace(/[^0-9]/g, ''), 10) === state.month) {
+                matchedKv = _aylikKVs[_mi];
+                break;
+            }
+        }
+        console.log('Seçilen ay key:', matchedKv ? matchedKv.key : null);
     });
 
     // Çeyrek seçimi
@@ -239,8 +300,8 @@ $(function () {
         state.quarter = +$(this).data('dp-quarter');
         state.year    = state.panelYear;
         closePanel(); refreshHeader(); notify();
-        console.log(state.quarter);
-        console.log(state.year);
+        var cKey = _ceyrekAvailMap[state.year] && _ceyrekAvailMap[state.year][state.quarter];
+        console.log('Seçilen çeyrek key:', cKey != null ? cKey : null);
     });
 
     // Yıl seçimi (yıllık mod)
@@ -248,7 +309,7 @@ $(function () {
         e.stopPropagation();
         state.year = +$(this).data('dp-year');
         closePanel(); refreshHeader(); notify();
-        console.log(state.year);
+        console.log('Seçilen yıl key:', _yillikYearKeyMap[state.year] != null ? _yillikYearKeyMap[state.year] : null);
     });
 
     // Dönem tipi değişimi (Aylık / Çeyreklik / Yıllık butonlarından)
