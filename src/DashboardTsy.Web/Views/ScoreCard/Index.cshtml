@@ -24,11 +24,21 @@
 <link rel="stylesheet" href="~/css/score-card.css" asp-append-version="true" />
 
 <!-- Page Header -->
-<div class="page-header">
-    <h1 class="page-title">Skor Kart</h1>
+<div class="page-header sc-page-header">
+<h1 class="page-title">Skor Kart</h1>
     <div class="page-date">
-        <span class="date-text" id="scMonthLabel">Mayıs 2026</span>
-        <span class="date-badge">Bu Ay</span>
+        <div class="sc-date-picker" id="scDatePicker">
+            <button type="button" class="sc-dp-nav" id="scDpPrev">&#8249;</button>
+            <div class="sc-dp-trigger-wrap">
+                <button type="button" class="sc-dp-trigger" id="scDpTrigger">
+                    <strong id="scDpLabel"></strong>
+                    <span class="sc-dp-badge" id="scDpBadge"></span>
+                    <img src="~/images/down.svg" alt="" class="sc-dp-arrow" />
+                </button>
+                <div class="sc-dp-panel" id="scDpPanel"></div>
+            </div>
+            <button type="button" class="sc-dp-nav" id="scDpNext">&#8250;</button>
+        </div>
     </div>
     <div class="page-icons">
       <img src="@avatarUrl" alt="Avatar" class="avatar" />
@@ -239,6 +249,7 @@
 @section Scripts {
     <script src="~/js/shared/mock.js" asp-append-version="true"></script>
     <script src="~/js/score-card/index.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/date-picker.js" asp-append-version="true"></script>
     <script src="~/js/score-card/filters.js" asp-append-version="true"></script>
     <script src="~/js/score-card/target-detail.js" asp-append-version="true"></script>
     <script src="~/js/score-card/trend-analize.js" asp-append-version="true"></script>
