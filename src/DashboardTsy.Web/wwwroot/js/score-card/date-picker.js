@@ -227,7 +227,6 @@ $(function () {
                     break;
                 }
             }
-            console.log('Seçilen ay key:', _navKv ? _navKv.key : null);
         }
     }
 
@@ -291,7 +290,6 @@ $(function () {
                 break;
             }
         }
-        console.log('Seçilen ay key:', matchedKv ? matchedKv.key : null);
     });
 
     // Çeyrek seçimi
@@ -301,7 +299,6 @@ $(function () {
         state.year    = state.panelYear;
         closePanel(); refreshHeader(); notify();
         var cKey = _ceyrekAvailMap[state.year] && _ceyrekAvailMap[state.year][state.quarter];
-        console.log('Seçilen çeyrek key:', cKey != null ? cKey : null);
     });
 
     // Yıl seçimi (yıllık mod)
@@ -309,7 +306,6 @@ $(function () {
         e.stopPropagation();
         state.year = +$(this).data('dp-year');
         closePanel(); refreshHeader(); notify();
-        console.log('Seçilen yıl key:', _yillikYearKeyMap[state.year] != null ? _yillikYearKeyMap[state.year] : null);
     });
 
     // Dönem tipi değişimi (Aylık / Çeyreklik / Yıllık butonlarından)
