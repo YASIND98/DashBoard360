@@ -416,10 +416,10 @@ $(document).ready(function () {
       if ($infoTooltip) $infoTooltip.removeClass('visible');
   }
 
-  $(document).on('mouseenter focusin', '.info-icon[data-tooltip]', function () {
+  $(document).on('mouseenter focusin', '[data-tooltip]', function () {
       showInfoTooltip($(this));
   });
-  $(document).on('mouseleave focusout', '.info-icon[data-tooltip]', hideInfoTooltip);
+  $(document).on('mouseleave focusout', '[data-tooltip]', hideInfoTooltip);
   $(window).on('scroll resize', hideInfoTooltip);
   $(document).on('scroll', '.table-wrapper, .table-container', hideInfoTooltip);
 });

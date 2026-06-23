@@ -98,6 +98,9 @@ var SCORE_CARD_GROUPS = [
   { label: "KOBİ", keys: [5, 13] }
 ];
 
+// "Genel Bakış" sekmesi (Key -1) skor kart servisinden dönmez; ön yüzde eklenir.
+var SCORE_CARD_OVERVIEW_KEY = -1;
+
 // Skor Kart - Hedef Detayı kolon eşlemesi
 var SCORE_CARD_DETAIL_COLUMN_LABELS = [
     { key: "ACILIS_TARIHI", label: "Açılış Tarihi" },

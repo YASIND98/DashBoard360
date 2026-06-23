@@ -176,6 +176,9 @@ $(function () {
 
     function renderScoreCardTabs(scRes) {
         var kv = (scRes && scRes.KeyValues) || [];
+        // "Genel Bakış" (-1) servisten gelmez; ön yüzde statik eklenir (tüm kullanıcılarda, en başta).
+        kv = kv.filter(function (item) { return Number(item.Key) !== SCORE_CARD_OVERVIEW_KEY; });
+        kv = [{ Key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
         _tabModel = buildScoreCardTabModel(kv);
         $('#scTabList').html(_tabModel.map(function (t, i) {
             var attr = (t.type === 'single') ? ' data-scorecard="' + t.key + '"' : '';
@@ -271,6 +274,114 @@ $(function () {
         });
     }
 
+    // dashboard/employee-order-summaries: sıralama kartlarını besler, yalnızca şube seçiliyken.
+    function fetchEmployeeOrderSummaries(callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/dashboard/employee-order-summaries',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                dateNumber: _dateNumber,
+                registerId: _registerId,
+                branchCode: _branchCode,
+                scoreCardId: _scoreCardId
+            })
+        }).done(function (res) {
+            callback(Array.isArray(res) ? res : ((res && res.rows) || []));
+        }).fail(function () {
+            callback(typeof getEmployeeOrderSummariesMock === 'function' ? getEmployeeOrderSummariesMock() : []);
+        });
+    }
+
+    // Sıralama kartları (yalnızca belirli bir şube seçiliyken gösterilir):
+    //   Banka Sıralaması = orderBankOrderNo / orderByBankCodeCount
+    //   Bölge Sıralaması = orderRegionOrderNo / orderByRegionCodeCount
+    function loadRankings() {
+        var $bar = $('.sc-ranking-bar');
+        if (_branchCode === -1) {
+            $bar.hide();
+            return;
+        }
+        $bar.show();
+        fetchEmployeeOrderSummaries(function (rows) {
+            var d = (rows && rows[0]) || {};
+            $('#scBankRank').text(d.orderBankOrderNo != null ? d.orderBankOrderNo : '-');
+            $('#scBankRankTotal').text('/' + (d.orderByBankCodeCount != null ? d.orderByBankCodeCount : '-'));
+            $('#scRegionRank').text(d.orderRegionOrderNo != null ? d.orderRegionOrderNo : '-');
+            $('#scRegionRankTotal').text('/' + (d.orderByRegionCodeCount != null ? d.orderByRegionCodeCount : '-'));
+        });
+    }
+
+    // Toplam Skor = tablodaki Ağırlıklı H/G % (weightedPercentage) değerlerinin toplamı.
+    // Genel skor olduğundan arama/ürün tipi filtresinden bağımsız, tüm satırlar üzerinden hesaplanır.
+    // Kart rengi (arka plan + çerçeve + sayı) tablodaki H/G % ile aynı kurala (percentColor) göre belirlenir.
+    function renderTotalScore() {
+        var total = ROWS.reduce(function (sum, r) {
+            return sum + (Number(r.weightedPercentage) || 0);
+        }, 0);
+        var rounded = Math.round(total);
+        // percentColor 'ratio-*' döner; kart varyant sınıfına çevrilir ('' ise renksiz/varsayılan kart).
+        var cardClass = percentColor(rounded).replace('ratio-', 'sc-ranking-card--');
+        $('#scTotalScore').closest('.sc-ranking-card')
+            .removeClass('sc-ranking-card--red sc-ranking-card--orange sc-ranking-card--green sc-ranking-card--blue')
+            .addClass(cardClass);
+        $('#scTotalScore').text(rounded);
+    }
+
+    // ===== Breadcrumb: Bölge / Şube / Sicil drill-down =====
+    // Seçili filtre kademesini gösterir; üst kademeye tıklayınca ilgili dropdown'ın "Tümü" seçimi
+    // tetiklenir (reset + yeniden yükleme zinciri filters.js'teki handler'larda).
+    function scCrumb(text, action, disabled) {
+        var cls = disabled ? ' disabled' : '';
+        var attr = (!disabled && action) ? ' data-sc-breadcrumb="' + action + '"' : '';
+        return '<span class="breadcrumb-item' + cls + '"' + attr + '>' + text + '</span>';
+    }
+
+    function renderBreadcrumb() {
+        var regionSel = _regionCode != null && _regionCode !== -1;
+        var branchSel = _branchCode != null && _branchCode !== -1;
+        var registerSel = _registerId != null && _registerId !== -1;
+
+        // Hiçbir kademe seçili değilse (hepsi Tümü) breadcrumb gizli
+        if (!regionSel && !branchSel && !registerSel) {
+            $('#scBreadcrumbBar').hide();
+            return;
+        }
+
+        // Tek seçenekli (kilitli) bölge dropdown'u -> "Tüm Bölgeler" tıklanamaz
+        var regionLocked = $('#scRegionSelect').hasClass('disabled');
+        var deepest = registerSel ? 'register' : (branchSel ? 'branch' : 'region');
+
+        // Kök "Tüm Bölgeler" + seçili kademeler. Aktif (en alt) kademe tıklanamaz.
+        var parts = [scCrumb('Tüm Bölgeler', 'allRegions', regionLocked)];
+        if (regionSel) {
+            parts.push(scCrumb($('#scRegionLabel').text(), 'region', regionLocked || deepest === 'region'));
+        }
+        if (branchSel) {
+            parts.push(scCrumb($('#scBranchLabel').text(), 'branch', deepest === 'branch'));
+        }
+        if (registerSel) {
+            parts.push(scCrumb($('#scRegisterLabel').text(), null, true));
+        }
+
+        $('#scBreadcrumb').html(parts.join('<span class="breadcrumb-separator">/</span>'));
+        $('#scBreadcrumbBar').show();
+    }
+
+    // Üst kademeye tıklayınca ilgili dropdown'ın "Tümü" (-1) seçimini tetikle:
+    //   Tüm Bölgeler -> bölge Tümü (şube+sicil sıfırlanır)
+    //   Bölge        -> şube Tümü (sicil sıfırlanır)
+    //   Şube         -> sicil Tümü
+    $(document).on('click', '[data-sc-breadcrumb="allRegions"]', function () {
+        $('#scRegionList .dropdown-item[data-code="-1"]').trigger('click');
+    });
+    $(document).on('click', '[data-sc-breadcrumb="region"]', function () {
+        $('#scBranchList .dropdown-item[data-code="-1"]').trigger('click');
+    });
+    $(document).on('click', '[data-sc-breadcrumb="branch"]', function () {
+        $('#scRegisterList .dropdown-item[data-code="-1"]').trigger('click');
+    });
+
     // Tabloyu doldur:
     //  - Genel Bakış sekmesi (scoreCardId === -1): seçili bölge/şube seviyesine göre özet
     //       • bölge seçili değil -> bölge özeti
@@ -278,6 +389,8 @@ $(function () {
     //       • şube seçili (şube müdürü / py) -> cumulatives ürün tablosu
     //  - Genel Bakış dışı sekme (scoreCardId !== -1) -> doğrudan cumulatives ürün tablosu
     function loadScoreCardTable() {
+        loadRankings();                                 // banka/bölge sıralama kartları (employee-order-summaries)
+        renderBreadcrumb();                             // Bölge/Şube/Sicil breadcrumb'ı
         // Yalnızca Genel Bakış sekmesinde özet tablosu çıkar
         if (_scoreCardId === -1) {
             // Bölge seçili değil -> bölge özeti
@@ -303,6 +416,7 @@ $(function () {
         fetchScoreCardCumulatives(buildCumulativesRequest(), function (res) {
             _overview = null;
             ROWS = (res && res.mainTableData) ? res.mainTableData : [];
+            renderTotalScore();                         // Toplam Skor = weightedPercentage toplamı
             renderReportBody();
         });
     }
