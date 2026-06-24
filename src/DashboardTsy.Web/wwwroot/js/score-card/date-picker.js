@@ -7,15 +7,47 @@ $(function () {
 
     if (!$('#scDatePicker').length) return;
 
-    var today       = _reportDate ? new Date(_reportDate) : new Date();
-    var CUR_YEAR    = today.getFullYear();
-    var CUR_MONTH   = today.getMonth() + 1;         // 1–12
-    var CUR_QUARTER = Math.ceil(CUR_MONTH / 3);     // 1–4
+    // var today       = _reportDate ? new Date(_reportDate) : new Date();
+    // var CUR_YEAR    = today.getFullYear();
+    // var CUR_MONTH   = today.getMonth() + 1;         // 1–12
+    // var CUR_QUARTER = Math.ceil(CUR_MONTH / 3);     // 1–4
+
+    var CUR_YEAR;
+    var CUR_MONTH;
+    var CUR_QUARTER;
 
     // PUPA_PERIOD_TYPE: aylik=1, ceyreklik=2, yillik=3
     var PERIOD = (typeof PUPA_PERIOD_TYPE !== 'undefined')
         ? PUPA_PERIOD_TYPE
         : { aylik: 1, ceyreklik: 2, yillik: 3 };
+
+    // "Bu Ay" / "Bu Çeyrek" / "Bu Yıl" sınırını gerçek tarih yerine
+    // primMonitoringPeriods[periodType].keyValues[0] (ilk dönem) üzerinden belirle.
+    var _initAylik = (typeof getPrimMonitoringPeriodsMock === 'function') ? getPrimMonitoringPeriodsMock(PERIOD.aylik) : null;
+    var _initKv0   = _initAylik && _initAylik.keyValues && _initAylik.keyValues[0];
+    if (_initKv0) {
+        var _p0     = _initKv0.value.split(' - ');
+        CUR_YEAR    = parseInt(_p0[0], 10);
+        CUR_MONTH   = parseInt(_p0[1].replace(/[^0-9]/g, ''), 10);
+        CUR_QUARTER = Math.ceil(CUR_MONTH / 3);
+    }
+
+    var _initCeyrek    = (typeof getPrimMonitoringPeriodsMock === 'function') ? getPrimMonitoringPeriodsMock(PERIOD.ceyreklik) : null;
+    var _initCeyrekKv0 = _initCeyrek && _initCeyrek.keyValues && _initCeyrek.keyValues[0];
+    var CUR_CEYREK_YEAR    = CUR_YEAR;
+    var CUR_CEYREK_QUARTER = CUR_QUARTER;
+    if (_initCeyrekKv0) {
+        var _pc0            = _initCeyrekKv0.value.split(' - ');
+        CUR_CEYREK_YEAR    = parseInt(_pc0[0], 10);
+        CUR_CEYREK_QUARTER = parseInt(_pc0[1].replace(/[^0-9]/g, ''), 10);
+    }
+
+    var _initYillik    = (typeof getPrimMonitoringPeriodsMock === 'function') ? getPrimMonitoringPeriodsMock(PERIOD.yillik) : null;
+    var _initYillikKv0 = _initYillik && _initYillik.keyValues && _initYillik.keyValues[0];
+    var CUR_YILLIK_YEAR = CUR_YEAR;
+    if (_initYillikKv0) {
+        CUR_YILLIK_YEAR = parseInt(_initYillikKv0.value.split(' - ')[0], 10);
+    }
 
     var state = {
         periodType : PERIOD.aylik,
@@ -34,9 +66,9 @@ $(function () {
     }
 
     function getBadge() {
-        if (state.periodType === PERIOD.aylik     && state.year === CUR_YEAR && state.month   === CUR_MONTH)   return 'Bu Ay';
-        if (state.periodType === PERIOD.ceyreklik && state.year === CUR_YEAR && state.quarter === CUR_QUARTER) return 'Bu Çeyrek';
-        if (state.periodType === PERIOD.yillik    && state.year === CUR_YEAR)                                  return 'Bu Yıl';
+        if (state.periodType === PERIOD.aylik     && state.year === CUR_YEAR         && state.month   === CUR_MONTH)          return 'Bu Ay';
+        if (state.periodType === PERIOD.ceyreklik && state.year === CUR_CEYREK_YEAR  && state.quarter === CUR_CEYREK_QUARTER) return 'Bu Çeyrek';
+        if (state.periodType === PERIOD.yillik    && state.year === CUR_YILLIK_YEAR)                                          return 'Bu Yıl';
         return '';
     }
 
@@ -265,7 +297,7 @@ $(function () {
     $(document).on('click', '[data-dp="next-year"]', function (e) {
         e.stopPropagation();
         if (state.periodType === PERIOD.aylik    && state.panelYear >= CUR_YEAR) return;
-        if (state.periodType === PERIOD.ceyreklik && state.panelYear >= CUR_YEAR) return;
+        if (state.periodType === PERIOD.ceyreklik && state.panelYear >= CUR_CEYREK_YEAR) return;
         state.panelYear++;
         renderPanel();
     });
@@ -310,10 +342,17 @@ $(function () {
         if (!type || type === state.periodType) return;
 
         state.periodType = type;
-        // Seçim güncel döneme sıfırla
-        state.year    = CUR_YEAR;
-        state.month   = CUR_MONTH;
-        state.quarter = CUR_QUARTER;
+        // Seçim güncel döneme sıfırla (her dönem tipi kendi ilk keyValue'suna döner)
+        if (type === PERIOD.ceyreklik) {
+            state.year    = CUR_CEYREK_YEAR;
+            state.quarter = CUR_CEYREK_QUARTER;
+        } else if (type === PERIOD.yillik) {
+            state.year    = CUR_YILLIK_YEAR;
+        } else {
+            state.year    = CUR_YEAR;
+            state.month   = CUR_MONTH;
+            state.quarter = CUR_QUARTER;
+        }
 
         closePanel();
         refreshHeader();
