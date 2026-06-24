@@ -190,20 +190,150 @@ window.getScoreCardReportMock = function () {
 window.MOCK.primMonitoringPeriods = {
     1: {
         keyValues: [
-            { key: 8917, value: '2026 - AY5' },
-            { key: 8886, value: '2026 - AY4' }
+        {
+            "key": 8918,
+            "value": "2026 - AY6"
+        },
+        {
+            "key": 8917,
+            "value": "2026 - AY5"
+        },
+        {
+            "key": 8886,
+            "value": "2026 - AY4"
+        },
+        {
+            "key": 8856,
+            "value": "2026 - AY3"
+        },
+        {
+            "key": 8825,
+            "value": "2026 - AY2"
+        },
+        {
+            "key": 8797,
+            "value": "2026 - AY1"
+        },
+        {
+            "key": 8766,
+            "value": "2025 - AY12"
+        },
+        {
+            "key": 8735,
+            "value": "2025 - AY11"
+        },
+        {
+            "key": 8705,
+            "value": "2025 - AY10"
+        },
+        {
+            "key": 8674,
+            "value": "2025 - AY9"
+        },
+        {
+            "key": 8644,
+            "value": "2025 - AY8"
+        },
+        {
+            "key": 8613,
+            "value": "2025 - AY7"
+        },
         ]
     },
     2: {
         keyValues: [
-            { key: 8920, value: '2026 - Ç1' },
-            { key: 8810, value: '2025 - Ç4' }
+        {
+            "key": 8947,
+            "value": "2026 - CEYREK2"
+        },
+        {
+            "key": 8856,
+            "value": "2026 - CEYREK1"
+        },
+        {
+            "key": 8766,
+            "value": "2025 - CEYREK4"
+        },
+        {
+            "key": 8674,
+            "value": "2025 - CEYREK3"
+        },
+        {
+            "key": 8582,
+            "value": "2025 - CEYREK2"
+        },
+        {
+            "key": 8491,
+            "value": "2025 - CEYREK1"
+        },
+        {
+            "key": 8401,
+            "value": "2024 - CEYREK4"
+        },
+        {
+            "key": 8309,
+            "value": "2024 - CEYREK3"
+        },
+        {
+            "key": 8217,
+            "value": "2024 - CEYREK2"
+        },
+        {
+            "key": 8126,
+            "value": "2024 - CEYREK1"
+        },
+        {
+            "key": 8035,
+            "value": "2023 - CEYREK4"
+        },
         ]
     },
     3: {
         keyValues: [
-            { key: 8000, value: '2026' },
-            { key: 7000, value: '2025' }
+        {
+            "key": 8917,
+            "value": "2026 - AY5"
+        },
+        {
+            "key": 8886,
+            "value": "2026 - AY4"
+        },
+        {
+            "key": 8856,
+            "value": "2026 - AY3"
+        },
+        {
+            "key": 8825,
+            "value": "2026 - AY2"
+        },
+        {
+            "key": 8797,
+            "value": "2026 - AY1"
+        },
+        {
+            "key": 8766,
+            "value": "2025 - AY12"
+        },
+        {
+            "key": 8735,
+            "value": "2025 - AY11"
+        },
+        {
+            "key": 8705,
+            "value": "2025 - AY10"
+        },
+        {
+            "key": 8674,
+            "value": "2025 - AY9"
+        },
+        {
+            "key": 8644,
+            "value": "2025 - AY8"
+        },
+        {
+            "key": 8613,
+            "value": "2025 - AY7"
+        },
         ]
     }
 };
