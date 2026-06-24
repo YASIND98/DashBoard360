@@ -174,8 +174,7 @@
   cursor: pointer;
 }
 
-.col-text {
-  color: var(--text-blue-light) !important;
+.col-left {
   text-align: left !important;
 }
 

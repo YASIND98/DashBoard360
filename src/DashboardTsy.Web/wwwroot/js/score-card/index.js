@@ -4,6 +4,7 @@ $(function () {
     if (!document.getElementById('scReportBody')) return;
 
     var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
+    var TABLE_NOTE = 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.';   // legend + PDF footer
 
     // Ürün Tipi sütun filtresi (productTypeId üzerinden; '' = Tümü)
     var selectedTypeId = '';
@@ -474,7 +475,7 @@ $(function () {
             if (c === 'Ürün Tipi') {
                 html += '<th class="sc-type-th">' + typeFilterHtml() + '</th>';
             } else if (c === 'Ürün / Hedef Adı') {
-                html += '<th class="col-text" data-sort-key="productName">' + c + sortIconHtml('productName') + '</th>';
+                html += '<th class="col-left" data-sort-key="productName">' + c + sortIconHtml('productName') + '</th>';
             } else {
                 html += '<th>' + c + '</th>';
             }
@@ -495,7 +496,7 @@ $(function () {
         var html = '<tr>';
         SCORE_CARD_OVERVIEW_COLUMNS.forEach(function (c) {
             if (c === 'Bölge Adı') {
-                html += '<th class="col-text" data-sort-key="regionName">' + c + sortIconHtml('regionName') + '</th>';
+                html += '<th class="col-left" data-sort-key="regionName">' + c + sortIconHtml('regionName') + '</th>';
             } else {
                 html += '<th>' + c + '</th>';
             }
@@ -506,16 +507,7 @@ $(function () {
 
     // Genel Bakış bölge özeti gövdesi: her satır bir bölge, hücreler H/G %'si (değere göre renkli)
     function renderOverviewBody() {
-        var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
-        var rows = ((_overview && _overview.rows) || []).filter(function (r) {
-            return !query || (r.regionName || '').toLowerCase().indexOf(query) > -1;
-        });
-        if (sortKey === 'regionName') {
-            rows = rows.slice().sort(function (a, b) {
-                var cmp = String(a.regionName || '').localeCompare(String(b.regionName || ''), 'tr', { sensitivity: 'base' });
-                return sortAsc ? cmp : -cmp;
-            });
-        }
+        var rows = visibleRegionRows();
 
         renderOverviewHead();
 
@@ -534,7 +526,7 @@ $(function () {
         var html = '';
         rows.forEach(function (r) {
             html += '<tr class="table-row">';
-            html += '<td class="col-text">' + (r.regionName || '') + '</td>';
+            html += '<td class="col-left">' + (r.regionName || '') + '</td>';
             html += pctCell(r.corporate);
             html += pctCell(r.commercial);
             html += pctCell(r.kbi);
@@ -564,7 +556,7 @@ $(function () {
             } else if (c === 'Sıralama') {
                 top += '<th rowspan="2" data-sort-key="rank">' + c + sortIconHtml('rank') + '</th>';
             } else if (c === 'Şube Adı') {
-                top += '<th rowspan="2" class="col-text" data-sort-key="branchName">' + c + sortIconHtml('branchName') + '</th>';
+                top += '<th rowspan="2" class="col-left" data-sort-key="branchName">' + c + sortIconHtml('branchName') + '</th>';
             } else {
                 top += '<th rowspan="2">' + c + '</th>';
             }
@@ -576,18 +568,7 @@ $(function () {
     function renderBranchOverviewBody() {
         var data = _overview || {};
         var months = data.months || [];
-        var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
-        var rows = (data.rows || []).filter(function (r) {
-            return !query || (r.branchName || '').toLowerCase().indexOf(query) > -1;
-        });
-        if (sortKey === 'branchName' || sortKey === 'rank') {
-            rows = rows.slice().sort(function (a, b) {
-                var cmp = (sortKey === 'rank')
-                    ? (a.rank || 0) - (b.rank || 0)
-                    : String(a.branchName || '').localeCompare(String(b.branchName || ''), 'tr', { sensitivity: 'base' });
-                return sortAsc ? cmp : -cmp;
-            });
-        }
+        var rows = visibleBranchRows();
 
         renderBranchOverviewHead(months);
 
@@ -608,7 +589,7 @@ $(function () {
         rows.forEach(function (r) {
             html += '<tr class="table-row">';
             html += '<td>' + (r.rank != null ? r.rank : '') + '</td>';
-            html += '<td class="col-text">' + (r.branchName || '') + '</td>';
+            html += '<td class="col-left">' + (r.branchName || '') + '</td>';
             html += pctCell(r.month1, 'col-selected-first') + pctCell(r.month2, 'col-selected-mid') + pctCell(r.month3, 'col-selected-last');
             html += pctCell(r.corporate);
             html += pctCell(r.commercial);
@@ -624,7 +605,119 @@ $(function () {
         if (typeof reStripeTable === 'function') reStripeTable($body);
     }
 
+    // Skor kart ana raporu PDF verisi (servis cevabından; DOM'dan değil). data-pdf="report" bunu kullanır.
+    function _scInfoLines() {
+        var date = ($('.date-text').text() || '').trim();
+        var crumb = $('#scBreadcrumbBar').is(':visible')
+            ? ($('#scBreadcrumb').text() || '').replace(/\s+/g, ' ').trim()
+            : '';
+        var scoreCard = [
+            ($('#scTabList .tab.active').text() || '').trim(),
+            ($('#scSubTabList .sub-tab.active').text() || '').trim()
+        ].filter(Boolean).join(' - ');
+        var pupa = ($('#scChannels .segment.active').text() || '').trim();
+        var period = ($('#scPeriod .period-btn.active').text() || '').trim();
+
+        var lines = [];
+        var l1 = crumb ? ((date ? date + ' tarihine ait ' : '') + crumb) : date;
+        if (l1) lines.push(l1);
+        if (scoreCard) lines.push('Skor Kart: ' + scoreCard);
+        if (pupa) lines.push('Pupa Tipi: ' + pupa);
+        if (period) lines.push('Periyot: ' + period);
+        return lines;
+    }
+    // Görünür satırlar: ekrandaki filtre (arama / tip) + client sıralama uygulanmış hali.
+    // Hem tablo render'ı hem PDF aynı kaynağı kullanır -> PDF her zaman ekranda görüneni indirir.
+    function visibleProductRows() {
+        var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
+        var rows = ROWS.filter(function (r) {
+            var matchesQuery = !query || (r.productName || '').toLowerCase().indexOf(query) > -1;
+            var matchesType = !selectedTypeId || String(r.productTypeId) === String(selectedTypeId);
+            return matchesQuery && matchesType;
+        });
+        if (sortKey) {
+            rows.sort(function (a, b) {
+                var cmp = String(a[sortKey] || '').localeCompare(String(b[sortKey] || ''), 'tr', { sensitivity: 'base' });
+                return sortAsc ? cmp : -cmp;
+            });
+        }
+        return rows;
+    }
+    function visibleRegionRows() {
+        var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
+        var rows = ((_overview && _overview.rows) || []).filter(function (r) {
+            return !query || (r.regionName || '').toLowerCase().indexOf(query) > -1;
+        });
+        if (sortKey === 'regionName') {
+            rows = rows.slice().sort(function (a, b) {
+                var cmp = String(a.regionName || '').localeCompare(String(b.regionName || ''), 'tr', { sensitivity: 'base' });
+                return sortAsc ? cmp : -cmp;
+            });
+        }
+        return rows;
+    }
+    function visibleBranchRows() {
+        var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
+        var rows = ((_overview && _overview.rows) || []).filter(function (r) {
+            return !query || (r.branchName || '').toLowerCase().indexOf(query) > -1;
+        });
+        if (sortKey === 'branchName' || sortKey === 'rank') {
+            rows = rows.slice().sort(function (a, b) {
+                var cmp = (sortKey === 'rank')
+                    ? (a.rank || 0) - (b.rank || 0)
+                    : String(a.branchName || '').localeCompare(String(b.branchName || ''), 'tr', { sensitivity: 'base' });
+                return sortAsc ? cmp : -cmp;
+            });
+        }
+        return rows;
+    }
+
+    function setScoreCardPdfReport() {
+        var cols, rows;
+        if (_overview && _overview.mode === 'region') {
+            cols = [
+                { header: 'Bölge Adı', key: 'regionName', align: 'left' },
+                { header: 'Kurumsal %', key: 'corporate', format: formatPercent }, { header: 'Ticari %', key: 'commercial', format: formatPercent },
+                { header: 'KBİ %', key: 'kbi', format: formatPercent }, { header: 'OBİ %', key: 'obi', format: formatPercent },
+                { header: 'Tarım %', key: 'agriculture', format: formatPercent }, { header: 'SY', key: 'sy', format: formatPercent },
+                { header: 'BD', key: 'bd', format: formatPercent }, { header: 'Gişe', key: 'gise', format: formatPercent }
+            ];
+            rows = visibleRegionRows();
+        } else if (_overview && _overview.mode === 'branch') {
+            // "3 Aylık Gerçekleşen %" grubu: başlıklar _overview.months, değerler month1/2/3 (ekranla aynı)
+            var monthCols = (_overview.months || []).map(function (m, i) {
+                return { header: m, key: 'month' + (i + 1), group: '3 Aylık Gerçekleşen %', format: formatPercent };
+            });
+            cols = [
+                { header: 'Sıralama', key: 'rank' }, { header: 'Şube Adı', key: 'branchName', align: 'left' }
+            ].concat(monthCols).concat([
+                { header: 'Kurumsal %', key: 'corporate', format: formatPercent }, { header: 'Ticari %', key: 'commercial', format: formatPercent },
+                { header: 'KBİ %', key: 'kbi', format: formatPercent }, { header: 'OBİ %', key: 'obi', format: formatPercent },
+                { header: 'Tarım %', key: 'agriculture', format: formatPercent }, { header: 'Kitle %', key: 'mass', format: formatPercent },
+                { header: 'Afili %', key: 'afili', format: formatPercent }, { header: 'ÖB %', key: 'privateBanking', format: formatPercent }
+            ]);
+            rows = visibleBranchRows();
+        } else {
+            cols = [
+                { header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }, { header: 'Ürün Tipi', key: 'productType' },
+                { header: 'Hedef', key: 'targetValue' }, { header: 'Gerçekleşen', key: 'realizedValue' },
+                { header: 'H/G %', key: 'targetRealizationPercentage', format: formatPercent }, { header: 'Ağırlık %', key: 'productWeight', format: formatPercent },
+                { header: 'Ağırlıklı H/G %', key: 'weightedPercentage', format: formatPercent }, { header: 'Bekleyen', key: 'pending' }
+            ];
+            rows = visibleProductRows();
+        }
+        window.PdfReport = {
+            title: ($('.page-title').text() || 'Skor Kart').trim(),
+            infoLines: _scInfoLines(),
+            columns: cols,
+            rows: rows || [],
+            footerNote: TABLE_NOTE,
+            filename: 'SkorKart.pdf'
+        };
+    }
+
     function renderReportBody() {
+        setScoreCardPdfReport();   // PDF verisini güncel tut (servis cevabından)
         // Genel Bakış özet modu: ürün tablosu yerine bölge/şube özet tablosu
         if (_overview) {
             if (_overview.mode === 'branch') renderBranchOverviewBody();
@@ -632,20 +725,7 @@ $(function () {
             return;
         }
 
-        var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
-        var rows = ROWS.filter(function (r) {
-            var matchesQuery = !query || (r.productName || '').toLowerCase().indexOf(query) > -1;
-            var matchesType = !selectedTypeId || String(r.productTypeId) === String(selectedTypeId);
-            return matchesQuery && matchesType;
-        });
-
-        // Client-side sıralama (aktifse). filter zaten yeni dizi döndürür.
-        if (sortKey) {
-            rows.sort(function (a, b) {
-                var cmp = String(a[sortKey] || '').localeCompare(String(b[sortKey] || ''), 'tr', { sensitivity: 'base' });
-                return sortAsc ? cmp : -cmp;
-            });
-        }
+        var rows = visibleProductRows();
 
         // Başlık (ve Ürün Tipi filtresi) sonuç boş olsa da görünür kalsın
         renderReportHead();
@@ -670,14 +750,14 @@ $(function () {
                 ? '<img class="info-icon" tabindex="0" data-tooltip="' + escapeAttr(r.productInfo) + '" src="/images/table-info.svg" alt="Bilgi" />'
                 : '';
             html += '<td class="col-info">' + infoCell + '</td>';
-            html += '<td class="col-text sc-product-name">' + r.productName + '</td>';
+            html += '<td class="col-left sc-product-name">' + r.productName + '</td>';
             html += '<td>' + r.productType + '</td>';
-            html += '<td>' + formatNumber(r.targetValue) + '</td>';
-            html += '<td>' + formatNumber(r.realizedValue) + '</td>';
+            html += '<td>' + r.targetValue + '</td>';
+            html += '<td>' + r.realizedValue + '</td>';
             html += '<td class="' + percentColor(r.targetRealizationPercentage) + '">' + formatPercent(r.targetRealizationPercentage) + '</td>';
             html += '<td>' + formatPercent(r.productWeight) + '</td>';
             html += '<td>' + formatPercent(r.weightedPercentage) + '</td>';
-            html += '<td>' + formatNumber(r.pending) + '</td>';
+            html += '<td>' + r.pending + '</td>';
             // Detay drill-down bağlamı (scorecards/details): productId satırdan, productType aktif kanaldan.
             // dateNumber/registerId istekte doğrudan modül state'inden gönderilir.
             html += '<td><img class="sc-detail-icon" src="/images/detail.svg" alt="Detay"' +
@@ -693,7 +773,7 @@ $(function () {
     function renderLegend() {
         if (typeof renderTableLegend === 'function') {
             renderTableLegend('#scReportLegend', {
-                note: 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.',
+                note: TABLE_NOTE,
                 ratio: true
             });
         }

@@ -22,10 +22,6 @@ function formatNumber(value, isPrice, productName) {
     return currency + ' ' + num;
 }
 
-function formatDecimal(v) {
-    return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(v);
-}
-
 // Türkçe ay adları (formatReportDateTr için)
 var _trMonths = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
 

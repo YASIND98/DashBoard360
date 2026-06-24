@@ -91,7 +91,7 @@
 }
 
 /* ----- Rapor tablosu ----- */
-.col-text.sc-product-name {
+.col-left.sc-product-name {
   white-space: normal;
   min-width: 220px;
   max-width: 340px;
@@ -454,24 +454,8 @@
 .sc-footer {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: end;
   margin-top: 16px;
-}
-
-.sc-excel-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: none;
-  border: none;
-  color: var(--text-light);
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.sc-excel-btn img {
-  width: 24px;
-  height: 24px;
 }
 
 .sc-pagination {

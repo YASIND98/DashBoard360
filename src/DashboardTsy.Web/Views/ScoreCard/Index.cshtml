@@ -155,7 +155,7 @@
     </div>
     <div class="sc-ranking-card">
         <span class="sc-ranking-label">Toplam Skor
-            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Info Message" />
+            <img src="~/images/info.svg" alt="" class="sc-ranking-info" data-tooltip="Toplam ağırlıklı H/G bilgisidir." />
         </span>
         <div class="sc-ranking-value"><strong class="first-number" id="scTotalScore">82</strong><span class="second-number" id="scTotalScoreMax">/100</span></div>
     </div>
@@ -184,6 +184,10 @@
         <div class="sc-header">
           <img id="scClose" src="~/images/close-circle.svg" alt="close" />
           <span class="sc-title" id="scModalTitle">Aktif Kredi Kartı Performansı</span>
+          <div class="download-pdf-btn" id="scTrendPdfBtn" data-pdf="scTrend" style="margin-left:auto; display:none;">
+              <img src="~/images/download.svg" alt="" />
+              <span>PDF İndir</span>
+          </div>
         </div>
 
         <div class="sc-tabs" id="scTabs">
@@ -220,10 +224,6 @@
           </div>
 
           <div class="sc-footer">
-              <button type="button" class="sc-excel-btn" data-activity="ScoreCard:ExcelIndir">
-                  <img src="~/images/download.svg" alt="" />
-                  <span>Excel İndir</span>
-              </button>
               <div class="sc-pagination" id="scPagination"></div>
           </div>
         </div>
@@ -243,6 +243,9 @@
 </div>
 
 @section Scripts {
+    <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
+    <script src="~/js/download-pdf.js" asp-append-version="true"></script>
     <script src="~/js/shared/mock.js" asp-append-version="true"></script>
     <script src="~/js/score-card/index.js" asp-append-version="true"></script>
     <script src="~/js/score-card/date-picker.js" asp-append-version="true"></script>

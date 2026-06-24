@@ -136,7 +136,7 @@ $(function () {
             .on('mouseenter', function () {
                 var $t = $(this);
                 $tip.html(
-                    '<div class="sc-tt-title">%' + formatDecimal(+$t.attr('data-hg')) + '</div>' +
+                    '<div class="sc-tt-title">%' + formatPercent(+$t.attr('data-hg')) + '</div>' +
                     '<div class="sc-tt-row">' + $t.attr('data-period') + '</div>'
                 ).show();
 
@@ -172,4 +172,24 @@ $(function () {
 
     window.ScoreCardDetail = window.ScoreCardDetail || {};
     window.ScoreCardDetail.loadTrend = loadTrend;
+
+    // "PDF İndir" butonu yalnızca Trend Analizi sekmesi açıkken görünür
+    function syncTrendPdfBtn() { $('#scTrendPdfBtn').toggle($('#scTrend').is(':visible')); }
+    $(document).on('click', '#scTabs .sc-tab, .sc-detail-icon', function () { setTimeout(syncTrendPdfBtn, 0); });
+
+    // Genel PDF motoru (download-pdf.js) bu config'i data-pdf="scTrend" üzerinden çeker:
+    // kolon başlıkları + her kolonun key'i + satır verisi (trend servis/mock cevabı) + başlık/info.
+    window.PdfSources = window.PdfSources || {};
+    window.PdfSources.scTrend = function () {
+        return {
+            title: $('#scModalTitle').text().trim(),
+            infoLines: ['Trend Analizi', 'Periyot: ' + ($('#scTrendTabs .sc-trend-tab.active').text().trim() || '-')],
+            columns: [
+                { header: 'Dönem', key: 'period', align: 'left' },
+                { header: 'H/G %', key: 'hgRatio', format: formatPercent }   // diğer tablolarla aynı; % başlıkta var
+            ],
+            rows: (_trendData && _trendData.points) || [],
+            filename: 'SkorKart-Trend-Analizi.pdf'
+        };
+    };
 });
