@@ -665,8 +665,8 @@
 }
 
 .sc-dp-nav {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   border-radius: 50%;
   border: 1.5px solid rgba(255, 255, 255, 0.75);
@@ -695,16 +695,22 @@
   align-items: center;
   gap: 8px;
   padding: 7px 14px;
-  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid;
+  border-color: transparent;
   border-radius: 10px;
+  background: transparent;
   color: white;
   cursor: pointer;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
   transition: background 0.2s ease;
+}
+
+.sc-dp-trigger.open {
+  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .sc-dp-trigger:hover {

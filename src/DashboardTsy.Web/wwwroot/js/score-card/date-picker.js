@@ -59,9 +59,20 @@ $(function () {
 
     // ── Label / Badge ─────────────────────────────────────────────────────────
 
+    // ≤4 karakter: tam ad, daha uzun: ilk 3 karakter (Mart→Mart, Nisan→Nis, Mayıs→May vb.)
+    function _shortMonth(m) { var n = _trMonths[m - 1]; return n.length <= 4 ? n : n.slice(0, 3); }
+
     function getLabel() {
-        if (state.periodType === PERIOD.aylik)     return _trMonths[state.month - 1] + ' ' + state.year;
-        if (state.periodType === PERIOD.ceyreklik) return state.quarter + '. Çeyrek';
+        if (state.periodType === PERIOD.aylik) return _trMonths[state.month - 1] + ' ' + state.year;
+        if (state.periodType === PERIOD.ceyreklik) {
+            // Banka çeyreği: Q1=Mar-Nis-May, Q2=Haz-Tem-Ağu, Q3=Eyl-Eki-Kas, Q4=Ara-Oca-Şub
+            var _m1 = state.quarter * 3;           // Q1→3, Q2→6, Q3→9, Q4→12
+            var _m2 = _m1 % 12 + 1;               // Q4: 12%12=0 → 1
+            var _m3 = _m2 % 12 + 1;
+            var _monthsPart = _shortMonth(_m1) + ' - ' + _shortMonth(_m2) + ' - ' + _shortMonth(_m3) + ' ' + state.year;
+            var _isCurCeyrek = (state.year === CUR_CEYREK_YEAR && state.quarter === CUR_CEYREK_QUARTER);
+            return _isCurCeyrek ? _monthsPart : _monthsPart + '  ' + state.quarter + '. Çeyrek';
+        }
         return '' + state.year;
     }
 
@@ -232,6 +243,7 @@ $(function () {
             var nextYc = state.year;
             if (nextQ < 1) { nextQ = 4; nextYc--; }
             if (nextQ > 4) { nextQ = 1; nextYc++; }
+            if (!(_ceyrekAvailMap[nextYc] && _ceyrekAvailMap[nextYc][nextQ])) return;
             state.quarter = nextQ;
             state.year    = nextYc;
         } else {
