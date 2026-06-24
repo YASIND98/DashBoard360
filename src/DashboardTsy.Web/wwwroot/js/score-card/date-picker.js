@@ -7,12 +7,7 @@ $(function () {
 
     if (!$('#scDatePicker').length) return;
 
-    var MONTHS = [
-        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
-        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
-    ];
-
-    var today       = new Date();
+    var today       = _reportDate ? new Date(_reportDate) : new Date();
     var CUR_YEAR    = today.getFullYear();
     var CUR_MONTH   = today.getMonth() + 1;         // 1–12
     var CUR_QUARTER = Math.ceil(CUR_MONTH / 3);     // 1–4
@@ -33,7 +28,7 @@ $(function () {
     // ── Label / Badge ─────────────────────────────────────────────────────────
 
     function getLabel() {
-        if (state.periodType === PERIOD.aylik)     return MONTHS[state.month - 1] + ' ' + state.year;
+        if (state.periodType === PERIOD.aylik)     return _trMonths[state.month - 1] + ' ' + state.year;
         if (state.periodType === PERIOD.ceyreklik) return state.quarter + '. Çeyrek';
         return '' + state.year;
     }
@@ -81,7 +76,7 @@ $(function () {
                 var cls = 'sc-dp-cell' + (active ? ' sc-dp-active' : '') + (disabled ? ' sc-dp-disabled' : '');
                 html += '<div class="' + cls + '"' +
                         (disabled ? '' : ' data-dp-month="' + m + '"') +
-                        '>' + MONTHS[m - 1] + '</div>';
+                        '>' + _trMonths[m - 1] + '</div>';
             }
             html += '</div>';
 
