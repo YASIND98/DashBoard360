@@ -29,7 +29,7 @@ $(function () {
     }
 
     // Servis (ScoreCardDetail) cevabını dinamik kolonlu tabloya çevirir.
-    // Kolonlar servisten dönen sırayla kurulur; her key için karşılığı varsa SCORE_CARD_DETAIL_COLUMN_LABELS'teki label, yoksa key adının kendisi gösterilir.
+    // Yalnızca SCORE_CARD_DETAIL_COLUMN_LABELS'te karşılığı (label'ı) olan key'ler gösterilir
     function buildDynamicResponse(scoreCardDetail) {
         var rows = [];
         try {
@@ -42,9 +42,9 @@ $(function () {
         var labelByKey = {};
         labels.forEach(function (c) { labelByKey[c.key] = c.label; });
         var sample = rows.length ? rows[0] : {};
-        var columns = Object.keys(sample).map(function (key) {
-            return { key: key, label: labelByKey[key] || key };
-        });
+        var columns = Object.keys(sample)
+            .filter(function (key) { return labelByKey[key] != null; })
+            .map(function (key) { return { key: key, label: labelByKey[key] }; });
         return { columns: columns, rows: rows, dynamic: true };
     }
 
@@ -62,8 +62,10 @@ $(function () {
             ? SCORE_CARD_DETAIL_STATUS[status] : 0;
 
         function handle(raw) {
-            if (raw && raw.ScoreCardDetail != null) {
-                callback(buildDynamicResponse(raw.ScoreCardDetail));
+            // Servis cevabı casing'i tutarsız olabilir (realized/pending: ScoreCardDetail, unrealized: scoreCardDetail).
+            var detail = raw && (raw.ScoreCardDetail != null ? raw.ScoreCardDetail : raw.scoreCardDetail);
+            if (detail != null) {
+                callback(buildDynamicResponse(detail));
             } else {
                 callback(raw || { columns: [], rows: [] });
             }
@@ -131,52 +133,6 @@ $(function () {
             renderDynamicBody(pageRows);
             return;
         }
-
-        if (_response.expandable) {
-            renderExpandableBody(pageRows, start);
-            return;
-        }
-    }
-
-    // Gerçekleşmeyen: özet satır + (expand'de) ürün/sebep detayları
-    function renderExpandableBody(pageRows, start) {
-        var colCount = getColumns().length;
-        var html = '';
-        pageRows.forEach(function (r, i) {
-            var rid = start + i;
-            html += '<tr class="sc-main-row ' + (i % 2 === 0 ? 'sc-zebra' : '') + '" data-row="' + rid + '">';
-            html += '<td>' + r.date + '</td>';
-            html += '<td><span class="sc-summary">' + (r.summary || '') + '</span></td>';
-            html += '<td><span class="sc-account">' + r.accountNo + '</span></td>';
-            html += '<td>' + r.customerName + '</td>';
-            html += '<td>' + r.kazanim + '</td>';
-            html += '<td>' + r.customerStatus + '</td>';
-            html += '<td class="sc-expand-cell"><img class="sc-expand-icon" src="/images/expand.svg" alt="Detay" data-row="' + rid + '" /></td>';
-            html += '</tr>';
-
-            // Detay satırı (varsayılan gizli)
-            html += '<tr class="sc-detail-row" data-row="' + rid + '" style="display:none;"><td colspan="' + colCount + '">';
-            html += '<div class="sc-details">';
-            (r.details || []).forEach(function (d) {
-                var ok = d.status === 'realized';
-                var cls = ok ? 'sc-detail-realized' : 'sc-detail-unrealized';
-                var statusTxt = ok ? 'Gerçekleşti' : 'Gerçekleşmedi';
-                var bar = '<div class="sc-detail ' + cls + '">' +
-                    '<span class="sc-detail-label">Ürün:</span>' +
-                    '<span class="sc-detail-product">' + d.product + '</span>' +
-                    '<span class="sc-detail-sep"></span>' +
-                    '<span class="sc-detail-status">' + statusTxt + '</span>';
-                if (!ok) {
-                    bar += '<span class="sc-detail-sep"></span>' +
-                        '<span class="sc-detail-label">' + (d.reasonCode || 'Reason Code') + ':</span>' +
-                        '<span class="sc-detail-reason">' + (d.reasonText || '') + '</span>';
-                }
-                bar += '</div>';
-                html += bar;
-            });
-            html += '</div></td></tr>';
-        });
-        $('#scTableBody').html(html);
     }
 
     // Dinamik kolonlu (ScoreCardDetail) servis cevabını render et
@@ -301,15 +257,5 @@ $(function () {
         }
         renderDetailBody();
         renderPagination();
-    });
-
-    // Satır expand/collapse (Gerçekleşmeyen)
-    $('#scTableBody').on('click', '.sc-expand-icon', function () {
-        var rid = $(this).data('row');
-        var $detail = $('#scTableBody .sc-detail-row[data-row="' + rid + '"]');
-        var willOpen = !$detail.is(':visible');
-        $detail.toggle(willOpen);
-        $(this).toggleClass('open', willOpen);
-        $('#scTableBody .sc-main-row[data-row="' + rid + '"]').toggleClass('expanded', willOpen);
     });
 });

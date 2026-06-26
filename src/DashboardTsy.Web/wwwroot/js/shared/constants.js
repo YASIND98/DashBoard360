@@ -101,6 +101,11 @@ var SCORE_CARD_GROUPS = [
 // "Genel Bakış" sekmesi (Key -1) skor kart servisinden dönmez; ön yüzde eklenir.
 var SCORE_CARD_OVERVIEW_KEY = -1;
 
+var SCORE_CARD_OVERVIEW_STATIC_COLUMNS = {
+  SUBE_ADI: "Şube Adı",
+  BOLGE_ADI: "Bölge Adı"
+};
+
 // Skor Kart - Hedef Detayı kolon eşlemesi
 var SCORE_CARD_DETAIL_COLUMN_LABELS = [
     { key: "ACILIS_TARIHI", label: "Açılış Tarihi" },
@@ -110,7 +115,8 @@ var SCORE_CARD_DETAIL_COLUMN_LABELS = [
     { key: "ACCOUNT_NUMBER", label: "Hesap Numarası" },
     { key: "KAZANIM", label: "Kazanım" },
     { key: "MUST_DURUM", label: "Müşteri Durumu" },
-    { key: "DOB_BAYI", label: "DOB Bayi" }
+    { key: "MUST_NO", label: "Müşteri No" },
+    { key: "UYMAYAN_KURAL", label: "Gerçekleşmeme Nedeni" }
 ];
 
 // Skor kart tablosu kolon başlıkları
