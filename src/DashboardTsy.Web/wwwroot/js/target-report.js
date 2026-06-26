@@ -59,10 +59,7 @@ $(document).ready(function () {
       $('[data-daily-header]').each(function () {
           var key = $(this).data('daily-header');
           if (key.indexOf('Date') > -1 && data[key]) {
-              var d = new Date(data[key]);
-              var dd = String(d.getDate()).padStart(2, '0');
-              var mm = String(d.getMonth() + 1).padStart(2, '0');
-              $(this).text('(' + dd + '.' + mm + '.' + d.getFullYear() + ')');
+              $(this).text('(' + fmtIsoDate(data[key]) + ')');
           } else if (data[key]) {
               $(this).text(data[key]);
           }
@@ -168,7 +165,7 @@ $(document).ready(function () {
               html += '<span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span>';
           }
           html += '</td>';
-          html += '<td class="col-text"><span class="sub-index" style="padding-left: ' + (depth * 16) + 'px">' + indexLabel + '</span>  ' + product.ProductName;
+          html += '<td class="col-left"><span class="sub-index" style="padding-left: ' + (depth * 16) + 'px">' + indexLabel + '</span>  ' + product.ProductName;
       } else {
           html += '<td class="col-index">' + indexLabel + '</td>';
           html += '<td class="col-expand">';
@@ -176,7 +173,7 @@ $(document).ready(function () {
               html += '<span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span>';
           }
           html += '</td>';
-          html += '<td class="col-text">' + product.ProductName;
+          html += '<td class="col-left">' + product.ProductName;
       }
       html += '</td>';
       return html;
@@ -264,6 +261,105 @@ $(document).ready(function () {
       return html;
   }
 
+  // ===== PDF verisi (window.PdfReport) — servis cevabından kurulur, DOM'dan okunmaz =====
+  function _pdfInfoLines() {
+    var date = ($('.date-text').text() || '').trim();
+    var region = (selectedRegion && selectedRegion.name) ? selectedRegion.name : 'Tüm Bölgeler';
+    var branch = (selectedBranch && selectedBranch.name) ? selectedBranch.name : 'Tüm Şubeler';
+    var type = ($('.segment[data-type].active').text() || '').trim();                                       // Hacim / Adet
+    var period = $('.period-toggle:visible').length ? ($('.period-btn.active').text() || '').trim() : '';   // Bakiye / H / G (Adet'te yok)
+    var tab = ($('.tab.active').text() || '').trim();
+    var subtab = ($('.sub-tab-bar:visible .sub-tab.active').text() || '').trim();
+
+    var lines = [];
+    lines.push((date ? date + ' tarihine ait ' : '') + region + ' / ' + branch);
+    var reportType = [type, period].filter(Boolean).join(' - ');
+    if (reportType) lines.push('Rapor Türü: ' + reportType);
+    var segment = [tab, subtab].filter(Boolean).join(' - ');
+    if (segment) lines.push('Segment: ' + segment);
+    return lines;
+  }
+
+  function setHomePdfReport(kind, products) {
+    // Başlık altı tarih (varsa) -> "(gg.aa.yyyy)" — paylaşımlı fmtIsoDate kullanılır
+    var _fmtDateHeader = function (v) { return v ? '(' + fmtIsoDate(v) + ')' : ''; };                                 // düz tutar (para birimsiz)
+    var _price = function (v, p) { return formatNumber(v, true, p.ProductName); };          // para birimli tutar
+    var _qty = function (v, p) { return formatNumber(v, false) + (isRatioProduct(p.ProductName) && v ? '%' : ''); };
+
+    // Fark detayları (ekrandaki .diff-details karşılığı): değerin altına label + value (renksiz, siyah).
+    // Toggle ("Farkları Göster") kapalıyken boş döner -> PDF ekranla aynı kalır.
+    var _diffBlock = function (items, fmtVal) {
+      var inner = items.map(function (it, i) {
+        var v = it.value || 0;
+        var sep = i ? 'border-left:1px solid #e6eaf0;' : '';
+        return '<div style="display:inline-block; text-align:center; padding:0 12px; vertical-align:top;' + sep + '">' +
+                 '<div style="font-size:11px; font-weight:300; color:#9aa3b2; margin-bottom:3px; white-space:nowrap;">' + (it.label || '') + '</div>' +
+                 '<div style="font-size:12px; font-weight:600; color:#1a1a1a;">' + fmtVal(v) + '</div>' +
+               '</div>';
+      }).join('');
+      return '<div style="margin-top:8px; white-space:nowrap;">' + inner + '</div>';
+    };
+
+    var h, cols;
+    if (kind === 'monthly') {
+      h = window._monthlyHeaders || {};
+      var mg = h.MonthGroupTitle;
+      var yg = h.YearGroupTitle;
+      cols = [
+        { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
+        { group: mg, header: h.MonthActualTitle, key: 'MonthActualAmount', format: formatNumber },
+        { group: mg, header: h.MonthTargetTitle, key: 'MonthTargetAmount', format: formatNumber },
+        { group: mg, header: h.MonthHGTitle, key: 'MonthRatio', format: formatPercent },
+        { group: yg, header: h.YearActualTitle, key: 'YearActualAmount', format: formatNumber },
+        { group: yg, header: h.YearTargetTitle, key: 'YearTargetAmount', format: formatNumber },
+        { group: yg, header: h.YearHGTitle, key: 'YearRatio', format: formatPercent }
+      ];
+    } else if (kind === 'quantity') {
+      h = window._quantityHeaders || {};
+      var _qtyDiff = function (p) {
+        if ($('#quantityDiffToggle').attr('data-active') !== 'true') return '';
+        var pct = isRatioProduct(p.ProductName) ? '%' : '';
+        return _diffBlock([
+          { label: h.DiffByLastYearTitle, value: p.DiffByLastYearAmount },
+          { label: h.DiffByLastTwoMonthEarlierTitle, value: p.DiffByLastTwoMonthEarlierAmount }
+        ], function (v) { return formatNumber(v || 0, false) + ((v || 0) ? pct : ''); });
+      };
+      cols = [
+        { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
+        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _qty },
+        { header: h.LastTwoMonthEarlierTitle, subHeader: _fmtDateHeader(h.LastTwoMonthEarlierDate), key: 'LastTwoMonthEarlierAmount', format: _qty },
+        { header: h.LastMonthTitle, subHeader: _fmtDateHeader(h.LastMonthDate), key: 'LastMonthAmount', format: _qty, extra: _qtyDiff }
+      ];
+    } else {
+      h = window._dailyHeaders || {};
+      var _dailyDiff = function (p) {
+        if ($('#diffToggle').attr('data-active') !== 'true') return '';
+        return _diffBlock([
+          { label: h.DiffByLastYearTitle, value: p.DiffByLastYearAmount },
+          { label: h.DiffByLastWeekTitle, value: p.DiffByLastWeekAmount },
+          { label: h.DiffByPrevDayTitle, value: p.DiffByPrevDayAmount }
+        ], function (v) { return formatNumber(v || 0, false); });
+      };
+      cols = [
+        { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
+        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _price },
+        { header: h.LastWeekTitle, subHeader: _fmtDateHeader(h.LastWeekDate), key: 'LastWeekAmount', format: _price },
+        { header: h.PrevDayTitle, subHeader: _fmtDateHeader(h.PrevDayDate), key: 'PrevDayAmount', format: _price },
+        { header: h.YesterdayTitle, subHeader: _fmtDateHeader(h.YesterdayDate), key: 'YesterdayAmount', format: _price, extra: _dailyDiff }
+      ];
+    }
+    var title = ($('.page-title').text() || 'Rapor').trim();
+    window.PdfReport = {
+      title: title,
+      infoLines: _pdfInfoLines(),
+      columns: cols,
+      rows: products || [],
+      childrenKey: 'SubProducts',
+      footerNote: 'Tablodaki değerler /1000 olarak verilmektedir.',
+      filename: (title.replace(/[\\/:*?"<>|]+/g, '').trim() || 'Rapor') + '.pdf'
+    };
+  }
+
   // ===== Skeleton =====
   function hideSkeleton() {
     hideLoadingOverlay();
@@ -283,6 +379,7 @@ $(document).ready(function () {
           data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#dailyTableBody').html(buildDailyRows(data.Products, 0, false));
+              setHomePdfReport('daily', data.Products);
 
               $('#dailyTableBody [data-daily-header]').each(function () {
                   var key = $(this).data('daily-header');
@@ -317,6 +414,7 @@ $(document).ready(function () {
           data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#monthlyTableBody').html(buildMonthlyRows(data.Products, 0, false));
+              setHomePdfReport('monthly', data.Products);
               if (monthlyFirstLoad) {
                   monthlyFirstLoad = false;
                   $('#monthlyTableSkeleton').hide();
@@ -340,10 +438,7 @@ $(document).ready(function () {
               $('[data-quantity-header]').each(function () {
                   var key = $(this).data('quantity-header');
                   if (key.indexOf('Date') > -1 && data[key]) {
-                      var d = new Date(data[key]);
-                      var dd = String(d.getDate()).padStart(2, '0');
-                      var mm = String(d.getMonth() + 1).padStart(2, '0');
-                      $(this).text('(' + dd + '.' + mm + '.' + d.getFullYear() + ')');
+                      $(this).text('(' + fmtIsoDate(data[key]) + ')');
                   } else if (data[key]) {
                       $(this).text(data[key]);
                   }
@@ -358,6 +453,7 @@ $(document).ready(function () {
           data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#quantityTableBody').html(buildQuantityRows(data.Products, 0, false));
+              setHomePdfReport('quantity', data.Products);
 
               $('#quantityTableBody [data-quantity-header]').each(function () {
                   var key = $(this).data('quantity-header');
@@ -496,13 +592,16 @@ $(document).ready(function () {
           if (!monthlyHeadersLoaded) {
               monthlyHeadersLoaded = true;
               loadHeaders('/TargetReport/GetMonthlyTargetReportTableHeaders', '_monthlyHeaders', function (data) {
+                  window._monthlyHeaders = data;
                   $('[data-monthly-header]').each(function () {
                       var key = $(this).data('monthly-header');
                       if (data[key]) $(this).text(data[key]);
                   });
+                  loadMonthlyReport();   // başlıklar geldikten sonra (PDF gerçek başlıkları kullansın)
               });
+          } else {
+              loadMonthlyReport();
           }
-          loadMonthlyReport();
       } else {
           var dd = String(now.getDate()).padStart(2, '0');
           $('.date-text').text(dd + ' ' + trMonths[now.getMonth()] + ' ' + now.getFullYear());

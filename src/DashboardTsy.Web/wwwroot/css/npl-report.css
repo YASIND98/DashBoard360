@@ -3,11 +3,6 @@
     padding: 14px 16px;
 }
 
-#nplDataTable .table-row td.col-text {
-    font-weight: 600;
-    color: var(--white) !important;
-    white-space: nowrap;
-}
 
 #nplDataTable .table-row td,
 #nplDataTable .table-row td:first-child,
@@ -28,7 +23,7 @@
 }
 
 /* Hücreler arası dikey ayraç (tasarımdaki gibi) - başlıkla aynı kenarda (border-left) hizalı */
-#nplDataTable .table-row td:not(.col-text) {
+#nplDataTable .table-row td:not(.col-left) {
     border-left: 1px solid rgba(212, 230, 252, 0.2);
 }
 

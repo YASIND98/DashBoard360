@@ -61,7 +61,7 @@ $(function () {
 
     function renderHead() {
         var h1 = '<tr>';
-        h1 += '<th class="col-text valign-bottom" rowspan="2"></th>';
+        h1 += '<th class="col-left valign-bottom" rowspan="2"></th>';
         MONTHS.forEach(function (m) {
             h1 += '<th colspan="4" class="col-group-header">' +
                     '<div class="col-group-header-content"><span>' + m + '</span></div>' +
@@ -110,7 +110,7 @@ $(function () {
         var html = '';
         data.forEach(function (r) {
             html += '<tr class="table-row">';
-            html += '<td class="col-text">' + r.metric + '</td>';
+            html += '<td class="col-left">' + r.metric + '</td>';
             MONTHS.forEach(function (m, mi) {
                 var cell = r.cells[mi] || [0, 0, 0, 0];
                 // Değer ve Bölge/Banka Gelişimi düz sayı; sadece Gelişim Oranı % ile gösterilir

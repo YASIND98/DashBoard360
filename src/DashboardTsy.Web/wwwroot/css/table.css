@@ -57,9 +57,9 @@
   white-space: nowrap;
 }
 
-#monthlyDataTable thead tr:nth-child(2) th,
-.yield-table thead tr:nth-child(2) th {
-  top: 42px;
+
+.data-table thead tr:nth-child(2) th {
+  top: var(--table-head-row-height);
 }
 
 .data-table thead th small {
@@ -174,8 +174,7 @@
   cursor: pointer;
 }
 
-.col-text {
-  color: var(--text-blue-light) !important;
+.col-left {
   text-align: left !important;
 }
 

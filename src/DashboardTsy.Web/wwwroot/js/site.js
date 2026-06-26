@@ -70,7 +70,7 @@ function renderTableLegend(containerId, options) {
   var html = '<span class="legend-note">' + note + '</span>';
   if (options.diff) html += '<div class="legend-colors">' + buildDiffLegend(options.diff) + '</div>';
   if (options.ratio) html += '<div class="legend-colors">' + LEGEND_RATIO + '</div>';
-  html += '<div class="download-pdf-btn" style="cursor:pointer;"><img src="/images/download.svg" alt="PDF İndir" /><span>PDF İndir</span></div>';
+  html += '<div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;"><img src="/images/download.svg" alt="PDF İndir" /><span>PDF İndir</span></div>';
   $el.html(html);
 }
 
@@ -269,9 +269,43 @@ function reStripeTable($tbody) {
     if ($lastVisible) $lastVisible.addClass('last-visible-row');
 }
 
+var _pdfSearchSnap = { ref: null, rows: null };
+function applyPdfSearchFilter(query) {
+    var R = window.PdfReport;
+    if (!R || !R.columns || !R.columns.length) return;
+    if (_pdfSearchSnap.ref !== R) { _pdfSearchSnap.ref = R; _pdfSearchSnap.rows = R.rows || []; }
+    var source = _pdfSearchSnap.rows || [];
+    query = (query || '').trim();
+    if (!query) { R.rows = source; return; }
+    var nameKey = R.columns[0].key;
+    var childrenKey = R.childrenKey;
+    var nq = normalizeTurkish(query);
+    function filt(list) {
+        var out = [];
+        (list || []).forEach(function (row) {
+            var name = normalizeTurkish(String(row[nameKey] == null ? '' : row[nameKey]));
+            var kids = childrenKey ? row[childrenKey] : null;
+            if (name.indexOf(nq) !== -1) {
+                out.push(row);                         // ad eşleşti -> alt kırılımıyla birlikte
+            } else if (Array.isArray(kids) && kids.length) {
+                var fk = filt(kids);
+                if (fk.length) {                       // alt kırılımda eşleşme var -> sadece eşleşenlerle
+                    var copy = {};
+                    for (var k in row) { if (row.hasOwnProperty(k)) copy[k] = row[k]; }
+                    copy[childrenKey] = fk;
+                    out.push(copy);
+                }
+            }
+        });
+        return out;
+    }
+    R.rows = filt(source);
+}
+
 function handleTableSearch(inputSelector) {
     $(inputSelector).on('input', function () {
         var query = $(this).val().trim();
+        applyPdfSearchFilter(query);   // PDF satırlarını ekrandaki arama ile eşle
         var $table = $('.table-container:visible .data-table tbody');
         if (!$table.length) return;
 
@@ -291,7 +325,7 @@ function handleTableSearch(inputSelector) {
         $table.find('tr.table-row').hide();
         $table.find('tr.table-row').not('.sub-row').each(function () {
             var $mainRow = $(this);
-            var mainName = normalizeTurkish($mainRow.find('.col-text').text().trim());
+            var mainName = normalizeTurkish($mainRow.find('.col-left').text().trim());
             var mainMatch = mainName.indexOf(normalizedQuery) !== -1;
             var $subRows = $mainRow.nextUntil('tr.table-row:not(.sub-row)').filter('.sub-row');
 
@@ -301,7 +335,7 @@ function handleTableSearch(inputSelector) {
             } else {
                 var anySubMatch = false;
                 $subRows.each(function () {
-                    var subName = normalizeTurkish($(this).find('.col-text').text().trim());
+                    var subName = normalizeTurkish($(this).find('.col-left').text().trim());
                     if (subName.indexOf(normalizedQuery) !== -1) {
                         $(this).show();
                         anySubMatch = true;

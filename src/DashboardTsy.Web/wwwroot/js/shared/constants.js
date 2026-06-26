@@ -116,20 +116,11 @@ var SCORE_CARD_DETAIL_COLUMN_LABELS = [
 // Skor kart tablosu kolon başlıkları
 var SCORE_CARD_REPORT_COLUMNS = ['', 'Ürün / Hedef Adı', 'Ürün Tipi', 'Hedef', 'Gerçekleşen', 'H/G %', 'Ağırlık %', 'Ağırlıklı H/G %', 'Bekleyen', 'Detay'];
 
-// Genel Bakış (scoreCardId = -1) ve bölge seçili değilse
-var SCORE_CARD_OVERVIEW_COLUMNS = ['Bölge Adı', 'Kurumsal %', 'Ticari %', 'KBİ %', 'OBİ %', 'Tarım %', 'SY', 'BD', 'Gişe'];
-
-// Genel Bakış (scoreCardId = -1), bölge seçili ve şube seçili değilse
-// '3 Aylık Gerçekleşen %' üst başlıktır; response.months'taki 3 ay etiketiyle 3 alt kolona açılır.
-var SCORE_CARD_BRANCH_OVERVIEW_COLUMNS = ['Sıralama', 'Şube Adı', '3 Aylık Gerçekleşen %', 'Kurumsal %', 'Ticari %', 'KBİ %', 'OBİ %', 'Tarım %', 'Kitle %', 'Afili %', 'ÖB %'];
-
-
 // scorecards/details servisi -> gönderilecek status kodu
 var SCORE_CARD_DETAIL_STATUS = {
     realized: 1,
     pending: 0,
-    unrealized: -1,
-    offtarget: 2
+    unrealized: -1
 };
 
 // Trend analizi sekmesi -> scorecards/trends trendPeriod parametresi
