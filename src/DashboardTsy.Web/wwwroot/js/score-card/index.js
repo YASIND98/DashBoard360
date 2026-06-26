@@ -230,7 +230,8 @@ $(function () {
             regionCode: _regionCode,                        // seçili bölge;
             branchCode: _branchCode,                        // seçili şube;
             pupaType: activePupaType(),                     // seçili pupa tipi;
-            scoreCardId: _scoreCardId,                      // seçili skor kart;
+            // Genel Bakış'ta (-1) şube seçili -> cumulatives'e düşülür; bu durumda Şube Müdürü Skorkart (21) gönderilir.
+            scoreCardId: (_scoreCardId === -1 ? 21 : _scoreCardId),
             scoreCardTypeId: -1
         };
     }
