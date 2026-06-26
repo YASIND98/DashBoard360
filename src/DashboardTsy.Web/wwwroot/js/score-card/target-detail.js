@@ -8,18 +8,10 @@ $(function () {
     window.ScoreCardDetail = window.ScoreCardDetail || {};
     window.ScoreCardDetail.ctx = {};
 
-    var STATUS_ICON = {
-        realized: '/images/realized.svg',
-        pending: '/images/pending.svg',
-        unrealized: '/images/unrealized.svg',
-        offtarget: '/images/off-target-sales.svg'
-    };
-
     var FILTER_ICON = {
         realized:   { base: '/images/realized.svg',   active: '/images/realized-selected.svg' },
         pending:    { base: '/images/pending.svg',    active: '/images/pending-selected.svg' },
-        unrealized: { base: '/images/unrealized.svg', active: '/images/unrealized-selected.svg' },
-        offtarget:  { base: '/images/off-target-sales.svg', active: '/images/off-target-sales-selected.svg' }
+        unrealized: { base: '/images/unrealized.svg', active: '/images/unrealized-selected.svg' }
     };
 
     var PAGE_SIZE = 13;
@@ -144,26 +136,6 @@ $(function () {
             renderExpandableBody(pageRows, start);
             return;
         }
-
-        // Eski düz tablo (Hedef Dışı): durum ikonu + ürün adı
-        var html = '';
-        var icon = STATUS_ICON[_statusFilter] || '';
-        pageRows.forEach(function (r, i) {
-            html += '<tr class="' + (i % 2 === 0 ? 'sc-zebra' : '') + '">';
-            html += '<td>' + r.date + '</td>';
-            for (var pi = 0; pi < 3; pi++) {
-                var pname = r.products[pi] || '';
-                html += '<td><span class="sc-prod">' +
-                    (icon ? '<img class="sc-prod-icon" src="' + icon + '" alt="" />' : '') +
-                    '<span>' + pname + '</span></span></td>';
-            }
-            html += '<td><span class="sc-account">' + r.accountNo + '</span></td>';
-            html += '<td>' + r.customerName + '</td>';
-            html += '<td>' + r.kazanim + '</td>';
-            html += '<td>' + r.customerStatus + '</td>';
-            html += '</tr>';
-        });
-        $('#scTableBody').html(html);
     }
 
     // Gerçekleşmeyen: özet satır + (expand'de) ürün/sebep detayları
@@ -236,7 +208,6 @@ $(function () {
         renderPagination();
     }
 
-    // Aktif filtre için (mock) servis isteği at; cevap gelince tabloyu render et
     function loadDetail() {
         _currentPage = 1;
         $('#scTableHead').empty();

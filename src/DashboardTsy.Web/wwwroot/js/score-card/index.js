@@ -45,7 +45,7 @@ $(function () {
     function applyUserAuthorities(auth) {
         if (!auth) return;
         if (auth.userInfo) {
-            _userRoleCode = auth.userInfo.userRoleCode;   // her zaman number
+            _userRoleCode = auth.userInfo.userRoleCode;
         }
         if (auth.userDashboard) {
             // userDashboard: başlangıç bölge/şube/sicil bağlamı (number; -1 = Tümü). Rol bu kodlardan türer.
@@ -103,15 +103,19 @@ $(function () {
         return isNaN(p) ? 1 : p;
     }
 
+    function reloadByDateNumber() {
+        fetchPupaTypes(_dateNumber, function (pupaRes) {
+            renderPupaChannels(pupaRes);
+            ScoreCard.filters.loadRegions(loadScoreCardTypes);
+        });
+    }
+
     function loadPupaFilters(period) {
         var periodType = PUPA_PERIOD_TYPE[period] || PUPA_PERIOD_TYPE.aylik;
         fetchPrimMonitoringPeriods(periodType, function (periodsRes) {
             var kv = (periodsRes && periodsRes.keyValues) || [];
             _dateNumber = kv.length ? kv[0].key : -1;
-            fetchPupaTypes(_dateNumber, function (pupaRes) {
-                renderPupaChannels(pupaRes);
-                ScoreCard.filters.loadRegions(loadScoreCardTypes);   // filters.js
-            });
+            reloadByDateNumber();
         });
     }
 
@@ -245,33 +249,49 @@ $(function () {
         });
     }
 
-    // Genel Bakış bölge özeti istek gövdesi (tüm bölgeler)
-    function buildOverviewRequest() {
+    // main-view-regions / main-view-branches ortak istek gövdesi; tek fark statik group:
+    //   bölge özeti (regions) -> group 4, şube özeti (branches) -> group 3.
+    function buildMainViewRequest(group) {
         var rd = reportDateParts();
         var period = $('#scPeriod .period-btn.active').data('period') || 'aylik';
         return {
+            roleCode: _userRoleCode,
+            regionCode: _regionCode,
             year: rd.year,
             month: rd.month,
-            quarter: (period === 'ceyreklik') ? 1 : -1,
             cumulativeFlag: (period === 'yillik') ? 1 : 0,
-            registerId: _registerId,
-            regionCode: _regionCode,
-            branchCode: _branchCode,
-            pupaType: activePupaType()
+            quarter: (period === 'ceyreklik') ? 1 : -1,
+            pupaType: activePupaType(),
+            scorecardId: _scoreCardId,
+            group: group
         };
     }
 
-    // scorecards/region-overview: Genel Bakış (scoreCardId -1) bölge/şube özet tablosu (aynı endpoint).
-    function fetchScoreCardOverview(body, mockFn, callback) {
+    // scorecards/main-view-regions: Genel Bakış bölge özeti (bölge seçili değilken).
+    function fetchScoreCardMainViewRegions(body, callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecards/region-overview',
+            url: SCORE_CARD_BASE_URL + '/scorecards/main-view-regions',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(body)
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(typeof mockFn === 'function' ? mockFn() : null);
+            callback(typeof getScoreCardMainViewRegionsMock === 'function' ? getScoreCardMainViewRegionsMock() : null);
+        });
+    }
+
+    // scorecards/main-view-branches: Genel Bakış şube özeti (bölge seçili, şube seçili değil). Dinamik kolonlu.
+    function fetchScoreCardMainViewBranches(body, callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/scorecards/main-view-branches',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(body)
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback(typeof getScoreCardMainViewBranchesMock === 'function' ? getScoreCardMainViewBranchesMock() : null);
         });
     }
 
@@ -314,8 +334,6 @@ $(function () {
     }
 
     // Toplam Skor = tablodaki Ağırlıklı H/G % (weightedPercentage) değerlerinin toplamı.
-    // Genel skor olduğundan arama/ürün tipi filtresinden bağımsız, tüm satırlar üzerinden hesaplanır.
-    // Kart rengi (arka plan + çerçeve + sayı) tablodaki H/G % ile aynı kurala (percentColor) göre belirlenir.
     function renderTotalScore() {
         var total = ROWS.reduce(function (sum, r) {
             return sum + (Number(r.weightedPercentage) || 0);
@@ -329,7 +347,7 @@ $(function () {
         $('#scTotalScore').text(rounded);
     }
 
-    // ===== Breadcrumb: Bölge / Şube / Sicil drill-down =====
+    // ===== Breadcrumb: Bölge / Şube / Sicil =====
     // Seçili filtre kademesini gösterir; üst kademeye tıklayınca ilgili dropdown'ın "Tümü" seçimi
     // tetiklenir (reset + yeniden yükleme zinciri filters.js'teki handler'larda).
     function scCrumb(text, action, disabled) {
@@ -390,23 +408,23 @@ $(function () {
     //       • şube seçili (şube müdürü / py) -> cumulatives ürün tablosu
     //  - Genel Bakış dışı sekme (scoreCardId !== -1) -> doğrudan cumulatives ürün tablosu
     function loadScoreCardTable() {
-        loadRankings();                                 // banka/bölge sıralama kartları (employee-order-summaries)
-        renderBreadcrumb();                             // Bölge/Şube/Sicil breadcrumb'ı
+        loadRankings();
+        renderBreadcrumb();
         // Yalnızca Genel Bakış sekmesinde özet tablosu çıkar
         if (_scoreCardId === -1) {
-            // Bölge seçili değil -> bölge özeti
+            // Bölge seçili değil -> bölge özeti (main-view-regions, group 4)
             if (_regionCode === -1) {
-                fetchScoreCardOverview(buildOverviewRequest(), getScoreCardRegionOverviewMock, function (res) {
-                    var rows = Array.isArray(res) ? res : ((res && res.rows) || []);
-                    _overview = { mode: 'region', rows: rows };
+                fetchScoreCardMainViewRegions(buildMainViewRequest(4), function (res) {
+                    _overview = buildRegionOverviewModel(res);
                     renderReportBody();
                 });
                 return;
             }
-            // Bölge seçili, şube seçili değil -> şube özeti
+            // Bölge seçili, şube seçili değil -> şube özeti (main-view-branches, group 3).
+            // Tek cevap: lastTargets (SUBE_KODU/ADI + 3 aylık) + scoreCardRegionSummary (dinamik HG) + summaryMainSum (Toplam).
             if (_branchCode === -1) {
-                fetchScoreCardOverview(buildOverviewRequest(), getScoreCardBranchOverviewMock, function (res) {
-                    _overview = { mode: 'branch', rows: (res && res.rows) || [], months: (res && res.months) || [] };
+                fetchScoreCardMainViewBranches(buildMainViewRequest(3), function (branchRes) {
+                    _overview = buildBranchOverviewModel(branchRes);
                     renderReportBody();
                 });
                 return;
@@ -430,7 +448,7 @@ $(function () {
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
     }
-    // "Ürün Tipi" filtre seçenekleri: unique productTypeId'ler (etiket = productType adı, değer = productTypeId)
+    // "Ürün Tipi" filtre seçenekleri: unique productTypeId'ler (label = productType adı, value = productTypeId)
     function getTypeOptions() {
         var seen = {};
         var opts = [{ label: 'Tümü', value: '' }];
@@ -484,7 +502,6 @@ $(function () {
         $('#scReportHead').html(html);
     }
 
-    // Genel Bakış bölge özeti: başlık (SCORE_CARD_OVERVIEW_COLUMNS)
     // Yüzde hücresi: değere göre renk (percentColor) + büyük sayı/küçük ondalık (formatPercent).
     function pctCell(v, extraCls) {
         let colorClass = percentColor(v);
@@ -492,28 +509,75 @@ $(function () {
         return `<td class="${cellClass}">${formatPercent(v)}</td>`;
     }
 
+    // Satırdan bölge adı (BOLGE_ADI değeri boşlukla doldurulmuş gelebilir)
+    function regionNameOf(r) { return String((r && r.BOLGE_ADI) || '').trim(); }
+
+    // main-view-regions cevabını dinamik kolonlu modele çevir:
+    //  - rows: scoreCardRegionSummary (STRING) -> JSON.parse
+    //  - columns: servisin döndürdüğü TÜM anahtarlar, servis sırasıyla (BOLGE_ADI/BOLGE_KODU dahil).
+    //    Başlık = anahtarın kendisi; etiket eşlemesi / isim manipülasyonu YOK.
+    //  - totals: summaryMainSum -> { <kolon adı(trim)>: değer } ("Toplam" satırı bununla dolar)
+    function buildRegionOverviewModel(res) {
+        var raw = res && res.scoreCardRegionSummary && res.scoreCardRegionSummary.scoreCardRegionSummary;
+        var rows = [];
+        try { rows = raw ? (JSON.parse(raw) || []) : (Array.isArray(res) ? res : []); }
+        catch (e) { rows = []; }
+
+        var sample = rows.length ? rows[0] : {};
+        var columns = Object.keys(sample).map(function (k) { return { key: k }; });
+
+        var totals = {};
+        ((res && res.summaryMainSum) || []).forEach(function (t) {
+            totals[String(t.columnName).trim()] = t.columnValue;
+        });
+
+        return { mode: 'region', columns: columns, rows: rows, totals: totals };
+    }
+    function overviewColLabel(key) {
+        var k = String(key).trim();
+        var STATIC = {
+            SUBE_KODU: 'Şube Kodu', SUBE_ADI: 'Şube Adı',
+            BOLGE_KODU: 'Bölge Kodu', BOLGE_ADI: 'Bölge Adı'
+        };
+        if (STATIC[k]) return STATIC[k];
+        var m = /^HG(\d+)$/i.exec(k);
+        if (m && SCORE_CARD_LABELS[m[1]] != null) return SCORE_CARD_LABELS[m[1]] + ' %';
+        return k;
+    }
+
+    // Hücre biçimi: BOLGE_ADI metin (sol), BOLGE_KODU düz sayı, diğerleri (HG*) yüzde + renk
+    function overviewCell(key, value) {
+        var k = String(key).trim();
+        if (k === 'BOLGE_ADI') return '<td class="col-left">' + String(value == null ? '' : value).trim() + '</td>';
+        if (k === 'BOLGE_KODU') return '<td>' + (value == null ? '' : value) + '</td>';
+        return pctCell(value);
+    }
+
     function renderOverviewHead() {
+        var cols = (_overview && _overview.columns) || [];
         var html = '<tr>';
-        SCORE_CARD_OVERVIEW_COLUMNS.forEach(function (c) {
-            if (c === 'Bölge Adı') {
-                html += '<th class="col-left" data-sort-key="regionName">' + c + sortIconHtml('regionName') + '</th>';
+        cols.forEach(function (c) {
+            // Başlık ön yüz etiketine eşlenir (Bölge Adı/Kodu, "SY %" ...)
+            if (String(c.key).trim() === 'BOLGE_ADI') {
+                html += '<th class="col-left" data-sort-key="regionName">' + overviewColLabel(c.key) + sortIconHtml('regionName') + '</th>';
             } else {
-                html += '<th>' + c + '</th>';
+                html += '<th>' + overviewColLabel(c.key) + '</th>';
             }
         });
         html += '</tr>';
         $('#scReportHead').html(html);
     }
 
-    // Genel Bakış bölge özeti gövdesi: her satır bir bölge, hücreler H/G %'si (değere göre renkli)
+    // Genel Bakış bölge özeti gövdesi: dinamik kolonlar (servis anahtarları) + en altta "Toplam" satırı
     function renderOverviewBody() {
+        var cols = (_overview && _overview.columns) || [];
         var rows = visibleRegionRows();
 
         renderOverviewHead();
 
         if (!rows.length) {
             $('#scReportBody').html(
-                '<tr class="no-result-row"><td colspan="' + SCORE_CARD_OVERVIEW_COLUMNS.length + '" style="text-align:center;padding:48px 16px;">' +
+                '<tr class="no-result-row"><td colspan="' + (cols.length || 1) + '" style="text-align:center;padding:48px 16px;">' +
                     '<div class="table-empty-state">' +
                         '<img src="/images/empty-state-seach.svg" alt="" />' +
                         '<span>Seçili döneme ait veri bulunmamaktadır.</span>' +
@@ -526,56 +590,133 @@ $(function () {
         var html = '';
         rows.forEach(function (r) {
             html += '<tr class="table-row">';
-            html += '<td class="col-left">' + (r.regionName || '') + '</td>';
-            html += pctCell(r.corporate);
-            html += pctCell(r.commercial);
-            html += pctCell(r.kbi);
-            html += pctCell(r.obi);
-            html += pctCell(r.agriculture);
-            html += pctCell(r.sy);
-            html += pctCell(r.bd);
-            html += pctCell(r.gise);
+            cols.forEach(function (c) { html += overviewCell(c.key, r[c.key]); });
             html += '</tr>';
         });
+        var totals = (_overview && _overview.totals) || {};
+        html += '<tr class="table-row sc-total-row">';
+        cols.forEach(function (c) {
+            var k = String(c.key).trim();
+            if (k === 'BOLGE_KODU') { html += '<td class="col-left">Toplam:</td>'; return; }
+            var v = totals[k];
+            html += '<td>' + (v != null ? formatPercent(v) : '') + '</td>';
+        });
+        html += '</tr>';
+
         var $body = $('#scReportBody').html(html);
         if (typeof reStripeTable === 'function') reStripeTable($body);
     }
 
-    function renderBranchOverviewHead(months) {
-        months = months || [];
-        var top = '<tr>', sub = '<tr>';
-        SCORE_CARD_BRANCH_OVERVIEW_COLUMNS.forEach(function (c) {
-            if (c === '3 Aylık Gerçekleşen %') {
-                top += '<th colspan="' + (months.length || 1) + '" class="col-group-header selected">' +
-                        '<div class="col-group-header-content"><span>' + c + '</span></div>' +
-                       '</th>';
-                months.forEach(function (m, mi) {
-                    var cls = (mi === 0) ? 'col-selected-first' : (mi === months.length - 1 ? 'col-selected-last' : 'col-selected-mid');
-                    sub += '<th class="' + cls + '">' + m + '</th>';
-                });
-            } else if (c === 'Sıralama') {
-                top += '<th rowspan="2" data-sort-key="rank">' + c + sortIconHtml('rank') + '</th>';
-            } else if (c === 'Şube Adı') {
-                top += '<th rowspan="2" class="col-left" data-sort-key="branchName">' + c + sortIconHtml('branchName') + '</th>';
-            } else {
-                top += '<th rowspan="2">' + c + '</th>';
-            }
-        });
-        $('#scReportHead').html(top + '</tr>' + sub + '</tr>');
+    // Satırdan şube adı (SUBE_ADI)
+    function branchNameOf(r) { return String((r && r.SUBE_ADI) || '').trim(); }
+
+    // Ay anahtarı -> başlık (NISAN_2026 -> "NISAN 2026")
+    function monthLabel(key) { return String(key).trim().replace(/_/g, ' '); }
+
+    // Ay grubu için hücre sınıfı (ilk/orta/son -> col-selected-*)
+    function monthCellClass(mi, total) {
+        return (mi === 0) ? 'col-selected-first' : (mi === total - 1 ? 'col-selected-last' : 'col-selected-mid');
     }
 
-    // Genel Bakış şube özeti gövdesi: her satır bir şube, hücreler H/G %'si (değere göre renkli)
+    // Şube özeti modeli (kolon düzeni: SUBE_KODU, SUBE_ADI | 3 Aylık Gerçekleşen % | HG kolonları).
+    // Tek cevap (main-view-branches) üç parça içerir:
+    //  - lastTargets: TABAN satırlar -> SUBE_KODU, SUBE_ADI (leadCols) + son 3 ay (monthCols).
+    //  - scoreCardRegionSummary (STRING): ortak kolon (SUBE_ADI/SUBE_KODU) DIŞINDAKİ HG kolonları (hgCols);
+    //    değerler SUBE_ADI ile lastTargets satırlarına eklenir.
+    //  - summaryMainSum -> "Toplam" satırı (HG kolonları).
+    function buildBranchOverviewModel(branchRes) {
+        // Taban: cevabın lastTargets'ı. Kopyala: satırlara HG eklenecek; kaynak/mock kirlenmesin
+        // (aynı obje referansı dönerse 2. yüklemede HG anahtarları ay kolonu sanılır).
+        var srcRows = (branchRes && branchRes.lastTargets) || [];
+        if (!Array.isArray(srcRows)) srcRows = srcRows.rows || [];
+        var rows = srcRows.map(function (r) { return Object.assign({}, r); });
+        var lastSample = rows.length ? rows[0] : {};
+        var leadCols = [], monthCols = [];
+        Object.keys(lastSample).forEach(function (k) {
+            var kk = k.trim();
+            if (kk === 'SUBE_KODU' || kk === 'SUBE_ADI') leadCols.push({ key: k });   // SUBE_KODU, SUBE_ADI (servis sırası)
+            else monthCols.push({ key: k });                                          // NISAN_2026 ...
+        });
+
+        // scoreCardRegionSummary: ortak kolon dışındaki HG kolonları
+        var raw = branchRes && branchRes.scoreCardRegionSummary && branchRes.scoreCardRegionSummary.scoreCardRegionSummary;
+        var branchRows = [];
+        try { branchRows = raw ? (JSON.parse(raw) || []) : []; }
+        catch (e) { branchRows = []; }
+        var branchSample = branchRows.length ? branchRows[0] : {};
+        var hgCols = Object.keys(branchSample).filter(function (k) {
+            var kk = k.trim();
+            return kk !== 'SUBE_ADI' && kk !== 'SUBE_KODU';
+        }).map(function (k) { return { key: k }; });
+
+        // HG değerlerini SUBE_ADI ile lastTargets satırlarına ekle
+        var byName = {};
+        branchRows.forEach(function (br) { byName[String(br.SUBE_ADI || '').trim()] = br; });
+        rows.forEach(function (r) {
+            var br = byName[branchNameOf(r)];
+            if (br) hgCols.forEach(function (hc) { r[hc.key] = br[hc.key]; });
+        });
+
+        var totals = {};
+        ((branchRes && branchRes.summaryMainSum) || []).forEach(function (t) {
+            totals[String(t.columnName).trim()] = t.columnValue;
+        });
+
+        return { mode: 'branch', leadCols: leadCols, monthCols: monthCols, hgCols: hgCols, rows: rows, totals: totals };
+    }
+
+    // Hücre biçimi: SUBE_ADI metin (sol), SUBE_KODU düz sayı, diğerleri (HG*) yüzde + renk
+    function branchOverviewCell(key, value) {
+        var k = String(key).trim();
+        if (k === 'SUBE_ADI') return '<td class="col-left">' + String(value == null ? '' : value).trim() + '</td>';
+        if (k === 'SUBE_KODU') return '<td>' + (value == null ? '' : value) + '</td>';
+        return pctCell(value);
+    }
+
+    function renderBranchOverviewHead() {
+        var leadCols = (_overview && _overview.leadCols) || [];
+        var monthCols = (_overview && _overview.monthCols) || [];
+        var hgCols = (_overview && _overview.hgCols) || [];
+        var hasMonths = monthCols.length > 0;
+        var top = '<tr>', sub = '<tr>';
+        function leafTh(c) {
+            var k = String(c.key).trim();
+            var rs = hasMonths ? ' rowspan="2"' : '';
+            // Başlık ön yüz etiketine eşlenir (Şube Kodu/Adı, "SY %" ...); SUBE_ADI sıralanabilir
+            if (k === 'SUBE_ADI') {
+                return '<th' + rs + ' class="col-left" data-sort-key="branchName">' + overviewColLabel(c.key) + sortIconHtml('branchName') + '</th>';
+            }
+            return '<th' + rs + '>' + overviewColLabel(c.key) + '</th>';
+        }
+        // SUBE_KODU, SUBE_ADI
+        leadCols.forEach(function (c) { top += leafTh(c); });
+        // 3 Aylık Gerçekleşen % grubu
+        if (hasMonths) {
+            top += '<th colspan="' + monthCols.length + '" class="col-group-header selected">' +
+                    '<div class="col-group-header-content"><span>3 Aylık Gerçekleşen %</span></div>' +
+                   '</th>';
+            monthCols.forEach(function (mc, mi) {
+                sub += '<th class="' + monthCellClass(mi, monthCols.length) + '">' + monthLabel(mc.key) + '</th>';
+            });
+        }
+        // HG kolonları (main-view-branches)
+        hgCols.forEach(function (c) { top += leafTh(c); });
+        $('#scReportHead').html(top + '</tr>' + (hasMonths ? (sub + '</tr>') : ''));
+    }
+
+    // Genel Bakış şube özeti gövdesi: SUBE_KODU/ADI + "3 Aylık Gerçekleşen %" + HG kolonları + "Toplam" satırı
     function renderBranchOverviewBody() {
-        var data = _overview || {};
-        var months = data.months || [];
+        var leadCols = (_overview && _overview.leadCols) || [];
+        var monthCols = (_overview && _overview.monthCols) || [];
+        var hgCols = (_overview && _overview.hgCols) || [];
         var rows = visibleBranchRows();
 
-        renderBranchOverviewHead(months);
+        renderBranchOverviewHead();
 
-        var leafCount = (SCORE_CARD_BRANCH_OVERVIEW_COLUMNS.length - 1) + months.length;
+        var leafCount = leadCols.length + monthCols.length + hgCols.length;
         if (!rows.length) {
             $('#scReportBody').html(
-                '<tr class="no-result-row"><td colspan="' + leafCount + '" style="text-align:center;padding:48px 16px;">' +
+                '<tr class="no-result-row"><td colspan="' + (leafCount || 1) + '" style="text-align:center;padding:48px 16px;">' +
                     '<div class="table-empty-state">' +
                         '<img src="/images/empty-state-seach.svg" alt="" />' +
                         '<span>Seçili döneme ait veri bulunmamaktadır.</span>' +
@@ -588,19 +729,26 @@ $(function () {
         var html = '';
         rows.forEach(function (r) {
             html += '<tr class="table-row">';
-            html += '<td>' + (r.rank != null ? r.rank : '') + '</td>';
-            html += '<td class="col-left">' + (r.branchName || '') + '</td>';
-            html += pctCell(r.month1, 'col-selected-first') + pctCell(r.month2, 'col-selected-mid') + pctCell(r.month3, 'col-selected-last');
-            html += pctCell(r.corporate);
-            html += pctCell(r.commercial);
-            html += pctCell(r.kbi);
-            html += pctCell(r.obi);
-            html += pctCell(r.agriculture);
-            html += pctCell(r.mass);
-            html += pctCell(r.afili);
-            html += pctCell(r.privateBanking);
+            leadCols.forEach(function (c) { html += branchOverviewCell(c.key, r[c.key]); });
+            monthCols.forEach(function (mc, mi) { html += pctCell(r[mc.key], monthCellClass(mi, monthCols.length)); });
+            hgCols.forEach(function (c) { html += pctCell(r[c.key]); });
             html += '</tr>';
         });
+
+        // "Toplam" satırı: HG kolonları summaryMainSum'dan; SUBE_KODU + 3 aylık kolonlar boş
+        var totals = (_overview && _overview.totals) || {};
+        html += '<tr class="table-row sc-total-row">';
+        leadCols.forEach(function (c) {
+            if (String(c.key).trim() === 'SUBE_ADI') { html += '<td class="col-left">Toplam:</td>'; return; }
+            html += '<td></td>';
+        });
+        monthCols.forEach(function (mc, mi) { html += '<td class="' + monthCellClass(mi, monthCols.length) + '"></td>'; });
+        hgCols.forEach(function (c) {
+            var v = totals[String(c.key).trim()];
+            html += '<td>' + (v != null ? formatPercent(v) : '') + '</td>';
+        });
+        html += '</tr>';
+
         var $body = $('#scReportBody').html(html);
         if (typeof reStripeTable === 'function') reStripeTable($body);
     }
@@ -646,11 +794,11 @@ $(function () {
     function visibleRegionRows() {
         var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
         var rows = ((_overview && _overview.rows) || []).filter(function (r) {
-            return !query || (r.regionName || '').toLowerCase().indexOf(query) > -1;
+            return !query || regionNameOf(r).toLowerCase().indexOf(query) > -1;
         });
         if (sortKey === 'regionName') {
             rows = rows.slice().sort(function (a, b) {
-                var cmp = String(a.regionName || '').localeCompare(String(b.regionName || ''), 'tr', { sensitivity: 'base' });
+                var cmp = regionNameOf(a).localeCompare(regionNameOf(b), 'tr', { sensitivity: 'base' });
                 return sortAsc ? cmp : -cmp;
             });
         }
@@ -659,13 +807,11 @@ $(function () {
     function visibleBranchRows() {
         var query = ($('#scSearchInput').val() || '').trim().toLowerCase();
         var rows = ((_overview && _overview.rows) || []).filter(function (r) {
-            return !query || (r.branchName || '').toLowerCase().indexOf(query) > -1;
+            return !query || branchNameOf(r).toLowerCase().indexOf(query) > -1;
         });
-        if (sortKey === 'branchName' || sortKey === 'rank') {
+        if (sortKey === 'branchName') {
             rows = rows.slice().sort(function (a, b) {
-                var cmp = (sortKey === 'rank')
-                    ? (a.rank || 0) - (b.rank || 0)
-                    : String(a.branchName || '').localeCompare(String(b.branchName || ''), 'tr', { sensitivity: 'base' });
+                var cmp = branchNameOf(a).localeCompare(branchNameOf(b), 'tr', { sensitivity: 'base' });
                 return sortAsc ? cmp : -cmp;
             });
         }
@@ -675,28 +821,47 @@ $(function () {
     function setScoreCardPdfReport() {
         var cols, rows;
         if (_overview && _overview.mode === 'region') {
-            cols = [
-                { header: 'Bölge Adı', key: 'regionName', align: 'left' },
-                { header: 'Kurumsal %', key: 'corporate', format: formatPercent }, { header: 'Ticari %', key: 'commercial', format: formatPercent },
-                { header: 'KBİ %', key: 'kbi', format: formatPercent }, { header: 'OBİ %', key: 'obi', format: formatPercent },
-                { header: 'Tarım %', key: 'agriculture', format: formatPercent }, { header: 'SY', key: 'sy', format: formatPercent },
-                { header: 'BD', key: 'bd', format: formatPercent }, { header: 'Gişe', key: 'gise', format: formatPercent }
-            ];
-            rows = visibleRegionRows();
-        } else if (_overview && _overview.mode === 'branch') {
-            // "3 Aylık Gerçekleşen %" grubu: başlıklar _overview.months, değerler month1/2/3 (ekranla aynı)
-            var monthCols = (_overview.months || []).map(function (m, i) {
-                return { header: m, key: 'month' + (i + 1), group: '3 Aylık Gerçekleşen %', format: formatPercent };
+            // Kolon başlıkları ön yüz etiketine eşlenir (Bölge Adı/Kodu, "SY %" ...).
+            cols = (_overview.columns || []).map(function (c) {
+                var k = String(c.key).trim();
+                if (k === 'BOLGE_ADI') return { header: overviewColLabel(c.key), key: c.key, align: 'left', format: function (v) { return String(v == null ? '' : v).trim(); } };
+                if (k === 'BOLGE_KODU') return { header: overviewColLabel(c.key), key: c.key };
+                return { header: overviewColLabel(c.key), key: c.key, format: formatPercent };
             });
-            cols = [
-                { header: 'Sıralama', key: 'rank' }, { header: 'Şube Adı', key: 'branchName', align: 'left' }
-            ].concat(monthCols).concat([
-                { header: 'Kurumsal %', key: 'corporate', format: formatPercent }, { header: 'Ticari %', key: 'commercial', format: formatPercent },
-                { header: 'KBİ %', key: 'kbi', format: formatPercent }, { header: 'OBİ %', key: 'obi', format: formatPercent },
-                { header: 'Tarım %', key: 'agriculture', format: formatPercent }, { header: 'Kitle %', key: 'mass', format: formatPercent },
-                { header: 'Afili %', key: 'afili', format: formatPercent }, { header: 'ÖB %', key: 'privateBanking', format: formatPercent }
-            ]);
-            rows = visibleBranchRows();
+            rows = visibleRegionRows().slice();
+            // Ekrandaki gibi "Toplam" satırını da PDF'e ekle (summaryMainSum)
+            var totalRow = {};
+            (_overview.columns || []).forEach(function (c) {
+                var k = String(c.key).trim();
+                if (k === 'BOLGE_ADI') { totalRow[c.key] = 'Toplam:'; return; }
+                var v = (_overview.totals || {})[k];
+                if (v != null) totalRow[c.key] = v;
+            });
+            rows.push(totalRow);
+        } else if (_overview && _overview.mode === 'branch') {
+            // Kolon düzeni: Şube Kodu, Şube Adı | 3 Aylık Gerçekleşen % | HG kolonları (ekranla aynı).
+            var leadPdf = (_overview.leadCols || []).map(function (c) {
+                if (String(c.key).trim() === 'SUBE_ADI') return { header: overviewColLabel(c.key), key: c.key, align: 'left', format: function (v) { return String(v == null ? '' : v).trim(); } };
+                return { header: overviewColLabel(c.key), key: c.key };
+            });
+            var mcols = (_overview.monthCols || []).map(function (mc) {
+                return { header: monthLabel(mc.key), key: mc.key, group: '3 Aylık Gerçekleşen %', format: formatPercent };
+            });
+            var hgPdf = (_overview.hgCols || []).map(function (c) {
+                return { header: overviewColLabel(c.key), key: c.key, format: formatPercent };
+            });
+            cols = leadPdf.concat(mcols).concat(hgPdf);
+            rows = visibleBranchRows().slice();
+            // Ekrandaki gibi "Toplam" satırını da PDF'e ekle (summaryMainSum; SUBE_KODU + 3 aylık kolonlar boş)
+            var btotalRow = {};
+            (_overview.leadCols || []).forEach(function (c) {
+                if (String(c.key).trim() === 'SUBE_ADI') btotalRow[c.key] = 'Toplam:';
+            });
+            (_overview.hgCols || []).forEach(function (c) {
+                var v = (_overview.totals || {})[String(c.key).trim()];
+                if (v != null) btotalRow[c.key] = v;
+            });
+            rows.push(btotalRow);
         } else {
             cols = [
                 { header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }, { header: 'Ürün Tipi', key: 'productType' },
@@ -802,12 +967,22 @@ $(function () {
         loadScoreCardTypes();
     });
 
-    // Period tipi (Aylık / Çeyreklik / Yıllık)
+    // Period tipi (Aylık / Çeyreklik / Yıllık): sadece aktif buton görünümü.
+    // Yeniden yükleme, date-picker yeni dönemin dateNumber'ını sc:dateChanged ile
+    // yayınladığında (aşağıdaki dinleyici) tetiklenir.
     $('#scPeriod').on('click', '.period-btn', function () {
         $('#scPeriod .period-btn').removeClass('active');
         $(this).addClass('active');
-        // Her periyot değişiminde periods + pupa-types + cumulatives zinciri tetiklenir
-        loadPupaFilters($(this).data('period'));
+    });
+
+    // Date picker'da dateNumber değişince: dateNumber içeren servisleri
+    // (pupa-types -> score-cards -> employee-order-summaries) sırasıyla yeniden çağır.
+    $(document).on('sc:dateChanged', function (e, payload) {
+        if (!payload || payload.dateNumber == null) return;
+        if (_userRoleCode == null) return;                 // ilk yükleme (auth) bitmeden tetiklenmesin; bootstrap loadPupaFilters yapar
+        if (payload.dateNumber === _dateNumber) return;    // değişmediyse atla
+        _dateNumber = payload.dateNumber;
+        reloadByDateNumber();
     });
 
     // Sıralama (başlığa tıkla: asc -> desc -> sırasız)

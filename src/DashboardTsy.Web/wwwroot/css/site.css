@@ -83,6 +83,10 @@
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-xl: 50px;
+
+  /* Sticky tablo başlığı: 1. başlık satırının yüksekliği.
+     İki satırlı başlıklarda 2. satır (alt başlıklar) bu kadar aşağıdan yapışır. */
+  --table-head-row-height: 42px;
 }
 
 html,

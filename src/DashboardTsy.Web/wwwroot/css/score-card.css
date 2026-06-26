@@ -846,6 +846,31 @@
 }
 
 
+/* Genel Bakış bölge özeti: "Toplam" satırı (main-view-regions / summaryMainSum) */
+.data-table tbody tr.sc-total-row td {
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+  color: #14BEDD;
+  background: #031A47;
+}
+
+/* "Toplam:" etiketi (col-left hücresi) beyaz kalır; diğer değerler #14BEDD */
+.data-table tbody tr.sc-total-row td.col-left {
+  color: #fff;
+}
+
+.data-table tbody tr.sc-total-row td:first-child {
+  border-left: 1px solid var(--border-row);
+}
+
+.data-table tbody tr.sc-total-row td:last-child {
+  border-right: 1px solid var(--border-row);
+}
+
+
 /* ===== Responsive ===== */
 @media (max-width: 900px) {
   .sc-header {

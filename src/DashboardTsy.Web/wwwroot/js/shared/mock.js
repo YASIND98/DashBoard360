@@ -58,15 +58,6 @@ window.MOCK.scoreCardDetail = {
                 ]
             }
         ]
-    },
-    offtarget: {
-        columns: ['Açılış Tarihi', 'Ürün 1', 'Ürün 2', 'Ürün 3', 'Hesap No', 'Müşteri Adı', 'Kazanım', 'Müşteri Durumu'],
-        rows: [
-            { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052771', customerName: 'Burak Yalçın', kazanim: 'Ürün', customerStatus: 'Yeni' },
-            { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052772', customerName: 'Sena Aydın', kazanim: 'Ürün', customerStatus: 'Yeni' },
-            { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052773', customerName: 'Tolga Acar', kazanim: 'Ürün', customerStatus: 'Yeni' },
-            { date: '05.04.2026', products: ['GSM Fatura', 'Deniz Bonus', 'Nakit KMH'], accountNo: '26052774', customerName: 'Ceren Köse', kazanim: 'Ürün', customerStatus: 'Yeni' }
-        ]
     }
 };
 
@@ -186,7 +177,10 @@ window.getScoreCardReportMock = function () {
     return window.MOCK.scoreCardReport || { mainTableData: [] };
 };
 
-// Skor Kart - prim-monitoring/periods örnek cevabı (periodTypes bazında: 1 Aylık, 2 Çeyrek, 3 Yıllık)
+// Skor Kart - prim-monitoring/periods örnek cevabı.
+// NOT: Gerçek serviste `periodTypes=N` gönderilir ve SADECE o tipin cevabı ({ keyValues: [...] }) döner;
+// 1/2/3 anahtarları yalnızca mock için (getPrimMonitoringPeriodsMock(type) ile o tipin cevabını seçmek).
+//   1=Aylık ("YIL - AYn"), 2=Çeyrek ("YIL - CEYREKn"), 3=Yıllık (aylık gibi; yıl bazında ilk key kullanılır).
 window.MOCK.primMonitoringPeriods = {
     1: {
         keyValues: [
@@ -334,6 +328,7 @@ window.MOCK.primMonitoringPeriods = {
     }
 };
 
+// Gerçek serviste periodTypes paramına karşılık gelen tek tipin cevabını döndürür.
 window.getPrimMonitoringPeriodsMock = function (periodType) {
     return window.MOCK.primMonitoringPeriods[periodType] || window.MOCK.primMonitoringPeriods[1];
 };
@@ -448,7 +443,8 @@ window.getUserAuthoritiesMock = function () {
 
 // Skor Kart - Bölge filtresi (dashboard/regions) örnek cevabı.
 window.MOCK.regions = [
-    { regionName: "Avrupa-1",          regionCode: 1 }
+    { regionName: "Avrupa-1", regionCode: 1 },
+    { regionName: "Avrupa-2", regionCode: 2 }
 ];
 
 window.getRegionsMock = function () {
@@ -501,47 +497,94 @@ window.getEmployeeOrderSummariesMock = function () {
     return window.MOCK.employeeOrderSummaries;
 };
 
-// Skor Kart - Genel Bakış bölge özeti (scorecards/region-overview) örnek cevabı.
-// Genel Bakış seçili + birden fazla bölge varsa bu servis çalışır.
-window.MOCK.scoreCardRegionOverview = [
-    { regionName: 'Akdeniz',           corporate: 105.1, commercial: 52.9,  kbi: 80.6,  obi: 100.5, agriculture: 88.0,  sy: 40.4,  bd: 35.1, gise: 56.8 },
-    { regionName: 'Avrupa-1',          corporate: 112.3, commercial: 64.2,  kbi: 78.1,  obi: 95.4,  agriculture: 120.6, sy: 55.0,  bd: 48.7, gise: 73.2 },
-    { regionName: 'Avrupa-2',          corporate: 98.7,  commercial: 71.5,  kbi: 102.3, obi: 88.9,  agriculture: 67.4,  sy: 130.2, bd: 61.8, gise: 44.5 },
-    { regionName: 'Başkent-1',         corporate: 124.6, commercial: 49.3,  kbi: 85.7,  obi: 111.2, agriculture: 93.5,  sy: 38.9,  bd: 72.4, gise: 101.7 },
-    { regionName: 'Başkent-2',         corporate: 76.4,  commercial: 118.9, kbi: 69.2,  obi: 104.8, agriculture: 82.1,  sy: 91.6,  bd: 33.5, gise: 58.3 },
-    { regionName: 'Çukurova',          corporate: 101.9, commercial: 57.6,  kbi: 96.4,  obi: 73.1,  agriculture: 128.7, sy: 46.2,  bd: 67.9, gise: 88.4 },
-    { regionName: 'Doğu Anadolu',      corporate: 69.3,  commercial: 84.2,  kbi: 113.5, obi: 99.0,  agriculture: 74.6,  sy: 52.8,  bd: 40.1, gise: 62.7 },
-    { regionName: 'Ege',               corporate: 118.2, commercial: 73.4,  kbi: 90.8,  obi: 122.5, agriculture: 101.3, sy: 64.7,  bd: 55.9, gise: 79.1 },
-    { regionName: 'Güney Ege',         corporate: 95.5,  commercial: 61.8,  kbi: 77.3,  obi: 86.4,  agriculture: 110.9, sy: 48.3,  bd: 71.2, gise: 53.6 },
-    { regionName: 'Güneydoğu Anadolu', corporate: 82.7,  commercial: 104.6, kbi: 68.9,  obi: 97.2,  agriculture: 79.5,  sy: 121.4, bd: 43.8, gise: 66.3 },
-    { regionName: 'İç Anadolu',        corporate: 109.4, commercial: 55.1,  kbi: 99.7,  obi: 115.8, agriculture: 87.2,  sy: 59.6,  bd: 38.4, gise: 91.0 },
-    { regionName: 'Karadeniz',         corporate: 73.8,  commercial: 92.7,  kbi: 106.1, obi: 81.5,  agriculture: 124.3, sy: 44.9,  bd: 69.5, gise: 57.2 },
-    { regionName: 'Marmara',           corporate: 127.1, commercial: 66.3,  kbi: 84.0,  obi: 103.7, agriculture: 96.8,  sy: 51.2,  bd: 73.6, gise: 85.9 }
-];
-
-window.getScoreCardRegionOverviewMock = function () {
-    return window.MOCK.scoreCardRegionOverview;
-};
-
-// Skor Kart - Genel Bakış şube özeti (scorecards/region-overview) örnek cevabı.
-// Genel Bakış seçili + tek bölge + birden fazla şube varsa bu cevap döner.
-// months: '3 Aylık Gerçekleşen %' alt başlıkları; rows alanları SCORE_CARD_BRANCH_OVERVIEW_COLUMNS ile eşleşir.
-window.MOCK.scoreCardBranchOverview = {
-    months: ["Mart '25", "Nis '26", "May '26"],
-    rows: [
-        { rank: 1,  branchName: 'Burdur',   month1: 90.7,  month2: 123.5, month3: 88.0,  corporate: 105.1, commercial: 52.9,  kbi: 80.6,  obi: 100.5, agriculture: 88.0,  mass: 40.4,  afili: 35.1, privateBanking: 56.8 },
-        { rank: 2,  branchName: 'Demre',    month1: 78.3,  month2: 95.2,  month3: 112.6, corporate: 96.4,  commercial: 61.7,  kbi: 73.2,  obi: 88.9,  agriculture: 121.5, mass: 47.8,  afili: 69.3, privateBanking: 50.1 },
-        { rank: 3,  branchName: 'Aksu',     month1: 124.1, month2: 67.4,  month3: 93.8,  corporate: 118.7, commercial: 70.3,  kbi: 101.4, obi: 74.6,  agriculture: 66.9,  mass: 129.2, afili: 58.5, privateBanking: 81.7 },
-        { rank: 4,  branchName: 'Bucak',    month1: 69.5,  month2: 110.8, month3: 84.2,  corporate: 82.6,  commercial: 117.9, kbi: 68.1,  obi: 104.3, agriculture: 79.4,  mass: 91.0,  afili: 44.7, privateBanking: 63.2 },
-        { rank: 5,  branchName: 'Antalya',  month1: 101.6, month2: 88.9,  month3: 100.4, corporate: 109.8, commercial: 55.4,  kbi: 95.7,  obi: 116.2, agriculture: 87.3,  mass: 60.9,  afili: 72.6, privateBanking: 90.5 },
-        { rank: 6,  branchName: 'Fener',    month1: 73.2,  month2: 128.6, month3: 76.9,  corporate: 74.1,  commercial: 84.8,  kbi: 113.6, obi: 81.7,  agriculture: 124.8, mass: 45.3,  afili: 67.1, privateBanking: 57.4 },
-        { rank: 7,  branchName: 'Yalvaç',   month1: 116.4, month2: 72.1,  month3: 105.3, corporate: 127.2, commercial: 66.5,  kbi: 84.9,  obi: 103.1, agriculture: 96.7,  mass: 51.8,  afili: 73.9, privateBanking: 85.6 },
-        { rank: 8,  branchName: 'Kepez',    month1: 85.9,  month2: 99.7,  month3: 67.8,  corporate: 95.3,  commercial: 73.6,  kbi: 77.5,  obi: 86.4,  agriculture: 110.2, mass: 48.6,  afili: 71.4, privateBanking: 53.9 },
-        { rank: 9,  branchName: 'Lara',     month1: 108.2, month2: 64.8,  month3: 119.5, corporate: 124.9, commercial: 49.7,  kbi: 99.1,  obi: 111.8, agriculture: 93.6,  mass: 38.7,  afili: 72.2, privateBanking: 101.3 },
-        { rank: 10, branchName: 'Konyaaltı', month1: 76.1, month2: 92.4,  month3: 88.6,  corporate: 101.7, commercial: 57.9,  kbi: 96.8,  obi: 73.4,  agriculture: 128.1, mass: 46.5,  afili: 68.2, privateBanking: 88.9 }
+// Skor Kart - Genel Bakış bölge özeti (scorecards/main-view-regions) örnek cevabı.
+// Genel Bakış sekmesi + bölge seçili DEĞİL (regionCode = -1) iken bu servis çalışır.
+// - scoreCardRegionSummary: backend satır dizisini STRING olarak döndürür (detay servisi gibi) -> JSON.parse edilir.
+//     Her satır: BOLGE_ADI, BOLGE_KODU + dinamik HG<scorecardId> kolonları (ör. HG14 -> scorecard 14 -> "TİCARİ").
+//     Anahtarlar 4 karaktere boşlukla tamamlanır (ör. "HG1 "); ön yüz trim'leyerek eşler.
+// - summaryMainSum: "Toplam" satırı; columnName (HG anahtarı) -> columnValue. Kolonlar buradan key ile eşlenir
+//     (summaryMainSum tablo kolonlarından fazla anahtar içerebilir; eşleşmeyenler yok sayılır).
+window.MOCK.scoreCardMainViewRegions = {
+    scoreCardRegionSummary: {
+        scoreCardRegionSummary: JSON.stringify([
+            { "BOLGE_ADI": "Avrupa-1            ", "BOLGE_KODU": 1,  "HG1 ": 35.816936, "HG13": 72.358720, "HG14": 64.656280, "HG17": 0.0,       "HG2 ": 67.460585, "HG23": 0.0,       "HG5 ": 68.396725, "HG6 ": 0.0 },
+            { "BOLGE_ADI": "Avrupa-2            ", "BOLGE_KODU": 3,  "HG1 ": 36.001721, "HG13": 66.578889, "HG14": 59.853245, "HG17": 0.0,       "HG2 ": 52.857055, "HG23": 0.0,       "HG5 ": 68.912845, "HG6 ": 0.0 },
+            { "BOLGE_ADI": "Akdeniz             ", "BOLGE_KODU": 5,  "HG1 ": 40.414969, "HG13": 59.880081, "HG14": 49.865860, "HG17": 58.333350, "HG2 ": 65.702840, "HG23": 89.223690, "HG5 ": 66.381705, "HG6 ": 63.571825 },
+            { "BOLGE_ADI": "Çukurova            ", "BOLGE_KODU": 6,  "HG1 ": 37.772736, "HG13": 66.092190, "HG14": 88.396220, "HG17": 50.000000, "HG2 ": 67.940155, "HG23": 92.228375, "HG5 ": 66.496195, "HG6 ": 72.932295 },
+            { "BOLGE_ADI": "Ege                 ", "BOLGE_KODU": 7,  "HG1 ": 40.733604, "HG13": 66.941703, "HG14": 47.044780, "HG17": 57.500000, "HG2 ": 62.490525, "HG23": 86.911450, "HG5 ": 67.895915, "HG6 ": 51.401160 },
+            { "BOLGE_ADI": "Marmara             ", "BOLGE_KODU": 10, "HG1 ": 38.316872, "HG13": 65.736513, "HG14": 58.665675, "HG17": 50.000000, "HG2 ": 65.967750, "HG23": 95.011850, "HG5 ": 70.882360, "HG6 ": 72.071335 },
+            { "BOLGE_ADI": "Güneydoğu Anadolu   ", "BOLGE_KODU": 17, "HG1 ": 35.348711, "HG13": 56.940291, "HG14": 0.0,       "HG17": 50.000000, "HG2 ": 46.674795, "HG23": 56.942700, "HG5 ": 71.798650, "HG6 ": 60.309905 },
+            { "BOLGE_ADI": "Karadeniz           ", "BOLGE_KODU": 18, "HG1 ": 39.626863, "HG13": 67.290121, "HG14": 51.384600, "HG17": 62.500000, "HG2 ": 62.826190, "HG23": 97.142300, "HG5 ": 68.528890, "HG6 ": 78.487645 },
+            { "BOLGE_ADI": "İstanbul Anadolu    ", "BOLGE_KODU": 19, "HG1 ": 37.211518, "HG13": 68.169798, "HG14": 56.588180, "HG17": 0.0,       "HG2 ": 62.248280, "HG23": 0.0,       "HG5 ": 69.082760, "HG6 ": 0.0 },
+            { "BOLGE_ADI": "Başkent-1           ", "BOLGE_KODU": 22, "HG1 ": 35.368516, "HG13": 73.734102, "HG14": 53.854175, "HG17": 50.000000, "HG2 ": 58.457745, "HG23": 92.376890, "HG5 ": 66.832450, "HG6 ": 61.165095 },
+            { "BOLGE_ADI": "Başkent-2           ", "BOLGE_KODU": 23, "HG1 ": 35.804540, "HG13": 67.817739, "HG14": 61.335625, "HG17": 50.000000, "HG2 ": 61.276605, "HG23": 96.887610, "HG5 ": 66.377910, "HG6 ": 58.375540 },
+            { "BOLGE_ADI": "Trakya              ", "BOLGE_KODU": 24, "HG1 ": 35.346501, "HG13": 83.410052, "HG14": 0.0,       "HG17": 53.125000, "HG2 ": 53.698870, "HG23": 92.235420, "HG5 ": 64.420205, "HG6 ": 51.212460 }
+        ])
+    },
+    summaryMainSum: [
+        { "columnName": "HG1 ", "columnValue": 447.76 },
+        { "columnName": "HG13", "columnValue": 814.95 },
+        { "columnName": "HG14", "columnValue": 591.64 },
+        { "columnName": "HG15", "columnValue": 54.62 },
+        { "columnName": "HG16", "columnValue": 1016.16 },
+        { "columnName": "HG17", "columnValue": 481.32 },
+        { "columnName": "HG2 ", "columnValue": 727.80 },
+        { "columnName": "HG23", "columnValue": 791.96 },
+        { "columnName": "HG5 ", "columnValue": 813.41 },
+        { "columnName": "HG6 ", "columnValue": 569.53 }
     ]
 };
 
-window.getScoreCardBranchOverviewMock = function () {
-    return window.MOCK.scoreCardBranchOverview;
+window.getScoreCardMainViewRegionsMock = function () {
+    return window.MOCK.scoreCardMainViewRegions;
+};
+
+// Skor Kart - Genel Bakış şube özeti (scorecards/main-view-branches) örnek cevabı.
+window.MOCK.scoreCardMainViewBranches = {
+    scoreCardRegionSummary: {
+        scoreCardRegionSummary: JSON.stringify([
+            { "SUBE_ADI": "1.LEVENT",     "HG1 ": 15.433915, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 78.089340, "HG23": 0.0, "HG5 ": 61.611820, "HG6 ": 0.0 },
+            { "SUBE_ADI": "MASLAK",       "HG1 ": 26.338173, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 48.629760, "HG23": 0.0, "HG5 ": 42.895665, "HG6 ": 0.0 },
+            { "SUBE_ADI": "ŞİŞLİ",        "HG1 ": 62.920493, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 78.675430, "HG6 ": 0.0 },
+            { "SUBE_ADI": "BEŞİKTAŞ",     "HG1 ": 36.474900, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 69.651715, "HG23": 0.0, "HG5 ": 68.541590, "HG6 ": 0.0 },
+            { "SUBE_ADI": "MECİDİYEKÖY",  "HG1 ": 34.970915, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 41.947820, "HG6 ": 0.0 },
+            { "SUBE_ADI": "BEYAZIT",      "HG1 ": 32.103673, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 70.129860, "HG6 ": 0.0 },
+            { "SUBE_ADI": "SİRKECİ",      "HG1 ": 30.984311, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 42.842035, "HG6 ": 0.0 },
+            { "SUBE_ADI": "KASIMPAŞA",    "HG1 ": 40.413936, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 73.161115, "HG6 ": 0.0 },
+            { "SUBE_ADI": "SARIYER",      "HG1 ": 34.155581, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 0.0,       "HG6 ": 0.0 },
+            { "SUBE_ADI": "KAPALIÇARŞI",  "HG1 ": 39.349561, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 42.478425, "HG6 ": 0.0 },
+            { "SUBE_ADI": "KARAKÖY",      "HG1 ": 26.782710, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 72.961175, "HG6 ": 0.0 },
+            { "SUBE_ADI": "SULTANHAMAM",  "HG1 ": 48.872146, "HG13": 0.0,       "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 65.804125, "HG23": 0.0, "HG5 ": 66.364050, "HG6 ": 0.0 },
+            { "SUBE_ADI": "ADANA",        "HG1 ": 12.267160, "HG13": 77.378318, "HG14": 0.0, "HG15": 0.0, "HG17": 0.0, "HG2 ": 0.0,       "HG23": 0.0, "HG5 ": 77.535815, "HG6 ": 0.0 }
+        ])
+    },
+    summaryMainSum: [
+        { "columnName": "HG1 ", "columnValue": 441.47 },
+        { "columnName": "HG13", "columnValue": 77.38 },
+        { "columnName": "HG14", "columnValue": 0.00 },
+        { "columnName": "HG15", "columnValue": 0.00 },
+        { "columnName": "HG17", "columnValue": 0.00 },
+        { "columnName": "HG2 ", "columnValue": 331.98 },
+        { "columnName": "HG23", "columnValue": 0.00 },
+        { "columnName": "HG5 ", "columnValue": 738.20 },
+        { "columnName": "HG6 ", "columnValue": 0.00 }
+    ],
+    lastTargets: [
+        { "SUBE_KODU": 9630, "SUBE_ADI": "1.LEVENT",    "NISAN_2026": 46.290577, "MAYIS_2026": 62.385237,  "HAZIRAN_2026": 65.065828 },
+        { "SUBE_KODU": 2100, "SUBE_ADI": "MASLAK",      "NISAN_2026": 49.884239, "MAYIS_2026": 80.336505,  "HAZIRAN_2026": 89.348315 },
+        { "SUBE_KODU": 3070, "SUBE_ADI": "ŞİŞLİ",       "NISAN_2026": 66.100112, "MAYIS_2026": 85.995271,  "HAZIRAN_2026": 84.012345 },
+        { "SUBE_KODU": 3080, "SUBE_ADI": "BEŞİKTAŞ",    "NISAN_2026": 70.133119, "MAYIS_2026": 94.476684,  "HAZIRAN_2026": 98.119037 },
+        { "SUBE_KODU": 3260, "SUBE_ADI": "MECİDİYEKÖY", "NISAN_2026": 77.138063, "MAYIS_2026": 98.666155,  "HAZIRAN_2026": 96.937270 },
+        { "SUBE_KODU": 3820, "SUBE_ADI": "BEYAZIT",     "NISAN_2026": 67.143797, "MAYIS_2026": 76.340033,  "HAZIRAN_2026": 86.799677 },
+        { "SUBE_KODU": 3920, "SUBE_ADI": "SİRKECİ",     "NISAN_2026": 70.590331, "MAYIS_2026": 96.038253,  "HAZIRAN_2026": 101.327842 },
+        { "SUBE_KODU": 5100, "SUBE_ADI": "KASIMPAŞA",   "NISAN_2026": 76.609955, "MAYIS_2026": 100.312166, "HAZIRAN_2026": 102.719263 },
+        { "SUBE_KODU": 5230, "SUBE_ADI": "SARIYER",     "NISAN_2026": 45.327393, "MAYIS_2026": 83.648967,  "HAZIRAN_2026": 85.668744 },
+        { "SUBE_KODU": 5510, "SUBE_ADI": "KAPALIÇARŞI", "NISAN_2026": 61.876286, "MAYIS_2026": 97.032599,  "HAZIRAN_2026": 90.520391 },
+        { "SUBE_KODU": 9027, "SUBE_ADI": "KARAKÖY",     "NISAN_2026": 49.617165, "MAYIS_2026": 54.825119,  "HAZIRAN_2026": 68.907590 },
+        { "SUBE_KODU": 9040, "SUBE_ADI": "SULTANHAMAM", "NISAN_2026": 65.682948, "MAYIS_2026": 105.684888, "HAZIRAN_2026": 102.223238 }
+    ]
+};
+
+window.getScoreCardMainViewBranchesMock = function () {
+    return window.MOCK.scoreCardMainViewBranches;
 };
