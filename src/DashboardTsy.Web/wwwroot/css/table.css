@@ -178,6 +178,10 @@
   text-align: left !important;
 }
 
+.col-right {
+  text-align: right !important;
+}
+
 .branch-link:hover {
   text-decoration: underline;
 }
@@ -276,7 +280,9 @@
   background: var(--text-light);
 }
 
-.col-group-header.selected::before {
+/* Seçili başlık hücresi: dashed kutu. col-group-header'dan bağımsız -> grup başlığı (col-group-header selected)
+   ya da tek kolon başlığı (sadece selected) aynı kutuyu alır. */
+.data-table thead th.selected::before {
   content: '';
   position: absolute;
   top: 0;
@@ -327,6 +333,15 @@
   left: 0;
   border-right: 1px dashed var(--white);
   border-radius: 0 0 20px 0;
+}
+
+/* Tek seçili kolon (aynı hücrede first+last): alt kavis iki köşeden de yuvarlak. */
+.last-visible-row .col-selected-first.col-selected-last::after {
+  left: -1px;
+  right: -1px;
+  border-left: 1px dashed var(--white);
+  border-right: 1px dashed var(--white);
+  border-radius: 0 0 20px 20px;
 }
 
 .last-visible-row .col-selected-mid::after {
