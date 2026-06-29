@@ -1,26 +1,9 @@
 @model ReportViewModel
 
 <link rel="stylesheet" href="~/css/npl-report.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
 
-@{
-    var profilePhoto = Context?.Session?.GetString("ProfilePhoto") ?? string.Empty;
-    var nameSurname = Context?.Session?.GetString("NameSurname") ?? string.Empty;
-    var parts = nameSurname
-        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-    var initials = parts.Length switch
-    {
-        >= 2 => $"{parts[0][0]}{parts[1][0]}",
-        1 => $"{parts[0][0]}",
-        _ => "AD"
-    };
-
-    initials = initials.ToUpperInvariant();
-    var initialsEncoded = System.Net.WebUtility.UrlEncode(initials);
-    var avatarUrl = !string.IsNullOrEmpty(profilePhoto)
-        ? profilePhoto
-        : $"https://ui-avatars.com/api/?name={initialsEncoded}&background=c44&color=fff&size=36&rounded=true";
-}
 
 <!-- Page Header -->
 <div class="page-header">
@@ -28,13 +11,7 @@
     <div class="page-date">
         <span class="date-text">Rapor Tarihi: <span id="nplReportDate">19 Şubat 2026</span></span>
     </div>
-    <div class="page-icons">
-        <img src="@avatarUrl" alt="Avatar" class="avatar" />
-        @if (!string.IsNullOrEmpty(nameSurname))
-        {
-            <span class="user-name">@nameSurname</span>
-        }
-    </div>
+    @await Html.PartialAsync("_AvatarArea")
 </div>
 
 <!-- Breadcrumb -->

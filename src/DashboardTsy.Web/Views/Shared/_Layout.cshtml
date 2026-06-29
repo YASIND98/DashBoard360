@@ -1,6 +1,8 @@
 ﻿@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
 @{
     var activityUserId = HttpContextAccessor.HttpContext?.Session.GetInt32("UserId") ?? 0;
+    var pageController = ViewContext.RouteData.Values["controller"]?.ToString()?.ToLowerInvariant() ?? "";
+    var pageIdandClass = $"page-{pageController}";
 }
 <!DOCTYPE html>
 <html lang="tr">
@@ -12,7 +14,7 @@
     <link rel="stylesheet" href="~/css/table.css" asp-append-version="true" />
     <link href="~/assets/lib/google-fonts/inter/inter.css" rel="stylesheet" asp-append-version="true" />
 </head>
-<body>
+<body id="@pageIdandClass" class="@pageIdandClass">
     <div class="app-wrapper">
         <!-- Sidebar -->
         <aside class="sidebar">

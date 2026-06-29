@@ -1,27 +1,10 @@
 @model ReportViewModel
 
 
-@{
-    var profilePhoto = Context?.Session?.GetString("ProfilePhoto") ?? string.Empty;
-    var nameSurname = Context?.Session?.GetString("NameSurname") ?? string.Empty;
-    var parts = nameSurname
-        .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-    var initials = parts.Length switch
-    {
-        >= 2 => $"{parts[0][0]}{parts[1][0]}",
-        1 => $"{parts[0][0]}",
-        _ => "AD"
-    };
-
-    initials = initials.ToUpperInvariant();
-    var initialsEncoded = System.Net.WebUtility.UrlEncode(initials);
-    var avatarUrl = !string.IsNullOrEmpty(profilePhoto)
-        ? profilePhoto
-        : $"https://ui-avatars.com/api/?name={initialsEncoded}&background=c44&color=fff&size=36&rounded=true";
-}
 
 <link rel="stylesheet" href="~/css/score-card.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/responsive.css" asp-append-version="true" />
 
 <!-- Page Header -->
 <div class="page-header sc-page-header">
@@ -40,13 +23,7 @@
             <button type="button" class="sc-dp-nav" id="scDpNext">&#8250;</button>
         </div>
     </div>
-    <div class="page-icons">
-      <img src="@avatarUrl" alt="Avatar" class="avatar" />
-      @if (!string.IsNullOrEmpty(nameSurname))
-      {
-        <span class="user-name">@nameSurname</span>
-      }
-    </div>
+    @await Html.PartialAsync("_AvatarArea")
 </div>
 
 <!-- Breadcrumb: Bölge / Şube / Sicil -->
