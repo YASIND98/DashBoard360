@@ -13,6 +13,10 @@ $(function () {
     var sortKey = null;
     var sortAsc = true;
 
+    // Seçili kolon: açılışta "Ağırlıklı H/G %"; th'ye tıklanınca değişir. Dashed kutu ile vurgulanır.
+    var SC_SELECTABLE_COLS = ['Hedef', 'Gerçekleşen', 'H/G %', 'Ağırlık %', 'Ağırlıklı H/G %', 'Bekleyen'];
+    var selectedCol = 'Ağırlıklı H/G %';
+
     // Rapor tablosu verisi (mock.js -> window.MOCK.scoreCardReport)
     var SC_RESPONSE = (typeof getScoreCardReportMock === 'function')
         ? getScoreCardReportMock()
@@ -485,13 +489,21 @@ $(function () {
         return ' <i class="sort-icon' + cls + '"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>';
     }
 
+    // Seçili kolonun gövde hücresi için sınıf — table.css'teki dashed kutu kenarları (+ son satır alt kavis)
+    function _selCol(c) { return c === selectedCol ? 'col-selected-first col-selected-last' : ''; }
+
     function renderReportHead() {
         var html = '<tr>';
         COLUMNS.forEach(function (c) {
             if (c === 'Ürün Tipi') {
+                // Filtre menüsü (seçilebilir kolon değil)
                 html += '<th class="sc-type-th">' + typeFilterHtml() + '</th>';
             } else if (c === 'Ürün / Hedef Adı') {
+                // Sıralama (seçilebilir kolon değil)
                 html += '<th class="col-left" data-sort-key="productName">' + c + sortIconHtml('productName') + '</th>';
+            } else if (SC_SELECTABLE_COLS.indexOf(c) > -1) {
+                var sel = (c === selectedCol) ? ' selected' : '';   // tek kolon kutusu: table.css thead th.selected
+                html += '<th class="sc-col-selectable' + sel + '" data-col="' + c + '">' + c + '</th>';
             } else {
                 html += '<th>' + c + '</th>';
             }
@@ -781,10 +793,8 @@ $(function () {
 
         var rows = visibleProductRows();
 
-        // Başlık (ve Ürün Tipi filtresi) sonuç boş olsa da görünür kalsın
-        renderReportHead();
-
         if (!rows.length) {
+            $('#scReportHead').html('');   // Veri yoksa başlıklar (th) da gizlenir
             $('#scReportBody').html(
                 '<tr class="no-result-row"><td colspan="' + COLUMNS.length + '" style="text-align:center;padding:48px 16px;">' +
                     '<div class="table-empty-state">' +
@@ -796,6 +806,9 @@ $(function () {
             return;
         }
 
+        // Başlık yalnız sonuç varken çizilir
+        renderReportHead();
+
         var html = '';
         rows.forEach(function (r) {
             html += '<tr class="table-row">';
@@ -806,12 +819,12 @@ $(function () {
             html += '<td class="col-info">' + infoCell + '</td>';
             html += '<td class="col-left sc-product-name">' + r.productName + '</td>';
             html += '<td>' + r.productType + '</td>';
-            html += '<td>' + r.targetValue + '</td>';
-            html += '<td>' + r.realizedValue + '</td>';
-            html += '<td class="' + percentColor(r.targetRealizationPercentage) + '">' + formatPercent(r.targetRealizationPercentage) + '</td>';
-            html += '<td>' + formatPercent(r.productWeight) + '</td>';
-            html += '<td>' + formatPercent(r.weightedPercentage) + '</td>';
-            html += '<td>' + r.pending + '</td>';
+            html += '<td class="' + _selCol('Hedef') + '">' + r.targetValue + '</td>';
+            html += '<td class="' + _selCol('Gerçekleşen') + '">' + r.realizedValue + '</td>';
+            html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + formatPercent(r.targetRealizationPercentage) + '</td>';
+            html += '<td class="' + _selCol('Ağırlık %') + '">' + formatPercent(r.productWeight) + '</td>';
+            html += '<td class="' + _selCol('Ağırlıklı H/G %') + '">' + formatPercent(r.weightedPercentage) + '</td>';
+            html += '<td class="' + _selCol('Bekleyen') + '">' + r.pending + '</td>';
             // Detay drill-down bağlamı (scorecards/details): productId satırdan, productType aktif kanaldan.
             // dateNumber/registerId istekte doğrudan modül state'inden gönderilir.
             html += '<td><img class="sc-detail-icon" src="/images/detail.svg" alt="Detay"' +
@@ -874,9 +887,17 @@ $(function () {
         reloadByDateNumber();
     });
 
-    // Sıralama (başlığa tıkla: asc -> desc -> sırasız)
+    // Seçili kolon: değer kolonu başlığına tıklanınca seçili kolon o olur (dashed kutu taşınır)
+    $(document).on('click', '#scReportHead th.sc-col-selectable', function () {
+        var c = $(this).data('col');
+        if (!c || c === selectedCol) return;
+        selectedCol = c;
+        renderReportBody();   // head + body yeniden çizilir
+    });
+
     $(document).on('click', '#scReportHead th[data-sort-key]', function () {
         var key = $(this).data('sort-key');
+        if (!key) return;
         if (sortKey === key) {
             if (sortAsc) { sortAsc = false; }
             else { sortKey = null; sortAsc = true; }
@@ -887,13 +908,14 @@ $(function () {
         renderReportBody();
     });
 
-    // Ürün Tipi sütun filtresi menüsü
+    // Ürün Tipi sütun filtresi menüsü (yalnız trigger'da; th'nin gerisi kolon seçer)
     $(document).on('click', '.sc-type-trigger', function (e) {
         e.stopPropagation();
         $(this).closest('.sc-type-filter').toggleClass('open');
     });
-    // Seçim (renderReportBody başlığı yeniden kurar -> menü kapanır)
-    $(document).on('click', '.sc-type-option', function () {
+    // Seçim (renderReportBody başlığı yeniden kurar -> menü kapanır). stopPropagation: kolon seçimini tetiklemesin.
+    $(document).on('click', '.sc-type-option', function (e) {
+        e.stopPropagation();
         selectedTypeId = $(this).attr('data-type') || '';
         renderReportBody();
     });
