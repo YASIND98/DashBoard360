@@ -1,0 +1,48 @@
+/* ===== Tabs Bar ===== */
+.tab-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px 20px 0;
+}
+
+.tab-list {
+  display: flex;
+  gap: 0;
+  align-items: center;
+}
+
+.tab {
+  color: var(--text-tab);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0px 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.tab.active {
+  color: var(--white);
+  border-bottom: 2px solid var(--border-tab-active);
+}
+
+/* Tab separators */
+.tab + .tab::before {
+  content: "";
+  position: absolute;
+  left: -24px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 16px;
+  background: var(--border-separator);
+}
+
+.tabs-right {
+  display: flex;
+  align-items: center;
+}

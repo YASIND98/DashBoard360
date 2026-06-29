@@ -1,0 +1,35 @@
+/* ===== Breadcrumb Bar ===== */
+.breadcrumb-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 0 0 24px;
+}
+
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.breadcrumb-item {
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.breadcrumb-item.active {
+  color: var(--white);
+  cursor: pointer;
+}
+
+.breadcrumb-item.disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.breadcrumb-separator {
+  color: var(--bg-period);
+  font-size: 14px;
+}
