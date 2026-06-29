@@ -1,0 +1,245 @@
+/* ===== Filters Row ===== */
+.filters-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 24px;
+}
+
+.filters-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.filter-dropdown-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 180px;
+  min-width: 170px;
+}
+
+.filter-dropdown {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6.5px 12px;
+  border: 1px solid var(--white);
+  border-radius: var(--radius-sm);
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+}
+
+.filter-dropdown .filter-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filter-dropdown.disabled {
+  cursor: default;
+  color: var(--disabled);
+  border-color: var(--disabled);
+}
+
+.filter-dropdown.disabled img {
+  filter: brightness(0) saturate(100%) invert(57%) sepia(10%) saturate(430%) hue-rotate(185deg) brightness(101%);
+}
+
+.filter-dropdown img {
+  width: 16px;
+  height: 16px;
+}
+
+.filter-badge {
+  padding: 3px 6px;
+  border-radius: 50%;
+  background: var(--badge);
+  color: var(--white);
+  font-size: 9px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.filter-apply-btn {
+  color: var(--blue-dark);
+  background: var(--white);
+  padding: 7px 12px;
+  border: 1px solid var(--white);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.filter-apply-btn:disabled {
+  cursor: not-allowed;
+  color: var(--text-disabled);
+}
+
+.filter-clear-btn {
+  color: var(--white);
+  background: transparent;
+  padding: 7px 12px;
+  border: 1px solid var(--white);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.segmented-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-period);
+  border-radius: 14px;
+  padding: 4px;
+}
+
+.segmented-control .divider {
+  width: 1px;
+  height: 16px;
+  background: var(--border-divider);
+}
+
+.segmented-control .segment {
+  padding: 6px 9.5px;
+  border: none;
+  background: transparent;
+  color: var(--text-gray);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.segmented-control .segment.active {
+  color: var(--white);
+  background: #0075FF;
+  border-radius: 12px;
+}
+
+/* Dropdown Panel */
+.dropdown-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  background: var(--bg-dropdown-panel);
+  border: 1px solid var(--white);
+  border-radius: var(--radius-md);
+  z-index: 100;
+  box-shadow: var(--shadow-dropdown);
+  overflow: hidden;
+  min-width: 100%;
+}
+
+.dropdown-panel.open {
+  display: block;
+}
+
+.dropdown-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--border-input);
+}
+
+.dropdown-search img {
+  width: 16px;
+  height: 16px;
+}
+
+.dropdown-search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--white);
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+}
+
+.dropdown-search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.dropdown-list {
+  max-height: 252px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  color: var(--text-light);
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--bg-subtab);
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover {
+  background: var(--bg-hover);
+}
+
+.dropdown-item.selected {
+  background: var(--bg-selected);
+  font-weight: 600;
+  color: var(--white);
+}
+
+.dropdown-item.selected:hover {
+  background: var(--bg-hover-selected);
+}
+
+.sub-arrow-icon {
+  width: 14px;
+  height: 14px;
+  vertical-align: middle;
+  margin-right: 2px;
+}
+
+.filter-search {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px;
+  border: 1px solid var(--white);
+  border-radius: var(--radius-sm);
+  max-width: 320px;
+  margin-left: 10px;
+}
+
+.filter-search img {
+  width: 16px;
+  height: 16px;
+}
+
+.filter-search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-light);
+  font-size: 14px;
+  width: 100%;
+}
+
+.filter-search input::placeholder {
+  color: var(--text-muted);
+}
