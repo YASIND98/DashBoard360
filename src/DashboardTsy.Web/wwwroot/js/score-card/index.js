@@ -500,9 +500,7 @@ $(function () {
 
     // Seçili kolonun gövde hücresi için sınıf — table.css'teki dashed kutu kenarları (+ son satır alt kavis)
     function _selCol(c) { return c === selectedCol ? 'col-selected-first col-selected-last' : ''; }
-
-    // Şube seçili DEĞİLKEN görünür satırların "Ağırlıklı H/G %" toplamı; şube seçiliyse null.
-    // ("Toplam Skor" kartıyla aynı hesap; şube seçiliyse toplam o kartta gösterilir, tablo satırı gizlenir.)
+    
     function weightedTotal(rows) {
         var branchSelected = _branchCode != null && _branchCode !== -1;
         if (branchSelected || !rows || !rows.length) return null;
@@ -795,9 +793,6 @@ $(function () {
             });
             rows.push(totalRow);
         } else {
-            // Toplam satırında (row.__isTotal) yüzde kolonlarına "-" basılmaz; değerin (Ağırlıklı H/G %) hemen
-            // solundaki "Ağırlık %" kolonu "Ağırlıklı H/G % Toplamı:" etiketini gösterir (ekrandaki konumla aynı).
-            // Motor format(v, row)'a satırı geçtiği için bu davranış sayfa tarafında, download-pdf.js'e dokunmadan kurulur.
             var pctOrTotal = function (role) {
                 return function (v, row) {
                     if (row && row.__isTotal) return role === 'label' ? (SC_TOTAL_COL + ' Toplamı:') : '';
