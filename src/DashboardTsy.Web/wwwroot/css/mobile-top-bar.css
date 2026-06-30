@@ -1,0 +1,87 @@
+/* ===== Mobile Top Bar (yalnızca < 1200px) ===========================
+   Dark / light mod arkaplanı --top-bar-bg token'ından gelir.
+   site.css içindeki [data-theme] kuralları bu değişkeni override eder.
+   ================================================================== */
+
+.mobile-top-bar {
+  display: none; /* desktop'ta gizli */
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: var(--top-bar-bg);
+  border-bottom: 1px solid var(--border-white-alpha);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+.mobile-top-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.mobile-top-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+.mobile-date-text {
+  font-weight: 600;
+}
+
+.mobile-date-badge {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.mobile-top-chevron {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+/* ===== Tema toggle butonu ===== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.theme-toggle:hover {
+  color: var(--text-body);
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Dark modda güneş görünür, ay gizli */
+:root .theme-icon--moon  { display: none; }
+:root .theme-icon--sun   { display: block; }
+
+/* Light modda ay görünür, güneş gizli */
+[data-theme="light"] .theme-icon--moon { display: block; }
+[data-theme="light"] .theme-icon--sun  { display: none; }
+
+/* ===== Breakpoint: < 1200px ===== */
+@media (max-width: 1199px) {
+  .mobile-top-bar {
+    display: flex;
+  }
+}

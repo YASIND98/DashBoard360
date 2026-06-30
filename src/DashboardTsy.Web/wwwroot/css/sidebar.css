@@ -110,3 +110,10 @@
 .sidebar:hover .sidebar-export {
   display: block;
 }
+
+/* ===== Responsive: < 1200px ===== */
+@media (max-width: 1199px) {
+  .sidebar {
+    display: none;
+  }
+}

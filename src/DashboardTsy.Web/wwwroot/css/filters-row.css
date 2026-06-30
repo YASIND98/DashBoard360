@@ -243,3 +243,54 @@
 .filter-search input::placeholder {
   color: var(--text-muted);
 }
+
+@media (max-width: 1199px) {
+  .filters-row {
+    background: #12375C;
+    flex-direction: column;
+    align-items: baseline;
+  }
+  .filter-dropdown-wrapper {
+    max-width: 100%;
+  }
+  .segmented-control {
+    margin: 0 auto;
+  }
+
+  /* ===== Dark tema: parlak mavi konteyner, koyu lacivert aktif pill ===== */
+  .segmented-control {
+    background: var(--blue-light-mobile);
+    border-radius: 50px;
+    padding: 5px;
+  }
+
+  .segmented-control .divider {
+    display: none;
+  }
+
+  .segmented-control .segment {
+    color: rgba(255, 255, 255, 0.75);
+    border-radius: 50px;
+  }
+
+  .segmented-control .segment.active {
+    background: #005CB0;
+    color: #ffffff;
+    border-radius: 50px;
+  }
+
+  /* ===== Light tema ===== */
+
+  [data-theme="light"] .segmented-control {
+    background: #E9F3FE;
+  }
+
+  [data-theme="light"] .segmented-control .segment {
+    color: #6b7a99;
+  }
+
+  [data-theme="light"] .segmented-control .segment.active {
+    background: #12375C;
+    color: #ffffff;
+  }
+}

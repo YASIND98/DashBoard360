@@ -81,8 +81,24 @@ var _reportDate = sessionStorage.getItem('_reportDate') || new Date().toISOStrin
 
 function applyReportDate() {
     var formatted = formatReportDateTr(_reportDate);
-    if (formatted) $('.date-text').text(formatted);
+    if (formatted) {
+        $('.date-text').text(formatted);
+        // Mobile top bar senkronizasyonu
+        $('#mobileTopDateText').text(formatted);
+        $('#mobileTopDateBadge').text($('.date-badge').first().text() || 'Bugün');
+    }
 }
+
+/* ===== Tema yönetimi =============================================
+   toggleTheme()  → dark ↔ light geçiş yapar, localStorage'a kaydeder.
+   Tema <html data-theme="..."> üzerinden CSS değişkenlerini tetikler.
+   ============================================================== */
+window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('app-theme', next);
+};
 
 function _isReportDateCacheFresh() {
     if (!sessionStorage.getItem('_reportDate')) return false;
