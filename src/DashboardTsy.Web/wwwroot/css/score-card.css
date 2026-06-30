@@ -73,15 +73,11 @@
 }
 
 .sc-ranking-value {
+  display: flex;
+  align-items: center;
   font-size: 20px;
   font-weight: 700;
   color: var(--white);
-  line-height: 1;
-}
-.sc-ranking-value .first-number {
-    position: relative;
-    top: 3px;
-    right: 1px;
 }
 
 .sc-ranking-value .second-number {
@@ -756,9 +752,9 @@
   background: #031A47;
 }
 
-/* "Toplam:" etiketi (col-left hücresi) beyaz kalır; diğer değerler #14BEDD */
-.data-table tbody tr.sc-total-row td.col-left {
-  color: #fff;
+.data-table tbody tr.sc-total-row td.col-right {
+  color: #B1BAC8;
+  font-size: 12px;
 }
 
 .data-table tbody tr.sc-total-row td:first-child {
