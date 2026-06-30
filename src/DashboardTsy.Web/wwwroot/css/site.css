@@ -106,7 +106,7 @@
 [data-theme="light"] {
   --top-bar-bg:    rgb(21 32 88);
   --app-bg:        linear-gradient(180deg, #1e3a8a 0%, #152d6b 100%);
-  --main-bg:       linear-gradient(135deg, #2563eb 0%, #1d4ed8 25%, #1e40af 50%, #1e3a8a 75%, #172554 100%);
+  --main-bg:       linear-gradient(145deg, #FBFBFD 0%, #EBF3FD 100%);
   --sidebar-color: linear-gradient(90deg, rgba(21,32,88,0.96) 0%, rgba(30,58,138,0) 100%);
 }
 
@@ -359,8 +359,21 @@ body:has(.scorecard-panel.open)::before {
 
 /* ===== Responsive ===== */
 @media (max-width: 1199px) {
+
+  [data-theme="light"] .main-content {
+    background: var(--main-bg);
+  }
+
   .page-header {
     display: none
+  }
+
+  .legend-actions {
+    display: none;
+  }
+
+  .download-pdf-btn {
+    display: none;
   }
 
   .period-toggle {
@@ -430,14 +443,14 @@ body:has(.scorecard-panel.open)::before {
     font-size: 20px;
   }
 
-  .tab {
+  /* .tab {
     font-size: 16px;
     margin: 0 16px;
   }
 
   .tab + .tab::before {
     left: -16px;
-  }
+  } */
 
   /* .tab-bar {
     padding: 12px 24px 16px 0;
@@ -518,10 +531,10 @@ body:has(.scorecard-panel.open)::before {
     height: 28px;
   }
 
-  .tab {
+  /* .tab {
     margin: 0 14px;
     font-size: 15px;
-  }
+  } */
 
   .download-pdf-btn span {
     display: none;
@@ -533,14 +546,14 @@ body:has(.scorecard-panel.open)::before {
 }
 
 @media (max-width: 700px) {
-  .tab {
+  /* .tab {
     margin: 0 10px;
     font-size: 15px;
-  }
+  } */
 
-  .legend-note {
+  /* .legend-note {
     max-width: 200px;
-  }
+  } */
 
   .filter-dropdown-wrapper {
     min-width: 130px;
