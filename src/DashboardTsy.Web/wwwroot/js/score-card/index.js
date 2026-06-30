@@ -17,6 +17,9 @@ $(function () {
     var SC_SELECTABLE_COLS = ['Hedef', 'Gerçekleşen', 'H/G %', 'Ağırlık %', 'Ağırlıklı H/G %', 'Bekleyen'];
     var selectedCol = 'Ağırlıklı H/G %';
 
+    // Tablo toplam satırı HER ZAMAN "Ağırlıklı H/G %" kolonu içindir (seçili kolondan bağımsız, sabit).
+    var SC_TOTAL_COL = 'Ağırlıklı H/G %';
+
     // Rapor tablosu verisi (mock.js -> window.MOCK.scoreCardReport)
     var SC_RESPONSE = (typeof getScoreCardReportMock === 'function')
         ? getScoreCardReportMock()
@@ -337,18 +340,24 @@ $(function () {
         });
     }
 
-    // Toplam Skor = tablodaki Ağırlıklı H/G % (weightedPercentage) değerlerinin toplamı.
-    function renderTotalScore() {
-        var total = ROWS.reduce(function (sum, r) {
+    // Ağırlıklı H/G % (weightedPercentage) değerlerinin toplamı. Hem "Toplam Skor" kartı hem
+    // tablo toplam satırı aynı hesabı kullanır.
+    function sumWeightedPercentage(rows) {
+        return (rows || []).reduce(function (sum, r) {
             return sum + (Number(r.weightedPercentage) || 0);
         }, 0);
-        var rounded = Math.round(total);
+    }
+
+    // Toplam Skor = tablodaki Ağırlıklı H/G % (weightedPercentage) değerlerinin toplamı.
+    function renderTotalScore() {
+        var total = sumWeightedPercentage(ROWS);
         // percentColor 'ratio-*' döner; kart varyant sınıfına çevrilir ('' ise renksiz/varsayılan kart).
-        var cardClass = percentColor(rounded).replace('ratio-', 'sc-ranking-card--');
+        var cardClass = percentColor(total).replace('ratio-', 'sc-ranking-card--');
         $('#scTotalScore').closest('.sc-ranking-card')
             .removeClass('sc-ranking-card--red sc-ranking-card--orange sc-ranking-card--green sc-ranking-card--blue')
             .addClass(cardClass);
-        $('#scTotalScore').text(rounded);
+        // Tablo toplam satırıyla aynı görünsün diye aynı biçim (formatPercent: 1 ondalık + küçük ondalık).
+        $('#scTotalScore').html(String(formatPercent(total)));
     }
 
     // ===== Breadcrumb: Bölge / Şube / Sicil =====
@@ -491,6 +500,25 @@ $(function () {
 
     // Seçili kolonun gövde hücresi için sınıf — table.css'teki dashed kutu kenarları (+ son satır alt kavis)
     function _selCol(c) { return c === selectedCol ? 'col-selected-first col-selected-last' : ''; }
+    
+    function weightedTotal(rows) {
+        var branchSelected = _branchCode != null && _branchCode !== -1;
+        if (branchSelected || !rows || !rows.length) return null;
+        return sumWeightedPercentage(rows);
+    }
+
+    // Ürün tablosu toplam satırı: toplam DAİMA "Ağırlıklı H/G %" kolonunda gösterilir (seçili kolondan bağımsız).
+    function productTotalRowHtml(rows) {
+        var sum = weightedTotal(rows);
+        if (sum == null) return '';
+        var colIndex = COLUMNS.indexOf(SC_TOTAL_COL);
+        var trailing = COLUMNS.length - colIndex - 1;
+        return '<tr class="table-row sc-total-row">' +
+            '<td colspan="' + colIndex + '" class="col-right">' + SC_TOTAL_COL + ' Toplamı:</td>' +
+            '<td class="' + _selCol(SC_TOTAL_COL) + '">' + formatPercent(sum) + '</td>' +
+            (trailing > 0 ? '<td colspan="' + trailing + '"></td>' : '') +
+            '</tr>';
+    }
 
     function renderReportHead() {
         var html = '<tr>';
@@ -765,13 +793,23 @@ $(function () {
             });
             rows.push(totalRow);
         } else {
+            var pctOrTotal = function (role) {
+                return function (v, row) {
+                    if (row && row.__isTotal) return role === 'label' ? (SC_TOTAL_COL + ' Toplamı:') : '';
+                    return formatPercent(v);
+                };
+            };
             cols = [
                 { header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }, { header: 'Ürün Tipi', key: 'productType' },
                 { header: 'Hedef', key: 'targetValue' }, { header: 'Gerçekleşen', key: 'realizedValue' },
-                { header: 'H/G %', key: 'targetRealizationPercentage', format: formatPercent }, { header: 'Ağırlık %', key: 'productWeight', format: formatPercent },
+                { header: 'H/G %', key: 'targetRealizationPercentage', format: pctOrTotal('blank') }, { header: 'Ağırlık %', key: 'productWeight', format: pctOrTotal('label') },
                 { header: 'Ağırlıklı H/G %', key: 'weightedPercentage', format: formatPercent }, { header: 'Bekleyen', key: 'pending' }
             ];
             rows = visibleProductRows();
+            var ptSum = weightedTotal(rows);
+            if (ptSum != null) {
+                rows = rows.concat([{ __isTotal: true, weightedPercentage: ptSum }]);
+            }
         }
         window.PdfReport = {
             title: ($('.page-title').text() || 'Skor Kart').trim(),
@@ -833,6 +871,8 @@ $(function () {
                 ' data-product-type="' + activePupaType() + '" /></td>';
             html += '</tr>';
         });
+        // Şube seçili değilken seçili kolonun toplam satırı en alta eklenir
+        html += productTotalRowHtml(rows);
         var $body = $('#scReportBody').html(html);
         if (typeof reStripeTable === 'function') reStripeTable($body);
     }
