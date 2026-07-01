@@ -24,7 +24,7 @@ $(function () {
         }).done(function (res) {
             callback(Array.isArray(res) ? res : ((res && res.rows) || []));
         }).fail(function () {
-            callback(typeof getRegionsMock === 'function' ? getRegionsMock() : []);
+            callback([]);
         });
     }
 
@@ -46,7 +46,7 @@ $(function () {
         }).done(function (res) {
             callback(Array.isArray(res) ? res : ((res && res.rows) || []));
         }).fail(function () {
-            callback(typeof getBranchesMock === 'function' ? getBranchesMock() : []);
+            callback([]);
         });
     }
 
@@ -131,7 +131,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(typeof getRegistersMock === 'function' ? getRegistersMock() : []);
+            callback([]);
         });
     }
 

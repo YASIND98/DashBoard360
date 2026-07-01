@@ -86,7 +86,7 @@ $(function () {
         }).done(function (res) {
             handle(res);
         }).fail(function () {
-            handle((typeof getScoreCardDetailMock === 'function') ? getScoreCardDetailMock(status) : null);
+            handle(null);
         });
     }
 
@@ -246,6 +246,31 @@ $(function () {
     });
 
     updateFilterIcons();
+
+    // "PDF İndir" (Hedef Detayı): ekrandaki detay tablosunu PDF olarak indir.
+    // Genel PDF motoru (download-pdf.js) bu config'i data-pdf="scDetail" üzerinden çeker.
+    // PDF her zaman ekranda görüneni (aynı _response) indirir.
+    var SC_DETAIL_STATUS_LABEL = { realized: 'Gerçekleşen', pending: 'Bekleyen', unrealized: 'Gerçekleşmeyen' };
+    window.PdfSources = window.PdfSources || {};
+    window.PdfSources.scDetail = function () {
+        var cols = (_response.columns || []).map(function (c, i) {
+            var key = (c && c.key != null) ? c.key : c;
+            var label = (c && c.label != null) ? c.label : String(c);
+            return {
+                header: label,
+                key: key,
+                align: i === 0 ? 'left' : 'center',
+                format: function (v) { return formatDetailCell(key, v); }
+            };
+        });
+        return {
+            title: $('#scModalTitle').text().trim(),
+            infoLines: ['Hedef Detayı', 'Durum: ' + (SC_DETAIL_STATUS_LABEL[_statusFilter] || '-')],
+            columns: cols,
+            rows: _response.rows || [],
+            filename: 'SkorKart-Hedef-Detayi.pdf'
+        };
+    };
 
     // Sayfalama
     $('#scPagination').on('click', '.sc-page-arrow', function () {

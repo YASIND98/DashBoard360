@@ -30,6 +30,13 @@ var TOP10_PRODUCT_NAMES = [
 
 var SCORE_CARD_BASE_URL = "http://api-pupa.v3.dev.intertech.com.tr/api";
 
+// ServiceBus OAuth (client_credentials) -> skor kart servis çağrılarına eklenecek Bearer token
+var SERVICEBUS_TOKEN_URL = "https://devesbappv3.intertech.com.tr/servicebus/oauth/token";
+var SERVICEBUS_CLIENT_ID = "YonetimRaporToPupa";
+var SERVICEBUS_CLIENT_SECRET = "19ea09f7714271b98b79332c36b16908262ea5ddc9b8fdb8a687981f1318c97f";
+// audience = skor kart servisinin origin'i; SCORE_CARD_BASE_URL'den türetilir (tek kaynak)
+var SERVICEBUS_AUDIENCE = new URL(SCORE_CARD_BASE_URL).origin;
+
 // users/authorities servisi -> sabit istek parametreleri
 var PUPA_USER_CODE = "INTERTECH\\FURKANAI";
 var PUPA_APPLICATION_CODE = "Surfacepluspupa";

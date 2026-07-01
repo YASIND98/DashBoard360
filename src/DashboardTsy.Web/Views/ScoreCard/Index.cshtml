@@ -81,27 +81,14 @@
         </div>
     </div>
 
-    <div class="segmented-control" id="scChannels">
-        <button type="button" class="segment active" data-channel="pazarlama">Pazarlama</button>
-        <div class="divider"></div>
-        <button type="button" class="segment" data-channel="operasyon">Operasyon</button>
-        <div class="divider"></div>
-        <button type="button" class="segment" data-channel="sdk">SDK</button>
-        <div class="divider"></div>
-        <button type="button" class="segment" data-channel="ozel">Özel Bankacılık</button>
-    </div>
+    <!-- Pupa tipi segmentleri sales-target-monitoring/pupa-types servisinden gelir (renderPupaChannels) -->
+    <div class="segmented-control" id="scChannels"></div>
 </div>
 
 <!-- Tabs + Period -->
 <div class="tab-bar">
-    <div class="tab-list" id="scTabList">
-        <button class="tab active" data-sctab="genel">Genel Bakış</button>
-        <button class="tab" data-sctab="kurumsal">Kurumsal</button>
-        <button class="tab" data-sctab="ticari">Ticari</button>
-        <button class="tab" data-sctab="kobi">KOBİ</button>
-        <button class="tab" data-sctab="tarim">Tarım</button>
-        <button class="tab" data-sctab="bireysel">Bireysel</button>
-    </div>
+    <!-- Skor kart sekmeleri dashboard/score-cards servisinden gelir (renderScoreCardTabs) -->
+    <div class="tab-list" id="scTabList"></div>
     <div class="period-toggle" id="scPeriod">
         <button class="period-btn active" data-period="aylik">
             <img src="~/images/calendar.svg" alt="monthly" class="period-icon" /> Aylık
@@ -142,8 +129,29 @@
     <div class="tab-list" id="scSubTabList"></div>
 </div>
 
+<!-- Score Card Report Table Skeleton (servis isteği sırasında; hedef raporlarındaki gibi) -->
+<div id="scTableSkeleton" class="page-skeleton" style="display:none;">
+    <div class="skeleton-table">
+        @for (int i = 0; i < 8; i++)
+        {
+            <div class="skeleton-table-row">
+                <div class="skeleton-bar" style="width:24px;height:24px"></div>
+                <div class="skeleton-bar" style="width:22%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:8%;height:16px"></div>
+                <div class="skeleton-bar" style="width:8%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:8%;height:16px"></div>
+                <div class="skeleton-bar" style="width:24px;height:24px"></div>
+            </div>
+        }
+    </div>
+</div>
+
 <!-- Score Card Report Table -->
-<div class="table-container">
+<div class="table-container" id="scTableContainer">
     <div class="table-wrapper">
         <table class="data-table">
             <thead id="scReportHead"></thead>
@@ -196,6 +204,10 @@
           </div>
 
           <div class="sc-footer">
+              <div class="download-pdf-btn" id="scDetailPdfBtn" data-pdf="scDetail" style="margin-right:auto;">
+                  <img src="~/images/download.svg" alt="" />
+                  <span>PDF İndir</span>
+              </div>
               <div class="sc-pagination" id="scPagination"></div>
           </div>
         </div>
@@ -215,6 +227,9 @@
 </div>
 
 @section Scripts {
+    <script>
+        window.SESSION_USERNAME = @Html.Raw(Json.Serialize(Context.Session.GetString("Username")));
+    </script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
