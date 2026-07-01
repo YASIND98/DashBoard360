@@ -37,7 +37,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(getScoreCardTrendMock());
+            callback(null);
         });
     }
 

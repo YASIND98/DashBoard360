@@ -58,10 +58,8 @@ $(function () {
     // Tablo toplam satırı HER ZAMAN "Ağırlıklı H/G %" kolonu içindir (seçili kolondan bağımsız, sabit).
     var SC_TOTAL_COL = 'Ağırlıklı H/G %';
 
-    // Rapor tablosu verisi (mock.js -> window.MOCK.scoreCardReport)
-    var SC_RESPONSE = (typeof getScoreCardReportMock === 'function')
-        ? getScoreCardReportMock()
-        : { mainTableData: [] };
+    // Rapor tablosu verisi; ilk servis cevabına kadar boş (mock kullanılmaz).
+    var SC_RESPONSE = { mainTableData: [] };
     var ROWS = SC_RESPONSE.mainTableData;
 
     let _regionCode;
@@ -84,7 +82,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(typeof getUserAuthoritiesMock === 'function' ? getUserAuthoritiesMock() : null);
+            callback(null);
         });
     }
 
@@ -110,7 +108,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(getPrimMonitoringPeriodsMock(periodType));
+            callback(null);
         });
     }
 
@@ -124,14 +122,14 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(getPupaTypesMock());
+            callback(null);
         });
     }
 
     // Pupa tipi: Key -> statik etiket (PUPA_TYPE_LABELS)
     function renderPupaChannels(pupaRes) {
         var kv = (pupaRes && pupaRes.KeyValues) || [];
-        if (!kv.length) return;
+        // Servis boş/başarısızsa segmentleri temizle (statik placeholder kalmasın).
         var html = '';
         kv.forEach(function (item, i) {
             var key = item.Key;
@@ -174,7 +172,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(getScoreCardsMock());
+            callback(null);
         });
     }
 
@@ -255,7 +253,7 @@ $(function () {
     }
 
     // scorecards/cumulatives: ana rapor tablosunu doldurur
-    // İstek gövdesi ekrandaki seçimlerden kurulur; hata olursa mock rapora düşülür.
+    // İstek gövdesi ekrandaki seçimlerden kurulur; servis hata verirse tablo boş kalır.
     // session _reportDate (site.js, ISO) -> { year, month }
     function reportDateParts() {
         var d = (typeof _reportDate !== 'undefined' && _reportDate) ? new Date(_reportDate) : new Date();
@@ -291,7 +289,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(getScoreCardReportMock());
+            callback(null);
         });
     }
 
@@ -323,7 +321,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(typeof getScoreCardMainViewRegionsMock === 'function' ? getScoreCardMainViewRegionsMock() : null);
+            callback(null);
         });
     }
 
@@ -337,7 +335,7 @@ $(function () {
         }).done(function (res) {
             callback(res);
         }).fail(function () {
-            callback(typeof getScoreCardMainViewBranchesMock === 'function' ? getScoreCardMainViewBranchesMock() : null);
+            callback(null);
         });
     }
 
@@ -356,7 +354,7 @@ $(function () {
         }).done(function (res) {
             callback(Array.isArray(res) ? res : ((res && res.rows) || []));
         }).fail(function () {
-            callback(typeof getEmployeeOrderSummariesMock === 'function' ? getEmployeeOrderSummariesMock() : []);
+            callback([]);
         });
     }
 
@@ -1031,7 +1029,7 @@ $(function () {
 
     // İlk render: önce ServiceBus token alınır (prefilter Bearer header'ı ekleyebilsin),
     // ardından kullanıcı yetki/bağlamı (users/authorities) çekilir ve filtre zinciri kurulur.
-    // .always: token alınamasa bile akış mock fallback ile devam eder.
+    // .always: token alınamasa bile veri zinciri yine de tetiklenir.
     loadScoreCardToken().always(function () {
         fetchUserAuthorities(function (auth) {
             applyUserAuthorities(auth);

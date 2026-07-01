@@ -86,7 +86,7 @@ $(function () {
         }).done(function (res) {
             handle(res);
         }).fail(function () {
-            handle((typeof getScoreCardDetailMock === 'function') ? getScoreCardDetailMock(status) : null);
+            handle(null);
         });
     }
 

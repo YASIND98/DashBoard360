@@ -81,27 +81,14 @@
         </div>
     </div>
 
-    <div class="segmented-control" id="scChannels">
-        <button type="button" class="segment active" data-channel="pazarlama">Pazarlama</button>
-        <div class="divider"></div>
-        <button type="button" class="segment" data-channel="operasyon">Operasyon</button>
-        <div class="divider"></div>
-        <button type="button" class="segment" data-channel="sdk">SDK</button>
-        <div class="divider"></div>
-        <button type="button" class="segment" data-channel="ozel">Özel Bankacılık</button>
-    </div>
+    <!-- Pupa tipi segmentleri sales-target-monitoring/pupa-types servisinden gelir (renderPupaChannels) -->
+    <div class="segmented-control" id="scChannels"></div>
 </div>
 
 <!-- Tabs + Period -->
 <div class="tab-bar">
-    <div class="tab-list" id="scTabList">
-        <button class="tab active" data-sctab="genel">Genel Bakış</button>
-        <button class="tab" data-sctab="kurumsal">Kurumsal</button>
-        <button class="tab" data-sctab="ticari">Ticari</button>
-        <button class="tab" data-sctab="kobi">KOBİ</button>
-        <button class="tab" data-sctab="tarim">Tarım</button>
-        <button class="tab" data-sctab="bireysel">Bireysel</button>
-    </div>
+    <!-- Skor kart sekmeleri dashboard/score-cards servisinden gelir (renderScoreCardTabs) -->
+    <div class="tab-list" id="scTabList"></div>
     <div class="period-toggle" id="scPeriod">
         <button class="period-btn active" data-period="aylik">
             <img src="~/images/calendar.svg" alt="monthly" class="period-icon" /> Aylık
