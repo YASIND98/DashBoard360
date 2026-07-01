@@ -3,6 +3,44 @@ $(function () {
 
     if (!document.getElementById('scReportBody')) return;
 
+    // ---- ServiceBus OAuth: skor kart servis çağrılarına Bearer token inject et ----
+    // ServiceBus token servisinden (client_credentials) access_token alınır ve
+    // SCORE_CARD_BASE_URL'e giden tüm jQuery isteklerine Authorization header'ı olarak eklenir.
+    var _scAccessToken = null;
+
+    $.ajaxPrefilter(function (options) {
+        if (_scAccessToken && options.url && options.url.indexOf(SCORE_CARD_BASE_URL) === 0) {
+            options.headers = options.headers || {};
+            options.headers.Authorization = 'Bearer ' + _scAccessToken;
+        }
+    });
+
+    // Token süresi dolmadan biraz önce yenile (sayfa uzun süre açık kalırsa).
+    function scheduleScoreCardTokenRefresh(expiresIn) {
+        var ms = Math.max(0, (expiresIn || 0) - 60) * 1000;
+        if (ms > 0) setTimeout(loadScoreCardToken, ms);
+    }
+
+    function loadScoreCardToken() {
+        return $.ajax({
+            url: SERVICEBUS_TOKEN_URL,
+            type: 'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: JSON.stringify({
+                client_id: SERVICEBUS_CLIENT_ID,
+                client_secret: SERVICEBUS_CLIENT_SECRET,
+                audience: SERVICEBUS_AUDIENCE,
+                grant_type: 'client_credentials'
+            })
+        }).done(function (res) {
+            if (res && res.access_token) {
+                _scAccessToken = res.access_token;
+                scheduleScoreCardTokenRefresh(res.expires_in);
+            }
+        });
+    }
+
     var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
     var TABLE_NOTE = 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.';   // legend + PDF footer
 
@@ -34,6 +72,7 @@ $(function () {
     let _scoreCardId;
     var _tabModel = [];
     var _overview = null;
+    var _firstLoad = true;   // ilk veri gelene kadar tam ekran loader göstermek için
 
     //users/authorities: kullanıcı rolü + başlangıç bölge/şube/sicil bağlamı. userCode/applicationCode sabittir.
     function fetchUserAuthorities(callback) {
@@ -41,7 +80,7 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/users/authorities',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ userCode: PUPA_USER_CODE, applicationCode: PUPA_APPLICATION_CODE })
+            data: JSON.stringify({ userCode: window.SESSION_USERNAME, applicationCode: PUPA_APPLICATION_CODE })
         }).done(function (res) {
             callback(res);
         }).fail(function () {
@@ -412,6 +451,27 @@ $(function () {
         $('#scRegisterList .dropdown-item[data-code="-1"]').trigger('click');
     });
 
+    // Sayfa ilk açıldığında tam ekran loader (diğer ekranlardaki gibi: loading.js + brand-spinner).
+    function showLoadingOverlay() {
+        $('body').loading({
+            stoppable: false,
+            message: '<div><div class="brand-spinner"></div><p class="loading-text">Yükleniyor<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p></div>'
+        });
+    }
+    function hideLoadingOverlay() {
+        $('body').loading('stop');
+    }
+
+    // Servis isteği sırasında tablo iskeleti (hedef raporlarındaki gibi: gerçek tabloyu gizle, .page-skeleton göster).
+    function showTableSkeleton() {
+        $('#scTableContainer').hide();
+        $('#scTableSkeleton').show();
+    }
+    function hideTableSkeleton() {
+        $('#scTableSkeleton').hide();
+        $('#scTableContainer').show();
+    }
+
     // Tabloyu doldur:
     //  - Genel Bakış sekmesi (scoreCardId === -1): seçili bölge/şube seviyesine göre özet
     //       • bölge seçili değil -> bölge özeti
@@ -421,6 +481,7 @@ $(function () {
     function loadScoreCardTable() {
         loadRankings();
         renderBreadcrumb();
+        showTableSkeleton();   // servis cevabı gelene kadar iskelet; renderReportBody çağrısı üzerine yerini gerçek tabloya bırakır
         // Yalnızca Genel Bakış sekmesinde özet tablosu çıkar
         if (_scoreCardId === -1) {
             // Bölge seçili değil -> bölge özeti (main-view-regions, group 4)
@@ -822,6 +883,8 @@ $(function () {
     }
 
     function renderReportBody() {
+        hideTableSkeleton();       // gerçek veri çiziliyor -> iskeleti gizle, tabloyu göster
+        if (_firstLoad) { hideLoadingOverlay(); _firstLoad = false; }   // ilk veride tam ekran loader'ı kapat
         setScoreCardPdfReport();   // PDF verisini güncel tut (servis cevabından)
         // Genel Bakış özet modu: ürün tablosu yerine bölge/şube özet tablosu (tek render path)
         if (_overview) {
@@ -966,13 +1029,18 @@ $(function () {
         }
     });
 
-    // İlk render: önce kullanıcı yetki/bağlamı (users/authorities) çekilir, sonra filtre zinciri kurulur
-    fetchUserAuthorities(function (auth) {
-        applyUserAuthorities(auth);
-        loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
+    // İlk render: önce ServiceBus token alınır (prefilter Bearer header'ı ekleyebilsin),
+    // ardından kullanıcı yetki/bağlamı (users/authorities) çekilir ve filtre zinciri kurulur.
+    // .always: token alınamasa bile akış mock fallback ile devam eder.
+    loadScoreCardToken().always(function () {
+        fetchUserAuthorities(function (auth) {
+            applyUserAuthorities(auth);
+            loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
+        });
     });
     renderLegend();
-    renderReportBody();
+    showLoadingOverlay();   // sayfa ilk açılışında tam ekran loader (diğer ekranlardaki gibi)
+    showTableSkeleton();    // arkada tablo iskeleti; gerçek veri auth -> servis zinciriyle gelince ikisi de kapanır
 
     window.ScoreCard = window.ScoreCard || {};
 

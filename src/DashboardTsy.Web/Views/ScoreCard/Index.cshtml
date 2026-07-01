@@ -142,8 +142,29 @@
     <div class="tab-list" id="scSubTabList"></div>
 </div>
 
+<!-- Score Card Report Table Skeleton (servis isteği sırasında; hedef raporlarındaki gibi) -->
+<div id="scTableSkeleton" class="page-skeleton" style="display:none;">
+    <div class="skeleton-table">
+        @for (int i = 0; i < 8; i++)
+        {
+            <div class="skeleton-table-row">
+                <div class="skeleton-bar" style="width:24px;height:24px"></div>
+                <div class="skeleton-bar" style="width:22%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:8%;height:16px"></div>
+                <div class="skeleton-bar" style="width:8%;height:16px"></div>
+                <div class="skeleton-bar" style="width:10%;height:16px"></div>
+                <div class="skeleton-bar" style="width:8%;height:16px"></div>
+                <div class="skeleton-bar" style="width:24px;height:24px"></div>
+            </div>
+        }
+    </div>
+</div>
+
 <!-- Score Card Report Table -->
-<div class="table-container">
+<div class="table-container" id="scTableContainer">
     <div class="table-wrapper">
         <table class="data-table">
             <thead id="scReportHead"></thead>
@@ -196,6 +217,10 @@
           </div>
 
           <div class="sc-footer">
+              <div class="download-pdf-btn" id="scDetailPdfBtn" data-pdf="scDetail" style="margin-right:auto;">
+                  <img src="~/images/download.svg" alt="" />
+                  <span>PDF İndir</span>
+              </div>
               <div class="sc-pagination" id="scPagination"></div>
           </div>
         </div>
@@ -215,6 +240,9 @@
 </div>
 
 @section Scripts {
+    <script>
+        window.SESSION_USERNAME = @Html.Raw(Json.Serialize(Context.Session.GetString("Username")));
+    </script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
