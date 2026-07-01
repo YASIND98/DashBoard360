@@ -227,8 +227,13 @@
 </div>
 
 @section Scripts {
+    @{
+        var sessionUser = System.Text.Json.JsonSerializer.Deserialize<DashboardTsy.Web.Models.UsersDto>(
+            Context.Session.GetString("User") ?? "null");
+    }
     <script>
-        window.SESSION_USERNAME = @Html.Raw(Json.Serialize(Context.Session.GetString("Username")));
+        // Skor kart servislerine userCode olarak gönderilir (session User.DomainName).
+        window.USER_CODE = @Html.Raw(Json.Serialize(sessionUser?.DomainName));
     </script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
