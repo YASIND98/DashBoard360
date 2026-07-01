@@ -63,8 +63,9 @@
     overflow-x: auto;
     gap: 2px;
     scrollbar-width: none;
-    justify-content: center;
+    padding: 0px;
     margin-bottom: 16px;
+    justify-content: center;
   }
 
   .tab-list::-webkit-scrollbar {
@@ -79,6 +80,7 @@
     color: rgba(255, 255, 255, 0.8);
     white-space: nowrap;
     flex-shrink: 0;
+    height: 45px;
   }
 
   .tab.active {
@@ -107,5 +109,11 @@
   [data-theme="light"] .tab.active {
     background: #0f2d5c;
     color: #ffffff;
+  }
+}
+
+@media (max-width: 767px) {
+  .tab-list {
+    justify-content: normal;
   }
 }
