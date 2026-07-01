@@ -78,7 +78,7 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/scorecard/authorities',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ userCode: window.SESSION_USERNAME, applicationCode: PUPA_APPLICATION_CODE })
+            data: JSON.stringify({ userCode: window.USER_CODE, applicationCode: PUPA_APPLICATION_CODE })
         }).done(function (res) {
             callback(res);
         }).fail(function () {
