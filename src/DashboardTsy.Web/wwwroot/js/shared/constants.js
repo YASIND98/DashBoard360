@@ -28,7 +28,7 @@ var TOP10_PRODUCT_NAMES = [
     "Mevduat"
 ];
 
-var SCORE_CARD_BASE_URL = "https://api-pupa.v3.dev.intertech.com.tr/api";
+var SCORE_CARD_BASE_URL = "https://api-pupa.apps.prod.deniz.denizbank.com/esbnode.asmx";
 
 // ServiceBus OAuth (client_credentials) -> skor kart servis çağrılarına eklenecek Bearer token
 var SERVICEBUS_TOKEN_URL = "https://devesbappv3.intertech.com.tr/servicebus/oauth/token";
