@@ -357,8 +357,19 @@ body:has(.scorecard-panel.open)::before {
   display: none; 
 }
 
+.desktop {
+  display: block; 
+}
+
 /* ===== Responsive ===== */
 @media (max-width: 1199px) {
+  .mobile {
+    display: block; 
+  }
+
+  .desktop {
+    display: none; 
+  }
 
   [data-theme="light"] .main-content {
     background: var(--main-bg);

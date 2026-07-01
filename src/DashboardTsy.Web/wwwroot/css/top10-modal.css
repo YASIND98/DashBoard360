@@ -152,3 +152,40 @@
 .top10-value.negative {
   color: #f44336;
 }
+
+@media (max-width: 1199px) {
+  .top10-modal {
+    background: #12375c;
+  }
+
+  .top10-period-toggle {
+    width: 100%;
+    background: #196CFC;
+    border-radius: 50px;
+    padding: 5px;
+    gap: 0;
+    margin-bottom: 16px;
+  }
+
+  .toggle-btn {
+    flex: 1;
+    justify-content: center;
+    border: none;
+    border-radius: 50px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 0;
+  }
+
+  .toggle-btn.active {
+    background: #005CB0;
+    color: #ffffff;
+    font-weight: 700;
+  }
+
+  .top10-toggle-icon {
+    display: none;
+  }
+}

@@ -40,7 +40,7 @@
 
 <!-- Filters -->
 <div class="filters-row">
-    <h1 class="page-title mobile" data-menu="ScreenTitle"></h1>
+    <h1 class="page-title page-title-mobile mobile" data-menu="ScreenTitle"></h1>
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="indexRegionSelect">
@@ -325,19 +325,19 @@
     <div class="top10-header">
       <h2 class="top10-title"></h2>
       <div class="top10-header-right">
-        <div class="top10-period-toggle">
-          <button class="toggle-btn active" data-top10-period="daily">
-            <img src="~/images/daily-calendar.svg" alt="calendar" class="top10-toggle-icon" /> Günlük
-          </button>
-          <button class="toggle-btn" data-top10-period="weekly">
-            <img src="~/images/calendar.svg" alt="calendar" class="top10-toggle-icon" /> Haftalık
-          </button>
+        <div class="desktop">
+          @await Html.PartialAsync("_Top10PeriodToggle")
         </div>
         <button class="top10-close" id="top10Close">
           <img src="~/images/close-circle.svg" alt="Kapat" />
         </button>
       </div>
     </div>
+
+    <div class="mobile">
+      @await Html.PartialAsync("_Top10PeriodToggle")
+    </div>
+
     <div class="top10-body">
       <div class="top10-column">
         <h3 class="top10-column-title">İlk 10</h3>

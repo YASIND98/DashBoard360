@@ -2,7 +2,9 @@
 function loadSidebarItems() {
     var cached = sessionStorage.getItem('_sidebarItems');
     if (cached) {
-        renderSidebar(JSON.parse(cached));
+        var items = JSON.parse(cached);
+        renderSidebar(items);
+        renderMobileMenu(items);
         return;
     }
     $.ajax({
@@ -14,6 +16,7 @@ function loadSidebarItems() {
             if (data && data.length > 0) {
                 sessionStorage.setItem('_sidebarItems', JSON.stringify(data));
                 renderSidebar(data);
+                renderMobileMenu(data);
             }
         }
     });
@@ -52,8 +55,45 @@ function renderSidebar(items) {
     $container.html(html);
 }
 
+// ===== Mobile Menu =====
+function renderMobileMenu(items) {
+    var $nav = $('#mobileMenuNav');
+    if (!$nav.length) return;
+    var currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+    var html = '';
+    items.sort(function (a, b) { return (a.OrderNo || 0) - (b.OrderNo || 0); });
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        if (!item.IsVisible) continue;
+        var isFinancialMap = item.Code === 'FinancialMap';
+        var itemPath = (item.Url || '/').replace(/\/$/, '') || '/';
+        var isActive = (!isFinancialMap && currentPath === itemPath) ? ' active' : '';
+        var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
+        var targetAttr = isFinancialMap ? ' target="_blank" rel="noopener noreferrer"' : '';
+        html += '<a href="' + item.Url + '" class="mobile-menu-item' + isActive + '"' + targetAttr + '>';
+        html += '<img src="' + icon + '" alt="" />';
+        html += '<span>' + item.Name + '</span>';
+        html += '</a>';
+    }
+    $nav.html(html);
+}
+
+function openMobileMenu() {
+    $('#mobileMenuDrawer').addClass('open');
+    $('#mobileMenuOverlay').addClass('open');
+    $('body').css('overflow', 'hidden');
+}
+
+function closeMobileMenu() {
+    $('#mobileMenuDrawer').removeClass('open');
+    $('#mobileMenuOverlay').removeClass('open');
+    $('body').css('overflow', '');
+}
+
 $(document).ready(function () {
     loadSidebarItems();
+    $('#mobileMenuBtn').on('click', openMobileMenu);
+    $('#mobileMenuClose, #mobileMenuOverlay').on('click', closeMobileMenu);
 });
 
 
