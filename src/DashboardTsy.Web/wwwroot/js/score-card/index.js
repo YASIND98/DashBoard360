@@ -72,7 +72,7 @@ $(function () {
     var _overview = null;
     var _firstLoad = true;   // ilk veri gelene kadar tam ekran loader göstermek için
 
-    //scorecard/authorities: kullanıcı rolü + başlangıç bölge/şube/sicil bağlamı. userCode/applicationCode sabittir.
+    //scorecard/authorities: kullanıcı rolü + başlangıç bölge/şube/sicil bağlamı. userCode/applicationCode sabittir
     function fetchUserAuthorities(callback) {
         $.ajax({
             url: SCORE_CARD_BASE_URL + '/scorecard/authorities',
