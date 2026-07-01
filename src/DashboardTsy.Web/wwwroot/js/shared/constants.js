@@ -28,10 +28,10 @@ var TOP10_PRODUCT_NAMES = [
     "Mevduat"
 ];
 
-var SCORE_CARD_BASE_URL = "https://api-pupa.apps.prod.deniz.denizbank.com/esbnode.asmx/api";
+var SCORE_CARD_BASE_URL = "https://api-pupa.apps.prod.deniz.denizbank.com/esbnode.asmx";
 
 // ServiceBus OAuth (client_credentials) -> skor kart servis çağrılarına eklenecek Bearer token
-var SERVICEBUS_TOKEN_URL = "https://surfaceauth.deniz.denizbank.com/surfaceAuth/api/login";
+var SERVICEBUS_TOKEN_URL = "https://devesbappv3.intertech.com.tr/servicebus/oauth/token";
 var SERVICEBUS_CLIENT_ID = "YonetimRaporToPupa";
 var SERVICEBUS_CLIENT_SECRET = "19ea09f7714271b98b79332c36b16908262ea5ddc9b8fdb8a687981f1318c97f";
 // audience = skor kart servisinin origin'i; SCORE_CARD_BASE_URL'den türetilir (tek kaynak)
