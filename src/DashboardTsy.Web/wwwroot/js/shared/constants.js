@@ -37,8 +37,7 @@ var SERVICEBUS_CLIENT_SECRET = "19ea09f7714271b98b79332c36b16908262ea5ddc9b8fdb8
 // audience = skor kart servisinin origin'i; SCORE_CARD_BASE_URL'den türetilir (tek kaynak)
 var SERVICEBUS_AUDIENCE = new URL(SCORE_CARD_BASE_URL).origin;
 
-// users/authorities servisi -> sabit istek parametreleri
-var PUPA_USER_CODE = "INTERTECH\\FURKANAI";
+// scorcard/authorities servisi -> sabit istek parametreleri
 var PUPA_APPLICATION_CODE = "Surfacepluspupa";
 
 // Period tipi: aylik/ceyreklik/yillik -> periodTypes query parametresi
