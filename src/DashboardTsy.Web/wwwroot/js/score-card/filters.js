@@ -9,10 +9,10 @@ $(function () {
     var _scRegions = [];
     var _scBranches = [];
 
-    // scorecard/regions: kullanıcının görebildiği bölgelerin listesi.
+    // dashboard/regions: kullanıcının görebildiği bölgelerin listesi.
     function fetchRegions(callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/regions',
+            url: SCORE_CARD_BASE_URL + '/dashboard/regions',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
@@ -28,10 +28,10 @@ $(function () {
         });
     }
 
-    //scorecard/branches: kullanıcının görebildiği şubelerin listesi.
+    //dashboard/branches: kullanıcının görebildiği şubelerin listesi.
     function fetchBranches(callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/branches',
+            url: SCORE_CARD_BASE_URL + '/dashboard/branches',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
@@ -112,10 +112,10 @@ $(function () {
         });
     }
 
-    //scorecard/registers: kullanıcının görebildiği şubelerin sicillerin (PY) listesi.
+    //dashboard/registers: kullanıcının görebildiği şubelerin sicillerin (PY) listesi.
     function fetchRegisters(callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/registers',
+            url: SCORE_CARD_BASE_URL + '/dashboard/registers',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({

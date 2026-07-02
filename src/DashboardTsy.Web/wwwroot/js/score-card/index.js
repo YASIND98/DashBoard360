@@ -34,10 +34,10 @@ $(function () {
     var _overview = null;
     var _firstLoad = true;   // ilk veri gelene kadar tam ekran loader göstermek için
 
-    //scorecard/authorities: kullanıcı rolü + başlangıç bölge/şube/sicil bağlamı. userCode/applicationCode sabittir
+    //users/authorities: kullanıcı rolü + başlangıç bölge/şube/sicil bağlamı. userCode/applicationCode sabittir
     function fetchUserAuthorities(callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/authorities',
+            url: SCORE_CARD_BASE_URL + '/users/authorities',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ userCode: window.USER_CODE, applicationCode: PUPA_APPLICATION_CODE })
@@ -61,10 +61,10 @@ $(function () {
         }
     }
 
-    // scorecard/periods: seçili periyot tipi (aylık/çeyreklik/yıllık) için dönem listesi.
+    // prim-monitoring/periods: seçili periyot tipi (aylık/çeyreklik/yıllık) için dönem listesi.
     function fetchPrimMonitoringPeriods(periodType, callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/periods',
+            url: SCORE_CARD_BASE_URL + '/prim-monitoring/periods',
             type: 'GET',
             data: { periodTypes: periodType }
         }).done(function (res) {
@@ -74,10 +74,10 @@ $(function () {
         });
     }
 
-    //scorecard/pupa-types: kullanıcı rolüne göre pupa tiplerinin listesi.
+    //sales-target-monitoring/pupa-types: kullanıcı rolüne göre pupa tiplerinin listesi.
     function fetchPupaTypes(dateNumber, callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/pupa-types',
+            url: SCORE_CARD_BASE_URL + '/sales-target-monitoring/pupa-types',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode })
@@ -126,10 +126,10 @@ $(function () {
         });
     }
 
-    //scorecard/score-cards: seçili dönem + pupa tipi için skor kart listesi.
+    //dashboard/score-cards: seçili dönem + pupa tipi için skor kart listesi.
     function fetchScoreCards(dateNumber, pupaType, callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/score-cards',
+            url: SCORE_CARD_BASE_URL + '/dashboard/score-cards',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: _userRoleCode})
@@ -216,7 +216,7 @@ $(function () {
         });
     }
 
-    // scorecard/cumulatives: ana rapor tablosunu doldurur
+    // scorecards/cumulatives: ana rapor tablosunu doldurur
     // İstek gövdesi ekrandaki seçimlerden kurulur; servis hata verirse tablo boş kalır.
     // session _reportDate (site.js, ISO) -> { year, month }
     function reportDateParts() {
@@ -243,10 +243,10 @@ $(function () {
         };
     }
 
-    // scorecard/cumulatives: seçili bağlam için ana rapor tablosu (ürün/hedef satırları).
+    // scorecards/cumulatives: seçili bağlam için ana rapor tablosu (ürün/hedef satırları).
     function fetchScoreCardCumulatives(body, callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/cumulatives',
+            url: SCORE_CARD_BASE_URL + '/scorecards/cumulatives',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(body)
@@ -275,10 +275,10 @@ $(function () {
         };
     }
 
-    // scorecard/main-view-regions: Genel Bakış bölge özeti (bölge seçili değilken).
+    // scorecards/main-view-regions: Genel Bakış bölge özeti (bölge seçili değilken).
     function fetchScoreCardMainViewRegions(body, callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/main-view-regions',
+            url: SCORE_CARD_BASE_URL + '/scorecards/main-view-regions',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(body)
@@ -289,10 +289,10 @@ $(function () {
         });
     }
 
-    // scorecard/main-view-branches: Genel Bakış şube özeti (bölge seçili, şube seçili değil). Dinamik kolonlu.
+    // scorecards/main-view-branches: Genel Bakış şube özeti (bölge seçili, şube seçili değil). Dinamik kolonlu.
     function fetchScoreCardMainViewBranches(body, callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/main-view-branches',
+            url: SCORE_CARD_BASE_URL + '/scorecards/main-view-branches',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(body)
@@ -303,10 +303,10 @@ $(function () {
         });
     }
 
-    // scorecard/employee-order-summaries: sıralama kartlarını besler, yalnızca şube seçiliyken.
+    // dashboard/employee-order-summaries: sıralama kartlarını besler, yalnızca şube seçiliyken.
     function fetchEmployeeOrderSummaries(callback) {
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/employee-order-summaries',
+            url: SCORE_CARD_BASE_URL + '/dashboard/employee-order-summaries',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
@@ -888,7 +888,7 @@ $(function () {
             html += '<td class="' + _selCol('Ağırlık %') + '">' + formatPercent(r.productWeight) + '</td>';
             html += '<td class="' + _selCol('Ağırlıklı H/G %') + '">' + formatPercent(r.weightedPercentage) + '</td>';
             html += '<td class="' + _selCol('Bekleyen') + '">' + r.pending + '</td>';
-            // Detay drill-down bağlamı (scorecard/details): productId satırdan, productType aktif kanaldan.
+            // Detay drill-down bağlamı (scorecards/details): productId satırdan, productType aktif kanaldan.
             // dateNumber/registerId istekte doğrudan modül state'inden gönderilir.
             html += '<td><img class="sc-detail-icon" src="/images/detail.svg" alt="Detay"' +
                 ' data-name="' + r.productName + '"' +
@@ -935,7 +935,7 @@ $(function () {
     });
 
     // Period tipi (Aylık / Çeyreklik / Yıllık): aktif butonu güncelle ve yeni tipin
-    // dönemlerini çek (scorecard/periods — tek istek). loadPupaFilters date-picker'ı besler,
+    // dönemlerini çek (prim-monitoring/periods — tek istek). loadPupaFilters date-picker'ı besler,
     // _dateNumber'ı ilk döneme ayarlar ve tabloyu yeniden yükler.
     $('#scPeriod').on('click', '.period-btn', function () {
         $('#scPeriod .period-btn').removeClass('active');
@@ -992,7 +992,7 @@ $(function () {
         }
     });
 
-    // İlk render: kullanıcı yetki/bağlamı (scorecard/authorities) çekilir ve filtre zinciri kurulur.
+    // İlk render: kullanıcı yetki/bağlamı (users/authorities) çekilir ve filtre zinciri kurulur.
     // Token yönetimi backend (ScoreCardTokenService) tarafından yapılır.
     fetchUserAuthorities(function (auth) {
         applyUserAuthorities(auth);
