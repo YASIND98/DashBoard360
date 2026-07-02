@@ -230,10 +230,15 @@
     @{
         var sessionUser = System.Text.Json.JsonSerializer.Deserialize<DashboardTsy.Web.Models.UsersDto>(
             Context.Session.GetString("User") ?? "null");
+        var dashboardApiOptions = Context.RequestServices
+            .GetRequiredService<Microsoft.Extensions.Options.IOptions<DashboardTsy.Web.Services.DashboardApiOptions>>().Value;
+        var scoreCardProxyBase = (dashboardApiOptions.BaseUrl?.TrimEnd('/') ?? "") + "/scorecard";
     }
     <script>
         // Skor kart servislerine userCode olarak gönderilir (session User.DomainName).
         window.USER_CODE = @Html.Raw(Json.Serialize(sessionUser?.DomainName));
+        // Skor kart proxy URL'i: DashboardTsy.Api üzerinden Pupa servislerine iletilir.
+        window.SCORE_CARD_BASE_URL = @Html.Raw(Json.Serialize(scoreCardProxyBase));
     </script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
