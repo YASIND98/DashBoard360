@@ -516,6 +516,7 @@
   .legend-note,
   .legend-value {
     font-style: normal;
+    color: #ffffff;
   }
 
   [data-theme="light"] .table-legend {

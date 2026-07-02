@@ -426,7 +426,7 @@
   }
 }
 
-@media (min-width: 767px) {
+@media (max-width: 767px) {
   .filters-left:has(.filter-search:focus-within) .filter-dropdown-wrapper {
     visibility: hidden;
     display: none;

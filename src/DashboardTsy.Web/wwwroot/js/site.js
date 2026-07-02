@@ -131,6 +131,7 @@ function applyReportDate() {
 
 /* ===== Tema yönetimi =============================================
    toggleTheme()  → dark ↔ light geçiş yapar, localStorage'a kaydeder.
+   openThemePanel() → Görünüm Tercihleri panelini açar.
    Tema <html data-theme="..."> üzerinden CSS değişkenlerini tetikler.
    ============================================================== */
 window.toggleTheme = function () {
@@ -138,7 +139,47 @@ window.toggleTheme = function () {
     var next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('app-theme', next);
+    localStorage.setItem('app-theme-source', 'manual');
 };
+
+function _applyTheme(value) {
+    if (value === 'system') {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        localStorage.setItem('app-theme-source', 'system');
+    } else {
+        document.documentElement.setAttribute('data-theme', value);
+        localStorage.setItem('app-theme', value);
+        localStorage.setItem('app-theme-source', 'manual');
+    }
+}
+
+window.openThemePanel = function () {
+    var source = localStorage.getItem('app-theme-source') || 'manual';
+    var storedTheme = localStorage.getItem('app-theme') || 'dark';
+    var radioVal = source === 'system' ? 'system' : storedTheme;
+    $('input[name="themeChoice"][value="' + radioVal + '"]').prop('checked', true);
+    $('#themePanel').addClass('open');
+    $('body').css('overflow', 'hidden');
+};
+
+window.closeThemePanel = function () {
+    $('#themePanel').removeClass('open');
+    $('body').css('overflow', '');
+};
+
+$(document).ready(function () {
+    $('#themePanelBack').on('click', closeThemePanel);
+    $('input[name="themeChoice"]').on('change', function () {
+        _applyTheme($(this).val());
+    });
+    // Sistem ayarı seçiliyse medya değişimine tepki ver
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        if (localStorage.getItem('app-theme-source') === 'system') {
+            document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+    });
+});
 
 function _isReportDateCacheFresh() {
     if (!sessionStorage.getItem('_reportDate')) return false;
