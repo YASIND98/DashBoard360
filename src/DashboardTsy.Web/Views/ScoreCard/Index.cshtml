@@ -230,8 +230,8 @@
     @{
         var sessionUser = System.Text.Json.JsonSerializer.Deserialize<DashboardTsy.Web.Models.UsersDto>(
             Context.Session.GetString("User") ?? "null");
-        var dashboardApiOptions = Context.RequestServices
-            .GetRequiredService<Microsoft.Extensions.Options.IOptions<DashboardTsy.Web.Services.DashboardApiOptions>>().Value;
+        var dashboardApiOptions = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions
+            .GetRequiredService<Microsoft.Extensions.Options.IOptions<DashboardTsy.Web.Services.DashboardApiOptions>>(Context.RequestServices).Value;
         var scoreCardProxyBase = (dashboardApiOptions.BaseUrl?.TrimEnd('/') ?? "") + "/scorecard";
     }
     <script>
