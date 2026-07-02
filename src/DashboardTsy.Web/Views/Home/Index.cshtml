@@ -74,6 +74,8 @@
             <img src="~/images/search.svg" alt="" />
             <input type="text" placeholder="Ara" id="searchInput" />
         </div>
+
+        @await Html.PartialAsync("_MobileMoreMenu")
     </div>
     <div class="segmented-control">
       <button class="segment active" data-type="hacim">Hacim</button>
@@ -357,4 +359,18 @@
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/target-report.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $('#mobileDiffBtn').on('click', function () {
+                $('#diffToggle').trigger('click');
+                var $txt = $('#mobileDiffBtnText');
+                $txt.text($txt.text() === 'Farkları Göster' ? 'Farkları Gizle' : 'Farkları Göster');
+                $(this).closest('details').removeAttr('open');
+            });
+            $('#mobilePdfBtn').on('click', function () {
+                $('#downloadPdfBtn').trigger('click');
+                $(this).closest('details').removeAttr('open');
+            });
+        });
+    </script>
 }
