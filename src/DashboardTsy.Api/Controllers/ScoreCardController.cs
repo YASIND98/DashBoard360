@@ -74,12 +74,12 @@ public class ScoreCardController : ControllerBase
 
     private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
     {
-        _logger.LogInformation("[ScoreCard] POST {Path} -> token alınıyor", path);
+        _logger.LogWarning("[ScoreCard] POST {Path} -> token alınıyor", path);
         string token;
         try
         {
             token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
-            _logger.LogInformation("[ScoreCard] Token alındı");
+            _logger.LogWarning("[ScoreCard] Token alındı");
         }
         catch (Exception ex)
         {
@@ -91,10 +91,10 @@ public class ScoreCardController : ControllerBase
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
 
-        _logger.LogInformation("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path}", _pupaClient.BaseAddress, path);
+        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path}", _pupaClient.BaseAddress, path);
         using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-        _logger.LogInformation("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
+        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
 
         if (!upstream.IsSuccessStatusCode)
         {
@@ -107,12 +107,12 @@ public class ScoreCardController : ControllerBase
 
     private async Task<IActionResult> ProxyGet(string pathAndQuery, CancellationToken ct)
     {
-        _logger.LogInformation("[ScoreCard] GET {PathAndQuery} -> token alınıyor", pathAndQuery);
+        _logger.LogWarning("[ScoreCard] GET {PathAndQuery} -> token alınıyor", pathAndQuery);
         string token;
         try
         {
             token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
-            _logger.LogInformation("[ScoreCard] Token alındı");
+            _logger.LogWarning("[ScoreCard] Token alındı");
         }
         catch (Exception ex)
         {
@@ -123,10 +123,10 @@ public class ScoreCardController : ControllerBase
         using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        _logger.LogInformation("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery}", _pupaClient.BaseAddress, pathAndQuery);
+        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery}", _pupaClient.BaseAddress, pathAndQuery);
         using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-        _logger.LogInformation("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
+        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
 
         if (!upstream.IsSuccessStatusCode)
         {

@@ -28,7 +28,7 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
     {
         if (_cachedToken != null && DateTimeOffset.UtcNow < _expiresAt)
         {
-            _logger.LogInformation("[TokenService] Cache'den token döndürüldü, geçerlilik: {ExpiresAt}", _expiresAt);
+            _logger.LogWarning("[TokenService] Cache'den token döndürüldü, geçerlilik: {ExpiresAt}", _expiresAt);
             return _cachedToken;
         }
 
@@ -37,11 +37,11 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
         {
             if (_cachedToken != null && DateTimeOffset.UtcNow < _expiresAt)
             {
-                _logger.LogInformation("[TokenService] Cache'den token döndürüldü (double-check), geçerlilik: {ExpiresAt}", _expiresAt);
+                _logger.LogWarning("[TokenService] Cache'den token döndürüldü (double-check), geçerlilik: {ExpiresAt}", _expiresAt);
                 return _cachedToken;
             }
 
-            _logger.LogInformation("[TokenService] Yeni token isteniyor. URL: {TokenUrl}, ClientId: {ClientId}", _options.TokenUrl, _options.ClientId);
+            _logger.LogWarning("[TokenService] Yeni token isteniyor. URL: {TokenUrl}, ClientId: {ClientId}", _options.TokenUrl, _options.ClientId);
 
             var formData = new FormUrlEncodedContent(new[]
             {
@@ -55,7 +55,7 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
                 .PostAsync(_options.TokenUrl, formData, cancellationToken)
                 .ConfigureAwait(false);
 
-            _logger.LogInformation("[TokenService] ServiceBus yanıtı: {StatusCode}", (int)response.StatusCode);
+            _logger.LogWarning("[TokenService] ServiceBus yanıtı: {StatusCode}", (int)response.StatusCode);
 
             var responseBody = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
 
@@ -71,7 +71,7 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
             _cachedToken = tokenResponse.AccessToken;
             _expiresAt = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn - 60);
 
-            _logger.LogInformation("[TokenService] Token alındı, ExpiresIn: {ExpiresIn}s, geçerlilik: {ExpiresAt}", tokenResponse.ExpiresIn, _expiresAt);
+            _logger.LogWarning("[TokenService] Token alındı, ExpiresIn: {ExpiresIn}s, geçerlilik: {ExpiresAt}", tokenResponse.ExpiresIn, _expiresAt);
 
             return _cachedToken;
         }
