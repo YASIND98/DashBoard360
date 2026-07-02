@@ -3,44 +3,6 @@ $(function () {
 
     if (!document.getElementById('scReportBody')) return;
 
-    // ---- ServiceBus OAuth: skor kart servis çağrılarına Bearer token inject et ----
-    // ServiceBus token servisinden (client_credentials) access_token alınır ve
-    // SCORE_CARD_BASE_URL'e giden tüm jQuery isteklerine Authorization header'ı olarak eklenir.
-    var _scAccessToken = null;
-
-    $.ajaxPrefilter(function (options) {
-        if (_scAccessToken && options.url && options.url.indexOf(SCORE_CARD_BASE_URL) === 0) {
-            options.headers = options.headers || {};
-            options.headers.Authorization = 'Bearer ' + _scAccessToken;
-        }
-    });
-
-    // Token süresi dolmadan biraz önce yenile (sayfa uzun süre açık kalırsa).
-    function scheduleScoreCardTokenRefresh(expiresIn) {
-        var ms = Math.max(0, (expiresIn || 0) - 60) * 1000;
-        if (ms > 0) setTimeout(loadScoreCardToken, ms);
-    }
-
-    function loadScoreCardToken() {
-        return $.ajax({
-            url: SERVICEBUS_TOKEN_URL,
-            type: 'POST',
-            contentType: 'application/json',
-            dataType: 'json',
-            data: JSON.stringify({
-                client_id: SERVICEBUS_CLIENT_ID,
-                client_secret: SERVICEBUS_CLIENT_SECRET,
-                audience: SERVICEBUS_AUDIENCE,
-                grant_type: 'client_credentials'
-            })
-        }).done(function (res) {
-            if (res && res.access_token) {
-                _scAccessToken = res.access_token;
-                scheduleScoreCardTokenRefresh(res.expires_in);
-            }
-        });
-    }
-
     var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
     var TABLE_NOTE = 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.';   // legend + PDF footer
 
@@ -1027,14 +989,11 @@ $(function () {
         }
     });
 
-    // İlk render: önce ServiceBus token alınır (prefilter Bearer header'ı ekleyebilsin),
-    // ardından kullanıcı yetki/bağlamı (scorecard/authorities) çekilir ve filtre zinciri kurulur.
-    // .always: token alınamasa bile veri zinciri yine de tetiklenir.
-    loadScoreCardToken().always(function () {
-        fetchUserAuthorities(function (auth) {
-            applyUserAuthorities(auth);
-            loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
-        });
+    // İlk render: kullanıcı yetki/bağlamı (scorecard/authorities) çekilir ve filtre zinciri kurulur.
+    // Token yönetimi backend (ScoreCardTokenService) tarafından yapılır.
+    fetchUserAuthorities(function (auth) {
+        applyUserAuthorities(auth);
+        loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
     });
     renderLegend();
     showLoadingOverlay();   // sayfa ilk açılışında tam ekran loader (diğer ekranlardaki gibi)

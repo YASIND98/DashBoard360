@@ -117,6 +117,25 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpClient<ITargetReportApiClient, TargetReportApiClient>();
 builder.Services.AddHttpClient<IProductivityReportApiClient, ProductivityReportApiClient>();
 builder.Services.AddHttpClient<IAiInsightApiClient, AiInsightApiClient>();
+
+// ScoreCard proxy: ServiceBus OAuth token (singleton cache) + Pupa API HttpClient
+builder.Services.Configure<PupaApiOptions>(builder.Configuration.GetSection(PupaApiOptions.SectionName));
+builder.Services.Configure<ServiceBusOptions>(builder.Configuration.GetSection(ServiceBusOptions.SectionName));
+
+builder.Services.AddHttpClient("ServiceBusToken");
+
+builder.Services.AddSingleton<IScoreCardTokenService>(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ServiceBusOptions>>();
+    return new ScoreCardTokenService(factory.CreateClient("ServiceBusToken"), options);
+});
+
+var pupaBaseUrl = builder.Configuration[$"{PupaApiOptions.SectionName}:BaseUrl"]?.TrimEnd('/') ?? string.Empty;
+builder.Services.AddHttpClient("PupaApi", client =>
+{
+    client.BaseAddress = new Uri(pupaBaseUrl + "/");
+});
 builder.Services.AddControllersWithViews()
     .AddRazorRuntimeCompilation()
     .AddJsonOptions(o =>

@@ -234,6 +234,8 @@
     <script>
         // Skor kart servislerine userCode olarak gönderilir (session User.DomainName).
         window.USER_CODE = @Html.Raw(Json.Serialize(sessionUser?.DomainName));
+        // Skor kart proxy URL'i: Web controller üzerinden Pupa servislerine iletilir (relative path).
+        var SCORE_CARD_BASE_URL = "";
     </script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
