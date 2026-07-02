@@ -1,4 +1,4 @@
-namespace DashboardTsy.Api.Services;
+namespace DashboardTsy.Web.Services;
 
 public interface IScoreCardTokenService
 {

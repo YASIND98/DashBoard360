@@ -28,9 +28,8 @@ var TOP10_PRODUCT_NAMES = [
     "Mevduat"
 ];
 
-// Skor kart proxy URL'i: backend API üzerinden iletilir (CORS sorununu önlemek için).
-// Gerçek değer Index.cshtml'de window.SCORE_CARD_BASE_URL olarak Razor ile set edilir.
-var SCORE_CARD_BASE_URL = window.SCORE_CARD_BASE_URL || "";
+// Skor kart proxy URL'i Index.cshtml'de Razor ile set edilir (constants.js'ten sonra yüklenir).
+// Bu değişken burada tanımlanmaz; Index.cshtml script bloğu var SCORE_CARD_BASE_URL = "..." yapar.
 
 // scorcard/authorities servisi -> sabit istek parametreleri
 var PUPA_APPLICATION_CODE = "Surfacepluspupa";

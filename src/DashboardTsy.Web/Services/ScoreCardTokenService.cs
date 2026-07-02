@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Options;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json;
 
-namespace DashboardTsy.Api.Services;
+namespace DashboardTsy.Web.Services;
 
 public sealed class ScoreCardTokenService : IScoreCardTokenService
 {
@@ -29,7 +29,6 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
         await _lock.WaitAsync(cancellationToken).ConfigureAwait(false);
         try
         {
-            // double-check after acquiring lock
             if (_cachedToken != null && DateTimeOffset.UtcNow < _expiresAt)
                 return _cachedToken;
 
@@ -52,7 +51,6 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
                 ?? throw new InvalidOperationException("ServiceBus token response was empty.");
 
             _cachedToken = tokenResponse.AccessToken;
-            // Refresh 60 seconds before actual expiry to avoid edge cases
             _expiresAt = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn - 60);
 
             return _cachedToken;

@@ -29,28 +29,6 @@ builder.Services.AddSingleton<DashboardTsy.Infrastructure.Data.IConnectionString
 builder.Services.AddScoped<DashboardTsy.Infrastructure.Data.IStoredProcedureExecutor, StoredProcedureExecutor>();
 builder.Services.AddScoped<DashboardTsy.Application.IReportDataProvider, ReportDataProvider>();
 
-// ScoreCard proxy: ServiceBus token (singleton cache) + Pupa API client
-builder.Services.Configure<PupaApiOptions>(builder.Configuration.GetSection(PupaApiOptions.SectionName));
-builder.Services.Configure<ServiceBusOptions>(builder.Configuration.GetSection(ServiceBusOptions.SectionName));
-
-// Named client for ServiceBus token endpoint (no base address; full URL in options)
-builder.Services.AddHttpClient("ServiceBusToken");
-
-// Singleton token service: shares one named HttpClient, caches the token in-process
-builder.Services.AddSingleton<IScoreCardTokenService>(sp =>
-{
-    var factory = sp.GetRequiredService<IHttpClientFactory>();
-    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<ServiceBusOptions>>();
-    return new ScoreCardTokenService(factory.CreateClient("ServiceBusToken"), options);
-});
-
-// Named client for Pupa API; injected into ScoreCardProxyController via IHttpClientFactory
-var pupaBaseUrl = builder.Configuration[$"{PupaApiOptions.SectionName}:BaseUrl"]?.TrimEnd('/') ?? string.Empty;
-builder.Services.AddHttpClient("PupaApi", client =>
-{
-    client.BaseAddress = new Uri(pupaBaseUrl + "/");
-});
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
