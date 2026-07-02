@@ -31,6 +31,15 @@ var TOP10_PRODUCT_NAMES = [
 // Skor kart proxy URL'i Index.cshtml'de Razor ile set edilir (constants.js'ten sonra yüklenir).
 // Bu değişken burada tanımlanmaz; Index.cshtml script bloğu var SCORE_CARD_BASE_URL = "..." yapar.
 
+// ServiceBus OAuth (client_credentials) -> skor kart servis çağrılarına eklenecek Bearer token
+var SERVICEBUS_TOKEN_URL = "https://esb.deniz.denizbank.com/ServiceBus/oauth/token";
+var SERVICEBUS_CLIENT_ID = "YonetimRaporToPupa";
+var SERVICEBUS_CLIENT_SECRET = "19ea09f7714271b98b79332c36b16908262ea5ddc9b8fdb8a687981f1318c97f";
+// audience = skor kart servisinin origin'i; relative proxy kullanıldığında mevcut origin'e düşer.
+var SERVICEBUS_AUDIENCE = SCORE_CARD_BASE_URL
+  ? new URL(SCORE_CARD_BASE_URL, window.location.origin).origin
+  : window.location.origin;
+
 // scorcard/authorities servisi -> sabit istek parametreleri
 var PUPA_APPLICATION_CODE = "Surfacepluspupa";
 
