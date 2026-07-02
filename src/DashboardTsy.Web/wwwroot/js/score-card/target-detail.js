@@ -56,7 +56,7 @@ $(function () {
         return escapeHtml(String(value).trim());
     }
 
-    //scorecard/details: Hedef Detayı servisi — seçili ürünün sicil/işlem detayları (detay modalı)
+    //scorecards/details: Hedef Detayı servisi — seçili ürünün sicil/işlem detayları (detay modalı)
     function requestScoreCardDetail(status, callback) {
         var statusCode = (typeof SCORE_CARD_DETAIL_STATUS !== 'undefined' && SCORE_CARD_DETAIL_STATUS[status] != null)
             ? SCORE_CARD_DETAIL_STATUS[status] : 0;
@@ -73,7 +73,7 @@ $(function () {
 
         var ctx = scCtx();
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecard/details',
+            url: SCORE_CARD_BASE_URL + '/scorecards/details',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
