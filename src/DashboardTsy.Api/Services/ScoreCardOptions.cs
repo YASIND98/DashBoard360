@@ -1,4 +1,4 @@
-namespace DashboardTsy.Web.Services;
+namespace DashboardTsy.Api.Services;
 
 public sealed class PupaApiOptions
 {

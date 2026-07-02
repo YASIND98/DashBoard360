@@ -1,22 +1,24 @@
-using DashboardTsy.Web.Services;
+using DashboardTsy.Api.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
+using System.Net.Http.Headers;
 using System.Text.Json;
 
-namespace DashboardTsy.Web.Controllers;
+namespace DashboardTsy.Api.Controllers;
 
 [ApiController]
 [Route("scorecard")]
-public class ScoreCardProxyController : ControllerBase
+public class ScoreCardController : ControllerBase
 {
-    private readonly HttpClient _apiClient;
+    private readonly HttpClient _pupaClient;
+    private readonly IScoreCardTokenService _tokenService;
+    private readonly ILogger<ScoreCardController> _logger;
 
-    public ScoreCardProxyController(IHttpClientFactory httpClientFactory, IOptions<DashboardApiOptions> apiOptions)
+    public ScoreCardController(IHttpClientFactory httpClientFactory, IScoreCardTokenService tokenService, ILogger<ScoreCardController> logger)
     {
-        _apiClient = httpClientFactory.CreateClient("DashboardApi");
+        _pupaClient = httpClientFactory.CreateClient("PupaApi");
+        _tokenService = tokenService;
+        _logger = logger;
     }
-
-    private bool HasSession() => (HttpContext.Session.GetInt32("UserId") ?? 0) > 0;
 
     [HttpPost("authorities")]
     public Task<IActionResult> Authorities([FromBody] JsonElement body, CancellationToken ct)
@@ -72,31 +74,65 @@ public class ScoreCardProxyController : ControllerBase
 
     private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
     {
-        if (!HasSession()) return Unauthorized();
+        _logger.LogInformation("[ScoreCard] POST {Path} -> token alınıyor", path);
+        string token;
+        try
+        {
+            token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
+            _logger.LogInformation("[ScoreCard] Token alındı");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ScoreCard] Token alınamadı");
+            return StatusCode(502, "Token alınamadı: " + ex.Message);
+        }
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
 
-        using var upstream = await _apiClient.SendAsync(request, ct).ConfigureAwait(false);
+        _logger.LogInformation("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path}", _pupaClient.BaseAddress, path);
+        using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+        _logger.LogInformation("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
 
         if (!upstream.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("[ScoreCard] Pupa hata döndü: {StatusCode} {Body}", (int)upstream.StatusCode, content);
             return StatusCode((int)upstream.StatusCode, content);
+        }
 
         return Content(content, "application/json");
     }
 
     private async Task<IActionResult> ProxyGet(string pathAndQuery, CancellationToken ct)
     {
-        if (!HasSession()) return Unauthorized();
+        _logger.LogInformation("[ScoreCard] GET {PathAndQuery} -> token alınıyor", pathAndQuery);
+        string token;
+        try
+        {
+            token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
+            _logger.LogInformation("[ScoreCard] Token alındı");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "[ScoreCard] Token alınamadı");
+            return StatusCode(502, "Token alınamadı: " + ex.Message);
+        }
 
         using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-        using var upstream = await _apiClient.SendAsync(request, ct).ConfigureAwait(false);
+        _logger.LogInformation("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery}", _pupaClient.BaseAddress, pathAndQuery);
+        using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+        _logger.LogInformation("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
 
         if (!upstream.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("[ScoreCard] Pupa hata döndü: {StatusCode} {Body}", (int)upstream.StatusCode, content);
             return StatusCode((int)upstream.StatusCode, content);
+        }
 
         return Content(content, "application/json");
     }

@@ -1,8 +1,6 @@
 using DashboardTsy.Web.Models.TargetReport;
 using DashboardTsy.Web.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace DashboardTsy.Web.Controllers;
 
@@ -11,14 +9,10 @@ namespace DashboardTsy.Web.Controllers;
 public class TargetReportController : ControllerBase
 {
     private readonly ITargetReportApiClient _apiClient;
-    private readonly HttpClient _pupaClient;
-    private readonly IScoreCardTokenService _tokenService;
 
-    public TargetReportController(ITargetReportApiClient apiClient, IHttpClientFactory httpClientFactory, IScoreCardTokenService tokenService)
+    public TargetReportController(ITargetReportApiClient apiClient)
     {
         _apiClient = apiClient;
-        _pupaClient = httpClientFactory.CreateClient("PupaApi");
-        _tokenService = tokenService;
     }
 
     private bool HasSession() => (HttpContext.Session.GetInt32("UserId") ?? 0) > 0;
@@ -273,94 +267,4 @@ public class TargetReportController : ControllerBase
         return Ok(result);
     }
 
-    // ── ScoreCard Proxy ──────────────────────────────────────────────────────
-
-    [HttpPost("scorecard/authorities")]
-    public Task<IActionResult> ScoreCardAuthorities([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/authorities", body, ct);
-
-    [HttpGet("scorecard/periods")]
-    public Task<IActionResult> ScoreCardPeriods([FromQuery] int periodTypes, CancellationToken ct)
-        => ProxyGet($"scorecard/periods?periodTypes={periodTypes}", ct);
-
-    [HttpPost("scorecard/pupa-types")]
-    public Task<IActionResult> ScoreCardPupaTypes([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/pupa-types", body, ct);
-
-    [HttpPost("scorecard/score-cards")]
-    public Task<IActionResult> ScoreCardScoreCards([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/score-cards", body, ct);
-
-    [HttpPost("scorecard/regions")]
-    public Task<IActionResult> ScoreCardRegions([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/regions", body, ct);
-
-    [HttpPost("scorecard/branches")]
-    public Task<IActionResult> ScoreCardBranches([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/branches", body, ct);
-
-    [HttpPost("scorecard/registers")]
-    public Task<IActionResult> ScoreCardRegisters([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/registers", body, ct);
-
-    [HttpPost("scorecard/cumulatives")]
-    public Task<IActionResult> ScoreCardCumulatives([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/cumulatives", body, ct);
-
-    [HttpPost("scorecard/main-view-regions")]
-    public Task<IActionResult> ScoreCardMainViewRegions([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/main-view-regions", body, ct);
-
-    [HttpPost("scorecard/main-view-branches")]
-    public Task<IActionResult> ScoreCardMainViewBranches([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/main-view-branches", body, ct);
-
-    [HttpPost("scorecard/employee-order-summaries")]
-    public Task<IActionResult> ScoreCardEmployeeOrderSummaries([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/employee-order-summaries", body, ct);
-
-    [HttpPost("scorecard/details")]
-    public Task<IActionResult> ScoreCardDetails([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/details", body, ct);
-
-    [HttpPost("scorecard/trends/product-sale-realized")]
-    public Task<IActionResult> ScoreCardTrendsProductSaleRealized([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/trends/product-sale-realized", body, ct);
-
-    private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
-    {
-        if (!HasSession()) return Unauthorized();
-
-        var token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, path);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
-
-        using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
-        var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-
-        if (!upstream.IsSuccessStatusCode)
-            return StatusCode((int)upstream.StatusCode, content);
-
-        return Content(content, "application/json");
-    }
-
-    private async Task<IActionResult> ProxyGet(string pathAndQuery, CancellationToken ct)
-    {
-        if (!HasSession()) return Unauthorized();
-
-        var token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-        using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
-        var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-
-        if (!upstream.IsSuccessStatusCode)
-            return StatusCode((int)upstream.StatusCode, content);
-
-        return Content(content, "application/json");
-    }
 }
