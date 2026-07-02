@@ -28,8 +28,7 @@ var TOP10_PRODUCT_NAMES = [
     "Mevduat"
 ];
 
-// Skor kart proxy URL'i Index.cshtml'de Razor ile set edilir (constants.js'ten sonra yüklenir).
-// Bu değişken burada tanımlanmaz; Index.cshtml script bloğu var SCORE_CARD_BASE_URL = "..." yapar.
+// Skor kart servisleri relative path ile Web controller (proxy) üzerinden çağrılır (ör. /scorecard/...).
 
 // scorcard/authorities servisi -> sabit istek parametreleri
 var PUPA_APPLICATION_CODE = "Surfacepluspupa";
