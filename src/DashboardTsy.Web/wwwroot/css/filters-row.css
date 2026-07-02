@@ -263,6 +263,7 @@
   }
   .segmented-control {
     margin: 0 auto;
+    width: 95%;
   }
 
   /* ===== Dark tema: parlak mavi konteyner, koyu lacivert aktif pill ===== */
@@ -277,6 +278,8 @@
   }
 
   .segmented-control .segment {
+    flex: 1;
+    text-align: center;
     color: rgba(255, 255, 255, 0.75);
     border-radius: 50px;
   }

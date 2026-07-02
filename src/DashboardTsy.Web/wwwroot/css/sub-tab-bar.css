@@ -44,8 +44,8 @@
   }
 
   .sub-tab-bar .tab-list {
-    width: auto;
-    justify-content: center;
+    width: 95%;
+    justify-content: stretch;
     gap: 2px;
     overflow-x: auto;
     scrollbar-width: none;
@@ -60,9 +60,10 @@
   }
 
   .sub-tab {
-    flex: 0 0 auto;
+    flex: 1;
+    text-align: center;
     max-width: none;
-    padding: 7px 20px;
+    padding: 7px 10px;
     border-radius: 50px;
     background: transparent;
     box-shadow: none;

@@ -371,6 +371,10 @@ body:has(.scorecard-panel.open)::before {
     display: none; 
   }
 
+  .breadcrumb-bar {
+    display: none !important;
+  }
+
   [data-theme="light"] .main-content {
     background: var(--main-bg);
   }

@@ -34,7 +34,6 @@
   max-height: calc(100vh - 280px);
   min-height: 240px;
   padding-bottom: 14px;
-  scrollbar-color: #196CFC #B3D9FF;
 }
 
 .table-wrapper::-webkit-scrollbar,
@@ -500,7 +499,10 @@
   .data-table tbody tr:first-child td:last-child,
   .data-table tbody tr.last-visible-row td:last-child,
   .data-table tbody tr:first-child td:first-child,
-  .data-table tbody tr.last-visible-row td:first-child {
+  .data-table tbody tr.last-visible-row td:first-child,
+  #dynamicTableContainer2 .data-table tbody tr.last-visible-row td:last-child,
+  .data-table tbody tr.last-visible-row td:last-child,
+  #dynamicTableContainer2 .data-table tbody tr.last-visible-row td:first-child {
     border-radius: 0;
   }
 
