@@ -116,8 +116,10 @@ $(function () {
         var start = (_currentPage - 1) * PAGE_SIZE;
         var pageRows = rows.slice(start, start + PAGE_SIZE);
 
-        // Seçili filtrede kayıt yoksa: kolon başlığı olmadan ikon + metin
+        // Seçili filtrede kayıt yoksa: başlık gizlenir, mesaj tablo alanında ortalanır (.sc-empty)
         if (pageRows.length === 0) {
+            $('#scTableHead').empty();
+            $('#scTableSection').addClass('sc-empty');
             $('#scTableBody').html(
                 '<tr class="sc-empty-row"><td>' +
                     '<div class="sc-empty-state">' +
@@ -137,6 +139,7 @@ $(function () {
 
     // Dinamik kolonlu (ScoreCardDetail) servis cevabını render et
     function renderDynamicBody(pageRows) {
+        $('#scTableSection').removeClass('sc-empty');
         var cols = _response.columns;
         var html = '';
         pageRows.forEach(function (r, i) {

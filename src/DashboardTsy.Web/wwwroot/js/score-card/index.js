@@ -120,6 +120,8 @@ $(function () {
         fetchPrimMonitoringPeriods(periodType, function (periodsRes) {
             var kv = (periodsRes && periodsRes.keyValues) || [];
             _dateNumber = kv.length ? kv[0].key : -1;
+            // Dönem listesini date-picker paneline aktar (date-picker ayrıca istek atmaz).
+            if (window.ScoreCardDatePicker) window.ScoreCardDatePicker.setPeriods(periodType, kv);
             reloadByDateNumber();
         });
     }
@@ -932,12 +934,13 @@ $(function () {
         loadScoreCardTypes();
     });
 
-    // Period tipi (Aylık / Çeyreklik / Yıllık): sadece aktif buton görünümü.
-    // Yeniden yükleme, date-picker yeni dönemin dateNumber'ını sc:dateChanged ile
-    // yayınladığında (aşağıdaki dinleyici) tetiklenir.
+    // Period tipi (Aylık / Çeyreklik / Yıllık): aktif butonu güncelle ve yeni tipin
+    // dönemlerini çek (scorecard/periods — tek istek). loadPupaFilters date-picker'ı besler,
+    // _dateNumber'ı ilk döneme ayarlar ve tabloyu yeniden yükler.
     $('#scPeriod').on('click', '.period-btn', function () {
         $('#scPeriod .period-btn').removeClass('active');
         $(this).addClass('active');
+        loadPupaFilters($(this).data('period'));
     });
 
     // Date picker'da dateNumber değişince: dateNumber içeren servisleri

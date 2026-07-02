@@ -177,18 +177,18 @@
 
 /* ----- Detay Modalı ----- */
 .sc-overlay {
-  display: none;
   position: fixed;
   inset: 0;
   background: rgba(8, 10, 34, 0.6);
   z-index: 1000;
-  justify-content: center;
-  align-items: center;
-  padding: 24px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .sc-overlay.active {
-  display: flex;
+  opacity: 1;
+  visibility: visible;
 }
 
 .sc-modal {
@@ -197,11 +197,20 @@
   background: linear-gradient(180deg, rgba(6, 11, 40, 0.74) 0%, rgba(10, 14, 35, 0.71) 100%);
   backdrop-filter: blur(120px);
   border: 1px solid var(--border-white-alpha);
-  border-radius: 16px;
-  width: 100%;
+  border-radius: 16px 0 0 16px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 86%;
   height: 100%;
   max-width: 1300px;
   padding: 24px;
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+}
+
+.sc-overlay.active .sc-modal {
+  transform: translateX(0);
 }
 .sc-header {
   display: flex;
@@ -284,6 +293,28 @@
   overflow: auto;
   border-radius: 20px;
   border: 1px solid #536076;
+}
+
+.sc-table-wrapper.sc-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 360px;
+  border-style: dashed;
+}
+
+.sc-empty-row td {
+  border: none;
+}
+
+.sc-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 40px;
+  text-align: center;
+  color: #B1BAC8;
 }
 
 .sc-table {
