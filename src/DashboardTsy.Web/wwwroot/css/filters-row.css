@@ -103,6 +103,11 @@
   padding: 4px;
 }
 
+/* Servisten segment gelmezse (boş) kutu/nokta görünmesin */
+.segmented-control:empty {
+  display: none;
+}
+
 .segmented-control .divider {
   width: 1px;
   height: 16px;

@@ -1,6 +1,6 @@
 // Score Card — Date Picker
 // Dönem tipine (aylik=1, ceyreklik=2, yillik=3) göre panel gösterir.
-// Dönem listesi prim-monitoring/periods servisinden gelir; servis TEK tip döndürür
+// Dönem listesi scorecard/periods servisinden gelir; servis TEK tip döndürür
 // (periodTypes=N -> sadece o tipin {keyValues:[...]}'i). Bu yüzden yalnızca AKTİF tip yüklenir;
 // dönem tipi değişince yeni tip yeniden yüklenir.
 // Seçim değişince: $(document).trigger('sc:dateChanged', { dateNumber })  // dateNumber = servis "key"i.
@@ -176,7 +176,6 @@ $(function () {
     // ── Event yayımla ───────────────────────────────────────────────────────────
     function notify() {
         var dateNumber = getDateNumber();
-        console.log('Date picker dateNumber:', dateNumber);
         $(document).trigger('sc:dateChanged', { dateNumber: dateNumber });
     }
 
