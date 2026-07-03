@@ -38,14 +38,18 @@
 
 .table-wrapper::-webkit-scrollbar,
 .table-wrapper:hover::-webkit-scrollbar,
-.table-wrapper:focus::-webkit-scrollbar {
+.table-wrapper:focus::-webkit-scrollbar,
+#dynamicTableContainer2::-webkit-scrollbar,
+#dynamicTableContainer2:hover::-webkit-scrollbar,
+#dynamicTableContainer2:focus::-webkit-scrollbar {
   background: #B3D9FF !important;
   height: 16px;
   width: 6px;
 }
 
 /* Native ok butonlarını tamamen kaldır */
-.table-wrapper::-webkit-scrollbar-button {
+.table-wrapper::-webkit-scrollbar-button,
+#dynamicTableContainer2::-webkit-scrollbar-button {
   display: none;
   width: 0;
   height: 0;
@@ -56,24 +60,33 @@
 .table-wrapper:hover::-webkit-scrollbar-track,
 .table-wrapper:hover::-webkit-scrollbar-track-piece
 .table-wrapper:focus::-webkit-scrollbar-track,
-.table-wrapper:focus::-webkit-scrollbar-track-piece {
+.table-wrapper:focus::-webkit-scrollbar-track-piece,
+#dynamicTableContainer2::-webkit-scrollbar-track,
+#dynamicTableContainer2::-webkit-scrollbar-track-piece,
+#dynamicTableContainer2:hover::-webkit-scrollbar-track,
+#dynamicTableContainer2:hover::-webkit-scrollbar-track-piece,
+#dynamicTableContainer2:focus::-webkit-scrollbar-track,
+#dynamicTableContainer2:focus::-webkit-scrollbar-track-piec {
   background: #B3D9FF !important;
   border-radius: 999px;
   box-shadow: inset 0 0 0 1000px #B3D9FF;
 }
 
-.table-wrapper::-webkit-scrollbar-corner {
+.table-wrapper::-webkit-scrollbar-corner,
+#dynamicTableContainer2::-webkit-scrollbar-corner {
   background: #B3D9FF;
 }
 
-.table-wrapper::-webkit-scrollbar-thumb {
+.table-wrapper::-webkit-scrollbar-thumb,
+#dynamicTableContainer2::-webkit-scrollbar-thumb {
   background: #196CFC;
   border-radius: 999px;
   border: 2px solid #B3D9FF;
   background-clip: padding-box;
 }
 
-.table-wrapper::-webkit-scrollbar-thumb:hover {
+.table-wrapper::-webkit-scrollbar-thumb:hover,
+#dynamicTableContainer2::-webkit-scrollbar-thumb:hover {
   background: #196CFC;
 }
 
