@@ -58,7 +58,7 @@
       </div>
       @await Html.PartialAsync("_MobileMoreMenu")
     </div>
-    <div class="scorecard-nps-wrapper mobile">
+    <div class="scorecard-nps-wrapper mobile" id="mobileScorecardWrapper" style="display:none;">
         @await Html.PartialAsync("_ScorecardNps")
     </div>
     <div class="segmented-control" id="yieldToggle" style="display:none;"></div>
@@ -321,10 +321,12 @@
         function updateBreadcrumb() {
             if (!selectedRegion && !selectedBranch) {
                 $('#breadcrumbBar').hide();
+                $('#mobileScorecardWrapper').hide();
                 return;
             }
 
             $('#breadcrumbBar').show();
+            $('#mobileScorecardWrapper').show();
             var singleRegion = _regionFilters.length === 1;
             var parts = [crumb('Tüm Bölgeler', 'allRegions', singleRegion)];
 
