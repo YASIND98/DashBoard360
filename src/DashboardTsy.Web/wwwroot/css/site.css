@@ -453,10 +453,75 @@ body:has(.scorecard-panel.open)::before {
   }
 
   .scorecard-nps-wrapper.mobile .scorecard-panel {
-    left: auto;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
     right: 0;
-    width: 308px;
-    border-radius: 20px;
+    width: 100%;
+    max-height: 85vh;
+    border-radius: 24px 24px 0 0;
+    padding: 0;
+    overflow: hidden;
+    display: none;
+    flex-direction: column;
+    z-index: 1001;
+    background: #12375C;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-panel.open {
+    display: flex;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-panel::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-header {
+    justify-content: space-between;
+    padding: 12px 16px 8px;
+    margin-bottom: 0;
+    font-size: 16px;
+    font-weight: 600;
+    flex-shrink: 0;
+    color: #ffffff;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-header .scorecard-close img {
+    filter: brightness(0) invert(1);
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-content {
+    padding: 12px 16px 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-section {
+    border-color: #ffffff;
+    background: transparent;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-section-title {
+    background: rgba(255, 255, 255, 0.07);
+    color: #d4e6fc;
+    font-size: 13px;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-table td {
+    color: #c8daf2;
+    border-bottom-color: #ffffff;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-table td:first-child {
+    border-right-color: rgba(255, 255, 255, 0.12);
   }
 
   /* Light tema */
