@@ -377,6 +377,10 @@ body:has(.scorecard-panel.open)::before {
     display: none; 
   }
 
+  .main-content {
+    padding-bottom: 64px;
+  }
+
   .breadcrumb-bar {
     display: none !important;
   }
