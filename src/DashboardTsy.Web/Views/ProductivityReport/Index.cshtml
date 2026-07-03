@@ -17,18 +17,8 @@
 <!-- Breadcrumb & Skor Kartı -->
 <div class="breadcrumb-bar" id="breadcrumbBar" style="display:none;">
     <div class="breadcrumb" id="yieldBreadcrumb"></div>
-    <div class="scorecard">
-        <button class="scorecard-btn" id="scorecardBtn">
-            <img src="~/images/down.svg" alt="" style="transform: rotate(90deg);" />
-            <span id="scorecardBtnLabel">Bölge Skor Kartı & NPS</span>
-        </button>
-        <div class="scorecard-panel" id="scorecardPanel">
-            <div class="scorecard-header">
-                <span id="scorecardTitle">Bölge Skor Kartı & NPS</span>
-                <button class="scorecard-close" id="scorecardClose"><img src="~/images/close-circle.svg" alt="" /></button>
-            </div>
-            <div class="scorecard-content" id="scorecardContent"></div>
-        </div>
+    <div class="scorecard-nps-wrapper desktop">
+        @await Html.PartialAsync("_ScorecardNps")
     </div>
 </div>
 
@@ -66,6 +56,9 @@
           <img src="~/images/search.svg" alt="" />
           <input type="text" placeholder="Ara" id="yieldSearchInput" />
       </div>
+    </div>
+    <div class="scorecard-nps-wrapper mobile">
+        @await Html.PartialAsync("_ScorecardNps")
     </div>
     <div class="segmented-control" id="yieldToggle" style="display:none;"></div>
 </div>

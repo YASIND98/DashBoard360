@@ -420,6 +420,34 @@ body:has(.scorecard-panel.open)::before {
     display: none;
   }
 
+  /* ===== Mobile scorecard-nps-wrapper ===== */
+  .scorecard-nps-wrapper.mobile {
+    width: 95%;
+    margin: 8px 0 0 auto;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-nps {
+    width: auto;
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-btn {
+    border-radius: 40px;
+    justify-content: center;
+    font-size: 14px;
+    padding: 10px 20px;
+    background: #015cb0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  .scorecard-nps-wrapper.mobile .scorecard-panel {
+    left: auto;
+    right: 0;
+    width: 308px;
+    border-radius: 20px;
+  }
+
   /* Light tema */
   [data-theme="light"] .period-toggle {
     background: #E9F3FE;
