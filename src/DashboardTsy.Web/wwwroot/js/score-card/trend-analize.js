@@ -6,7 +6,7 @@ $(function () {
     function scCtx() { return (window.ScoreCard && window.ScoreCard.getContext) ? window.ScoreCard.getContext() : {}; }
     function detailCtx() { return (window.ScoreCardDetail && window.ScoreCardDetail.ctx) || {}; }
 
-    // Trend Analizi (scorecards/trends/product-sale-realized)
+    // Trend Analizi (scorecard/trends/product-sale-realized)
     var _trendData = { labels: [], values: [], points: [] };
 
     // Servis cevabı kronolojik sırada gelir; doğrudan grafik verisine çevir
@@ -19,11 +19,11 @@ $(function () {
         };
     }
 
-    //scorecards/trends/product-sale-realized: seçili ürünün H/G trend grafiği (seçili trendPeriod).
+    //scorecard/trends/product-sale-realized: seçili ürünün H/G trend grafiği (seçili trendPeriod).
     function fetchScoreCardTrend(trendPeriod, callback) {
         var ctx = scCtx();
         $.ajax({
-            url: SCORE_CARD_BASE_URL + '/scorecards/trends/product-sale-realized',
+            url: SCORE_CARD_BASE_URL + '/scorecard/trends/product-sale-realized',
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({

@@ -1,6 +1,6 @@
 // Score Card — Date Picker
 // Dönem tipine (aylik=1, ceyreklik=2, yillik=3) göre panel gösterir.
-// Dönem listesi prim-monitoring/periods servisinden gelir; servis TEK tip döndürür
+// Dönem listesi scorecard/periods servisinden gelir; servis TEK tip döndürür
 // (periodTypes=N -> sadece o tipin {keyValues:[...]}'i). Bu yüzden yalnızca AKTİF tip yüklenir;
 // dönem tipi değişince yeni tip yeniden yüklenir.
 // Seçim değişince: $(document).trigger('sc:dateChanged', { dateNumber })  // dateNumber = servis "key"i.
@@ -212,7 +212,7 @@ $(function () {
 
     // Periyot tipi (Aylık/Çeyreklik/Yıllık) değişimini index.js dinler; dönemleri çekip
 
-    // ── Dış API: dönem listesini index.js besler (prim-monitoring/periods tek yerden çekilir) ──
+    // ── Dış API: dönem listesini index.js besler (scorecard/periods tek yerden çekilir) ──
     $('#scDatePicker').hide();   // dönem verisi gelene kadar gizli; veri boşsa gizli kalır
     window.ScoreCardDatePicker = {
         setPeriods: function (type, kvs) { applyPeriods(type, kvs || []); }
