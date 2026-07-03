@@ -91,10 +91,10 @@ public class ScoreCardController : ControllerBase
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
 
-        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path}", _pupaClient.BaseAddress, path);
+        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path} | Body: {Body}", _pupaClient.BaseAddress, path, body.GetRawText());
         using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
+        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode} | Body: {Body}", (int)upstream.StatusCode, content);
 
         if (!upstream.IsSuccessStatusCode)
         {
@@ -126,7 +126,7 @@ public class ScoreCardController : ControllerBase
         _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery}", _pupaClient.BaseAddress, pathAndQuery);
         using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode}, body uzunluğu: {Len}", (int)upstream.StatusCode, content.Length);
+        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode} | Body: {Body}", (int)upstream.StatusCode, content);
 
         if (!upstream.IsSuccessStatusCode)
         {
