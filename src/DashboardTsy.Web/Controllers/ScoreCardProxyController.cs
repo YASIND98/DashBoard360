@@ -1,4 +1,5 @@
 using DashboardTsy.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -7,6 +8,7 @@ namespace DashboardTsy.Web.Controllers;
 
 [ApiController]
 [Route("scorecard")]
+[AllowAnonymous]
 public class ScoreCardProxyController : ControllerBase
 {
     private readonly HttpClient _apiClient;
