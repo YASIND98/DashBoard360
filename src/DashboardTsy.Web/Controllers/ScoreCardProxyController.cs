@@ -73,7 +73,7 @@ public class ScoreCardProxyController : ControllerBase
 
     private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
     {
-        if (!HasSession()) return Unauthorized();
+        //if (!HasSession()) return Unauthorized();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
@@ -89,7 +89,7 @@ public class ScoreCardProxyController : ControllerBase
 
     private async Task<IActionResult> ProxyGet(string pathAndQuery, CancellationToken ct)
     {
-        if (!HasSession()) return Unauthorized();
+        //if (!HasSession()) return Unauthorized();
 
         using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
 
