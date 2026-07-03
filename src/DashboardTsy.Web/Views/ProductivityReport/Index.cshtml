@@ -364,7 +364,7 @@
             $('#scorecardTitle').text(label);
 
             if (!selectedRegion && !selectedBranch) {
-                $('#scorecardContent').html('');
+                $('.scorecard-content').html('');
                 return;
             }
 
@@ -427,20 +427,20 @@
                 html += '</table></div>';
             });
 
-            $('#scorecardContent').html(html);
+            $('.scorecard-content').html(html);
         }
 
         // ===== Scorecard Panel Toggle =====
-        $('#scorecardBtn').on('click', function (e) {
+        $('.scorecard-nps .scorecard-btn').on('click', function (e) {
             e.stopPropagation();
-            $('#scorecardPanel').toggleClass('open');
+            $(e.target).closest('.scorecard-nps').find('.scorecard-panel').toggleClass('open');
         });
-        $('#scorecardClose').on('click', function () {
-            $('#scorecardPanel').removeClass('open');
+        $('.scorecard-nps .scorecard-close').on('click', function () {
+            $(this).closest('.scorecard-nps').find('.scorecard-panel').removeClass('open');
         });
         $(document).on('click', function (e) {
-            if (!$(e.target).closest('.scorecard').length) {
-                $('#scorecardPanel').removeClass('open');
+            if (!$(e.target).closest('.scorecard-nps').length) {
+                $('.scorecard-nps .scorecard-panel').removeClass('open');
             }
         });
 
