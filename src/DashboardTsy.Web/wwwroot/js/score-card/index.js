@@ -80,7 +80,7 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/scorecard/pupa-types',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode })
+            data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode, userCode: window.USER_CODE })
         }).done(function (res) {
             callback(res);
         }).fail(function () {
@@ -132,7 +132,7 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/scorecard/score-cards',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: _userRoleCode})
+            data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: _userRoleCode, userCode: window.USER_CODE })
         }).done(function (res) {
             callback(res);
         }).fail(function () {
@@ -232,7 +232,7 @@ $(function () {
             year: rd.year,                                  // session _reportDate yılı
             month: rd.month,                                // session _reportDate ayı (4, 5 ...)
             quarter: (period === 'ceyreklik') ? 1 : -1,     // çeyreklik seçiliyse 1, değilse -1
-            cumulativeFlag: (period === 'yillik') ? 1 : 0,  // yıllık seçiliyse 1, değilse 0
+            cumulativeFlag: (period === 'yillik') ? '1' : '0',  // yıllık seçiliyse 1, değilse 0
             registerId: _registerId,                        // seçili sicil;
             regionCode: _regionCode,                        // seçili bölge;
             branchCode: _branchCode,                        // seçili şube;
@@ -267,7 +267,7 @@ $(function () {
             regionCode: _regionCode,
             year: rd.year,
             month: rd.month,
-            cumulativeFlag: (period === 'yillik') ? 1 : 0,
+            cumulativeFlag: (period === 'yillik') ? '1' : '0',
             quarter: (period === 'ceyreklik') ? 1 : -1,
             pupaType: activePupaType(),
             scorecardId: _scoreCardId,
