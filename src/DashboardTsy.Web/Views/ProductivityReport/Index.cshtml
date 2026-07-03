@@ -56,6 +56,7 @@
           <img src="~/images/search.svg" alt="" />
           <input type="text" placeholder="Ara" id="yieldSearchInput" />
       </div>
+      @await Html.PartialAsync("_MobileMoreMenu")
     </div>
     <div class="scorecard-nps-wrapper mobile">
         @await Html.PartialAsync("_ScorecardNps")

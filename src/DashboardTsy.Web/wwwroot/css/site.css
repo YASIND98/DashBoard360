@@ -391,6 +391,11 @@ body:has(.scorecard-panel.open)::before {
     display: none;
   }
 
+  .download-pdf-btn.mobile {
+    display: flex;
+    color: #ffffff;
+  }
+
   .period-toggle {
     width: 95%;
     background: #196CFC;

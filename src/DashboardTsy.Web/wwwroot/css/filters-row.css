@@ -309,6 +309,7 @@
   /* Arama açıkken dropdown wrapper'lar gizlenir */
   .filters-left:has(.filter-search:focus-within) .filter-dropdown-wrapper {
     visibility: hidden;
+    display: none;
   }
 
   /* ===== Arama: kapalı → tıklanınca açılır ===== */
@@ -342,7 +343,7 @@
 
   /* Açık hâl */
   .filter-search:focus-within {
-    width: 300px;
+    width: 90%;
     gap: 8px;
     cursor: text;
   }
@@ -426,12 +427,5 @@
     height: 16px;
     flex-shrink: 0;
     opacity: 0.75;
-  }
-}
-
-@media (max-width: 767px) {
-  .filters-left:has(.filter-search:focus-within) .filter-dropdown-wrapper {
-    visibility: hidden;
-    display: none;
   }
 }
