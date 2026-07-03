@@ -28,7 +28,7 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
     {
         if (_cachedToken != null && DateTimeOffset.UtcNow < _expiresAt)
         {
-            _logger.LogWarning("[TokenService] Cache'den token döndürüldü, geçerlilik: {ExpiresAt}", _expiresAt);
+            _logger.LogWarning("[TokenService] Cache'den token döndürüldü, geçerlilik: {ExpiresAt} : {Token} : ", _expiresAt ,_cachedToken);
             return _cachedToken;
         }
 
@@ -37,7 +37,7 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
         {
             if (_cachedToken != null && DateTimeOffset.UtcNow < _expiresAt)
             {
-                _logger.LogWarning("[TokenService] Cache'den token döndürüldü (double-check), geçerlilik: {ExpiresAt}", _expiresAt);
+                _logger.LogWarning("[TokenService] Cache'den token döndürüldü (double-check), geçerlilik: {ExpiresAt}, {Token} : ", _expiresAt,_cachedToken);
                 return _cachedToken;
             }
 
@@ -71,7 +71,7 @@ public sealed class ScoreCardTokenService : IScoreCardTokenService
             _cachedToken = tokenResponse.AccessToken;
             _expiresAt = DateTimeOffset.UtcNow.AddSeconds(tokenResponse.ExpiresIn - 60);
 
-            _logger.LogWarning("[TokenService] Token alındı, ExpiresIn: {ExpiresIn}s, geçerlilik: {ExpiresAt}", tokenResponse.ExpiresIn, _expiresAt);
+            _logger.LogWarning("[TokenService] Token alındı, ExpiresIn: {ExpiresIn}s, geçerlilik: {ExpiresAt}, {Token} : ", tokenResponse.ExpiresIn, _expiresAt, _cachedToken);
 
             return _cachedToken;
         }
