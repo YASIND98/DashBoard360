@@ -29,11 +29,30 @@ public class ScoreCardProxyController : ControllerBase
 
     [HttpPost("pupa-types")]
     public Task<IActionResult> PupaTypes([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/pupa-types", body, ct);
+        => ProxyPost("scorecard/pupa-types", body, ct, externalContext: BuildExternalContext(body));
 
     [HttpPost("score-cards")]
     public Task<IActionResult> ScoreCards([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/score-cards", body, ct);
+        => ProxyPost("scorecard/score-cards", body, ct, externalContext: BuildExternalContext(body));
+
+    private string? BuildExternalContext(JsonElement body)
+    {
+        var userCode = body.TryGetProperty("userCode", out var el) && el.ValueKind == JsonValueKind.String
+            ? el.GetString()
+            : null;
+        if (string.IsNullOrEmpty(userCode))
+            return null;
+
+        var branchCode = HttpContext.Session.GetInt32("BranchCode") ?? 0;
+
+        return JsonSerializer.Serialize(new
+        {
+            BranchCode = branchCode,
+            ChannelCode = "BATCH",
+            UserCode = userCode,
+            TranCode = "BATCH"
+        });
+    }
 
     [HttpPost("regions")]
     public Task<IActionResult> Regions([FromBody] JsonElement body, CancellationToken ct)
@@ -71,11 +90,13 @@ public class ScoreCardProxyController : ControllerBase
     public Task<IActionResult> TrendsProductSaleRealized([FromBody] JsonElement body, CancellationToken ct)
         => ProxyPost("scorecard/trends/product-sale-realized", body, ct);
 
-    private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
+    private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct, string? externalContext = null)
     {
         //if (!HasSession()) return Unauthorized();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
+        if (!string.IsNullOrEmpty(externalContext))
+            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
 
         using var upstream = await _apiClient.SendAsync(request, ct).ConfigureAwait(false);
