@@ -186,15 +186,6 @@
   margin-top: 2px;
 }
 
-.mobile-menu-close svg {
-  width: 20px;
-  height: 20px;
-}
-
-.mobile-menu-close:hover {
-  color: #ffffff;
-}
-
 /* ===== Drawer Nav ===== */
 .mobile-menu-nav {
   flex: 1;

@@ -487,6 +487,9 @@ $(document).ready(function () {
       if (!$(e.target).closest('.dropdown-panel, .filter-dropdown').length) {
           $('.dropdown-panel').removeClass('open');
       }
+      if (!$(e.target).closest('.mobile-more').length) {
+          $('.mobile-more[open]').removeAttr('open');
+      }
   });
 
   // Prevent panel click from closing

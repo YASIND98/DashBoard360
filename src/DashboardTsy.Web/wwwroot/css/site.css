@@ -357,6 +357,12 @@ body:has(.scorecard-panel.open)::before {
   display: none; 
 }
 
+.mobile-close-btn {
+  width: 20px;
+  height: 20px;
+  color: #fff;
+}
+
 @media (min-width: 1200px) {
   #mobileScorecardWrapper {
     display: none !important;
