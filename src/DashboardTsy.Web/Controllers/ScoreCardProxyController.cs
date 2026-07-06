@@ -39,7 +39,7 @@ public class ScoreCardProxyController : ControllerBase
     {
         var userCode = body.TryGetProperty("userCode", out var el) && el.ValueKind == JsonValueKind.String
             ? el.GetString()
-            : null;
+            : HttpContext.Session.GetString("Username");
         if (string.IsNullOrEmpty(userCode))
             return null;
 
@@ -68,7 +68,7 @@ public class ScoreCardProxyController : ControllerBase
 
     [HttpPost("cumulatives")]
     public Task<IActionResult> Cumulatives([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/cumulatives", body, ct);
+        => ProxyPost("scorecard/cumulatives", body, ct, externalContext: BuildExternalContext(body));
 
     [HttpPost("main-view-regions")]
     public Task<IActionResult> MainViewRegions([FromBody] JsonElement body, CancellationToken ct)

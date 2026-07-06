@@ -53,7 +53,7 @@ public class ScoreCardController : ControllerBase
 
     [HttpPost("cumulatives")]
     public Task<IActionResult> Cumulatives([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecards/cumulatives", body, ct);
+        => ProxyPost("scorecards/cumulatives", body, ct, externalContext: ReadExternalContextHeader());
 
     [HttpPost("main-view-regions")]
     public Task<IActionResult> MainViewRegions([FromBody] JsonElement body, CancellationToken ct)
