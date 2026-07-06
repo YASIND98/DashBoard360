@@ -43,7 +43,7 @@ $(function () {
 
     // Aktif trend sekmesine göre servisi tetikle -> grafiği çiz
     function loadTrend() {
-        var tabKey = $('#scTrendTabs .sc-trend-tab.active').data('trend-period') || 'bu-ay';
+        var tabKey = $('#scTrendTabs .sc-trend-tab.active').data('trend-period') || 'son-3-ay';
         var trendPeriod = (typeof SCORE_CARD_TREND_PERIOD !== 'undefined' && SCORE_CARD_TREND_PERIOD[tabKey]) || 1;
         fetchScoreCardTrend(trendPeriod, function (res) {
             _trendData = buildTrend(res);

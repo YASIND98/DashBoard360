@@ -3,44 +3,6 @@ $(function () {
 
     if (!document.getElementById('scReportBody')) return;
 
-    // ---- ServiceBus OAuth: skor kart servis çağrılarına Bearer token inject et ----
-    // ServiceBus token servisinden (client_credentials) access_token alınır ve
-    // SCORE_CARD_BASE_URL'e giden tüm jQuery isteklerine Authorization header'ı olarak eklenir.
-    var _scAccessToken = null;
-
-    $.ajaxPrefilter(function (options) {
-        if (_scAccessToken && options.url && options.url.indexOf(SCORE_CARD_BASE_URL) === 0) {
-            options.headers = options.headers || {};
-            options.headers.Authorization = 'Bearer ' + _scAccessToken;
-        }
-    });
-
-    // Token süresi dolmadan biraz önce yenile (sayfa uzun süre açık kalırsa).
-    function scheduleScoreCardTokenRefresh(expiresIn) {
-        var ms = Math.max(0, (expiresIn || 0) - 60) * 1000;
-        if (ms > 0) setTimeout(loadScoreCardToken, ms);
-    }
-
-    function loadScoreCardToken() {
-        return $.ajax({
-            url: SERVICEBUS_TOKEN_URL,
-            type: 'POST',
-            contentType: 'application/json',
-            dataType: 'json',
-            data: JSON.stringify({
-                client_id: SERVICEBUS_CLIENT_ID,
-                client_secret: SERVICEBUS_CLIENT_SECRET,
-                audience: SERVICEBUS_AUDIENCE,
-                grant_type: 'client_credentials'
-            })
-        }).done(function (res) {
-            if (res && res.access_token) {
-                _scAccessToken = res.access_token;
-                scheduleScoreCardTokenRefresh(res.expires_in);
-            }
-        });
-    }
-
     var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
     var TABLE_NOTE = 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.';   // legend + PDF footer
 
@@ -118,7 +80,7 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/scorecard/pupa-types',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode })
+            data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode, userCode: window.USER_CODE })
         }).done(function (res) {
             callback(res);
         }).fail(function () {
@@ -158,6 +120,8 @@ $(function () {
         fetchPrimMonitoringPeriods(periodType, function (periodsRes) {
             var kv = (periodsRes && periodsRes.keyValues) || [];
             _dateNumber = kv.length ? kv[0].key : -1;
+            // Dönem listesini date-picker paneline aktar (date-picker ayrıca istek atmaz).
+            if (window.ScoreCardDatePicker) window.ScoreCardDatePicker.setPeriods(periodType, kv);
             reloadByDateNumber();
         });
     }
@@ -168,7 +132,7 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/scorecard/score-cards',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: _userRoleCode})
+            data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: _userRoleCode, userCode: window.USER_CODE })
         }).done(function (res) {
             callback(res);
         }).fail(function () {
@@ -268,7 +232,7 @@ $(function () {
             year: rd.year,                                  // session _reportDate yılı
             month: rd.month,                                // session _reportDate ayı (4, 5 ...)
             quarter: (period === 'ceyreklik') ? 1 : -1,     // çeyreklik seçiliyse 1, değilse -1
-            cumulativeFlag: (period === 'yillik') ? 1 : 0,  // yıllık seçiliyse 1, değilse 0
+            cumulativeFlag: (period === 'yillik') ? '1' : '0',  // yıllık seçiliyse 1, değilse 0
             registerId: _registerId,                        // seçili sicil;
             regionCode: _regionCode,                        // seçili bölge;
             branchCode: _branchCode,                        // seçili şube;
@@ -303,7 +267,7 @@ $(function () {
             regionCode: _regionCode,
             year: rd.year,
             month: rd.month,
-            cumulativeFlag: (period === 'yillik') ? 1 : 0,
+            cumulativeFlag: (period === 'yillik') ? '1' : '0',
             quarter: (period === 'ceyreklik') ? 1 : -1,
             pupaType: activePupaType(),
             scorecardId: _scoreCardId,
@@ -970,12 +934,13 @@ $(function () {
         loadScoreCardTypes();
     });
 
-    // Period tipi (Aylık / Çeyreklik / Yıllık): sadece aktif buton görünümü.
-    // Yeniden yükleme, date-picker yeni dönemin dateNumber'ını sc:dateChanged ile
-    // yayınladığında (aşağıdaki dinleyici) tetiklenir.
+    // Period tipi (Aylık / Çeyreklik / Yıllık): aktif butonu güncelle ve yeni tipin
+    // dönemlerini çek (scorecard/periods — tek istek). loadPupaFilters date-picker'ı besler,
+    // _dateNumber'ı ilk döneme ayarlar ve tabloyu yeniden yükler.
     $('#scPeriod').on('click', '.period-btn', function () {
         $('#scPeriod .period-btn').removeClass('active');
         $(this).addClass('active');
+        loadPupaFilters($(this).data('period'));
     });
 
     // Date picker'da dateNumber değişince: dateNumber içeren servisleri
@@ -1027,14 +992,11 @@ $(function () {
         }
     });
 
-    // İlk render: önce ServiceBus token alınır (prefilter Bearer header'ı ekleyebilsin),
-    // ardından kullanıcı yetki/bağlamı (scorecard/authorities) çekilir ve filtre zinciri kurulur.
-    // .always: token alınamasa bile veri zinciri yine de tetiklenir.
-    loadScoreCardToken().always(function () {
-        fetchUserAuthorities(function (auth) {
-            applyUserAuthorities(auth);
-            loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
-        });
+    // İlk render: kullanıcı yetki/bağlamı (scorecard/authorities) çekilir ve filtre zinciri kurulur.
+    // Token yönetimi backend (ScoreCardTokenService) tarafından yapılır.
+    fetchUserAuthorities(function (auth) {
+        applyUserAuthorities(auth);
+        loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
     });
     renderLegend();
     showLoadingOverlay();   // sayfa ilk açılışında tam ekran loader (diğer ekranlardaki gibi)

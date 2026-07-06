@@ -266,4 +266,5 @@ public class TargetReportController : ControllerBase
             return StatusCode(502);
         return Ok(result);
     }
+
 }

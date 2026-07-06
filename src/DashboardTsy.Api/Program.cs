@@ -4,6 +4,7 @@ using DashboardTsy.Api.Services;
 using DashboardTsy.Infrastructure.Data;
 using DashboardTsy.Infrastructure.Reports;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +29,25 @@ builder.Services.AddSingleton(new ReferansDbOptions { ConnectionString = referan
 builder.Services.AddSingleton<DashboardTsy.Infrastructure.Data.IConnectionStringProvider, ConnectionStringProvider>();
 builder.Services.AddScoped<DashboardTsy.Infrastructure.Data.IStoredProcedureExecutor, StoredProcedureExecutor>();
 builder.Services.AddScoped<DashboardTsy.Application.IReportDataProvider, ReportDataProvider>();
+
+// ScoreCard proxy: ServiceBus OAuth token (singleton cache) + Pupa API HttpClient
+builder.Services.Configure<PupaApiOptions>(builder.Configuration.GetSection(PupaApiOptions.SectionName));
+builder.Services.Configure<ServiceBusOptions>(builder.Configuration.GetSection(ServiceBusOptions.SectionName));
+
+builder.Services.AddHttpClient("ServiceBusToken");
+builder.Services.AddSingleton<IScoreCardTokenService>(sp =>
+{
+    var factory = sp.GetRequiredService<IHttpClientFactory>();
+    var options = sp.GetRequiredService<IOptions<ServiceBusOptions>>();
+    var logger = sp.GetRequiredService<ILogger<ScoreCardTokenService>>();
+    return new ScoreCardTokenService(factory.CreateClient("ServiceBusToken"), options, logger);
+});
+
+var pupaBaseUrl = builder.Configuration[$"{PupaApiOptions.SectionName}:BaseUrl"]?.TrimEnd('/') ?? string.Empty;
+builder.Services.AddHttpClient("PupaApi", client =>
+{
+    client.BaseAddress = new Uri(pupaBaseUrl + "/");
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

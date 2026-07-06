@@ -19,16 +19,12 @@ $(function () {
     // sub = aktif tipe göre ay / çeyrek / 0 (yıllık).
     var state = { year: 0, sub: 0, panelYear: 0 };
 
-    // ── Servis dönemini parse et ────────────────────────────────────────────────
-    function periodKVs(type) {
-        return ((typeof getPrimMonitoringPeriodsMock === 'function' ? getPrimMonitoringPeriodsMock(type) : null) || {}).keyValues || [];
-    }
-
+    // ── Servis dönemini parse et ─────────────────────────────────────────────────
     // value formatı: "YIL - AYn" / "YIL - CEYREKn"; yıllıkta yıl bazında İLK key alınır.
-    function parsePeriods(type) {
+    function parsePeriods(type, kvs) {
         var isYear = (type === PERIOD.yillik);
         var byYear = {}, years = [], first = null;
-        periodKVs(type).forEach(function (it) {
+        (kvs || []).forEach(function (it) {
             var p = String(it.value).split(' - ');
             var year = parseInt(p[0], 10);
             var sub = isYear ? 0 : parseInt((p[1] || '').replace(/[^0-9]/g, ''), 10);
@@ -39,12 +35,16 @@ $(function () {
         return { type: type, byYear: byYear, years: years, first: first || { year: 0, sub: 0 } };
     }
 
-    // Dönem tipini yükle + seçimi servisten dönen İLK objeye sıfırla.
-    function loadPeriod(type) {
-        D = parsePeriods(type);
+    // index.js'ten gelen dönem listesini (keyValues) uygula: parse et, seçimi İLK döneme sıfırla.
+    function applyPeriods(type, kvs) {
+        D = parsePeriods(type, kvs);
+        var hasData = D.years.length > 0;
+        $('#scDatePicker').toggle(hasData);
+        if (!hasData) return;
         state.year = D.first.year;
         state.sub  = D.first.sub;
         state.panelYear = D.first.year;
+        refreshHeader();
     }
 
     // ── Etiket / Badge / dateNumber ─────────────────────────────────────────────
@@ -132,6 +132,7 @@ $(function () {
 
     // ── Panel açma / kapama ─────────────────────────────────────────────────────
     function openPanel() {
+        if (!D) return;   // dönem verisi henüz gelmediyse panel açma
         state.panelYear = state.year;
         renderPanel();
         $('#scDpPanel').addClass('open');
@@ -158,6 +159,7 @@ $(function () {
     }
 
     function navigate(dir) {
+        if (!D) return;
         var t = nextSelection(dir);
         if (!t) return;
         state.year = t.year; state.sub = t.sub;
@@ -208,17 +210,11 @@ $(function () {
         closePanel(); refreshHeader(); notify();
     });
 
-    // Dönem tipi değişimi: yeni tipi yükle (kendi İLK dönemine sıfırlanır).
-    $('#scPeriod').on('click', '.period-btn', function () {
-        var map  = { aylik: PERIOD.aylik, ceyreklik: PERIOD.ceyreklik, yillik: PERIOD.yillik };
-        var type = map[$(this).data('period')];
-        if (!type || (D && type === D.type)) return;
-        loadPeriod(type);
-        closePanel(); refreshHeader(); notify();
-    });
+    // Periyot tipi (Aylık/Çeyreklik/Yıllık) değişimini index.js dinler; dönemleri çekip
 
-    // ── Başlat: aktif tip aylık ─────────────────────────────────────────────────
-    loadPeriod(PERIOD.aylik);
-    refreshHeader();
-    notify();
+    // ── Dış API: dönem listesini index.js besler (scorecard/periods tek yerden çekilir) ──
+    $('#scDatePicker').hide();   // dönem verisi gelene kadar gizli; veri boşsa gizli kalır
+    window.ScoreCardDatePicker = {
+        setPeriods: function (type, kvs) { applyPeriods(type, kvs || []); }
+    };
 });

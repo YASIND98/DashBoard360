@@ -215,8 +215,7 @@
         <!-- Trend Analizi Tabı -->
         <div class="sc-trend" id="scTrend" style="display: none;">
             <div class="sc-trend-tabs" id="scTrendTabs">
-                <button type="button" class="sc-trend-tab active" data-trend-period="bu-ay">Bu Ay</button>
-                <button type="button" class="sc-trend-tab" data-trend-period="son-3-ay">Son 3 Ay</button>
+                <button type="button" class="sc-trend-tab active" data-trend-period="son-3-ay">Son 3 Ay</button>
                 <button type="button" class="sc-trend-tab" data-trend-period="son-6-ay">Son 6 Ay</button>
                 <button type="button" class="sc-trend-tab" data-trend-period="son-12-ay">Son 12 Ay</button>
             </div>
@@ -234,6 +233,8 @@
     <script>
         // Skor kart servislerine userCode olarak gönderilir (session User.DomainName).
         window.USER_CODE = @Html.Raw(Json.Serialize(sessionUser?.DomainName));
+        // Skor kart proxy URL'i: Web controller üzerinden Pupa servislerine iletilir (relative path).
+        var SCORE_CARD_BASE_URL = "";
     </script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
