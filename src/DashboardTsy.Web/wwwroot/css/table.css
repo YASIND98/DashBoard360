@@ -509,6 +509,54 @@
     border-radius: 0;
     margin: 0;
   }
+
+  /* ===== Hedef raporları sayfası: İlk 3 sütun sticky ===== */
+  .page-home .data-table th.col-index,
+  .page-home .data-table td.col-index {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+  }
+
+  .page-home .data-table th.col-expand,
+  .page-home .data-table td.col-expand {
+    position: sticky;
+    left: 57px;
+    z-index: 2;
+  }
+
+  .page-home .data-table th.col-left,
+  .page-home .data-table td.col-left {
+    position: sticky;
+    left: 93px;
+    z-index: 2;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-shadow: 4px 0 6px rgba(0, 0, 0, 0.35);
+  }
+
+  /* Header sticky → z-index thead'den yüksek olmalı (thead th zaten z-index:3) */
+  .page-home .data-table thead th.col-index,
+  .page-home .data-table thead th.col-expand,
+  .page-home .data-table thead th.col-left {
+    z-index: 5;
+    background: rgb(21, 32, 88);
+  }
+
+  /* Satır arkaplanları – sticky hücreler şeffaf kalırsa alttan içerik görünür */
+  .page-home .data-table tr.stripe-odd td.col-index,
+  .page-home .data-table tr.stripe-odd td.col-expand,
+  .page-home .data-table tr.stripe-odd td.col-left {
+    background: var(--bg-stripe);
+  }
+
+  .page-home .data-table tr.stripe-even td.col-index,
+  .page-home .data-table tr.stripe-even td.col-expand,
+  .page-home .data-table tr.stripe-even td.col-left {
+    background: rgb(21, 32, 88);
+  }
   .data-table tbody tr:first-child td:last-child,
   .data-table tbody tr.last-visible-row td:last-child,
   .data-table tbody tr:first-child td:first-child,
