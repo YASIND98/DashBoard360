@@ -29,30 +29,11 @@ public class ScoreCardProxyController : ControllerBase
 
     [HttpPost("pupa-types")]
     public Task<IActionResult> PupaTypes([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/pupa-types", body, ct, externalContext: BuildExternalContext(body));
+        => ProxyPost("scorecard/pupa-types", body, ct);
 
     [HttpPost("score-cards")]
     public Task<IActionResult> ScoreCards([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/score-cards", body, ct, externalContext: BuildExternalContext(body));
-
-    private string? BuildExternalContext(JsonElement body)
-    {
-        var userCode = body.TryGetProperty("userCode", out var el) && el.ValueKind == JsonValueKind.String
-            ? el.GetString()
-            : HttpContext.Session.GetString("Username");
-        if (string.IsNullOrEmpty(userCode))
-            return null;
-
-        var branchCode = HttpContext.Session.GetInt32("BranchCode") ?? 0;
-
-        return JsonSerializer.Serialize(new
-        {
-            BranchCode = branchCode,
-            ChannelCode = "BATCH",
-            UserCode = userCode,
-            TranCode = "BATCH"
-        });
-    }
+        => ProxyPost("scorecard/score-cards", body, ct);
 
     [HttpPost("regions")]
     public Task<IActionResult> Regions([FromBody] JsonElement body, CancellationToken ct)
@@ -68,7 +49,7 @@ public class ScoreCardProxyController : ControllerBase
 
     [HttpPost("cumulatives")]
     public Task<IActionResult> Cumulatives([FromBody] JsonElement body, CancellationToken ct)
-        => ProxyPost("scorecard/cumulatives", body, ct, externalContext: BuildExternalContext(body));
+        => ProxyPost("scorecard/cumulatives", body, ct);
 
     [HttpPost("main-view-regions")]
     public Task<IActionResult> MainViewRegions([FromBody] JsonElement body, CancellationToken ct)
@@ -90,11 +71,50 @@ public class ScoreCardProxyController : ControllerBase
     public Task<IActionResult> TrendsProductSaleRealized([FromBody] JsonElement body, CancellationToken ct)
         => ProxyPost("scorecard/trends/product-sale-realized", body, ct);
 
-    private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct, string? externalContext = null)
+    private string? BuildExternalContext(JsonElement body)
+    {
+        var userCode = body.ValueKind == JsonValueKind.Object
+            && body.TryGetProperty("userCode", out var el)
+            && el.ValueKind == JsonValueKind.String
+                ? el.GetString()
+                : HttpContext.Session.GetString("Username");
+        if (string.IsNullOrEmpty(userCode))
+            return null;
+
+        var branchCode = HttpContext.Session.GetInt32("BranchCode") ?? 0;
+
+        return JsonSerializer.Serialize(new
+        {
+            BranchCode = branchCode,
+            ChannelCode = "BATCH",
+            UserCode = userCode,
+            TranCode = "BATCH"
+        });
+    }
+
+    private string? BuildExternalContextFromSession()
+    {
+        var userCode = HttpContext.Session.GetString("Username");
+        if (string.IsNullOrEmpty(userCode))
+            return null;
+
+        var branchCode = HttpContext.Session.GetInt32("BranchCode") ?? 0;
+
+        return JsonSerializer.Serialize(new
+        {
+            BranchCode = branchCode,
+            ChannelCode = "BATCH",
+            UserCode = userCode,
+            TranCode = "BATCH"
+        });
+    }
+
+    private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
     {
         //if (!HasSession()) return Unauthorized();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
+        var externalContext = BuildExternalContext(body);
         if (!string.IsNullOrEmpty(externalContext))
             request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
@@ -113,6 +133,9 @@ public class ScoreCardProxyController : ControllerBase
         //if (!HasSession()) return Unauthorized();
 
         using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
+        var externalContext = BuildExternalContextFromSession();
+        if (!string.IsNullOrEmpty(externalContext))
+            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
 
         using var upstream = await _apiClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
