@@ -90,11 +90,11 @@ $(function () {
 
     // Pupa tipi: Key -> statik etiket (PUPA_TYPE_LABELS)
     function renderPupaChannels(pupaRes) {
-        var kv = (pupaRes && pupaRes.KeyValues) || [];
+        var kv = (pupaRes && pupaRes.keyValues) || [];
         // Servis boş/başarısızsa segmentleri temizle (statik placeholder kalmasın).
         var html = '';
         kv.forEach(function (item, i) {
-            var key = item.Key;
+            var key = item.key;
             var label = PUPA_TYPE_LABELS[key];
             if (i > 0) html += '<div class="divider"></div>';
             html += '<button type="button" class="segment' + (i === 0 ? ' active' : '') +
@@ -146,11 +146,12 @@ $(function () {
         return groups.filter(function (g) { return g.keys.indexOf(key) > -1; })[0] || null;
     }
 
-    // Servis Key'lerinden sekme modeli: gruba ait key'ler tek üst sekmede (sub-tab) toplanır
+    // Servis item'ından skor kart id'si. Yeni cevap küçük harf ('key'); eski 'Key' de desteklenir.
+    function scItemKey(item) { return (item && item.key != null) ? item.key : (item && item.Key); }
     function buildScoreCardTabModel(kv) {
         var model = [], byGroup = {};
         kv.forEach(function (item) {
-            var key = item.Key;
+            var key = scItemKey(item);
             var label = SCORE_CARD_LABELS[key];
             var group = findScoreCardGroup(key);
             if (!group) return void model.push({ type: 'single', key: key, label: label });
@@ -187,10 +188,10 @@ $(function () {
     }
 
     function renderScoreCardTabs(scRes) {
-        var kv = (scRes && scRes.KeyValues) || [];
+        var kv = (scRes && (scRes.keyValues || scRes.KeyValues)) || [];
         // "Genel Bakış" (-1) servisten gelmez; ön yüzde statik eklenir (tüm kullanıcılarda, en başta).
-        kv = kv.filter(function (item) { return Number(item.Key) !== SCORE_CARD_OVERVIEW_KEY; });
-        kv = [{ Key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
+        kv = kv.filter(function (item) { return Number(scItemKey(item)) !== SCORE_CARD_OVERVIEW_KEY; });
+        kv = [{ key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
         _tabModel = buildScoreCardTabModel(kv);
         $('#scTabList').html(_tabModel.map(function (t, i) {
             var attr = (t.type === 'single') ? ' data-scorecard="' + t.key + '"' : '';

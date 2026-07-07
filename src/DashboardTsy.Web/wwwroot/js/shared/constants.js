@@ -67,7 +67,7 @@ var SCORE_CARD_LABELS = {
   14: "Ticari",
   15: "Kurumsal",
   16: "MİS-NİS",
-  17: "TARIM-ST",
+  17: "Tarım-ST",
   19: "Mobil Satış",
   20: "ÖB Ve Yatırım",
   21: "ŞUBE Müdürü SKORKART",
@@ -79,12 +79,12 @@ var SCORE_CARD_LABELS = {
   27: "Merkezi Portföy Yönetimi",
   28: "BHT",
   29: "BD-2",
-  31: "KIBRIS-BİREYSEL – SY",
-  32: "KIBRIS-BİREYSEL – BD",
-  33: "KIBRIS-TİCARİ",
-  34: "KIBRIS-OBİ",
-  35: "KIBRIS-KBİ",
-  36: "KIBRIS-MİS-NİS",
+  31: "Kıbrıs-Bireysel – SY",
+  32: "Kıbrıs-Bireysel – BD",
+  33: "Kıbrıs-Ticari",
+  34: "Kıbrıs-OBİ",
+  35: "Kıbrıs-KBİ",
+  36: "Kıbrıs-MİS-NİS",
   37: "BÖLGE Müdürü",
   38: "Kamu Portföy",
   39: "Ticari Merkez BD",
@@ -94,7 +94,8 @@ var SCORE_CARD_LABELS = {
 //Sub tab olarak gösterilecek skor kartlar
 var SCORE_CARD_GROUPS = [
   { label: "Bireysel", keys: [1, 2] },
-  { label: "KOBİ", keys: [5, 13] }
+  { label: "KOBİ", keys: [5, 13] },
+  { label: "Kıbrıs", keys: [31, 32, 33, 34, 35, 36] }
 ];
 
 // "Genel Bakış" sekmesi (Key -1) skor kart servisinden dönmez; ön yüzde eklenir.
