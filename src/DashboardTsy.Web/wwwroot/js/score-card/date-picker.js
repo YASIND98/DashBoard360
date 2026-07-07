@@ -215,6 +215,9 @@ $(function () {
     // ── Dış API: dönem listesini index.js besler (scorecard/periods tek yerden çekilir) ──
     $('#scDatePicker').hide();   // dönem verisi gelene kadar gizli; veri boşsa gizli kalır
     window.ScoreCardDatePicker = {
-        setPeriods: function (type, kvs) { applyPeriods(type, kvs || []); }
+        setPeriods: function (type, kvs) { applyPeriods(type, kvs || []); },
+        getSelection: function () {
+            return D ? { type: D.type, year: state.year, sub: state.sub } : null;
+        }
     };
 });
