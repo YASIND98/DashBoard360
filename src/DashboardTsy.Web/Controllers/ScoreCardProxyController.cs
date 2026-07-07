@@ -1,4 +1,5 @@
 using DashboardTsy.Web.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Text.Json;
@@ -70,11 +71,52 @@ public class ScoreCardProxyController : ControllerBase
     public Task<IActionResult> TrendsProductSaleRealized([FromBody] JsonElement body, CancellationToken ct)
         => ProxyPost("scorecard/trends/product-sale-realized", body, ct);
 
+    private string? BuildExternalContext(JsonElement body)
+    {
+        var userCode = body.ValueKind == JsonValueKind.Object
+            && body.TryGetProperty("userCode", out var el)
+            && el.ValueKind == JsonValueKind.String
+                ? el.GetString()
+                : HttpContext.Session.GetString("Username");
+        if (string.IsNullOrEmpty(userCode))
+            return null;
+
+        var branchCode = HttpContext.Session.GetInt32("BranchCode") ?? 0;
+
+        return JsonSerializer.Serialize(new
+        {
+            BranchCode = branchCode,
+            ChannelCode = "BATCH",
+            UserCode = userCode,
+            TranCode = "BATCH"
+        });
+    }
+
+    private string? BuildExternalContextFromSession()
+    {
+        var userCode = HttpContext.Session.GetString("Username");
+        if (string.IsNullOrEmpty(userCode))
+            return null;
+
+        var branchCode = HttpContext.Session.GetInt32("BranchCode") ?? 0;
+
+        return JsonSerializer.Serialize(new
+        {
+            BranchCode = branchCode,
+            ChannelCode = "BATCH",
+            UserCode = userCode,
+            TranCode = "BATCH"
+        });
+    }
+
     private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
     {
-        if (!HasSession()) return Unauthorized();
+        //if (!HasSession()) return Unauthorized();
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
+        var externalContext = BuildExternalContext(body);
+        if (!string.IsNullOrEmpty(externalContext))
+            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
 
         using var upstream = await _apiClient.SendAsync(request, ct).ConfigureAwait(false);
@@ -88,9 +130,12 @@ public class ScoreCardProxyController : ControllerBase
 
     private async Task<IActionResult> ProxyGet(string pathAndQuery, CancellationToken ct)
     {
-        if (!HasSession()) return Unauthorized();
+        //if (!HasSession()) return Unauthorized();
 
         using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
+        var externalContext = BuildExternalContextFromSession();
+        if (!string.IsNullOrEmpty(externalContext))
+            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
 
         using var upstream = await _apiClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
