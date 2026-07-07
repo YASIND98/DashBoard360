@@ -563,49 +563,18 @@ body:has(.scorecard-panel.open)::before {
     height: 20px;
   }
 
-  /* .page-header {
-    padding: 12px 16px;
-  } */
-
   .page-title {
     font-size: 20px;
   }
 
-  /* .tab {
-    font-size: 16px;
-    margin: 0 16px;
-  }
-
-  .tab + .tab::before {
-    left: -16px;
-  } */
-
-  /* .tab-bar {
-    padding: 12px 24px 16px 0;
-  } */
-
-  /* .filters-row {
-    padding: 16px;
-  } */
-
   .segmented-control {
     gap: 6px;
   }
-  
-  /* .segmented-control .segment {
-    padding: 4px 8px;
-    font-size: 13px;
-  } */
 
   .period-btn {
     font-size: 13px;
     gap: 6px;
   }
-
-  /* .period-icon {
-    width: 18px;
-    height: 18px;
-  } */
 
   .legend-actions {
     gap: 16px;
@@ -649,6 +618,9 @@ body:has(.scorecard-panel.open)::before {
   #scorecardBtnLabel {
     display: none;
   }
+  .scorecard-nps-wrapper.mobile .scorecard-btn {
+    padding: 8px;
+  }
 }
 
 @media (max-width: 750px) {
@@ -665,11 +637,6 @@ body:has(.scorecard-panel.open)::before {
     height: 28px;
   }
 
-  /* .tab {
-    margin: 0 14px;
-    font-size: 15px;
-  } */
-
   .download-pdf-btn span {
     display: none;
   }
@@ -680,15 +647,6 @@ body:has(.scorecard-panel.open)::before {
 }
 
 @media (max-width: 700px) {
-  /* .tab {
-    margin: 0 10px;
-    font-size: 15px;
-  } */
-
-  /* .legend-note {
-    max-width: 200px;
-  } */
-
   .filter-dropdown-wrapper {
     min-width: 130px;
   }

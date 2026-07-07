@@ -593,21 +593,14 @@
   }
 }
 
-/* @media (max-width: 950px) {
-  .table-row td {
-    font-size: 14px;
-  }
-
-  .table-legend {
-    padding: 14px 8px 0;
-  }
-} */
-
 @media (max-width: 767px) {
   .table-legend {
     flex-direction: column-reverse;
   }
   .legend-colors {
     margin-bottom: 8px;
+  }
+  .table-row td {
+    font-size: 12px;
   }
 }
