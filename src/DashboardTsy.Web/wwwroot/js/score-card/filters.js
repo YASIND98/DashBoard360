@@ -41,7 +41,7 @@ $(function () {
                 registerId: R().registerId,
                 scoreCardTypeId: 0,
                 regionCode: R().regionCode,
-                scoreCardId: (R().scoreCardId === -1 ? 21 : R().scoreCardId)
+                scoreCardId: R().scoreCardId
             })
         }).done(function (res) {
             callback(Array.isArray(res) ? res : ((res && res.rows) || []));
@@ -89,8 +89,7 @@ $(function () {
                 R().regionCode = _scRegions[0].regionCode;
                 $('#scRegionLabel').text(_scRegions[0].regionName);
             }
-            // Tek bölge dönerse dropdown kilitlenir (hedef ekranındaki gibi disabled)
-            $('#scRegionSelect').toggleClass('disabled', single);
+            $('#scRegionSelect').toggleClass('disabled', R().regionDisabled);
             renderScRegionList();
             if (done) done();
         });
@@ -105,8 +104,7 @@ $(function () {
                 R().branchCode = _scBranches[0].branchCode;
                 $('#scBranchLabel').text(_scBranches[0].branchName);
             }
-            // Tek şube dönerse dropdown kilitlenir (hedef ekranındaki gibi disabled)
-            $('#scBranchSelect').toggleClass('disabled', single);
+            $('#scBranchSelect').toggleClass('disabled', R().branchDisabled);
             renderScBranchList();
             if (done) done();
         });
@@ -122,7 +120,7 @@ $(function () {
                 regionCode: R().regionCode,
                 branchCode: R().branchCode,
                 registerId: R().registerId,
-                scoreCardId: (R().scoreCardId === -1 ? 21 : R().scoreCardId),
+                scoreCardId: R().scoreCardId,
                 dateNumber: R().dateNumber,
                 pupaTypeId: R().activePupaType(),
                 registerText: -1,
@@ -161,8 +159,7 @@ $(function () {
                 R().registerId = registers[0].registerId;
                 $('#scRegisterLabel').text(registers[0].registerName);
             }
-            // Tek sicil dönerse dropdown kilitlenir (hedef ekranındaki gibi disabled)
-            $('#scRegisterSelect').toggleClass('disabled', single);
+            $('#scRegisterSelect').toggleClass('disabled', R().registerDisabled);
             renderRegisterList(registers);
             if (done) done();
         });

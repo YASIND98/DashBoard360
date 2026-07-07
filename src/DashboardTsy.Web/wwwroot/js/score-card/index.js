@@ -30,6 +30,7 @@ $(function () {
     let _userRoleCode;
     let _dateNumber;
     let _scoreCardId;
+    var _regionDisabled = false, _branchDisabled = false, _registerDisabled = false;
     var _tabModel = [];
     var _overview = null;
     var _firstLoad = true;   // ilk veri gelene kadar tam ekran loader göstermek için
@@ -58,6 +59,9 @@ $(function () {
             _regionCode = ud.regionCode;
             _branchCode = ud.branchCode;
             _registerId = ud.registerId;
+            _regionDisabled   = ud.regionCode !== -1;
+            _branchDisabled   = ud.branchCode !== -1;
+            _registerDisabled = ud.registerId !== -1;
         }
     }
 
@@ -272,7 +276,7 @@ $(function () {
             cumulativeFlag: p.cumulativeFlag,
             quarter: p.quarter,
             pupaType: activePupaType(),
-            scorecardId: (_scoreCardId === -1 ? 21 : _scoreCardId),
+            scorecardId: _scoreCardId,
             group: group
         };
     }
@@ -315,7 +319,7 @@ $(function () {
                 dateNumber: _dateNumber,
                 registerId: _registerId,
                 branchCode: _branchCode,
-                scoreCardId: (_scoreCardId === -1 ? 21 : _scoreCardId)
+                scoreCardId: _scoreCardId
             })
         }).done(function (res) {
             callback(Array.isArray(res) ? res : ((res && res.rows) || []));
@@ -382,13 +386,13 @@ $(function () {
         }
 
         // Tek seçenekli (kilitli) bölge dropdown'u -> "Tüm Bölgeler" tıklanamaz
-        var regionLocked = $('#scRegionSelect').hasClass('disabled');
+        var regionDisabled = $('#scRegionSelect').hasClass('disabled');
         var deepest = registerSel ? 'register' : (branchSel ? 'branch' : 'region');
 
         // Kök "Tüm Bölgeler" + seçili kademeler. Aktif (en alt) kademe tıklanamaz.
-        var parts = [scCrumb('Tüm Bölgeler', 'allRegions', regionLocked)];
+        var parts = [scCrumb('Tüm Bölgeler', 'allRegions', regionDisabled)];
         if (regionSel) {
-            parts.push(scCrumb($('#scRegionLabel').text(), 'region', regionLocked || deepest === 'region'));
+            parts.push(scCrumb($('#scRegionLabel').text(), 'region', regionDisabled || deepest === 'region'));
         }
         if (branchSel) {
             parts.push(scCrumb($('#scBranchLabel').text(), 'branch', deepest === 'branch'));
@@ -1018,6 +1022,9 @@ $(function () {
         set registerId(v) { _registerId = v; },
         get dateNumber()  { return _dateNumber; },
         get scoreCardId() { return _scoreCardId; },
+        get regionDisabled()   { return _regionDisabled; },
+        get branchDisabled()   { return _branchDisabled; },
+        get registerDisabled() { return _registerDisabled; },
         activePupaType: activePupaType,
         loadTable: loadScoreCardTable,
         renderBody: renderReportBody
