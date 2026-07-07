@@ -41,7 +41,7 @@ $(function () {
                 registerId: R().registerId,
                 scoreCardTypeId: 0,
                 regionCode: R().regionCode,
-                scoreCardId: R().scoreCardId
+                scoreCardId: (R().scoreCardId === -1 ? 21 : R().scoreCardId)
             })
         }).done(function (res) {
             callback(Array.isArray(res) ? res : ((res && res.rows) || []));
@@ -122,7 +122,7 @@ $(function () {
                 regionCode: R().regionCode,
                 branchCode: R().branchCode,
                 registerId: R().registerId,
-                scoreCardId: R().scoreCardId,
+                scoreCardId: (R().scoreCardId === -1 ? 21 : R().scoreCardId),
                 dateNumber: R().dateNumber,
                 pupaTypeId: R().activePupaType(),
                 registerText: -1,
