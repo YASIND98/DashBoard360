@@ -412,13 +412,18 @@ body:has(.scorecard-panel.open)::before {
     color: #ffffff;
   }
 
+  .period-toggle-row {
+    background: #12375c;
+    padding-bottom: 16px;
+  }
+
   .period-toggle {
     width: 95%;
     background: #196CFC;
     border-radius: 50px;
     padding: 5px;
     gap: 0;
-    margin:0 auto 16px;
+    margin: 0 auto;
   }
 
   .period-btn {

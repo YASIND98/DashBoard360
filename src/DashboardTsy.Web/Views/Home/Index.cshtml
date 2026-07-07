@@ -95,13 +95,8 @@
     <button class="tab" data-tab="tarim" data-menu="TabAgricultureTitle"></button>
     <button class="tab has-subtabs" data-tab="bireysel" data-menu="TabRetailTitle"></button>
   </div>
-  <div class="period-toggle">
-    <button class="period-btn active" data-period="daily">
-      <img src="~/images/balance.svg" alt="" class="period-icon" /> Bakiye
-    </button>
-    <button class="period-btn" data-period="monthly">
-      <img src="~/images/percentage.svg" alt="" class="period-icon" /> H / G
-    </button>
+  <div class="desktop">
+    @await Html.PartialAsync("_PeriodToggleHome")
   </div>
 </div>
 
@@ -123,6 +118,10 @@
         <button class="sub-tab" data-subtab="bireysel-adet" data-menu="AmountSubTabTitle" style="display:none;"></button>
         <button class="sub-tab" data-subtab="bireysel-ozel" data-menu="RetailSubTabPrivateTitle"></button>
     </div>
+</div>
+
+<div class="mobile period-toggle-row">
+  @await Html.PartialAsync("_PeriodToggleHome")
 </div>
 
 <!-- Daily Table -->
