@@ -224,9 +224,9 @@ $(function () {
             ? window.ScoreCardDatePicker.getSelection() : null;
         var year = sel ? sel.year : -1;
         var sub = sel ? sel.sub : -1;
-        if (period === 'yillik')    return { year: year, month: -1, quarter: -1, cumulativeFlag: 1 };
-        if (period === 'ceyreklik') return { year: year, month: -1, quarter: sub, cumulativeFlag: 0 };
-        return { year: year, month: sub, quarter: -1, cumulativeFlag: 0 };
+        if (period === 'yillik')    return { year: year, month: -1, quarter: -1, cumulativeFlag: "1" };
+        if (period === 'ceyreklik') return { year: year, month: -1, quarter: sub, cumulativeFlag: "0" };
+        return { year: year, month: sub, quarter: -1, cumulativeFlag: "0" };
     }
 
     function buildCumulativesRequest() {
