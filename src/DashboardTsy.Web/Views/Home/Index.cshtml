@@ -40,7 +40,10 @@
 
 <!-- Filters -->
 <div class="filters-row">
-    <h1 class="page-title page-title-mobile mobile" data-menu="ScreenTitle"></h1>
+    <div class="mobile filters-mobile-header">
+      <h1 class="page-title page-title-mobile" data-menu="ScreenTitle"></h1>
+      @await Html.PartialAsync("_SegmentedControlHome")
+    </div>
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="indexRegionSelect">
@@ -77,12 +80,10 @@
 
         @await Html.PartialAsync("_MobileMoreMenu")
     </div>
-    <div class="segmented-control">
-      <button class="segment active" data-type="hacim">Hacim</button>
-      <div class="divider"></div>
-      <button class="segment" data-type="adet">Adet</button>
+    <div class="desktop">
+        @await Html.PartialAsync("_SegmentedControlHome")
     </div>
-</div>
+  </div>
 
 <!-- Tabs -->
 <div class="tab-bar">

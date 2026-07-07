@@ -258,6 +258,20 @@
     flex-direction: column;
     align-items: baseline;
   }
+
+  .filters-mobile-header {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .filters-mobile-header .segmented-control {
+    margin: 0;
+    width: auto;
+  }
+
   .filter-dropdown-wrapper {
     max-width: 100%;
   }

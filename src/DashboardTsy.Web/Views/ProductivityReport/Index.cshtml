@@ -24,7 +24,12 @@
 
 <!-- Filters -->
 <div class="filters-row">
-    <h1 class="page-title page-title-mobile mobile">Verim Performans Raporları</h1>
+    <div class="mobile filters-mobile-header">
+        <h1 class="page-title page-title-mobile mobile">Verim Performans Raporları</h1>
+        <div class="scorecard-nps-wrapper mobile" id="mobileScorecardWrapper" style="display:none;">
+            @await Html.PartialAsync("_ScorecardNps")
+        </div>
+    </div>
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="yieldBolgeSelect">
@@ -57,9 +62,6 @@
           <input type="text" placeholder="Ara" id="yieldSearchInput" />
       </div>
       @await Html.PartialAsync("_MobileMoreMenu")
-    </div>
-    <div class="scorecard-nps-wrapper mobile" id="mobileScorecardWrapper" style="display:none;">
-        @await Html.PartialAsync("_ScorecardNps")
     </div>
     <div class="segmented-control" id="yieldToggle" style="display:none;"></div>
 </div>

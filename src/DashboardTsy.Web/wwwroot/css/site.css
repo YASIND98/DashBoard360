@@ -442,12 +442,6 @@ body:has(.scorecard-panel.open)::before {
   }
 
   /* ===== Mobile scorecard-nps-wrapper ===== */
-  .scorecard-nps-wrapper.mobile {
-    width: 95%;
-    margin: 8px 0 0 auto;
-    display: flex;
-    justify-content: flex-end;
-  }
 
   .scorecard-nps-wrapper.mobile .scorecard-nps {
     width: auto;
@@ -643,6 +637,12 @@ body:has(.scorecard-panel.open)::before {
   .download-pdf-btn img {
     width: 22px;
     height: 22px;
+  }
+}
+
+@media (max-width: 767px) {
+  #scorecardBtnLabel {
+    display: none;
   }
 }
 
