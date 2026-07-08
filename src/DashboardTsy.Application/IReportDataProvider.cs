@@ -5,6 +5,8 @@ using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
 using DashboardTsy.Application.AiInsight.Requests;
 using DashboardTsy.Application.AiInsight.Responses;
+using DashboardTsy.Application.ExchangeRate.Requests;
+using DashboardTsy.Application.ExchangeRate.Responses;
 
 namespace DashboardTsy.Application;
 
@@ -158,4 +160,11 @@ public interface IReportDataProvider
     IReadOnlyList<GetReportDatesItem> GetReportDates();
 
     GetBranchAiInsightResponse GetBranchAiInsights(GetBranchAiInsightRequest request);
+
+    /// <summary>
+    /// Yabancı Para hesaplamalarında kullanılan USD kur bilgilerini döner.
+    /// Seçilen tarih baz alınarak: dün (T-1), önceki gün (T-2), geçen hafta (T-7), geçen yıl (T-365).
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    GetUsdExchangeRatesResponse? GetUsdExchangeRates(GetUsdExchangeRatesRequest request);
 }

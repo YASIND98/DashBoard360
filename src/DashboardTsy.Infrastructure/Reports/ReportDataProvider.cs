@@ -6,6 +6,8 @@ using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
 using DashboardTsy.Application.AiInsight.Requests;
 using DashboardTsy.Application.AiInsight.Responses;
+using DashboardTsy.Application.ExchangeRate.Requests;
+using DashboardTsy.Application.ExchangeRate.Responses;
 using DashboardTsy.Infrastructure.Data;
 using DashboardTsy.Infrastructure.TargetReport;
 using DashboardTsy.Infrastructure.ProductivityReport;
@@ -1070,6 +1072,28 @@ public class ReportDataProvider : IReportDataProvider
             return Array.Empty<GetReportDatesItem>();
 
         return DataTableHelper.ToList<GetReportDatesItem>(ds.Tables[0]);
+    }
+
+    public GetUsdExchangeRatesResponse? GetUsdExchangeRates(GetUsdExchangeRatesRequest request)
+    {
+        if (MockEnabled)
+            return MockProductivityReportData.GetUsdExchangeRates(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@ReportDate"] = request.ReportDate == default ? (object)DBNull.Value : request.ReportDate
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetUsdExchangeRates",
+            parameters);
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return null;
+
+        return DataTableHelper.ToObject<GetUsdExchangeRatesResponse>(ds.Tables[0].Rows[0]);
     }
 
     #region Helpers
