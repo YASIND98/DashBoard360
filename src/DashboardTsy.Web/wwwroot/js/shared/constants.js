@@ -128,7 +128,10 @@ var SCORE_CARD_DETAIL_COLUMN_LABELS = [
     { key: "SKORKARTA_YAZMA_TARIHI", label: "Skorkarta Yazma Tarihi" },
     { key: "VARLIK_KAZANIM_KONTROL_TARIHI", label: "Varlık Kazanım Kontrol Tarihi" },
     { key: "VARLIK_KAZANIM_TARIHI", label: "Varlık Kazanım Tarihi" },
-    { key: "SKORKART_DETAYI", label: "Skorkart Detayı" }
+    { key: "SKORKART_DETAYI", label: "Skorkart Detayı" },
+    { key: "ELEME_GRUP", label: "Eleme Grubu" },
+    { key: "URUN", label: "Ürün" },
+    { key: "ACIKLAMA", label: "Açıklama" }
 ];
 
 // Skor kart tablosu kolon başlıkları
