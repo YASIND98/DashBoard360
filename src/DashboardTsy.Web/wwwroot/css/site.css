@@ -550,6 +550,10 @@ body:has(.scorecard-panel.open)::before {
   [data-theme="light"] .page-title {
     color: #12375C;
   }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-btn {
+    background: #12375C;
+  }
 }
 
 @media (max-width: 950px) {

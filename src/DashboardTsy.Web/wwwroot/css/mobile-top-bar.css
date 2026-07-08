@@ -395,4 +395,8 @@
   .mobile-top-bar {
     display: flex;
   }
+
+  [data-theme="light"] .mobile-top-bar {
+    background: #12375c;
+  }
 }
