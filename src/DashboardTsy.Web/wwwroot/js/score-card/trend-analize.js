@@ -186,6 +186,8 @@ $(function () {
             infoLines: ['Trend Analizi', 'Periyot: ' + ($('#scTrendTabs .sc-trend-tab.active').text().trim() || '-')],
             columns: [
                 { header: 'Dönem', key: 'period', align: 'left' },
+                { header: 'Gerçekleşen', key: 'realizedValue', format: function (v) { return formatNumber(v); } },
+                { header: 'Bekleyen', key: 'pendingValue', format: function (v) { return formatNumber(v); } },
                 { header: 'H/G %', key: 'hgRatio', format: formatPercent }   // diğer tablolarla aynı; % başlıkta var
             ],
             rows: (_trendData && _trendData.points) || [],
