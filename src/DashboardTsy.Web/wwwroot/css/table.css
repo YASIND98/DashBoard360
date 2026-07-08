@@ -585,6 +585,14 @@
     color: #ffffff;
   }
 
+  .custom-last-row td {
+    font-size: 14px !important;
+  }
+
+  [data-theme="light"] .custom-last-row td {
+    background: #ffffff !important;
+  }
+
   [data-theme="light"] .table-legend {
     background: #e9f3fe;
   }
@@ -599,7 +607,8 @@
     background: var(--main-bg);
   }
 
-  [data-theme="light"] .data-table thead th {
+  [data-theme="light"] .data-table thead th,
+  [data-theme="light"] #nplDataTable thead th {
     background: #E9F3FE;
   }
 
@@ -608,12 +617,18 @@
     color: #262A33;
   }
 
-  [data-theme="light"] .data-table tbody tr.stripe-odd {
+  [data-theme="light"] .data-table tbody tr.stripe-odd,
+  [data-theme="light"] #nplTableContainer .data-table tbody tr.stripe-odd {
     background: #ffffff;
   }
 
-  [data-theme="light"] .data-table tbody tr.stripe-even {
+  [data-theme="light"] .data-table tbody tr.stripe-even,
+  [data-theme="light"] #dynamicTableContainer2 .data-table tbody tr.stripe-odd {
     background: #E9F3FE;
+  }
+
+  [data-theme="light"] #dynamicTableContainer2 .data-table tbody tr.stripe-even {
+    background: #ffffff;
   }
 
   [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-index,
@@ -633,6 +648,10 @@
   }
 
   [data-theme="light"] .top10-icon {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
+  }
+
+  [data-theme="light"] .expand-icon img {
     filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
   }
 
