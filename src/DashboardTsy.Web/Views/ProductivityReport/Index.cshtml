@@ -116,7 +116,7 @@
 </div>
 
 <!-- AI İçgörüleri (Floating Button) -->
-<div class="ai-insights">
+<div class="ai-insights" id="aiInsightsContainer" style="display:none;">
     <a href="#" class="ai-insights-btn" id="aiInsightsBtn">
         <img src="~/images/ai-logo.svg" alt="AI" />
         <span class="ai-insights-label">AI İçgörüleri</span>
@@ -184,6 +184,11 @@
     <script src="~/js/ai-insights.js" asp-append-version="true"></script>
     <script>
     $(document).ready(function () {
+
+        // AI İçgörüleri butonunu backend ayarına göre göster/gizle.
+        AppSettings.isVisible('ProductivityReport.AiInsight.Visible').then(function (visible) {
+            $('#aiInsightsContainer').toggle(visible);
+        });
 
         // Data field mapping per section (by section index in OrderNo)
         // Region returns 2 sections (manager+roles, NPS); Branch returns 3 sections (manager+months, roles, NPS).
