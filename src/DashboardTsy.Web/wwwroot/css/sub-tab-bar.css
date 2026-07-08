@@ -30,6 +30,7 @@
   background: rgb(21 32 88);
   color: var(--white);
   font-weight: 700;
+  -webkit-backdrop-filter: blur(120px);
   backdrop-filter: blur(120px);
 }
 
