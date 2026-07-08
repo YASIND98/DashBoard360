@@ -45,8 +45,12 @@ var PUPA_TYPE_LABELS = {
   1: "Pazarlama",
   2: "Operasyon",
   3: "SDK",
-  4: "Özel Bankacılık"
+  4: "Özel Bankacılık",
+  "-1": "Yönetim"
 };
+
+// "Yönetim" (Key -1) pupa-types servisinden dönmez; ön yüzde statik olarak en sona eklenir.
+var PUPA_TYPE_MANAGEMENT_KEY = -1;
 
 // dashboard/score-cards Key -> ön yüzde gösterilecek skor kart etiketi
 var SCORE_CARD_LABELS = {
@@ -116,7 +120,18 @@ var SCORE_CARD_DETAIL_COLUMN_LABELS = [
     { key: "KAZANIM", label: "Kazanım" },
     { key: "MUST_DURUM", label: "Müşteri Durumu" },
     { key: "MUST_NO", label: "Müşteri No" },
-    { key: "UYMAYAN_KURAL", label: "Gerçekleşmeme Nedeni" }
+    { key: "UYMAYAN_KURAL", label: "Gerçekleşmeme Nedeni" },
+    { key: "MUSTERI_GRUP", label: "Müşteri Grubu" },
+    { key: "ONCEKI_TOPLAM_VARLIK", label: "Önceki Toplam Varlık" },
+    { key: "KAZANIM_SONRASI_VARLIK", label: "Kazanım Sonrası Varlık" },
+    { key: "ILAVE_ALINAN_VARLIK", label: "İlave Alınan Varlık" },
+    { key: "SKORKARTA_YAZMA_TARIHI", label: "Skorkarta Yazma Tarihi" },
+    { key: "VARLIK_KAZANIM_KONTROL_TARIHI", label: "Varlık Kazanım Kontrol Tarihi" },
+    { key: "VARLIK_KAZANIM_TARIHI", label: "Varlık Kazanım Tarihi" },
+    { key: "SKORKART_DETAYI", label: "Skorkart Detayı" },
+    { key: "ELEME_GRUP", label: "Eleme Grubu" },
+    { key: "URUN", label: "Ürün" },
+    { key: "ACIKLAMA", label: "Açıklama" }
 ];
 
 // Skor kart tablosu kolon başlıkları

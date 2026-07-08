@@ -30,6 +30,8 @@ $(function () {
     let _userRoleCode;
     let _dateNumber;
     let _scoreCardId;
+    let _dashboardPupaType;   // userDashboard.pupaType; (-1 dışı) sabit bir tip geldiyse pupa-types servisi çağrılmaz
+    let _dashboardScoreCardId;   // userDashboard.scoreCardId; (-1 dışı) sabit bir kart geldiyse score-cards servisi çağrılmaz
     var _regionDisabled = false, _branchDisabled = false, _registerDisabled = false;
     var _tabModel = [];
     var _overview = null;
@@ -59,6 +61,8 @@ $(function () {
             _regionCode = ud.regionCode;
             _branchCode = ud.branchCode;
             _registerId = ud.registerId;
+            _dashboardPupaType = ud.pupaType;
+            _dashboardScoreCardId = ud.scoreCardId;
             _regionDisabled   = ud.regionCode !== -1;
             _branchDisabled   = ud.branchCode !== -1;
             _registerDisabled = ud.registerId !== -1;
@@ -95,7 +99,8 @@ $(function () {
     // Pupa tipi: Key -> statik etiket (PUPA_TYPE_LABELS)
     function renderPupaChannels(pupaRes) {
         var kv = (pupaRes && pupaRes.keyValues) || [];
-        // Servis boş/başarısızsa segmentleri temizle (statik placeholder kalmasın).
+        kv = kv.filter(function (item) { return Number(item.key) !== PUPA_TYPE_MANAGEMENT_KEY; });
+        if (!_registerDisabled) kv = kv.concat([{ key: PUPA_TYPE_MANAGEMENT_KEY }]);
         var html = '';
         kv.forEach(function (item, i) {
             var key = item.key;
@@ -112,7 +117,26 @@ $(function () {
         return isNaN(p) ? 1 : p;
     }
 
+    // userDashboard'da (-1 dışında) sabit bir pupa tipi geldi mi? Geldiyse pupa-types servisine gidilmez.
+    function hasFixedPupaType() {
+        return _dashboardPupaType != null && Number(_dashboardPupaType) !== PUPA_TYPE_MANAGEMENT_KEY;
+    }
+
+    // Sabit pupa tipinde tek segment çiz (servis çağrılmaz); "1"/1 fark etmez, PUPA_TYPE_LABELS ile etiketlenir.
+    function renderSinglePupaChannel(pupaType) {
+        $('#scChannels').html(
+            '<button type="button" class="segment active" data-channel="' + pupaType + '">' +
+                PUPA_TYPE_LABELS[pupaType] + '</button>'
+        );
+    }
+
     function reloadByDateNumber() {
+        // userDashboard'da sabit pupa tipi geldiyse pupa-types servisine gitme; yalnızca o tek tipi göster.
+        if (hasFixedPupaType()) {
+            renderSinglePupaChannel(_dashboardPupaType);
+            ScoreCard.filters.loadRegions(loadScoreCardTypes);
+            return;
+        }
         fetchPupaTypes(_dateNumber, function (pupaRes) {
             renderPupaChannels(pupaRes);
             ScoreCard.filters.loadRegions(loadScoreCardTypes);
@@ -190,11 +214,16 @@ $(function () {
         if (reload) reloadByScoreCard();   // scoreCardId değişti -> branches/registers de yeniden çekilir
     }
 
+    // userDashboard'da (-1 dışında) sabit bir skor kartı geldi mi? Geldiyse score-cards servisine gidilmez.
+    function hasFixedScoreCardId() {
+        return _dashboardScoreCardId != null && Number(_dashboardScoreCardId) !== SCORE_CARD_OVERVIEW_KEY;
+    }
+
     function renderScoreCardTabs(scRes) {
         var kv = (scRes && scRes.keyValues) || [];
-        // "Genel Bakış" (-1) servisten gelmez; ön yüzde statik eklenir (tüm kullanıcılarda, en başta).
         kv = kv.filter(function (item) { return Number(item.key) !== SCORE_CARD_OVERVIEW_KEY; });
-        kv = [{ key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
+        // "Genel Bakış" (-1) yalnızca sicil kısıtı yokken (registerId === -1) VE sabit skor kartı yokken en başa eklenir.
+        if (!_registerDisabled && !hasFixedScoreCardId()) kv = [{ key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
         _tabModel = buildScoreCardTabModel(kv);
         $('#scTabList').html(_tabModel.map(function (t, i) {
             var attr = (t.type === 'single') ? ' data-scorecard="' + t.key + '"' : '';
@@ -216,6 +245,12 @@ $(function () {
 
     // Pupa/period değişince çalışır: score-cards iste -> sekmeleri çiz (_scoreCardId) -> şube -> sicil -> tablo.
     function loadScoreCardTypes() {
+        // userDashboard'da sabit skor kartı geldiyse score-cards servisine gitme; yalnızca o tek kartı göster.
+        if (hasFixedScoreCardId()) {
+            renderScoreCardTabs({ keyValues: [{ key: Number(_dashboardScoreCardId) }] });
+            reloadByScoreCard();
+            return;
+        }
         fetchScoreCards(_dateNumber, activePupaType(), function (scRes) {
             renderScoreCardTabs(scRes);
             reloadByScoreCard();
@@ -941,10 +976,7 @@ $(function () {
         // pupaType değişti -> skor kart tipleri (sekmeler) + tablo yenilensin
         loadScoreCardTypes();
     });
-
-    // Period tipi (Aylık / Çeyreklik / Yıllık): aktif butonu güncelle ve yeni tipin
-    // dönemlerini çek (scorecard/periods — tek istek). loadPupaFilters date-picker'ı besler,
-    // _dateNumber'ı ilk döneme ayarlar ve tabloyu yeniden yükler.
+    
     $('#scPeriod').on('click', '.period-btn', function () {
         $('#scPeriod .period-btn').removeClass('active');
         $(this).addClass('active');
@@ -966,7 +998,7 @@ $(function () {
         var c = $(this).data('col');
         if (!c || c === selectedCol) return;
         selectedCol = c;
-        renderReportBody();   // head + body yeniden çizilir
+        renderReportBody();
     });
 
     $(document).on('click', '#scReportHead th[data-sort-key]', function () {
@@ -993,15 +1025,12 @@ $(function () {
         selectedTypeId = $(this).attr('data-type') || '';
         renderReportBody();
     });
-    // Dışarı tıklayınca kapat
     $(document).on('click', function (e) {
         if (!$(e.target).closest('.sc-type-filter').length) {
             $('.sc-type-filter').removeClass('open');
         }
     });
 
-    // İlk render: kullanıcı yetki/bağlamı (scorecard/authorities) çekilir ve filtre zinciri kurulur.
-    // Token yönetimi backend (ScoreCardTokenService) tarafından yapılır.
     fetchUserAuthorities(function (auth) {
         applyUserAuthorities(auth);
         loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');

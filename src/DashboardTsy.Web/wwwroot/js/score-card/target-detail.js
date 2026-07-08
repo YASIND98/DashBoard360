@@ -29,7 +29,6 @@ $(function () {
     }
 
     // Servis (ScoreCardDetail) cevabını dinamik kolonlu tabloya çevirir.
-    // Yalnızca SCORE_CARD_DETAIL_COLUMN_LABELS'te karşılığı (label'ı) olan key'ler gösterilir
     function buildDynamicResponse(scoreCardDetail) {
         var rows = [];
         try {
@@ -42,16 +41,20 @@ $(function () {
         var labelByKey = {};
         labels.forEach(function (c) { labelByKey[c.key] = c.label; });
         var sample = rows.length ? rows[0] : {};
+        // Servisten dönse bile ön yüzde gösterilmeyen kontrol alanları.
+        var HIDDEN_KEYS = { LINK: true, DOB_BAYI: true };
         var columns = Object.keys(sample)
-            .filter(function (key) { return labelByKey[key] != null; })
-            .map(function (key) { return { key: key, label: labelByKey[key] }; });
+            .filter(function (key) { return !HIDDEN_KEYS[key]; })
+            .map(function (key) {
+                return { key: key, label: labelByKey[key] != null ? labelByKey[key] : key };
+            });
         return { columns: columns, rows: rows, dynamic: true };
     }
 
     // Dinamik tabloda tek hücreyi alan adına göre biçimlendir
     function formatDetailCell(key, value) {
         if (value == null) return '';
-        if (key === 'ACILIS_TARIHI') return fmtIsoDate(value);
+        if (/_TARIHI$/.test(key)) return fmtIsoDate(value);   // ACILIS_TARIHI + Varlık Kazanım tarih kolonları
         if (key === 'ACCOUNT_NUMBER') return '<span class="sc-account">' + escapeHtml(String(value)) + '</span>';
         return escapeHtml(String(value).trim());
     }
