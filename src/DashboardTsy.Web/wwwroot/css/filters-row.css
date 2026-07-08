@@ -442,4 +442,42 @@
     flex-shrink: 0;
     opacity: 0.75;
   }
+
+  /* ===== Light tema mobile ===== */
+  [data-theme="light"] .filters-row {
+    background: #ffffff;
+  }
+
+  [data-theme="light"] .filter-dropdown {
+    border-color: #12375C;
+    color: #12375C;
+  }
+
+  [data-theme="light"] .filter-dropdown img {
+    filter: brightness(0) opacity(0.65);
+  }
+
+  [data-theme="light"] .filter-search {
+    border-color: #12375C;
+    color: #12375C;
+  }
+
+  [data-theme="light"] .filter-search img {
+    filter: brightness(0) opacity(0.65);
+  }
+
+  [data-theme="light"] .mobile-more-btn {
+    border-color: #12375C;
+    color: #12375C;
+  }
+
+  [data-theme="light"] .mobile-more-dropdown {
+    background: #E9F3FE;
+    border-color: rgba(18, 55, 92, 0.15);
+  }
+
+  [data-theme="light"] .mobile-more-item,
+  [data-theme="light"] .download-pdf-btn.mobile {
+    color: #12375C;
+  }
 }

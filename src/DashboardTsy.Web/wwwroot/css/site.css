@@ -546,6 +546,10 @@ body:has(.scorecard-panel.open)::before {
     background: #0f2d5c;
     color: #ffffff;
   }
+
+  [data-theme="light"] .page-title {
+    color: #12375C;
+  }
 }
 
 @media (max-width: 950px) {

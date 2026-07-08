@@ -508,6 +508,7 @@
   #dynamicTableContainer2.table-container {
     border-radius: 0;
     margin: 0;
+    padding: 0;
   }
 
   /* ===== Hedef raporları sayfası: İlk 3 sütun sticky ===== */
@@ -542,7 +543,6 @@
   .page-home .data-table thead th.col-expand,
   .page-home .data-table thead th.col-left {
     z-index: 5;
-    background: rgb(21, 32, 88);
   }
 
   /* Satır arkaplanları – sticky hücreler şeffaf kalırsa alttan içerik görünür */
@@ -590,6 +590,43 @@
   [data-theme="light"] .legend-value {
     color: #262A33;
     font-style: normal;
+  }
+
+  [data-theme="light"] .table-container {
+    background: var(--main-bg);
+  }
+
+  [data-theme="light"] .data-table thead th {
+    background: #E9F3FE;
+  }
+
+  [data-theme="light"] .data-table thead th,
+  [data-theme="light"] .table-row td {
+    color: #262A33;
+  }
+
+  [data-theme="light"] .data-table tbody tr.stripe-odd {
+    background: #ffffff;
+  }
+
+  [data-theme="light"] .data-table tbody tr.stripe-even {
+    background: #E9F3FE;
+  }
+
+  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-index,
+  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-expand,
+  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-left {
+    background: #ffffff;
+  }
+
+  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-index,
+  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-expand,
+  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-left {
+    background: #E9F3FE;
+  }
+
+  [data-theme="light"] .table-row td {
+    border-color: #B6D6F8;
   }
 }
 
