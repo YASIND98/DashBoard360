@@ -2,7 +2,7 @@ function formatPercent(ratio) {
     if (!ratio) return "-";
     var rounded = Math.round(ratio * 10) / 10;
     if (rounded % 1 === 0) return rounded;
-    return rounded.toFixed(1).replace('.', '.<small>') + '</small>';
+    return ratio.toFixed(2).replace('.', '.<small>') + '</small>';
 }
 
 
