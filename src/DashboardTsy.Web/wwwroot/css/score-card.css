@@ -459,18 +459,6 @@
   stroke-dasharray: 2 4;
 }
 
-.sc-trend-grid.sc-trend-hl {
-  stroke: #8FDA9B;
-}
-
-.sc-trend-dot.sc-trend-hl {
-  fill: #8FDA9B;
-}
-
-.sc-trend-axis.sc-trend-hl {
-  fill: #8FDA9B;
-}
-
 .sc-trend-plot-bg {
   fill: rgba(255, 255, 255, 0.02);
 }

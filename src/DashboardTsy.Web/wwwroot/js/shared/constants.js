@@ -52,6 +52,9 @@ var PUPA_TYPE_LABELS = {
 // "Yönetim" (Key -1) pupa-types servisinden dönmez; ön yüzde statik olarak en sona eklenir.
 var PUPA_TYPE_MANAGEMENT_KEY = -1;
 
+// "Özel Bankacılık" (Key 4): bu pupa tipinde skor kart sekmelerine "Genel Bakış" eklenmez.
+var PUPA_TYPE_PRIVATE_BANKING_KEY = 4;
+
 // dashboard/score-cards Key -> ön yüzde gösterilecek skor kart etiketi
 var SCORE_CARD_LABELS = {
   "-1": "Genel Bakış",
@@ -74,9 +77,9 @@ var SCORE_CARD_LABELS = {
   17: "Tarım-ST",
   19: "Mobil Satış",
   20: "ÖB Ve Yatırım",
-  21: "ŞUBE Müdürü SKORKART",
-  22: "KOBI DENIZ",
-  23: "BÖLGE Sorumlusu",
+  21: "Şube Müdürü Skorkart",
+  22: "KOBI Deniz",
+  23: "Bölge Sorumlusu",
   24: "Satış Müdürü",
   25: "Bireysel Mikro",
   26: "Bireysel Kitle",
@@ -89,7 +92,7 @@ var SCORE_CARD_LABELS = {
   34: "Kıbrıs-OBİ",
   35: "Kıbrıs-KBİ",
   36: "Kıbrıs-MİS-NİS",
-  37: "BÖLGE Müdürü",
+  37: "Bölge Müdürü",
   38: "Kamu Portföy",
   39: "Ticari Merkez BD",
   40: "Maaş Müşterisi"
@@ -105,9 +108,24 @@ var SCORE_CARD_GROUPS = [
 // "Genel Bakış" sekmesi (Key -1) skor kart servisinden dönmez; ön yüzde eklenir.
 var SCORE_CARD_OVERVIEW_KEY = -1;
 
+// "Yönetim" pupa tipinde score-cards servisine gidilmez; statik olarak bu skor kartları listelenir.
+// 21 = ŞUBE Müdürü SKORKART, 37 = BÖLGE Müdürü
+var SCORE_CARD_MANAGEMENT_KEYS = [21, 37];
+
+// Bu skor kartları seçildiğinde alt sekmeler scorecard/types servisinden gelen skor kart tipleridir
+var SCORE_CARD_TYPE_TAB_IDS = [19, 20, 22];
+
 var SCORE_CARD_OVERVIEW_STATIC_COLUMNS = {
   SUBE_ADI: "Şube Adı",
   BOLGE_ADI: "Bölge Adı"
+};
+
+// Genel Bakış özet tablosunda servis dönse bile gizlenecek HG kolonları
+var SCORE_CARD_OVERVIEW_HIDDEN_KEYS = {
+  HG31: true,
+  HG32: true,
+  HG34: true,
+  HG35: true
 };
 
 // Skor Kart - Hedef Detayı kolon eşlemesi
