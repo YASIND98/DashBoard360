@@ -39,7 +39,7 @@ $(function () {
                 branchCode: R().branchCode,
                 dateNumber: R().dateNumber,
                 registerId: R().registerId,
-                scoreCardTypeId: 0,
+                scoreCardTypeId: (R().scoreCardTypeId ? R().scoreCardTypeId : -1),
                 regionCode: R().regionCode,
                 scoreCardId: R().scoreCardId
             })
@@ -124,7 +124,7 @@ $(function () {
                 dateNumber: R().dateNumber,
                 pupaTypeId: R().activePupaType(),
                 registerText: -1,
-                scoreCardTypeId: 0
+                scoreCardTypeId: (R().scoreCardTypeId ? R().scoreCardTypeId : -1)
             })
         }).done(function (res) {
             callback(res);

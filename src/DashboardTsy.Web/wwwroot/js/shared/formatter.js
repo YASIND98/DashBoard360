@@ -16,7 +16,7 @@ function percentColor(ratio) {
 
 function formatNumber(value, isPrice, productName) {
     if (!value) return "-";
-    var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
+    var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(value);
     if (!isPrice) return num;
     var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
     return currency + ' ' + num;

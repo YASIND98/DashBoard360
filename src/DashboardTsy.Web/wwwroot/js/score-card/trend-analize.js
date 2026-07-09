@@ -60,9 +60,9 @@ $(function () {
         var plotW = W - ml - mr;
         var plotH = H - mt - mb;
 
-        // Y ekseni statik: HG oranı (%) — sabit ölçek 0..200
-        var top = 200;
-        var Y_TICKS = [0, 50, 75, 100, 150, 200];
+        // Y ekseni statik: HG oranı (%) — sabit ölçek 0..50
+        var top = 50;
+        var Y_TICKS = [0, 10, 20, 30, 40, 50];
         var n = data.values.length;
         var step = n > 1 ? plotW / (n - 1) : 0;
 
@@ -88,11 +88,9 @@ $(function () {
         var yLabels = '', yGrid = '', yDots = '';
         Y_TICKS.forEach(function (val) {
             var y = yAt(val);
-            // %75 eşik çizgisi vurgulu (yeşil)
-            var hl = val === 75 ? ' sc-trend-hl' : '';
-            yGrid += '<line x1="' + ml + '" y1="' + y + '" x2="' + (W - mr) + '" y2="' + y + '" class="sc-trend-grid' + hl + '" />';
-            yDots += '<circle cx="' + ml + '" cy="' + y + '" r="2.5" class="sc-trend-dot' + hl + '" />';
-            yLabels += '<text x="' + (ml - 12) + '" y="' + (y + 4) + '" text-anchor="end" class="sc-trend-axis' + hl + '">%' + val + '</text>';
+            yGrid += '<line x1="' + ml + '" y1="' + y + '" x2="' + (W - mr) + '" y2="' + y + '" class="sc-trend-grid" />';
+            yDots += '<circle cx="' + ml + '" cy="' + y + '" r="2.5" class="sc-trend-dot" />';
+            yLabels += '<text x="' + (ml - 12) + '" y="' + (y + 4) + '" text-anchor="end" class="sc-trend-axis">%' + val + '</text>';
         });
         var xLabels = '', xGrid = '', xDots = '', hovers = '';
         for (var j = 0; j < n; j++) {
