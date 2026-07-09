@@ -155,6 +155,10 @@ app.UseSession();
 
 app.MapControllers();
 app.MapControllerRoute(
+    name: "mobileLogin",
+    pattern: "mobile/login",
+    defaults: new { controller = "MobileAuth", action = "Login" });
+app.MapControllerRoute(
     name: "login",
     pattern: "login",
     defaults: new { controller = "Auth", action = "Login" });
