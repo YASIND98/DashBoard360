@@ -105,6 +105,59 @@ public class WindowsAuthService : IWindowsAuthService
         return response;
     }
 
+    public async Task<ApiResponse<UsersDto>> SessionLoginAsync(string sessionId, CancellationToken cancellationToken = default)
+    {
+        var response = NewResponse();
+
+        if (string.IsNullOrWhiteSpace(sessionId))
+        {
+            response.Message!.message = "Hata";
+            response.Message.message2 = "Session bilgisi boş olamaz.";
+            return response;
+        }
+
+        try
+        {
+            var hesNo = await GetHesNoBySessionIdAsync(sessionId, cancellationToken).ConfigureAwait(false);
+            if (string.IsNullOrWhiteSpace(hesNo))
+            {
+                response.Message!.message = "Hata";
+                response.Message.message2 = "Geçersiz session bilgisi.";
+                return response;
+            }
+
+            var windowsUser = await GetWindowsUserByCustomerNoAsync(hesNo, cancellationToken).ConfigureAwait(false);
+            if (windowsUser == null || string.IsNullOrEmpty(windowsUser.EMAIL) || string.IsNullOrEmpty(windowsUser.FIRSTNAME))
+            {
+                response.Message!.message = "Hata";
+                response.Message.message2 = "Kullanıcı kaydı bulunamadı.";
+                return response;
+            }
+
+            if (string.IsNullOrEmpty(windowsUser.REGIONCODE) || string.IsNullOrEmpty(windowsUser.BRANCHCODE))
+            {
+                response.Message!.message = "Hata";
+                response.Message.message2 = "Kullanıcı kaydı bulunamadı.";
+                return response;
+            }
+
+            var domainName = windowsUser.FULLLOGINNAME ?? hesNo;
+            var dto = MapToDtoFromWindowsUser(domainName, windowsUser);
+            dto.Password = GenerateJwt(new User { UserId = dto.UserId, Email = dto.Email });
+            response.Result = dto;
+
+            response.Message!.message = "Başarılı";
+            response.Message.message2 = "Giriş başarılı.";
+        }
+        catch (Exception)
+        {
+            response.Message!.message = "Hata";
+            response.Message.message2 = "İşlemler sırasında bir hata oluştu.";
+        }
+
+        return response;
+    }
+
     public async Task<ApiResponse<UsersDto>> LoginAsync(string username, string password, CancellationToken cancellationToken = default)
     {
         var response = NewResponse();
@@ -162,7 +215,7 @@ public class WindowsAuthService : IWindowsAuthService
         if (string.IsNullOrEmpty(_referansOptions.ConnectionString))
             return null;
 
-        const string sql = "SELECT FIRSTNAME, SURNAME, EMAIL, BRANCHCODE, REGIONCODE, GROUPNAME, URL FROM SSO_USERVIEW WHERE FULLLOGINNAME = @fullName";
+        const string sql = "SELECT FIRSTNAME, SURNAME, EMAIL, BRANCHCODE, REGIONCODE, GROUPNAME, URL, FULLLOGINNAME FROM SSO_USERVIEW WHERE FULLLOGINNAME = @fullName";
         await using var conn = new SqlConnection(_referansOptions.ConnectionString);
         await using var cmd = new SqlCommand(sql, conn);
         cmd.Parameters.AddWithValue("@fullName", fullLoginName);
@@ -171,6 +224,45 @@ public class WindowsAuthService : IWindowsAuthService
         if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
             return null;
 
+        return ReadWindowsUser(reader);
+    }
+
+    private async Task<WindowsUserInfo?> GetWindowsUserByCustomerNoAsync(string customerNo, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(_referansOptions.ConnectionString))
+            return null;
+
+        const string sql = "SELECT FIRSTNAME, SURNAME, EMAIL, BRANCHCODE, REGIONCODE, GROUPNAME, URL, FULLLOGINNAME FROM SSO_USERVIEW WHERE CUSTOMERNO = @customerNo";
+        await using var conn = new SqlConnection(_referansOptions.ConnectionString);
+        await using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@customerNo", customerNo);
+        await conn.OpenAsync(cancellationToken).ConfigureAwait(false);
+        await using var reader = await cmd.ExecuteReaderAsync(cancellationToken).ConfigureAwait(false);
+        if (!await reader.ReadAsync(cancellationToken).ConfigureAwait(false))
+            return null;
+
+        return ReadWindowsUser(reader);
+    }
+
+    private async Task<string?> GetHesNoBySessionIdAsync(string sessionId, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrEmpty(_referansOptions.ConnectionString))
+            return null;
+
+        const string sql = "SELECT TOP 1 HesNo FROM UserLogin WHERE SessionId = @sessionId ORDER BY SessionStartDate DESC";
+        await using var conn = new SqlConnection(_referansOptions.ConnectionString);
+        await using var cmd = new SqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@sessionId", sessionId);
+        await conn.OpenAsync(cancellationToken).ConfigureAwait(false);
+        var result = await cmd.ExecuteScalarAsync(cancellationToken).ConfigureAwait(false);
+        if (result == null || result == DBNull.Value)
+            return null;
+
+        return result.ToString();
+    }
+
+    private static WindowsUserInfo ReadWindowsUser(SqlDataReader reader)
+    {
         return new WindowsUserInfo
         {
             FIRSTNAME = reader.IsDBNull(0) ? null : reader.GetString(0),
@@ -179,7 +271,8 @@ public class WindowsAuthService : IWindowsAuthService
             BRANCHCODE = reader.IsDBNull(3) ? null : reader.GetValue(3)?.ToString(),
             REGIONCODE = reader.IsDBNull(4) ? null : reader.GetValue(4)?.ToString(),
             GROUPNAME = reader.IsDBNull(5) ? null : reader.GetString(5),
-            Resim = reader.IsDBNull(6) ? null : reader.GetString(6)
+            Resim = reader.IsDBNull(6) ? null : reader.GetString(6),
+            FULLLOGINNAME = reader.IsDBNull(7) ? null : reader.GetString(7)
         };
     }
 

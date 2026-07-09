@@ -9,4 +9,5 @@ public class WindowsUserInfo
     public string? REGIONCODE { get; set; }
     public string? GROUPNAME { get; set; }
     public string? Resim { get; set; }
+    public string? FULLLOGINNAME { get; set; }
 }

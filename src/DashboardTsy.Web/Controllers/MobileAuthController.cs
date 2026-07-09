@@ -91,6 +91,56 @@ public class MobileAuthController : Controller
     }
 
     [HttpGet]
+    public async Task<IActionResult> SessionLogin([FromQuery] string sessionId, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(sessionId))
+            return BadRequest(new ApiResponse<UsersDto>
+            {
+                Result = new UsersDto(),
+                Message = new MessageResult { message = "Hata", message2 = "Session bilgisi boş olamaz." }
+            });
+
+        if (AuthMockEnabled)
+        {
+            var mock = BuildMockUser("mock-session-user");
+            SetSession(mock, mock.DomainName);
+            await LogLoginSuccessAsync("MobileSession(Mock)", mock, cancellationToken).ConfigureAwait(false);
+            return Redirect("/");
+        }
+
+        var baseUrl = _configuration["DashboardApi:BaseUrl"]?.TrimEnd('/') + "/";
+        var url = $"{baseUrl}Public/SessionLogin?sessionId={WebUtility.UrlEncode(sessionId)}";
+
+        ApiResponse<UsersDto>? result = null;
+        try
+        {
+            var client = _httpClientFactory.CreateClient();
+            var response = await client.GetAsync(url, cancellationToken).ConfigureAwait(false);
+            if (response.IsSuccessStatusCode)
+            {
+                var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+                result = JsonSerializer.Deserialize<ApiResponse<UsersDto>>(json, JsonOptions);
+            }
+        }
+        catch
+        {
+            // ignore
+        }
+
+        if (result?.Result == null || result.Result.UserId <= 0 || result.Result.IsBlock == true)
+            return Unauthorized(result ?? new ApiResponse<UsersDto>
+            {
+                Result = new UsersDto(),
+                Message = new MessageResult { message = "Hata", message2 = "Session dogrulanamadi." }
+            });
+
+        SetSession(result.Result, result.Result.DomainName);
+        await LogLoginSuccessAsync("MobileSession", result.Result, cancellationToken).ConfigureAwait(false);
+
+        return Redirect("/");
+    }
+
+    [HttpGet]
     public async Task<IActionResult> Logout(CancellationToken cancellationToken)
     {
         var userId = HttpContext.Session.GetInt32("UserId") ?? 0;
