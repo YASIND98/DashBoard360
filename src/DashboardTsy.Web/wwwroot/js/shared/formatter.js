@@ -1,8 +1,8 @@
 function formatPercent(ratio) {
     if (!ratio) return "-";
-    var rounded = Math.round(ratio * 10) / 10;
-    if (rounded % 1 === 0) return rounded;
-    return ratio.toFixed(2).replace('.', '.<small>') + '</small>';
+    var truncated = Math.trunc(ratio * 100 + 1e-6) / 100;
+    if (truncated % 1 === 0) return truncated;
+    return truncated.toFixed(2).replace('.', '.<small>') + '</small>';
 }
 
 

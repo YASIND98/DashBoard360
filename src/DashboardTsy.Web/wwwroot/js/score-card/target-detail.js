@@ -84,7 +84,7 @@ $(function () {
                 registerId: ctx.registerId,
                 productId: ScoreCardDetail.ctx.productId,
                 status: statusCode,
-                productType: ScoreCardDetail.ctx.productType
+                productType: ScoreCardDetail.ctx.productTypeId
             })
         }).done(function (res) {
             handle(res);
@@ -250,7 +250,6 @@ $(function () {
         if (name) $('#scModalTitle').text(name);
         ScoreCardDetail.ctx = {
             productId: $i.data('product-id'),
-            productType: $i.data('product-type'),
             productTypeId: $i.data('product-type-id')
         };
         applyDetailButtonVisibility();

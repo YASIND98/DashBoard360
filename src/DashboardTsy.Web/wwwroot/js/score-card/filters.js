@@ -16,10 +16,10 @@ $(function () {
             type: 'POST',
             contentType: 'application/json',
             data: JSON.stringify({
-                regionCode: R().regionCode,
-                branchCode: R().branchCode,
+                regionCode: R().initialRegionCode,
+                branchCode: R().initialBranchCode,
                 dateNumber: R().dateNumber,
-                registerId: R().registerId
+                registerId: R().initialRegisterId
             })
         }).done(function (res) {
             callback(Array.isArray(res) ? res : ((res && res.rows) || []));
@@ -36,9 +36,9 @@ $(function () {
             contentType: 'application/json',
             data: JSON.stringify({
                 pupaType: R().activePupaType(),
-                branchCode: R().branchCode,
+                branchCode: R().initialBranchCode,
                 dateNumber: R().dateNumber,
-                registerId: R().registerId,
+                registerId: R().initialRegisterId,
                 scoreCardTypeId: (R().scoreCardTypeId ? R().scoreCardTypeId : -1),
                 regionCode: R().regionCode,
                 scoreCardId: R().scoreCardId
@@ -119,7 +119,7 @@ $(function () {
             data: JSON.stringify({
                 regionCode: R().regionCode,
                 branchCode: R().branchCode,
-                registerId: R().registerId,
+                registerId: R().initialRegisterId,
                 scoreCardId: R().scoreCardId,
                 dateNumber: R().dateNumber,
                 pupaTypeId: R().activePupaType(),
