@@ -4,7 +4,6 @@ $(function () {
     if (!document.getElementById('scReportBody')) return;
 
     var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
-    var TABLE_NOTE = 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.';   // legend + PDF footer
 
     // Ürün Tipi sütun filtresi (productTypeId üzerinden; '' = Tümü)
     var selectedTypeId = '';
@@ -33,6 +32,10 @@ $(function () {
     let _scoreCardTypeId = null;   // 19/20/22 kartlarında seçili skor kart tipi; tip modunda değilse null
     let _dashboardPupaType;   // userDashboard.pupaType; (-1 dışı) sabit bir tip geldiyse pupa-types servisi çağrılmaz
     let _dashboardScoreCardId;   // userDashboard.scoreCardId; (-1 dışı) sabit bir kart geldiyse score-cards servisi çağrılmaz
+    // auth.userDashboard başlangıç yetki değerleri
+    let _initialRegionCode;
+    let _initialBranchCode;
+    let _initialRegisterId;
     var _regionDisabled = false, _branchDisabled = false, _registerDisabled = false;
     var _tabModel = [];
     var _overview = null;
@@ -62,6 +65,10 @@ $(function () {
             _regionCode = ud.regionCode;
             _branchCode = ud.branchCode;
             _registerId = ud.registerId;
+            // regions servisi için sabit başlangıç değerleri (kullanıcı seçim yapsa da değişmez)
+            _initialRegionCode = ud.regionCode;
+            _initialBranchCode = ud.branchCode;
+            _initialRegisterId = ud.registerId;
             _dashboardPupaType = ud.pupaType;
             _dashboardScoreCardId = ud.scoreCardId;
             _regionDisabled   = ud.regionCode !== -1;
@@ -242,7 +249,9 @@ $(function () {
     function renderScoreCardTabs(scRes, skipOverview) {
         var kv = (scRes && scRes.keyValues) || [];
         kv = kv.filter(function (item) { return Number(item.key) !== SCORE_CARD_OVERVIEW_KEY; });
-        // "Genel Bakış" (-1) yalnızca sicil kısıtı yokken (registerId === -1) VE sabit skor kartı yokken en başa eklenir.
+        // Şube kısıtlı kullanıcıda (_branchDisabled) skor kartları gösterilmez.
+        if (_branchDisabled) kv = [];
+        // "Genel Bakış" (-1) yalnızca sicil kısıtı yokken (registerId === -1) ve sabit skor kartı yokken en başa eklenir.
         // Yönetim pupa tipinde (skipOverview) yalnızca sabit skor kartları gösterilir; Genel Bakış eklenmez.
         if (!skipOverview && !_registerDisabled && !hasFixedScoreCardId()) kv = [{ key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
         _tabModel = buildScoreCardTabModel(kv);
@@ -684,6 +693,11 @@ $(function () {
         try { rows = raw ? (JSON.parse(raw) || []) : (Array.isArray(res) ? res : []); }
         catch (e) { rows = []; }
 
+        // Ön yüzde gizlenecek bölge kodlarını (ör. 62 KKTC) servis dönse bile listeden çıkar.
+        rows = rows.filter(function (r) {
+            return SCORE_CARD_OVERVIEW_HIDDEN_REGION_CODES.indexOf(Number(r.BOLGE_KODU)) === -1;
+        });
+
         var sample = rows.length ? rows[0] : {};
         var columns = Object.keys(sample).filter(isOverviewVisibleColumn).map(function (k) {
             return { key: k, label: overviewColLabel(k) };
@@ -945,7 +959,6 @@ $(function () {
             infoLines: _scInfoLines(),
             columns: cols,
             rows: rows || [],
-            footerNote: TABLE_NOTE,
             filename: 'SkorKart.pdf'
         };
     }
@@ -990,7 +1003,10 @@ $(function () {
             html += '<td>' + r.productType + '</td>';
             html += '<td class="' + _selCol('Hedef') + '">' + formatNumber(r.targetValue) + '</td>';
             html += '<td class="' + _selCol('Gerçekleşen') + '">' + formatNumber(r.realizedValue) + '</td>';
-            html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + formatPercent(r.targetRealizationPercentage) + '</td>';
+            var hgBase = (r.targetRealizationPercentageBase)
+                ? ' <span class="' + percentColor(r.targetRealizationPercentageBase) + '">(' + formatPercent(r.targetRealizationPercentageBase) + ')</span>'
+                : '';
+            html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + formatPercent(r.targetRealizationPercentage) + hgBase + '</td>';
             html += '<td class="' + _selCol('Ağırlık %') + '">' + formatPercent(r.productWeight) + '</td>';
             html += '<td class="' + _selCol('Ağırlıklı H/G %') + '">' + formatPercent(r.weightedPercentage) + '</td>';
             html += '<td class="' + _selCol('Bekleyen') + '">' + formatNumber(r.pending) + '</td>';
@@ -1012,7 +1028,6 @@ $(function () {
     function renderLegend() {
         if (typeof renderTableLegend === 'function') {
             renderTableLegend('#scReportLegend', {
-                note: TABLE_NOTE,
                 ratio: true
             });
         }
@@ -1118,6 +1133,10 @@ $(function () {
     window.ScoreCard.report = {
         get regionCode()  { return _regionCode; },
         set regionCode(v) { _regionCode = v; },
+        // auth.userDashboard başlangıç değerleri (regions servisi hep bunları kullanır)
+        get initialRegionCode() { return _initialRegionCode; },
+        get initialBranchCode() { return _initialBranchCode; },
+        get initialRegisterId() { return _initialRegisterId; },
         get branchCode()  { return _branchCode; },
         set branchCode(v) { _branchCode = v; },
         get registerId()  { return _registerId; },

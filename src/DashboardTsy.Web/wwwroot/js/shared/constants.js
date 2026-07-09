@@ -44,7 +44,7 @@ var PUPA_PERIOD_TYPE = {
 var PUPA_TYPE_LABELS = {
   1: "Pazarlama",
   2: "Operasyon",
-  3: "SDK",
+  3: "ŞDK",
   4: "Özel Bankacılık",
   "-1": "Yönetim"
 };
@@ -77,7 +77,7 @@ var SCORE_CARD_LABELS = {
   17: "Tarım-ST",
   19: "Mobil Satış",
   20: "ÖB Ve Yatırım",
-  21: "Şube Müdürü Skorkart",
+  21: "Şube Müdürü",
   22: "KOBI Deniz",
   23: "Bölge Sorumlusu",
   24: "Satış Müdürü",
@@ -126,6 +126,9 @@ var SCORE_CARD_OVERVIEW_HIDDEN_KEYS = {
   HG34: true,
   HG35: true
 };
+
+// Genel Bakış bölge özetinde servis dönse bile gizlenecek bölge kodları (satır listelenmez)
+var SCORE_CARD_OVERVIEW_HIDDEN_REGION_CODES = [62];
 
 // Skor Kart - Hedef Detayı kolon eşlemesi
 var SCORE_CARD_DETAIL_COLUMN_LABELS = [

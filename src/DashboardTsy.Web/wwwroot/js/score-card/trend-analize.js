@@ -60,9 +60,9 @@ $(function () {
         var plotW = W - ml - mr;
         var plotH = H - mt - mb;
 
-        // Y ekseni statik: HG oranı (%) — sabit ölçek 0..50
-        var top = 50;
-        var Y_TICKS = [0, 10, 20, 30, 40, 50];
+        // Y ekseni statik: HG oranı (%) — sabit ölçek 0..10
+        var top = 10;
+        var Y_TICKS = [0, 2, 4, 6, 8, 10];
         var n = data.values.length;
         var step = n > 1 ? plotW / (n - 1) : 0;
 
