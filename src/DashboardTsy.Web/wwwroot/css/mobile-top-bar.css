@@ -73,10 +73,6 @@
   transition: color 0.2s;
 }
 
-.theme-toggle:hover {
-  color: var(--text-body);
-}
-
 .theme-icon {
   width: 18px;
   height: 18px;
@@ -207,11 +203,6 @@
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 }
 
-.mobile-menu-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: #ffffff;
-}
-
 .mobile-menu-item.active {
   background: #1a294b;
   border-left-color: #8b94a4;
@@ -255,21 +246,11 @@
   font-family: inherit;
 }
 
-.mobile-menu-footer-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.85);
-}
-
 .mobile-menu-footer-item svg,
 .mobile-menu-footer-item img {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
-}
-
-.mobile-menu-footer-item:hover svg,
-.mobile-menu-footer-item:hover img {
-  opacity: 0.85;
 }
 
 /* ===== Light tema ===== */

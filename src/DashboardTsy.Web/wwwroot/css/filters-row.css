@@ -198,18 +198,10 @@
   border-bottom: none;
 }
 
-.dropdown-item:hover {
-  background: var(--bg-hover);
-}
-
 .dropdown-item.selected {
   background: var(--bg-selected);
   font-weight: 600;
   color: var(--white);
-}
-
-.dropdown-item.selected:hover {
-  background: var(--bg-hover-selected);
 }
 
 .sub-arrow-icon {
@@ -251,6 +243,16 @@
 
 /* mobile-more desktop'ta gizli */
 .mobile-more { display: none; }
+
+@media (min-width: 1199px) {
+  .dropdown-item:hover {
+    background: var(--bg-hover);
+  }
+
+  .dropdown-item.selected:hover {
+    background: var(--bg-hover-selected);
+  }
+}
 
 @media (max-width: 1199px) {
   .filters-row {
@@ -430,10 +432,6 @@
 
   .mobile-more-item + .mobile-more-item {
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .mobile-more-item:hover {
-    background: rgba(255, 255, 255, 0.08);
   }
 
   .mobile-more-item svg {
