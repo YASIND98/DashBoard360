@@ -67,7 +67,7 @@ function buildDiffLegend(label) {
 function renderTableLegend(containerId, options) {
   var $el = $(containerId);
   var note = options.note || '';
-  var html = '<span class="legend-note">' + note + '</span>';
+  var html = note ? ('<span class="legend-note">' + note + '</span>') : '';
   if (options.diff) html += '<div class="legend-colors">' + buildDiffLegend(options.diff) + '</div>';
   if (options.ratio) html += '<div class="legend-colors">' + LEGEND_RATIO + '</div>';
   html += '<div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;"><img src="/images/download.svg" alt="PDF İndir" /><span>PDF İndir</span></div>';

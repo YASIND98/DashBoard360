@@ -942,10 +942,16 @@ $(function () {
                     return formatPercent(v);
                 };
             };
+            // H/G %: değer + (varsa) parantez içinde base. PDF düz/renksiz olduğu için span/renk yok. Toplam satırında boş.
+            var hgPct = function (v, row) {
+                if (row && row.__isTotal) return '';
+                var base = row && row.targetRealizationPercentageBase;
+                return formatPercent(v) + (base ? (' (' + formatPercent(base) + ')') : '');
+            };
             cols = [
                 { header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }, { header: 'Ürün Tipi', key: 'productType' },
                 { header: 'Hedef', key: 'targetValue' }, { header: 'Gerçekleşen', key: 'realizedValue' },
-                { header: 'H/G %', key: 'targetRealizationPercentage', format: pctOrTotal('blank') }, { header: 'Ağırlık %', key: 'productWeight', format: pctOrTotal('label') },
+                { header: 'H/G %', key: 'targetRealizationPercentage', format: hgPct }, { header: 'Ağırlık %', key: 'productWeight', format: pctOrTotal('label') },
                 { header: 'Ağırlıklı H/G %', key: 'weightedPercentage', format: formatPercent }, { header: 'Bekleyen', key: 'pending' }
             ];
             rows = visibleProductRows();
