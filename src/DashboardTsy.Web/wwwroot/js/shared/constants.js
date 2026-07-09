@@ -109,8 +109,7 @@ var SCORE_CARD_GROUPS = [
 var SCORE_CARD_OVERVIEW_KEY = -1;
 
 // "Yönetim" pupa tipinde score-cards servisine gidilmez; statik olarak bu skor kartları listelenir.
-// 21 = ŞUBE Müdürü SKORKART, 37 = BÖLGE Müdürü
-var SCORE_CARD_MANAGEMENT_KEYS = [21, 37];
+var SCORE_CARD_MANAGEMENT_KEYS = [21, 24, 37];
 
 // Bu skor kartları seçildiğinde alt sekmeler scorecard/types servisinden gelen skor kart tipleridir
 var SCORE_CARD_TYPE_TAB_IDS = [19, 20, 22];
