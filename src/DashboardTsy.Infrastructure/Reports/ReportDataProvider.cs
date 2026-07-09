@@ -1082,7 +1082,7 @@ public class ReportDataProvider : IReportDataProvider
         var parameters = new Dictionary<string, object?>
         {
             ["@SessionId"] = request.SessionId ?? string.Empty,
-            ["@ReportDate"] = request.ReportDate == default ? (object)DBNull.Value : request.ReportDate
+            ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
         };
 
         var ds = _spExecutor.ExecuteDataSet(
