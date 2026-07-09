@@ -72,6 +72,10 @@ public class ScoreCardController : ControllerBase
     public Task<IActionResult> TrendsProductSaleRealized([FromBody] JsonElement body, CancellationToken ct)
         => ProxyPost("scorecards/trends/product-sale-realized", body, ct);
 
+    [HttpPost("types")]
+    public Task<IActionResult> Types([FromBody] JsonElement body, CancellationToken ct)
+        => ProxyPost("scorecards/types", body, ct);
+
     private string? ReadExternalContextHeader()
         => Request.Headers.TryGetValue("ExternalContext", out var v) ? v.ToString() : null;
 

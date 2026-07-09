@@ -71,6 +71,10 @@ public class ScoreCardProxyController : ControllerBase
     public Task<IActionResult> TrendsProductSaleRealized([FromBody] JsonElement body, CancellationToken ct)
         => ProxyPost("scorecard/trends/product-sale-realized", body, ct);
 
+    [HttpPost("types")]
+    public Task<IActionResult> Types([FromBody] JsonElement body, CancellationToken ct)
+        => ProxyPost("scorecard/types", body, ct);
+
     private string? BuildExternalContext(JsonElement body)
     {
         var userCode = body.ValueKind == JsonValueKind.Object
