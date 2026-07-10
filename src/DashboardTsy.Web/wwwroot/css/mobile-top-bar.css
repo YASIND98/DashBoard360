@@ -83,7 +83,13 @@
 :root .theme-icon--sun   { display: block; }
 
 /* Light modda ay görünür, güneş gizli */
-[data-theme="light"] .theme-icon--moon { display: block; }
+[data-theme="light"] .theme-icon--moon {
+  display: block;
+  background: #12375c;
+  border-radius: 50%;
+  padding: 2px;
+}
+
 [data-theme="light"] .theme-icon--sun  { display: none; }
 
 /* ===== Mobile Menu Overlay ===== */
