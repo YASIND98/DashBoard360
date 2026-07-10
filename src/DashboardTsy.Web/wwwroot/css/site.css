@@ -367,6 +367,34 @@ body:has(.scorecard-panel.open)::before {
   #mobileScorecardWrapper {
     display: none !important;
   }
+
+  [data-theme="light"] .main-content {
+    background: #fbfbfd;
+  }
+
+  [data-theme="light"] .page-title {
+    color: #262A33;
+  }
+
+  [data-theme="light"] .period-btn {
+    background: #ffffff;
+    color: #12375C;
+    border-color: #536076;
+  }
+
+  [data-theme="light"] .period-btn .period-icon {
+    filter: brightness(0) saturate(100%) invert(34%) sepia(20%) saturate(500%) hue-rotate(180deg) brightness(85%);
+  }
+
+  [data-theme="light"] .period-btn.active {
+    background: #12375C;
+    color: #ffffff;
+    filter:none;
+  }
+
+  [data-theme="light"] .period-btn.active .period-icon {
+    filter:none;
+  }
 }
 
 .desktop {

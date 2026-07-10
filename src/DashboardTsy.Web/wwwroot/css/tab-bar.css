@@ -47,6 +47,20 @@
   align-items: center;
 }
 
+@media (min-width: 1200px) {
+  [data-theme="light"] .tab {
+    color: #8795A9;
+  }
+  [data-theme="light"] .tab.active {
+    color: #12375C;
+    opacity: 1;
+    border-bottom: 2px solid #12375C;
+  }
+  [data-theme="light"] .tab + .tab::before {
+    background: #D5DBE5;
+  }
+}
+
 @media (max-width: 1199px) {
   .tab-bar {
     flex-direction: column-reverse;

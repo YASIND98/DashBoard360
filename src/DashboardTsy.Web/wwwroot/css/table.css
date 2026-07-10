@@ -504,6 +504,89 @@
   .table-row:hover td {
     background: var(--bg-hover);
   }
+
+  [data-theme="light"] .table-container,
+  [data-theme="light"] #dynamicTableContainer2.table-container,
+  [data-theme="light"] #nplTableContainer.table-container {
+    background: #F0F6FE;
+  }
+
+  [data-theme="light"] .data-table thead th {
+    background: transparent;
+    color: #68778f;
+  }
+
+  [data-theme="light"] .data-table tbody .table-row:first-child td {
+    border-top: 1px solid #B6D6F8;
+  }
+
+  [data-theme="light"] .table-row td {
+    color: #262A33;
+    border-bottom: 1px solid #B6D6F8;
+  }
+
+  [data-theme="light"] .data-table tbody tr.stripe-odd, [data-theme="light"] #nplTableContainer .data-table tbody tr.stripe-odd, [data-theme="light"] .data-table tbody tr.sc-total-row td {
+    background: #f0f6fe;
+  }
+
+  [data-theme="light"] .custom-last-row td {
+    background: #f0f6fe !important;
+  }
+
+  [data-theme="light"] .data-table tbody tr.stripe-even {
+    background: #e8f2fd;
+  }
+
+  [data-theme="light"] .table-row:hover td {
+    background: #d4e9fb;
+  }
+
+  [data-theme="light"] .top10-icon {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
+  }
+
+  [data-theme="light"] .expand-icon img {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
+  }
+
+  [data-theme="light"] .table-row td:first-child{
+    border-left: 1px solid #B6D6F8 !important;
+  }
+
+  [data-theme="light"] .table-row td:last-child {
+    border-right: 1px solid #B6D6F8;
+  }
+
+  [data-theme="light"] .legend-note,
+  [data-theme="light"] .legend-value,
+  [data-theme="light"] .diff-toggle {
+    color: #536076;
+  }
+
+  [data-theme="light"] .diff-toggle .switch-icon.active {
+    content: url('/images/switch-active-light.svg');
+  }
+
+  [data-theme="light"] .diff-toggle .switch-icon.inactive {
+    content: url('/images/switch-inactive-light.svg');
+  }
+
+  [data-theme="light"] .download-pdf-btn {
+    color: #536076;
+  }
+
+  [data-theme="light"] .download-pdf-btn img {
+    filter: brightness(0) saturate(100%) invert(37%) sepia(11%) saturate(718%) hue-rotate(177deg) brightness(91%);
+  }
+
+  [data-theme="light"] .table-empty-state {
+    color: #3B4351;
+  }
+
+  [data-theme="light"] .table-empty-state img {
+    content: url('/images/empty-state-seach-light.svg');
+  }
+
 }
 
 @media (max-width: 1199px) {
@@ -610,6 +693,7 @@
   [data-theme="light"] .data-table thead th,
   [data-theme="light"] #nplDataTable thead th {
     background: #E9F3FE;
+    color: #262A33;
   }
 
   [data-theme="light"] .data-table thead th,

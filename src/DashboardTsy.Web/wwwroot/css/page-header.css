@@ -43,3 +43,18 @@
   height: 32px;
   border-radius: 50%;
 }
+
+@media (min-width: 1200px) {
+  [data-theme="light"] .page-header {
+    box-shadow: 0 2px 8px rgba(18, 55, 92, 0.15);
+  }
+  [data-theme="light"] .user-name {
+    color: #12375C;
+  }
+  [data-theme="light"] .date-text {
+    color: #3B3E45;
+  }
+  [data-theme="light"] .date-badge {
+    color: #585E6A;
+  }
+}

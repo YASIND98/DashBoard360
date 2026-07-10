@@ -252,6 +252,38 @@
   .dropdown-item.selected:hover {
     background: var(--bg-hover-selected);
   }
+  
+  [data-theme="light"] .filter-dropdown,
+  [data-theme="light"] .filter-search {
+    border-color: #cacbce;
+    color: #3B4351;
+  }
+
+  [data-theme="light"] .filter-dropdown img {
+    filter: brightness(0) opacity(0.65);
+  }
+
+  [data-theme="light"] .filter-search input,
+  [data-theme="light"] .filter-search input::placeholder {
+    color: #3B4351;
+  }
+
+  [data-theme="light"] .filter-search img {
+    filter: brightness(0) opacity(0.65);
+  }
+
+  [data-theme="light"] .segmented-control {
+    background: #E9F3FE;
+  }
+
+  [data-theme="light"] .segmented-control .segment {
+    color: #6b7a99;
+  }
+
+  [data-theme="light"] .segmented-control .segment.active {
+    background: #12375C;
+    color: #ffffff;
+  }
 }
 
 @media (max-width: 1199px) {

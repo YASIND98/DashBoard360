@@ -35,6 +35,16 @@
   backdrop-filter: blur(120px);
 }
 
+@media (min-width: 1200px) {
+  [data-theme="light"] .sub-tab {
+    background: #e8f3fe;
+  }
+  [data-theme="light"] .sub-tab.active {
+    background: #0f2d5c;
+    color: #ffffff;
+  }
+}
+
 /* ===== Mobil: < 1200px ===== */
 @media (max-width: 1199px) {
   .sub-tab-bar {

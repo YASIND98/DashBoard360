@@ -111,6 +111,12 @@
   display: block;
 }
 
+@media (min-width: 1200px) {
+  [data-theme="light"] .sidebar {
+    background: #12375c;
+  }
+}
+
 /* ===== Responsive: < 1200px ===== */
 @media (max-width: 1199px) {
   .sidebar {

@@ -33,3 +33,10 @@
   color: var(--bg-period);
   font-size: 14px;
 }
+
+@media (min-width: 1200px) {
+  [data-theme="light"] .breadcrumb-item,
+  [data-theme="light"] .breadcrumb-separator {
+    color: #3c4351;
+  }
+}
