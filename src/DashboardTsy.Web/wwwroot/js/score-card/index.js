@@ -1048,7 +1048,8 @@ $(function () {
             var hgBase = (r.targetRealizationPercentageBase)
                 ? ' <span class="' + percentColor(r.targetRealizationPercentageBase) + '">(' + formatPercent(r.targetRealizationPercentageBase) + ')</span>'
                 : '';
-            html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + formatPercent(r.targetRealizationPercentage) + hgBase + '</td>';
+            var hgMain = r.targetRealizationPercentage ? formatPercent(r.targetRealizationPercentage) : '';
+            html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + hgMain + hgBase + '</td>';
             html += '<td class="' + _selCol('Ağırlık %') + '">' + formatPercent(r.productWeight) + '</td>';
             html += '<td class="' + _selCol('Ağırlıklı H/G %') + '">' + formatPercent(r.weightedPercentage) + '</td>';
             html += '<td class="' + _selCol('Bekleyen') + '">' + formatNumber(r.pending) + '</td>';

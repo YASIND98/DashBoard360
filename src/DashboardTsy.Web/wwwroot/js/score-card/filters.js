@@ -103,6 +103,12 @@ $(function () {
             if (single) {
                 R().branchCode = _scBranches[0].branchCode;
                 $('#scBranchLabel').text(_scBranches[0].branchName);
+            } else {
+                var stillExists = _scBranches.some(function (b) { return b.branchCode === R().branchCode; });
+                if (!stillExists) {
+                    R().branchCode = -1;
+                    $('#scBranchLabel').text('Şube');
+                }
             }
             $('#scBranchSelect').toggleClass('disabled', R().branchDisabled);
             renderScBranchList();
@@ -158,6 +164,10 @@ $(function () {
             if (single) {
                 R().registerId = registers[0].registerId;
                 $('#scRegisterLabel').text(registers[0].registerName);
+            } else {
+                // Seçili sicil yeni cevapta yoksa seçim temizlensin (Tümü'ye dön); dönüyorsa korunur.
+                var stillExists = registers.some(function (r) { return r.registerId === R().registerId; });
+                if (!stillExists) resetRegisterFilter();
             }
             $('#scRegisterSelect').toggleClass('disabled', R().registerDisabled);
             renderRegisterList(registers);
