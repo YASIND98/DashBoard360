@@ -668,8 +668,9 @@ $(function () {
     function productTotalRowHtml(rows) {
         var sum = weightedTotal(rows);
         if (sum == null) return '';
-        var colIndex = COLUMNS.indexOf(SC_TOTAL_COL);
-        var trailing = COLUMNS.length - colIndex - 1;
+        var cols = reportColumns();
+        var colIndex = cols.indexOf(SC_TOTAL_COL);
+        var trailing = cols.length - colIndex - 1;
         return '<tr class="table-row sc-total-row">' +
             '<td colspan="' + colIndex + '" class="col-right">' + SC_TOTAL_COL + ' Toplamı:</td>' +
             '<td class="' + _selCol(SC_TOTAL_COL) + '">' + formatPercent(sum) + '</td>' +
@@ -677,9 +678,16 @@ $(function () {
             '</tr>';
     }
 
+    function reportColumns() {
+        if (_scoreCardId !== 21) return SCORE_CARD_REPORT_COLUMNS;
+        var cols = SCORE_CARD_REPORT_COLUMNS.slice();
+        cols.splice(cols.indexOf('Ürün / Hedef Adı') + 1, 0, 'Çalışan Sayısı');
+        return cols;
+    }
+
     function renderReportHead() {
         var html = '<tr>';
-        COLUMNS.forEach(function (c) {
+        reportColumns().forEach(function (c) {
             if (c === 'Ürün Tipi') {
                 // Filtre menüsü (seçilebilir kolon değil)
                 html += '<th class="sc-type-th">' + typeFilterHtml() + '</th>';
@@ -975,12 +983,15 @@ $(function () {
                 var base = row && row.targetRealizationPercentageBase;
                 return formatPercent(v) + (base ? (' (' + formatPercent(base) + ')') : '');
             };
-            cols = [
-                { header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }, { header: 'Ürün Tipi', key: 'productType' },
+            cols = [{ header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }];
+            // Şube Müdürü (21): ürün adının hemen sağında çalışan sayısı (norm).
+            if (_scoreCardId === 21) cols.push({ header: 'Çalışan Sayısı', key: 'norm' });
+            cols = cols.concat([
+                { header: 'Ürün Tipi', key: 'productType' },
                 { header: 'Hedef', key: 'targetValue' }, { header: 'Gerçekleşen', key: 'realizedValue' },
                 { header: 'H/G %', key: 'targetRealizationPercentage', format: hgPct }, { header: 'Ağırlık %', key: 'productWeight', format: pctOrTotal('label') },
                 { header: 'Ağırlıklı H/G %', key: 'weightedPercentage', format: formatPercent }, { header: 'Bekleyen', key: 'pending' }
-            ];
+            ]);
             rows = visibleProductRows();
             var ptSum = weightedTotal(rows);
             if (ptSum != null) {
@@ -1020,7 +1031,7 @@ $(function () {
                 emptyMsg = 'Seçili döneme ait veri bulunmamaktadır.';
             }
             $('#scReportBody').html(
-                '<tr class="no-result-row"><td colspan="' + COLUMNS.length + '" style="text-align:center;padding:48px 16px;">' +
+                '<tr class="no-result-row"><td colspan="' + reportColumns().length + '" style="text-align:center;padding:48px 16px;">' +
                     '<div class="table-empty-state">' +
                         '<img src="/images/empty-state-seach.svg" alt="" />' +
                         '<span>' + emptyMsg + '</span>' +
@@ -1042,6 +1053,8 @@ $(function () {
                 : '';
             html += '<td class="col-info">' + infoCell + '</td>';
             html += '<td class="col-left sc-product-name">' + r.productName + '</td>';
+            // Şube Müdürü (21): ürünün hemen yanında çalışan sayısı (servisten norm).
+            if (_scoreCardId === 21) html += '<td class="sc-norm">' + (r.norm != null ? r.norm : '') + '</td>';
             html += '<td>' + r.productType + '</td>';
             html += '<td class="' + _selCol('Hedef') + '">' + formatNumber(r.targetValue) + '</td>';
             html += '<td class="' + _selCol('Gerçekleşen') + '">' + formatNumber(r.realizedValue) + '</td>';
