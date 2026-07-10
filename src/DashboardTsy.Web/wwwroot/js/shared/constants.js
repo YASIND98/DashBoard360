@@ -80,7 +80,7 @@ var SCORE_CARD_LABELS = {
   21: "Şube Müdürü",
   22: "KOBI Deniz",
   23: "Bölge Sorumlusu",
-  24: "Satış Müdürü",
+  24: "Bölge Pazarlama Müdürü",
   25: "Bireysel Mikro",
   26: "Bireysel Kitle",
   27: "Merkezi Portföy Yönetimi",
@@ -111,8 +111,11 @@ var SCORE_CARD_OVERVIEW_KEY = -1;
 // "Yönetim" pupa tipinde score-cards servisine gidilmez; statik olarak bu skor kartları listelenir.
 var SCORE_CARD_MANAGEMENT_KEYS = [21, 24, 37];
 
-// Bu skor kartları seçildiğinde alt sekmeler scorecard/types servisinden gelen skor kart tipleridir
-var SCORE_CARD_TYPE_TAB_IDS = [19, 20, 22];
+// Bu skor kartlar seçildiğinde alt sekmeler scorecard/types servisinden gelen skor kart tipleridir
+var SCORE_CARD_TYPE_TAB_IDS = [19, 20, 22, 24, 27];
+
+// scorecard/types servisinden dönse bile ön yüzde gösterilmeyecek skor kart tip id'leri
+var SCORE_CARD_HIDDEN_TYPE_IDS = [9];
 
 var SCORE_CARD_OVERVIEW_STATIC_COLUMNS = {
   SUBE_ADI: "Şube Adı",
@@ -123,8 +126,10 @@ var SCORE_CARD_OVERVIEW_STATIC_COLUMNS = {
 var SCORE_CARD_OVERVIEW_HIDDEN_KEYS = {
   HG31: true,
   HG32: true,
+  HG33: true,
   HG34: true,
-  HG35: true
+  HG35: true,
+  HG36: true,
 };
 
 // Genel Bakış bölge özetinde servis dönse bile gizlenecek bölge kodları (satır listelenmez)
