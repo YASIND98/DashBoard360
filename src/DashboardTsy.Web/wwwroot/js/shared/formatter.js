@@ -1,8 +1,8 @@
 function formatPercent(ratio) {
     if (!ratio) return "-";
-    var rounded = Math.round(ratio * 10) / 10;
-    if (rounded % 1 === 0) return rounded;
-    return rounded.toFixed(1).replace('.', '.<small>') + '</small>';
+    var truncated = Math.trunc(ratio * 100 + 1e-6) / 100;
+    if (truncated % 1 === 0) return truncated;
+    return truncated.toFixed(2).replace('.', '.<small>') + '</small>';
 }
 
 
@@ -16,7 +16,7 @@ function percentColor(ratio) {
 
 function formatNumber(value, isPrice, productName) {
     if (!value) return "-";
-    var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(value);
+    var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(value);
     if (!isPrice) return num;
     var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
     return currency + ' ' + num;

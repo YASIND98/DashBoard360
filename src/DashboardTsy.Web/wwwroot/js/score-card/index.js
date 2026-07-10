@@ -4,7 +4,6 @@ $(function () {
     if (!document.getElementById('scReportBody')) return;
 
     var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
-    var TABLE_NOTE = 'Tabloda yer alan tutarlar /1000 olarak verilmektedir.';   // legend + PDF footer
 
     // Ürün Tipi sütun filtresi (productTypeId üzerinden; '' = Tümü)
     var selectedTypeId = '';
@@ -30,6 +29,14 @@ $(function () {
     let _userRoleCode;
     let _dateNumber;
     let _scoreCardId;
+    let _scoreCardTypeId = null;   // 19/20/22 kartlarında seçili skor kart tipi; tip modunda değilse null
+    let _dashboardPupaType;   // userDashboard.pupaType; (-1 dışı) sabit bir tip geldiyse pupa-types servisi çağrılmaz
+    let _dashboardScoreCardId;   // userDashboard.scoreCardId; (-1 dışı) sabit bir kart geldiyse score-cards servisi çağrılmaz
+    // auth.userDashboard başlangıç yetki değerleri
+    let _initialRegionCode;
+    let _initialBranchCode;
+    let _initialRegisterId;
+    var _regionDisabled = false, _branchDisabled = false, _registerDisabled = false;
     var _tabModel = [];
     var _overview = null;
     var _firstLoad = true;   // ilk veri gelene kadar tam ekran loader göstermek için
@@ -58,6 +65,15 @@ $(function () {
             _regionCode = ud.regionCode;
             _branchCode = ud.branchCode;
             _registerId = ud.registerId;
+            // regions servisi için sabit başlangıç değerleri (kullanıcı seçim yapsa da değişmez)
+            _initialRegionCode = ud.regionCode;
+            _initialBranchCode = ud.branchCode;
+            _initialRegisterId = ud.registerId;
+            _dashboardPupaType = ud.pupaType;
+            _dashboardScoreCardId = ud.scoreCardId;
+            _regionDisabled   = ud.regionCode !== -1;
+            _branchDisabled   = ud.branchCode !== -1;
+            _registerDisabled = ud.registerId !== -1;
         }
     }
 
@@ -80,7 +96,7 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/scorecard/pupa-types',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode, userCode: window.USER_CODE })
+            data: JSON.stringify({ dateNumber: dateNumber, roleCode: _userRoleCode })
         }).done(function (res) {
             callback(res);
         }).fail(function () {
@@ -90,14 +106,22 @@ $(function () {
 
     // Pupa tipi: Key -> statik etiket (PUPA_TYPE_LABELS)
     function renderPupaChannels(pupaRes) {
-        var kv = (pupaRes && pupaRes.KeyValues) || [];
-        // Servis boş/başarısızsa segmentleri temizle (statik placeholder kalmasın).
+        var kv = (pupaRes && pupaRes.keyValues) || [];
+        kv = kv.filter(function (item) { return item.key !== PUPA_TYPE_MANAGEMENT_KEY; });
+        if (!_registerDisabled) kv = kv.concat([{ key: PUPA_TYPE_MANAGEMENT_KEY }]);
+
+        // Servis tekrar çağrıldığında (ör. tarih değişimi) mevcut seçili pupa tipi yeni cevapta da varsa o seçili kalır; yoksa ilk seçenek aktif olur.
+        var prev = $('#scChannels .segment.active').data('channel');
+        var prevKey =  prev ? prev : null;
+        var activeIndex = 0;
+        kv.forEach(function (item, i) { if (item.key === prevKey) activeIndex = i; });
+
         var html = '';
         kv.forEach(function (item, i) {
-            var key = item.Key;
+            var key = item.key;
             var label = PUPA_TYPE_LABELS[key];
             if (i > 0) html += '<div class="divider"></div>';
-            html += '<button type="button" class="segment' + (i === 0 ? ' active' : '') +
+            html += '<button type="button" class="segment' + (i === activeIndex ? ' active' : '') +
                     '" data-channel="' + key + '">' + label + '</button>';
         });
         $('#scChannels').html(html);
@@ -108,7 +132,26 @@ $(function () {
         return isNaN(p) ? 1 : p;
     }
 
+    // userDashboard'da (-1 dışında) sabit bir pupa tipi geldi mi? Geldiyse pupa-types servisine gidilmez.
+    function hasFixedPupaType() {
+        return _dashboardPupaType != null && Number(_dashboardPupaType) !== PUPA_TYPE_MANAGEMENT_KEY;
+    }
+
+    // Sabit pupa tipinde tek segment çiz (servis çağrılmaz); "1"/1 fark etmez, PUPA_TYPE_LABELS ile etiketlenir.
+    function renderSinglePupaChannel(pupaType) {
+        $('#scChannels').html(
+            '<button type="button" class="segment active" data-channel="' + pupaType + '">' +
+                PUPA_TYPE_LABELS[pupaType] + '</button>'
+        );
+    }
+
     function reloadByDateNumber() {
+        // userDashboard'da sabit pupa tipi geldiyse pupa-types servisine gitme; yalnızca o tek tipi göster.
+        if (hasFixedPupaType()) {
+            renderSinglePupaChannel(_dashboardPupaType);
+            ScoreCard.filters.loadRegions(loadScoreCardTypes);
+            return;
+        }
         fetchPupaTypes(_dateNumber, function (pupaRes) {
             renderPupaChannels(pupaRes);
             ScoreCard.filters.loadRegions(loadScoreCardTypes);
@@ -132,11 +175,30 @@ $(function () {
             url: SCORE_CARD_BASE_URL + '/scorecard/score-cards',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: _userRoleCode, userCode: window.USER_CODE })
+            data: JSON.stringify({ dateNumber: dateNumber, pupaType: pupaType, roleCode: _userRoleCode})
         }).done(function (res) {
             callback(res);
         }).fail(function () {
             callback(null);
+        });
+    }
+
+    // scorecard/types: 19/20/22 skor kartlarında alt sekme olarak gösterilecek skor kart tipleri.
+    function fetchScoreCardTypes(scoreCardId, callback) {
+        $.ajax({
+            url: SCORE_CARD_BASE_URL + '/scorecard/types',
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                scoreCardId: scoreCardId,
+                pupaTypeId: activePupaType(),
+                registerId: _registerId,
+                dateNumber: _dateNumber
+            })
+        }).done(function (res) {
+            callback(res);
+        }).fail(function () {
+            callback([]);
         });
     }
 
@@ -146,11 +208,11 @@ $(function () {
         return groups.filter(function (g) { return g.keys.indexOf(key) > -1; })[0] || null;
     }
 
-    // Servis Key'lerinden sekme modeli: gruba ait key'ler tek üst sekmede (sub-tab) toplanır
+    // Servis key'lerinden sekme modeli: gruba ait key'ler tek üst sekmede (sub-tab) toplanır
     function buildScoreCardTabModel(kv) {
         var model = [], byGroup = {};
         kv.forEach(function (item) {
-            var key = item.Key;
+            var key = item.key;
             var label = SCORE_CARD_LABELS[key];
             var group = findScoreCardGroup(key);
             if (!group) return void model.push({ type: 'single', key: key, label: label });
@@ -183,63 +245,136 @@ $(function () {
             $('#scSubTabBar').hide();
             _scoreCardId = t ? t.key : -1;
         }
-        if (reload) loadScoreCardTable();
+        if (reload) reloadByScoreCard();   // scoreCardId değişti -> branches/registers de yeniden çekilir
     }
 
-    function renderScoreCardTabs(scRes) {
-        var kv = (scRes && scRes.KeyValues) || [];
-        // "Genel Bakış" (-1) servisten gelmez; ön yüzde statik eklenir (tüm kullanıcılarda, en başta).
-        kv = kv.filter(function (item) { return Number(item.Key) !== SCORE_CARD_OVERVIEW_KEY; });
-        kv = [{ Key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
+    // userDashboard'da (-1 dışında) sabit bir skor kartı geldi mi? Geldiyse score-cards servisine gidilmez.
+    function hasFixedScoreCardId() {
+        return _dashboardScoreCardId != null && Number(_dashboardScoreCardId) !== SCORE_CARD_OVERVIEW_KEY;
+    }
+
+    function renderScoreCardTabs(scRes, skipOverview) {
+        var kv = (scRes && scRes.keyValues) || [];
+        kv = kv.filter(function (item) { return Number(item.key) !== SCORE_CARD_OVERVIEW_KEY; });
+        // "Genel Bakış" (-1) yalnızca sicil kısıtı yokken (registerId === -1) ve sabit skor kartı yokken en başa eklenir.
+        // Yönetim pupa tipinde (skipOverview) yalnızca sabit skor kartları gösterilir; Genel Bakış eklenmez.
+        if (!skipOverview && !_registerDisabled && !hasFixedScoreCardId()) kv = [{ key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
         _tabModel = buildScoreCardTabModel(kv);
         $('#scTabList').html(_tabModel.map(function (t, i) {
             var attr = (t.type === 'single') ? ' data-scorecard="' + t.key + '"' : '';
             return '<button class="tab" data-tabindex="' + i + '"' + attr + '>' + t.label + '</button>';
         }).join(''));
         if (_tabModel.length) {
-            activateMainTab($('#scTabList .tab').first(), false); // reload loadScoreCardTypes'te
+            // Servis tekrar çağrıldığında mevcut seçili skor kart yeni listede de varsa o sekme içindeyse ilgili alt sekme dahil) korunur; yoksa ilk sekme aktif olur.
+            var prev = _scoreCardId;
+            var mainIndex = 0, keepSubKey = null;
+            _tabModel.forEach(function (t, i) {
+                if (t.type === 'single') {
+                    if (t.key === prev) mainIndex = i;
+                } else {
+                    t.subs.forEach(function (s) { if (s.key === prev) { mainIndex = i; keepSubKey = s.key; } });
+                }
+            });
+            activateMainTab($('#scTabList .tab').eq(mainIndex), false); // reload loadScoreCardTypes'te
+            // Grup sekmesinde korunacak alt sekme varsa aktif et (activateMainTab ilk alt sekmeyi seçer).
+            if (keepSubKey != null) {
+                _scoreCardId = keepSubKey;
+                $('#scSubTabList .sub-tab').removeClass('active');
+                $('#scSubTabList .sub-tab[data-scorecard="' + keepSubKey + '"]').addClass('active');
+            }
         } else {
             $('#scSubTabBar').hide();
             _scoreCardId = -1;
         }
     }
 
-    // Pupa/period değişince çalışır: score-cards iste -> sekmeleri çiz (_scoreCardId) -> şube -> sicil -> tablo.
-    function loadScoreCardTypes() {
-        fetchScoreCards(_dateNumber, activePupaType(), function (scRes) {
-            renderScoreCardTabs(scRes);                 // _scoreCardId set edilir
-            // branches gövdesi scoreCardId + pupaType ister -> score-cards'tan SONRA, sicil/tablodan ÖNCE.
-            // (pupa/period değişiminde loadScoreCardTypes tekrar çağrıldığından branches de yenilenir.)
-            ScoreCard.filters.loadBranches(function () {            // filters.js
-                ScoreCard.filters.loadRegisters(loadScoreCardTable);
-            });
+    // Alt sekmeleri skor kart TİPLERİnden çiz (scorecard/types cevabı). İlk tip aktif.
+    function renderTypeSubTabs(types) {
+        types = types || [];
+        if (!types.length) { $('#scSubTabBar').hide(); return; }
+        $('#scSubTabList').html(types.map(function (t, i) {
+            return '<button class="sub-tab' + (i ? '' : ' active') +
+                   '" data-scorecardtype="' + t.scoreCardTypeId + '">' + t.scoreCardType + '</button>';
+        }).join(''));
+        $('#scSubTabBar').show();
+    }
+
+    // Şube -> sicil -> tablo zinciri. (Skor kart tipi seçimi de bunu tetikler; tipleri yeniden çekmez.)
+    function reloadScoreCardFilters() {
+        ScoreCard.filters.loadBranches(function () {
+            ScoreCard.filters.loadRegisters(loadScoreCardTable);
         });
     }
 
-    // scorecard/cumulatives: ana rapor tablosunu doldurur
-    // İstek gövdesi ekrandaki seçimlerden kurulur; servis hata verirse tablo boş kalır.
-    // session _reportDate (site.js, ISO) -> { year, month }
-    function reportDateParts() {
-        var d = (typeof _reportDate !== 'undefined' && _reportDate) ? new Date(_reportDate) : new Date();
-        if (isNaN(d.getTime())) d = new Date();
-        return { year: d.getFullYear(), month: d.getMonth() + 1 };
+    function reloadByScoreCard() {
+        if (SCORE_CARD_TYPE_TAB_IDS.indexOf(_scoreCardId) !== -1) {
+            fetchScoreCardTypes(_scoreCardId, function (types) {
+                // Servisten dönse bile gizlenecek tipleri (ör. scoreCardTypeId 9) ön yüzden çıkar.
+                types = (types || []).filter(function (t) {
+                    return SCORE_CARD_HIDDEN_TYPE_IDS.indexOf(t.scoreCardTypeId) === -1;
+                });
+                renderTypeSubTabs(types);
+                _scoreCardTypeId = (types && types.length) ? types[0].scoreCardTypeId : null;
+                reloadScoreCardFilters();
+            });
+            return;
+        }
+        _scoreCardTypeId = null;   // tip modunda değil -> servisler kendi varsayılan scoreCardTypeId'sini kullanır
+        reloadScoreCardFilters();
+    }
+
+    // Pupa/period değişince çalışır: score-cards iste -> sekmeleri çiz (_scoreCardId) -> şube -> sicil -> tablo.
+    function loadScoreCardTypes() {
+        // userDashboard'da sabit skor kartı geldiyse score-cards servisine gitme; yalnızca o tek kartı göster.
+        if (hasFixedScoreCardId()) {
+            renderScoreCardTabs({ keyValues: [{ key: Number(_dashboardScoreCardId) }] });
+            reloadByScoreCard();
+            return;
+        }
+        var pupaType = activePupaType();
+        // "Yönetim" pupa tipinde score-cards servisine gidilmez; statik olarak Şube Müdürü (21) ve Bölge Müdürü (37) skor kartları listelenir.
+        if (pupaType === PUPA_TYPE_MANAGEMENT_KEY) {
+            // Şube kısıtlı kullanıcıda (_branchDisabled) Yönetim'de yalnızca Şube Müdürü Skorkart (21) sekmesi gösterilir.
+            var mgmtKeys = _branchDisabled ? [21] : SCORE_CARD_MANAGEMENT_KEYS;
+            renderScoreCardTabs({
+                keyValues: mgmtKeys.map(function (k) { return { key: k }; })
+            }, true);
+            reloadByScoreCard();
+            return;
+        }
+        fetchScoreCards(_dateNumber, pupaType, function (scRes) {
+            // Özel Bankacılık pupa tipinde "Genel Bakış" sekmesi eklenmez.
+            renderScoreCardTabs(scRes, pupaType === PUPA_TYPE_PRIVATE_BANKING_KEY);
+            reloadByScoreCard();
+        });
+    }
+
+    function periodParams() {
+        var period = $('#scPeriod .period-btn.active').data('period') || 'aylik';
+        var sel = (window.ScoreCardDatePicker && window.ScoreCardDatePicker.getSelection)
+            ? window.ScoreCardDatePicker.getSelection() : null;
+        var year = sel ? sel.year : -1;
+        var sub = sel ? sel.sub : -1;
+        if (period === 'yillik')    return { year: year, month: -1, quarter: -1, cumulativeFlag: "1" };
+        if (period === 'ceyreklik') return { year: year, month: -1, quarter: sub, cumulativeFlag: "0" };
+        return { year: year, month: sub, quarter: -1, cumulativeFlag: "0" };
     }
 
     function buildCumulativesRequest() {
-        var rd = reportDateParts();
-        var period = $('#scPeriod .period-btn.active').data('period') || 'aylik';
+        var p = periodParams();
         return {
-            year: rd.year,                                  // session _reportDate yılı
-            month: rd.month,                                // session _reportDate ayı (4, 5 ...)
-            quarter: (period === 'ceyreklik') ? 1 : -1,     // çeyreklik seçiliyse 1, değilse -1
-            cumulativeFlag: (period === 'yillik') ? '1' : '0',  // yıllık seçiliyse 1, değilse 0
+            year: p.year,                                   // date-picker'da seçili yıl
+            month: p.month,                                 // aylıkta seçili ay; çeyreklik/yıllıkta -1
+            quarter: p.quarter,                             // çeyreklikte seçili çeyrek (1-4); değilse -1
+            cumulativeFlag: p.cumulativeFlag,               // yıllıkta 1; değilse 0
             registerId: _registerId,                        // seçili sicil;
             regionCode: _regionCode,                        // seçili bölge;
             branchCode: _branchCode,                        // seçili şube;
             pupaType: activePupaType(),                     // seçili pupa tipi;
             // Genel Bakış'ta (-1) şube seçili -> cumulatives'e düşülür; bu durumda Şube Müdürü Skorkart (21) gönderilir.
             scoreCardId: (_scoreCardId === -1 ? 21 : _scoreCardId),
-            scoreCardTypeId: -1
+            // Tip modunda (19/20/22) seçili skor kart tipi; değilse varsayılan -1.
+            scoreCardTypeId: (_scoreCardTypeId != null ? _scoreCardTypeId : -1)
         };
     }
 
@@ -260,15 +395,14 @@ $(function () {
     // main-view-regions / main-view-branches ortak istek gövdesi; tek fark statik group:
     //   bölge özeti (regions) -> group 4, şube özeti (branches) -> group 3.
     function buildMainViewRequest(group) {
-        var rd = reportDateParts();
-        var period = $('#scPeriod .period-btn.active').data('period') || 'aylik';
+        var p = periodParams();
         return {
             roleCode: _userRoleCode,
             regionCode: _regionCode,
-            year: rd.year,
-            month: rd.month,
-            cumulativeFlag: (period === 'yillik') ? '1' : '0',
-            quarter: (period === 'ceyreklik') ? 1 : -1,
+            year: p.year,
+            month: p.month,
+            cumulativeFlag: p.cumulativeFlag,
+            quarter: p.quarter,
             pupaType: activePupaType(),
             scorecardId: _scoreCardId,
             group: group
@@ -380,13 +514,13 @@ $(function () {
         }
 
         // Tek seçenekli (kilitli) bölge dropdown'u -> "Tüm Bölgeler" tıklanamaz
-        var regionLocked = $('#scRegionSelect').hasClass('disabled');
+        var regionDisabled = $('#scRegionSelect').hasClass('disabled');
         var deepest = registerSel ? 'register' : (branchSel ? 'branch' : 'region');
 
         // Kök "Tüm Bölgeler" + seçili kademeler. Aktif (en alt) kademe tıklanamaz.
-        var parts = [scCrumb('Tüm Bölgeler', 'allRegions', regionLocked)];
+        var parts = [scCrumb('Tüm Bölgeler', 'allRegions', regionDisabled)];
         if (regionSel) {
-            parts.push(scCrumb($('#scRegionLabel').text(), 'region', regionLocked || deepest === 'region'));
+            parts.push(scCrumb($('#scRegionLabel').text(), 'region', regionDisabled || deepest === 'region'));
         }
         if (branchSel) {
             parts.push(scCrumb($('#scBranchLabel').text(), 'branch', deepest === 'branch'));
@@ -586,6 +720,11 @@ $(function () {
         try { rows = raw ? (JSON.parse(raw) || []) : (Array.isArray(res) ? res : []); }
         catch (e) { rows = []; }
 
+        // Ön yüzde gizlenecek bölge kodlarını (ör. 62 KKTC) servis dönse bile listeden çıkar.
+        rows = rows.filter(function (r) {
+            return SCORE_CARD_OVERVIEW_HIDDEN_REGION_CODES.indexOf(Number(r.BOLGE_KODU)) === -1;
+        });
+
         var sample = rows.length ? rows[0] : {};
         var columns = Object.keys(sample).filter(isOverviewVisibleColumn).map(function (k) {
             return { key: k, label: overviewColLabel(k) };
@@ -611,6 +750,8 @@ $(function () {
     //  - Bunların dışında servisten gelen kolonlar (BOLGE_KODU, SUBE_KODU ...) gizlenir.
     function isOverviewVisibleColumn(key) {
         var k = String(key).trim();
+        // Servisten dönse bile gizlenecek kolonlar (ör. Kıbrıs skor kartları HG31/32/34/35).
+        if (SCORE_CARD_OVERVIEW_HIDDEN_KEYS[k]) return false;
         return isOverviewHgColumn(k) || SCORE_CARD_OVERVIEW_STATIC_COLUMNS[k] != null;
     }
     function overviewColLabel(key) {
@@ -707,6 +848,9 @@ $(function () {
 
     function buildBranchOverviewModel(branchRes) {
         var srcRows = (branchRes && branchRes.lastTargets) || [];
+        if (typeof srcRows === 'string') {
+            try { srcRows = JSON.parse(srcRows) || []; } catch (e) { srcRows = []; }
+        }
         if (!Array.isArray(srcRows)) srcRows = srcRows.rows || [];
         var rows = srcRows.map(function (r) { return Object.assign({}, r); });
         var lastSample = rows.length ? rows[0] : {};
@@ -730,7 +874,10 @@ $(function () {
         try { branchRows = raw ? (JSON.parse(raw) || []) : []; }
         catch (e) { branchRows = []; }
         var branchSample = branchRows.length ? branchRows[0] : {};
-        var hgKeys = Object.keys(branchSample).filter(isOverviewHgColumn);
+        // Yalnızca HG kolonları; gizlenecek olanlar (ör. Kıbrıs HG31/32/34/35) hariç.
+        var hgKeys = Object.keys(branchSample).filter(function (k) {
+            return isOverviewHgColumn(k) && isOverviewVisibleColumn(k);
+        });
         var hgCols = hgKeys.map(function (k) { return { key: k, label: overviewColLabel(k) }; });
 
         var byName = {};
@@ -822,10 +969,16 @@ $(function () {
                     return formatPercent(v);
                 };
             };
+            // H/G %: değer + (varsa) parantez içinde base. PDF düz/renksiz olduğu için span/renk yok. Toplam satırında boş.
+            var hgPct = function (v, row) {
+                if (row && row.__isTotal) return '';
+                var base = row && row.targetRealizationPercentageBase;
+                return formatPercent(v) + (base ? (' (' + formatPercent(base) + ')') : '');
+            };
             cols = [
                 { header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }, { header: 'Ürün Tipi', key: 'productType' },
                 { header: 'Hedef', key: 'targetValue' }, { header: 'Gerçekleşen', key: 'realizedValue' },
-                { header: 'H/G %', key: 'targetRealizationPercentage', format: pctOrTotal('blank') }, { header: 'Ağırlık %', key: 'productWeight', format: pctOrTotal('label') },
+                { header: 'H/G %', key: 'targetRealizationPercentage', format: hgPct }, { header: 'Ağırlık %', key: 'productWeight', format: pctOrTotal('label') },
                 { header: 'Ağırlıklı H/G %', key: 'weightedPercentage', format: formatPercent }, { header: 'Bekleyen', key: 'pending' }
             ];
             rows = visibleProductRows();
@@ -839,7 +992,6 @@ $(function () {
             infoLines: _scInfoLines(),
             columns: cols,
             rows: rows || [],
-            footerNote: TABLE_NOTE,
             filename: 'SkorKart.pdf'
         };
     }
@@ -857,12 +1009,21 @@ $(function () {
         var rows = visibleProductRows();
 
         if (!rows.length) {
-            $('#scReportHead').html('');   // Veri yoksa başlıklar (th) da gizlenir
+            $('#scReportHead').html(''); 
+            let emptyMsg;
+            const isRegisterSelected = _registerId !== -1
+            if (!isRegisterSelected && _scoreCardId === 21) {
+                emptyMsg = 'Verileri görüntülemek için Şube &amp; Sicil No seçiniz.';
+            } else if (!isRegisterSelected && (_scoreCardId === 24 || _scoreCardId === 37)) {
+                emptyMsg = 'Verileri görüntülemek için Bölge &amp; Sicil No seçiniz.';
+            } else {
+                emptyMsg = 'Seçili döneme ait veri bulunmamaktadır.';
+            }
             $('#scReportBody').html(
                 '<tr class="no-result-row"><td colspan="' + COLUMNS.length + '" style="text-align:center;padding:48px 16px;">' +
                     '<div class="table-empty-state">' +
                         '<img src="/images/empty-state-seach.svg" alt="" />' +
-                        '<span>Seçili döneme ait veri bulunmamaktadır.</span>' +
+                        '<span>' + emptyMsg + '</span>' +
                     '</div>' +
                 '</td></tr>'
             );
@@ -882,17 +1043,21 @@ $(function () {
             html += '<td class="col-info">' + infoCell + '</td>';
             html += '<td class="col-left sc-product-name">' + r.productName + '</td>';
             html += '<td>' + r.productType + '</td>';
-            html += '<td class="' + _selCol('Hedef') + '">' + r.targetValue + '</td>';
-            html += '<td class="' + _selCol('Gerçekleşen') + '">' + r.realizedValue + '</td>';
-            html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + formatPercent(r.targetRealizationPercentage) + '</td>';
+            html += '<td class="' + _selCol('Hedef') + '">' + formatNumber(r.targetValue) + '</td>';
+            html += '<td class="' + _selCol('Gerçekleşen') + '">' + formatNumber(r.realizedValue) + '</td>';
+            var hgBase = (r.targetRealizationPercentageBase)
+                ? ' <span class="' + percentColor(r.targetRealizationPercentageBase) + '">(' + formatPercent(r.targetRealizationPercentageBase) + ')</span>'
+                : '';
+            html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + formatPercent(r.targetRealizationPercentage) + hgBase + '</td>';
             html += '<td class="' + _selCol('Ağırlık %') + '">' + formatPercent(r.productWeight) + '</td>';
             html += '<td class="' + _selCol('Ağırlıklı H/G %') + '">' + formatPercent(r.weightedPercentage) + '</td>';
-            html += '<td class="' + _selCol('Bekleyen') + '">' + r.pending + '</td>';
+            html += '<td class="' + _selCol('Bekleyen') + '">' + formatNumber(r.pending) + '</td>';
             // Detay drill-down bağlamı (scorecard/details): productId satırdan, productType aktif kanaldan.
             // dateNumber/registerId istekte doğrudan modül state'inden gönderilir.
             html += '<td><img class="sc-detail-icon" src="/images/detail.svg" alt="Detay"' +
                 ' data-name="' + r.productName + '"' +
                 ' data-product-id="' + (r.productId != null ? r.productId : -1) + '"' +
+                ' data-product-type-id="' + (r.productTypeId != null ? r.productTypeId : '') + '"' +
                 ' data-product-type="' + activePupaType() + '" /></td>';
             html += '</tr>';
         });
@@ -904,10 +1069,7 @@ $(function () {
 
     function renderLegend() {
         if (typeof renderTableLegend === 'function') {
-            renderTableLegend('#scReportLegend', {
-                note: TABLE_NOTE,
-                ratio: true
-            });
+            renderTableLegend('#scReportLegend', {});
         }
     }
 
@@ -917,13 +1079,22 @@ $(function () {
         activateMainTab($(this), true);
     });
 
-    // Alt sekme (ör. Bireysel -> SY / BD): scoreCardId aynı parametre, tabloyu yenile
     $('#scSubTabList').on('click', '.sub-tab', function () {
         $('#scSubTabList .sub-tab').removeClass('active');
         $(this).addClass('active');
-        _scoreCardId = parseInt($(this).data('scorecard'), 10);
-        if (isNaN(_scoreCardId)) _scoreCardId = -1;
-        loadScoreCardTable();
+        var typeAttr = $(this).attr('data-scorecardtype');
+        if (typeAttr != null) {
+            // Skor kart tipi alt sekmesi: scoreCardId (19/20/22) sabit kalır, scoreCardTypeId değişir.
+            // Tipleri yeniden çekmeden yalnızca şube/sicil/tablo zincirini yenile.
+            _scoreCardTypeId = parseInt(typeAttr, 10);
+            if (isNaN(_scoreCardTypeId)) _scoreCardTypeId = null;
+            reloadScoreCardFilters();
+        } else {
+            // Grup alt sekmesi (ör. Bireysel/KOBİ): scoreCardId değişir.
+            _scoreCardId = parseInt($(this).data('scorecard'), 10);
+            if (isNaN(_scoreCardId)) _scoreCardId = -1;
+            reloadByScoreCard();
+        }
     });
 
     // Pupa tipi (kanal) seçimi
@@ -933,10 +1104,7 @@ $(function () {
         // pupaType değişti -> skor kart tipleri (sekmeler) + tablo yenilensin
         loadScoreCardTypes();
     });
-
-    // Period tipi (Aylık / Çeyreklik / Yıllık): aktif butonu güncelle ve yeni tipin
-    // dönemlerini çek (scorecard/periods — tek istek). loadPupaFilters date-picker'ı besler,
-    // _dateNumber'ı ilk döneme ayarlar ve tabloyu yeniden yükler.
+    
     $('#scPeriod').on('click', '.period-btn', function () {
         $('#scPeriod .period-btn').removeClass('active');
         $(this).addClass('active');
@@ -958,7 +1126,7 @@ $(function () {
         var c = $(this).data('col');
         if (!c || c === selectedCol) return;
         selectedCol = c;
-        renderReportBody();   // head + body yeniden çizilir
+        renderReportBody();
     });
 
     $(document).on('click', '#scReportHead th[data-sort-key]', function () {
@@ -985,15 +1153,12 @@ $(function () {
         selectedTypeId = $(this).attr('data-type') || '';
         renderReportBody();
     });
-    // Dışarı tıklayınca kapat
     $(document).on('click', function (e) {
         if (!$(e.target).closest('.sc-type-filter').length) {
             $('.sc-type-filter').removeClass('open');
         }
     });
 
-    // İlk render: kullanıcı yetki/bağlamı (scorecard/authorities) çekilir ve filtre zinciri kurulur.
-    // Token yönetimi backend (ScoreCardTokenService) tarafından yapılır.
     fetchUserAuthorities(function (auth) {
         applyUserAuthorities(auth);
         loadPupaFilters($('#scPeriod .period-btn.active').data('period') || 'aylik');
@@ -1008,12 +1173,21 @@ $(function () {
     window.ScoreCard.report = {
         get regionCode()  { return _regionCode; },
         set regionCode(v) { _regionCode = v; },
+        // auth.userDashboard başlangıç değerleri (regions servisi hep bunları kullanır)
+        get initialRegionCode() { return _initialRegionCode; },
+        get initialBranchCode() { return _initialBranchCode; },
+        get initialRegisterId() { return _initialRegisterId; },
         get branchCode()  { return _branchCode; },
         set branchCode(v) { _branchCode = v; },
         get registerId()  { return _registerId; },
         set registerId(v) { _registerId = v; },
         get dateNumber()  { return _dateNumber; },
         get scoreCardId() { return _scoreCardId; },
+        get scoreCardTypeId() { return _scoreCardTypeId; },   // null = tip modu değil
+
+        get regionDisabled()   { return _regionDisabled; },
+        get branchDisabled()   { return _branchDisabled; },
+        get registerDisabled() { return _registerDisabled; },
         activePupaType: activePupaType,
         loadTable: loadScoreCardTable,
         renderBody: renderReportBody
@@ -1026,7 +1200,7 @@ $(function () {
             registerId: _registerId,
             regionCode: _regionCode,
             branchCode: _branchCode,
-            scoreCardId: _scoreCardId
+            scoreCardId: (_scoreCardId === -1 ? 21 : _scoreCardId)
         };
     };
 });

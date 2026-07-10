@@ -1,4 +1,6 @@
 using System.Globalization;
+using DashboardTsy.Application.ExchangeRate.Requests;
+using DashboardTsy.Application.ExchangeRate.Responses;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
 
@@ -1283,6 +1285,26 @@ public static class MockProductivityReportData
                 ReportDate = DateTime.Today.AddDays(-1),
                 IsDefault = false
             }
+        };
+    }
+
+    public static GetUsdExchangeRatesResponse GetUsdExchangeRates(GetUsdExchangeRatesRequest request)
+    {
+        var baseDate = request.ReportDate == default ? DateTime.Today : request.ReportDate.Date;
+
+        return new GetUsdExchangeRatesResponse
+        {
+            YesterdayDate = baseDate.AddDays(-1),
+            YesterdayRate = 34.1250m,
+
+            PreviousDayDate = baseDate.AddDays(-2),
+            PreviousDayRate = 34.0875m,
+
+            PreviousWeekDate = baseDate.AddDays(-7),
+            PreviousWeekRate = 33.9520m,
+
+            PreviousYearDate = baseDate.AddDays(-365),
+            PreviousYearRate = 27.6430m
         };
     }
 

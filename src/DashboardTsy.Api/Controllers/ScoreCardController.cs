@@ -72,6 +72,13 @@ public class ScoreCardController : ControllerBase
     public Task<IActionResult> TrendsProductSaleRealized([FromBody] JsonElement body, CancellationToken ct)
         => ProxyPost("scorecards/trends/product-sale-realized", body, ct);
 
+    [HttpPost("types")]
+    public Task<IActionResult> Types([FromBody] JsonElement body, CancellationToken ct)
+        => ProxyPost("scorecards/types", body, ct);
+
+    private string? ReadExternalContextHeader()
+        => Request.Headers.TryGetValue("ExternalContext", out var v) ? v.ToString() : null;
+
     private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
     {
         _logger.LogWarning("[ScoreCard] POST {Path} -> token alınıyor", path);
@@ -89,9 +96,12 @@ public class ScoreCardController : ControllerBase
 
         using var request = new HttpRequestMessage(HttpMethod.Post, path);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var externalContext = ReadExternalContextHeader();
+        if (!string.IsNullOrEmpty(externalContext))
+            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
         request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
 
-        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path} | Body: {Body}", _pupaClient.BaseAddress, path, body.GetRawText());
+        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path} | Body: {Body} | ExternalContext: {ExternalContext}", _pupaClient.BaseAddress, path, body.GetRawText(), externalContext ?? "(yok)");
         using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
         _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode} | Body: {Body}", (int)upstream.StatusCode, content);
@@ -122,8 +132,11 @@ public class ScoreCardController : ControllerBase
 
         using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
         request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var externalContext = ReadExternalContextHeader();
+        if (!string.IsNullOrEmpty(externalContext))
+            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
 
-        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery}", _pupaClient.BaseAddress, pathAndQuery);
+        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery} | ExternalContext: {ExternalContext}", _pupaClient.BaseAddress, pathAndQuery, externalContext ?? "(yok)");
         using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
         var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
         _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode} | Body: {Body}", (int)upstream.StatusCode, content);

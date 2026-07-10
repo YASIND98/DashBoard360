@@ -504,14 +504,14 @@ $(document).ready(function () {
       e.stopPropagation();
   });
 
-  // Search inside dropdown
   $(document).on('keyup', '.dropdown-search-input', function (e) {
       e.stopPropagation();
-      var query = normalizeTurkish($(this).val());
+      var query = normalizeTurkish($(this).val().trim());
       var $items = $(this).closest('.dropdown-panel').find('.dropdown-list .dropdown-item:not(.tumu-item)');
       $items.each(function () {
           var text = normalizeTurkish($(this).text());
-          $(this).toggle(text.indexOf(query) > -1);
+          var code = normalizeTurkish($(this).attr('data-code') || '');
+          $(this).toggle(text.indexOf(query) > -1 || (!!code && code.indexOf(query) > -1));
       });
   });
 

@@ -28,4 +28,11 @@ public class PublicController(IWindowsAuthService authService) : ControllerBase
         var result = await authService.LoginAsync(username, password, cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
+
+    [HttpGet("SessionLogin")]
+    public async Task<ActionResult<ApiResponse<UsersDto>>> SessionLogin([FromQuery] string sessionId, CancellationToken cancellationToken)
+    {
+        var result = await authService.SessionLoginAsync(sessionId, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
 }

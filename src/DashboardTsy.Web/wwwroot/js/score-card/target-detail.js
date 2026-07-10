@@ -29,7 +29,6 @@ $(function () {
     }
 
     // Servis (ScoreCardDetail) cevabını dinamik kolonlu tabloya çevirir.
-    // Yalnızca SCORE_CARD_DETAIL_COLUMN_LABELS'te karşılığı (label'ı) olan key'ler gösterilir
     function buildDynamicResponse(scoreCardDetail) {
         var rows = [];
         try {
@@ -42,16 +41,20 @@ $(function () {
         var labelByKey = {};
         labels.forEach(function (c) { labelByKey[c.key] = c.label; });
         var sample = rows.length ? rows[0] : {};
+        // Servisten dönse bile ön yüzde gösterilmeyen kontrol alanları.
+        var HIDDEN_KEYS = { LINK: true, DOB_BAYI: true };
         var columns = Object.keys(sample)
-            .filter(function (key) { return labelByKey[key] != null; })
-            .map(function (key) { return { key: key, label: labelByKey[key] }; });
+            .filter(function (key) { return !HIDDEN_KEYS[key]; })
+            .map(function (key) {
+                return { key: key, label: labelByKey[key] != null ? labelByKey[key] : key };
+            });
         return { columns: columns, rows: rows, dynamic: true };
     }
 
     // Dinamik tabloda tek hücreyi alan adına göre biçimlendir
     function formatDetailCell(key, value) {
         if (value == null) return '';
-        if (key === 'ACILIS_TARIHI') return fmtIsoDate(value);
+        if (/_TARIHI$/.test(key)) return fmtIsoDate(value);   // ACILIS_TARIHI + Varlık Kazanım tarih kolonları
         if (key === 'ACCOUNT_NUMBER') return '<span class="sc-account">' + escapeHtml(String(value)) + '</span>';
         return escapeHtml(String(value).trim());
     }
@@ -81,7 +84,7 @@ $(function () {
                 registerId: ctx.registerId,
                 productId: ScoreCardDetail.ctx.productId,
                 status: statusCode,
-                productType: ScoreCardDetail.ctx.productType
+                productType: ScoreCardDetail.ctx.productTypeId
             })
         }).done(function (res) {
             handle(res);
@@ -204,6 +207,42 @@ $(function () {
         $('#scOverlay').removeClass('active');
     }
 
+    var SCORE_CARD_REGION_MANAGER_ID = 37;
+
+    function applyDetailButtonVisibility() {
+        var isRegionManager = scCtx().scoreCardId === SCORE_CARD_REGION_MANAGER_ID;
+        var typeId = Number(ScoreCardDetail.ctx.productTypeId);
+
+        // Gerçekleşmeyen, Gerçekleşen ile aynı kurala tabidir.
+        var showRealized   = isRegionManager ? true : typeId !== 1 && typeId !== 2;
+        var showUnrealized = showRealized;
+        var showPending    = isRegionManager ? typeId !== 1 && typeId !== 2 && typeId !== 3  : typeId !== 1 && typeId !== 2;
+
+        $('#scFilters .sc-filter[data-filter="realized"]').toggle(showRealized);
+        $('#scFilters .sc-filter[data-filter="pending"]').toggle(showPending);
+        $('#scFilters .sc-filter[data-filter="unrealized"]').toggle(showUnrealized);
+        $('#scTabs .sc-tab[data-tab="trend"]').show();   // Trend Analizi her durumda
+
+        // Aktif filtre gizlendiyse görünür ilk filtreye geç (hiçbiri görünmüyorsa dokunma).
+        var visible = [];
+        if (showRealized) visible.push('realized');
+        if (showPending) visible.push('pending');
+        if (showUnrealized) visible.push('unrealized');
+        if (visible.length && visible.indexOf(_statusFilter) === -1) {
+            _statusFilter = visible[0];
+            $('#scFilters .sc-filter').removeClass('active');
+            $('#scFilters .sc-filter[data-filter="' + _statusFilter + '"]').addClass('active');
+            updateFilterIcons();
+        }
+
+        // Hiçbir status çipi (Gerçekleşen/Bekleyen/Gerçekleşmeyen) yoksa Hedef Detayı sekmesini
+        // gizle ve Trend Analizi'ni aktif et; en az biri varsa Hedef Detayı görünür + varsayılan sekme.
+        var hasStatus = visible.length > 0;
+        $('#scTabs .sc-tab[data-tab="hedef"]').toggle(hasStatus);
+        $('#scTabs .sc-tab').removeClass('active');
+        $('#scTabs .sc-tab[data-tab="' + (hasStatus ? 'hedef' : 'trend') + '"]').addClass('active');
+    }
+
     $('#scOpenBtn').on('click', openModal);
     $(document).on('click', '.sc-detail-icon', function () {
         var $i = $(this);
@@ -211,8 +250,9 @@ $(function () {
         if (name) $('#scModalTitle').text(name);
         ScoreCardDetail.ctx = {
             productId: $i.data('product-id'),
-            productType: $i.data('product-type')
+            productTypeId: $i.data('product-type-id')
         };
+        applyDetailButtonVisibility();
         openModal();
     });
     $('#scClose').on('click', closeModal);
