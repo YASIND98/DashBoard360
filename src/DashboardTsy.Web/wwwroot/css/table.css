@@ -587,6 +587,42 @@
     content: url('/images/empty-state-seach-light.svg');
   }
 
+  [data-theme="light"] .data-table thead th.selected::before {
+    border: 1px dashed black;
+  }
+
+  [data-theme="light"] .col-selected-first {
+    border-left: 1px dashed black !important;
+  }
+
+  [data-theme="light"] .col-selected-last {
+    border-right: 1px dashed black !important;
+  }
+
+  [data-theme="light"] .info-icon {
+    filter: brightness(0) saturate(100%) invert(18%) sepia(50%) saturate(600%) hue-rotate(185deg) brightness(90%);
+  }
+
+  [data-theme="light"] .last-visible-row .col-selected-first::after,
+  [data-theme="light"] .last-visible-row .col-selected-mid::after,
+  [data-theme="light"] .last-visible-row .col-selected-last::after {
+    border-bottom: 1px dashed black;
+  }
+
+  [data-theme="light"] .last-visible-row .col-selected-first::after {
+    border-left: 1px dashed black;
+  }
+
+  [data-theme="light"] .last-visible-row .col-selected-last::after {
+    border-right: 1px dashed black;
+  }
+
+  /* Tek seçili kolon (aynı hücrede first+last): alt kavis iki köşeden de yuvarlak. */
+  [data-theme="light"] .last-visible-row .col-selected-first.col-selected-last::after {
+    border-left: 1px dashed black;
+    border-right: 1px dashed black;
+  }
+
 }
 
 @media (max-width: 1199px) {

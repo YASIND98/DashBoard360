@@ -284,6 +284,15 @@
     background: #12375C;
     color: #ffffff;
   }
+
+  [data-theme="light"] .dropdown-panel {
+    background: #12375c;
+  }
+
+  [data-theme="light"] .dropdown-item.selected {
+    background: #e8f3fe;
+    color: #6b7a99;
+  }
 }
 
 @media (max-width: 1199px) {
