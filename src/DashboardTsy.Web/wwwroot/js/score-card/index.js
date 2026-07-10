@@ -107,14 +107,21 @@ $(function () {
     // Pupa tipi: Key -> statik etiket (PUPA_TYPE_LABELS)
     function renderPupaChannels(pupaRes) {
         var kv = (pupaRes && pupaRes.keyValues) || [];
-        kv = kv.filter(function (item) { return Number(item.key) !== PUPA_TYPE_MANAGEMENT_KEY; });
+        kv = kv.filter(function (item) { return item.key !== PUPA_TYPE_MANAGEMENT_KEY; });
         if (!_registerDisabled) kv = kv.concat([{ key: PUPA_TYPE_MANAGEMENT_KEY }]);
+
+        // Servis tekrar çağrıldığında (ör. tarih değişimi) mevcut seçili pupa tipi yeni cevapta da varsa o seçili kalır; yoksa ilk seçenek aktif olur.
+        var prev = $('#scChannels .segment.active').data('channel');
+        var prevKey =  prev ? prev : null;
+        var activeIndex = 0;
+        kv.forEach(function (item, i) { if (item.key === prevKey) activeIndex = i; });
+
         var html = '';
         kv.forEach(function (item, i) {
             var key = item.key;
             var label = PUPA_TYPE_LABELS[key];
             if (i > 0) html += '<div class="divider"></div>';
-            html += '<button type="button" class="segment' + (i === 0 ? ' active' : '') +
+            html += '<button type="button" class="segment' + (i === activeIndex ? ' active' : '') +
                     '" data-channel="' + key + '">' + label + '</button>';
         });
         $('#scChannels').html(html);
@@ -249,8 +256,6 @@ $(function () {
     function renderScoreCardTabs(scRes, skipOverview) {
         var kv = (scRes && scRes.keyValues) || [];
         kv = kv.filter(function (item) { return Number(item.key) !== SCORE_CARD_OVERVIEW_KEY; });
-        // Şube kısıtlı kullanıcıda (_branchDisabled) skor kartları gösterilmez.
-        if (_branchDisabled) kv = [];
         // "Genel Bakış" (-1) yalnızca sicil kısıtı yokken (registerId === -1) ve sabit skor kartı yokken en başa eklenir.
         // Yönetim pupa tipinde (skipOverview) yalnızca sabit skor kartları gösterilir; Genel Bakış eklenmez.
         if (!skipOverview && !_registerDisabled && !hasFixedScoreCardId()) kv = [{ key: SCORE_CARD_OVERVIEW_KEY }].concat(kv);
@@ -260,7 +265,23 @@ $(function () {
             return '<button class="tab" data-tabindex="' + i + '"' + attr + '>' + t.label + '</button>';
         }).join(''));
         if (_tabModel.length) {
-            activateMainTab($('#scTabList .tab').first(), false); // reload loadScoreCardTypes'te
+            // Servis tekrar çağrıldığında mevcut seçili skor kart yeni listede de varsa o sekme içindeyse ilgili alt sekme dahil) korunur; yoksa ilk sekme aktif olur.
+            var prev = _scoreCardId;
+            var mainIndex = 0, keepSubKey = null;
+            _tabModel.forEach(function (t, i) {
+                if (t.type === 'single') {
+                    if (t.key === prev) mainIndex = i;
+                } else {
+                    t.subs.forEach(function (s) { if (s.key === prev) { mainIndex = i; keepSubKey = s.key; } });
+                }
+            });
+            activateMainTab($('#scTabList .tab').eq(mainIndex), false); // reload loadScoreCardTypes'te
+            // Grup sekmesinde korunacak alt sekme varsa aktif et (activateMainTab ilk alt sekmeyi seçer).
+            if (keepSubKey != null) {
+                _scoreCardId = keepSubKey;
+                $('#scSubTabList .sub-tab').removeClass('active');
+                $('#scSubTabList .sub-tab[data-scorecard="' + keepSubKey + '"]').addClass('active');
+            }
         } else {
             $('#scSubTabBar').hide();
             _scoreCardId = -1;
@@ -288,6 +309,10 @@ $(function () {
     function reloadByScoreCard() {
         if (SCORE_CARD_TYPE_TAB_IDS.indexOf(_scoreCardId) !== -1) {
             fetchScoreCardTypes(_scoreCardId, function (types) {
+                // Servisten dönse bile gizlenecek tipleri (ör. scoreCardTypeId 9) ön yüzden çıkar.
+                types = (types || []).filter(function (t) {
+                    return SCORE_CARD_HIDDEN_TYPE_IDS.indexOf(t.scoreCardTypeId) === -1;
+                });
                 renderTypeSubTabs(types);
                 _scoreCardTypeId = (types && types.length) ? types[0].scoreCardTypeId : null;
                 reloadScoreCardFilters();
@@ -309,8 +334,10 @@ $(function () {
         var pupaType = activePupaType();
         // "Yönetim" pupa tipinde score-cards servisine gidilmez; statik olarak Şube Müdürü (21) ve Bölge Müdürü (37) skor kartları listelenir.
         if (pupaType === PUPA_TYPE_MANAGEMENT_KEY) {
+            // Şube kısıtlı kullanıcıda (_branchDisabled) Yönetim'de yalnızca Şube Müdürü Skorkart (21) sekmesi gösterilir.
+            var mgmtKeys = _branchDisabled ? [21] : SCORE_CARD_MANAGEMENT_KEYS;
             renderScoreCardTabs({
-                keyValues: SCORE_CARD_MANAGEMENT_KEYS.map(function (k) { return { key: k }; })
+                keyValues: mgmtKeys.map(function (k) { return { key: k }; })
             }, true);
             reloadByScoreCard();
             return;
@@ -982,12 +1009,21 @@ $(function () {
         var rows = visibleProductRows();
 
         if (!rows.length) {
-            $('#scReportHead').html('');   // Veri yoksa başlıklar (th) da gizlenir
+            $('#scReportHead').html(''); 
+            let emptyMsg;
+            const isRegisterSelected = _registerId !== -1
+            if (!isRegisterSelected && _scoreCardId === 21) {
+                emptyMsg = 'Verileri görüntülemek için Şube &amp; Sicil No seçiniz.';
+            } else if (!isRegisterSelected && (_scoreCardId === 24 || _scoreCardId === 37)) {
+                emptyMsg = 'Verileri görüntülemek için Bölge &amp; Sicil No seçiniz.';
+            } else {
+                emptyMsg = 'Seçili döneme ait veri bulunmamaktadır.';
+            }
             $('#scReportBody').html(
                 '<tr class="no-result-row"><td colspan="' + COLUMNS.length + '" style="text-align:center;padding:48px 16px;">' +
                     '<div class="table-empty-state">' +
                         '<img src="/images/empty-state-seach.svg" alt="" />' +
-                        '<span>Seçili döneme ait veri bulunmamaktadır.</span>' +
+                        '<span>' + emptyMsg + '</span>' +
                     '</div>' +
                 '</td></tr>'
             );
@@ -1033,9 +1069,7 @@ $(function () {
 
     function renderLegend() {
         if (typeof renderTableLegend === 'function') {
-            renderTableLegend('#scReportLegend', {
-                ratio: true
-            });
+            renderTableLegend('#scReportLegend', {});
         }
     }
 
