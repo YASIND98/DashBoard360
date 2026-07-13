@@ -503,6 +503,11 @@
     color: #12375C;
   }
 
+  [data-theme="light"] .filter-search input,
+  [data-theme="light"] .filter-search input::placeholder {
+    color: #3B4351;
+  }
+
   [data-theme="light"] .filter-search img {
     filter: brightness(0) opacity(0.65);
   }

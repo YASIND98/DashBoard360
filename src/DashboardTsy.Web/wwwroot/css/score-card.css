@@ -784,15 +784,58 @@
   border-right: 1px solid var(--border-row);
 }
 
+[data-theme="light"] .sc-modal{
+    background: #FFFFFF;
+  }
+
+  [data-theme="light"] .sc-header span {
+    color: #104570;
+  }
+
+  [data-theme="light"] .sc-tab {
+    color: #8795A9;
+    border-bottom-color: #8795A9;
+  }
+
+  [data-theme="light"] .sc-tab.active {
+    color: #12375C;
+    border-bottom-color: #12375C;
+  }
+
+  [data-theme="light"] .sc-trend-tab {
+    border-color: #12375C;
+    color: #12375C;
+    background: transparent;
+  }
+
+  [data-theme="light"] .sc-trend-tab.active {
+    background: #12375C;
+    color: #ffffff;
+    border-color: #12375C;
+  }
+
+  [data-theme="light"] .sc-trend-area {
+    fill: #79C3FF;
+  }
+
+  [data-theme="light"] .sc-trend-axis {
+    fill: #104570;
+  }
+
+  [data-theme="light"] .sc-header img {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
+  }
+
+  [data-theme="light"] .sc-detail-icon {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
+  }
+
 @media (max-width: 1199px) {
   .sc-ranking-bar {
    flex-wrap: wrap; 
   }
   .page-scorecard .period-toggle {
     margin-bottom: 16px;
-  }
-  [data-theme="light"] .sc-detail-icon {
-    filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
   }
 }
 
@@ -806,5 +849,9 @@
     flex: 1 1 calc(50% - 4px);
     max-width: calc(50% - 4px);
     min-width: 0;
+  }
+
+  .sc-trend-tabs {
+    flex-wrap: wrap;
   }
 }
