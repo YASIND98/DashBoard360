@@ -1,0 +1,27 @@
+<div class="theme-panel" id="themePanel" role="dialog" aria-modal="true" aria-label="Görünüm Tercihleri">
+    <div class="theme-panel-header">
+        <button type="button" class="theme-panel-back" id="themePanelBack" aria-label="Geri">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+            </svg>
+        </button>
+        <span>Görünüm Tercihleri</span>
+    </div>
+    <div class="theme-panel-body">
+        <label class="theme-option" for="themeLight">
+            <span class="theme-option-title">Açık Mod</span>
+            <input type="radio" name="themeChoice" id="themeLight" value="light" />
+        </label>
+        <label class="theme-option" for="themeDark">
+            <span class="theme-option-title">Koyu Mod</span>
+            <input type="radio" name="themeChoice" id="themeDark" value="dark" />
+        </label>
+        <label class="theme-option" for="themeSystem">
+            <span class="theme-option-text">
+                <span class="theme-option-title">Sistem Ayarlarını Kullan</span>
+                <span class="theme-option-desc">Bu ayar, cihaz ayarlarınızın Ekran ve Parlaklık menüsündeki mod tercihlerinize uyum sağlar.</span>
+            </span>
+            <input type="radio" name="themeChoice" id="themeSystem" value="system" />
+        </label>
+    </div>
+</div>

@@ -40,6 +40,10 @@
 
 <!-- Filters -->
 <div class="filters-row">
+    <div class="mobile filters-mobile-header">
+      <h1 class="page-title page-title-mobile" data-menu="ScreenTitle"></h1>
+      @await Html.PartialAsync("_SegmentedControlHome")
+    </div>
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="indexRegionSelect">
@@ -73,13 +77,13 @@
             <img src="~/images/search.svg" alt="" />
             <input type="text" placeholder="Ara" id="searchInput" />
         </div>
+
+        @await Html.PartialAsync("_MobileMoreMenu")
     </div>
-    <div class="segmented-control">
-      <button class="segment active" data-type="hacim">Hacim</button>
-      <div class="divider"></div>
-      <button class="segment" data-type="adet">Adet</button>
+    <div class="desktop">
+        @await Html.PartialAsync("_SegmentedControlHome")
     </div>
-</div>
+  </div>
 
 <!-- Tabs -->
 <div class="tab-bar">
@@ -91,13 +95,8 @@
     <button class="tab" data-tab="tarim" data-menu="TabAgricultureTitle"></button>
     <button class="tab has-subtabs" data-tab="bireysel" data-menu="TabRetailTitle"></button>
   </div>
-  <div class="period-toggle">
-    <button class="period-btn active" data-period="daily">
-      <img src="~/images/balance.svg" alt="" class="period-icon" /> Bakiye
-    </button>
-    <button class="period-btn" data-period="monthly">
-      <img src="~/images/percentage.svg" alt="" class="period-icon" /> H / G
-    </button>
+  <div class="desktop">
+    @await Html.PartialAsync("_PeriodToggleHome")
   </div>
 </div>
 
@@ -119,6 +118,10 @@
         <button class="sub-tab" data-subtab="bireysel-adet" data-menu="AmountSubTabTitle" style="display:none;"></button>
         <button class="sub-tab" data-subtab="bireysel-ozel" data-menu="RetailSubTabPrivateTitle"></button>
     </div>
+</div>
+
+<div class="mobile period-toggle-row">
+  @await Html.PartialAsync("_PeriodToggleHome")
 </div>
 
 <!-- Daily Table -->
@@ -324,19 +327,22 @@
     <div class="top10-header">
       <h2 class="top10-title"></h2>
       <div class="top10-header-right">
-        <div class="top10-period-toggle">
-          <button class="toggle-btn active" data-top10-period="daily">
-            <img src="~/images/daily-calendar.svg" alt="calendar" class="top10-toggle-icon" /> Günlük
-          </button>
-          <button class="toggle-btn" data-top10-period="weekly">
-            <img src="~/images/calendar.svg" alt="calendar" class="top10-toggle-icon" /> Haftalık
-          </button>
+        <div class="desktop">
+          @await Html.PartialAsync("_Top10PeriodToggle")
         </div>
         <button class="top10-close" id="top10Close">
-          <img src="~/images/close-circle.svg" alt="Kapat" />
+          <img class="desktop" src="~/images/close-circle.svg" alt="Kapat" />
+          <svg class="mobile mobile-close-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
         </button>
       </div>
     </div>
+
+    <div class="mobile">
+      @await Html.PartialAsync("_Top10PeriodToggle")
+    </div>
+
     <div class="top10-body">
       <div class="top10-column">
         <h3 class="top10-column-title">İlk 10</h3>
@@ -356,4 +362,18 @@
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/target-report.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+    <script>
+        $(document).ready(function () {
+            $('#mobileDiffBtn').on('click', function () {
+                $('#diffToggle').trigger('click');
+                var $txt = $('#mobileDiffBtnText');
+                $txt.text($txt.text() === 'Farkları Göster' ? 'Farkları Gizle' : 'Farkları Göster');
+                $(this).closest('details').removeAttr('open');
+            });
+            $('#mobilePdfBtn').on('click', function () {
+                $('#downloadPdfBtn').trigger('click');
+                $(this).closest('details').removeAttr('open');
+            });
+        });
+    </script>
 }

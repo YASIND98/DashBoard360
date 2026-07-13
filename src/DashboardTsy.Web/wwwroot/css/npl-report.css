@@ -34,7 +34,6 @@
 
 #nplTableContainer.table-container {
     background: var(--bg-table2);
-    border-radius: 40px;
     padding: 0;
 }
 

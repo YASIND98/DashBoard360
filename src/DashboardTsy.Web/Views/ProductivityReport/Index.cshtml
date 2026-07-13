@@ -17,23 +17,19 @@
 <!-- Breadcrumb & Skor Kartı -->
 <div class="breadcrumb-bar" id="breadcrumbBar" style="display:none;">
     <div class="breadcrumb" id="yieldBreadcrumb"></div>
-    <div class="scorecard">
-        <button class="scorecard-btn" id="scorecardBtn">
-            <img src="~/images/down.svg" alt="" style="transform: rotate(90deg);" />
-            <span id="scorecardBtnLabel">Bölge Skor Kartı & NPS</span>
-        </button>
-        <div class="scorecard-panel" id="scorecardPanel">
-            <div class="scorecard-header">
-                <span id="scorecardTitle">Bölge Skor Kartı & NPS</span>
-                <button class="scorecard-close" id="scorecardClose"><img src="~/images/close-circle.svg" alt="" /></button>
-            </div>
-            <div class="scorecard-content" id="scorecardContent"></div>
-        </div>
+    <div class="scorecard-nps-wrapper desktop">
+        @await Html.PartialAsync("_ScorecardNps")
     </div>
 </div>
 
 <!-- Filters -->
 <div class="filters-row">
+    <div class="mobile filters-mobile-header">
+        <h1 class="page-title page-title-mobile mobile">Verim Performans Raporları</h1>
+        <div class="scorecard-nps-wrapper mobile" id="mobileScorecardWrapper" style="display:none;">
+            @await Html.PartialAsync("_ScorecardNps")
+        </div>
+    </div>
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="yieldBolgeSelect">
@@ -65,6 +61,7 @@
           <img src="~/images/search.svg" alt="" />
           <input type="text" placeholder="Ara" id="yieldSearchInput" />
       </div>
+      @await Html.PartialAsync("_MobileMoreMenu")
     </div>
     <div class="segmented-control" id="yieldToggle" style="display:none;"></div>
 </div>
@@ -331,10 +328,12 @@
         function updateBreadcrumb() {
             if (!selectedRegion && !selectedBranch) {
                 $('#breadcrumbBar').hide();
+                $('#mobileScorecardWrapper').hide();
                 return;
             }
 
             $('#breadcrumbBar').show();
+            $('#mobileScorecardWrapper').show();
             var singleRegion = _regionFilters.length === 1;
             var parts = [crumb('Tüm Bölgeler', 'allRegions', singleRegion)];
 
@@ -374,7 +373,7 @@
             $('#scorecardTitle').text(label);
 
             if (!selectedRegion && !selectedBranch) {
-                $('#scorecardContent').html('');
+                $('.scorecard-content').html('');
                 return;
             }
 
@@ -437,20 +436,20 @@
                 html += '</table></div>';
             });
 
-            $('#scorecardContent').html(html);
+            $('.scorecard-content').html(html);
         }
 
         // ===== Scorecard Panel Toggle =====
-        $('#scorecardBtn').on('click', function (e) {
+        $('.scorecard-nps .scorecard-btn').on('click', function (e) {
             e.stopPropagation();
-            $('#scorecardPanel').toggleClass('open');
+            $(e.target).closest('.scorecard-nps').find('.scorecard-panel').toggleClass('open');
         });
-        $('#scorecardClose').on('click', function () {
-            $('#scorecardPanel').removeClass('open');
+        $('.scorecard-nps .scorecard-close').on('click', function () {
+            $(this).closest('.scorecard-nps').find('.scorecard-panel').removeClass('open');
         });
         $(document).on('click', function (e) {
-            if (!$(e.target).closest('.scorecard').length) {
-                $('#scorecardPanel').removeClass('open');
+            if (!$(e.target).closest('.scorecard-nps').length) {
+                $('.scorecard-nps .scorecard-panel').removeClass('open');
             }
         });
 

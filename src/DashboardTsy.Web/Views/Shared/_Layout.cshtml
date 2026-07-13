@@ -7,8 +7,11 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    <!-- Tema: localStorage'dan oku, FOUC'u önle -->
+    <script>(function(){var t=localStorage.getItem('app-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}());</script>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Yönetici Raporu</title>
     <link href="~/assets/lib/google-fonts/inter/inter.css" rel="stylesheet" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/sidebar.css" asp-append-version="true" />
@@ -21,6 +24,7 @@
     <link rel="stylesheet" href="~/css/top10-modal.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/info-icon.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/mobile-top-bar.css" asp-append-version="true" />
 </head>
 <body id="@pageIdandClass" class="@pageIdandClass">
     <div class="app-wrapper">
@@ -35,6 +39,8 @@
 
         <!-- Main Content -->
         <div class="main-content">
+            @await Html.PartialAsync("_MobileTopBar")
+            @await Html.PartialAsync("_ThemePanel")
             @RenderBody()
         </div>
     </div>

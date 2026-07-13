@@ -2,7 +2,9 @@
 function loadSidebarItems() {
     var cached = sessionStorage.getItem('_sidebarItems');
     if (cached) {
-        renderSidebar(JSON.parse(cached));
+        var items = JSON.parse(cached);
+        renderSidebar(items);
+        renderMobileMenu(items);
         return;
     }
     $.ajax({
@@ -14,6 +16,7 @@ function loadSidebarItems() {
             if (data && data.length > 0) {
                 sessionStorage.setItem('_sidebarItems', JSON.stringify(data));
                 renderSidebar(data);
+                renderMobileMenu(data);
             }
         }
     });
@@ -52,8 +55,45 @@ function renderSidebar(items) {
     $container.html(html);
 }
 
+// ===== Mobile Menu =====
+function renderMobileMenu(items) {
+    var $nav = $('#mobileMenuNav');
+    if (!$nav.length) return;
+    var currentPath = window.location.pathname.replace(/\/$/, '') || '/';
+    var html = '';
+    items.sort(function (a, b) { return (a.OrderNo || 0) - (b.OrderNo || 0); });
+    for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        if (!item.IsVisible) continue;
+        var isFinancialMap = item.Code === 'FinancialMap';
+        var itemPath = (item.Url || '/').replace(/\/$/, '') || '/';
+        var isActive = (!isFinancialMap && currentPath === itemPath) ? ' active' : '';
+        var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
+        var targetAttr = isFinancialMap ? ' target="_blank" rel="noopener noreferrer"' : '';
+        html += '<a href="' + item.Url + '" class="mobile-menu-item' + isActive + '"' + targetAttr + '>';
+        html += '<img src="' + icon + '" alt="" />';
+        html += '<span>' + item.Name + '</span>';
+        html += '</a>';
+    }
+    $nav.html(html);
+}
+
+function openMobileMenu() {
+    $('#mobileMenuDrawer').addClass('open');
+    $('#mobileMenuOverlay').addClass('open');
+    $('body').css('overflow', 'hidden');
+}
+
+function closeMobileMenu() {
+    $('#mobileMenuDrawer').removeClass('open');
+    $('#mobileMenuOverlay').removeClass('open');
+    $('body').css('overflow', '');
+}
+
 $(document).ready(function () {
     loadSidebarItems();
+    $('#mobileMenuBtn').on('click', openMobileMenu);
+    $('#mobileMenuClose, #mobileMenuOverlay').on('click', closeMobileMenu);
 });
 
 
@@ -81,8 +121,65 @@ var _reportDate = sessionStorage.getItem('_reportDate') || new Date().toISOStrin
 
 function applyReportDate() {
     var formatted = formatReportDateTr(_reportDate);
-    if (formatted) $('.date-text').text(formatted);
+    if (formatted) {
+        $('.date-text').text(formatted);
+        // Mobile top bar senkronizasyonu
+        $('#mobileTopDateText').text(formatted);
+        $('#mobileTopDateBadge').text($('.date-badge').first().text() || 'Bugün');
+    }
 }
+
+/* ===== Tema yönetimi =============================================
+   toggleTheme()  → dark ↔ light geçiş yapar, localStorage'a kaydeder.
+   openThemePanel() → Görünüm Tercihleri panelini açar.
+   Tema <html data-theme="..."> üzerinden CSS değişkenlerini tetikler.
+   ============================================================== */
+window.toggleTheme = function () {
+    var current = document.documentElement.getAttribute('data-theme') || 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('app-theme', next);
+    localStorage.setItem('app-theme-source', 'manual');
+};
+
+function _applyTheme(value) {
+    if (value === 'system') {
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.setAttribute('data-theme', prefersDark ? 'dark' : 'light');
+        localStorage.setItem('app-theme-source', 'system');
+    } else {
+        document.documentElement.setAttribute('data-theme', value);
+        localStorage.setItem('app-theme', value);
+        localStorage.setItem('app-theme-source', 'manual');
+    }
+}
+
+window.openThemePanel = function () {
+    var source = localStorage.getItem('app-theme-source') || 'manual';
+    var storedTheme = localStorage.getItem('app-theme') || 'dark';
+    var radioVal = source === 'system' ? 'system' : storedTheme;
+    $('input[name="themeChoice"][value="' + radioVal + '"]').prop('checked', true);
+    $('#themePanel').addClass('open');
+    $('body').css('overflow', 'hidden');
+};
+
+window.closeThemePanel = function () {
+    $('#themePanel').removeClass('open');
+    $('body').css('overflow', '');
+};
+
+$(document).ready(function () {
+    $('#themePanelBack').on('click', closeThemePanel);
+    $('input[name="themeChoice"]').on('change', function () {
+        _applyTheme($(this).val());
+    });
+    // Sistem ayarı seçiliyse medya değişimine tepki ver
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function (e) {
+        if (localStorage.getItem('app-theme-source') === 'system') {
+            document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+    });
+});
 
 function _isReportDateCacheFresh() {
     if (!sessionStorage.getItem('_reportDate')) return false;
@@ -389,6 +486,9 @@ $(document).ready(function () {
   $(document).on('click', function (e) {
       if (!$(e.target).closest('.dropdown-panel, .filter-dropdown').length) {
           $('.dropdown-panel').removeClass('open');
+      }
+      if (!$(e.target).closest('.mobile-more').length) {
+          $('.mobile-more[open]').removeAttr('open');
       }
   });
 

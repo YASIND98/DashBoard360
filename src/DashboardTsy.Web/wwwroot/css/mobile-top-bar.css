@@ -1,0 +1,389 @@
+/* ===== Mobile Top Bar (yalnızca < 1200px) ===========================
+   Dark / light mod arkaplanı --top-bar-bg token'ından gelir.
+   site.css içindeki [data-theme] kuralları bu değişkeni override eder.
+   ================================================================== */
+
+.mobile-top-bar {
+  display: none; /* desktop'ta gizli */
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: var(--top-bar-bg);
+  border-bottom: 1px solid var(--border-white-alpha);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  flex-shrink: 0;
+}
+
+/* ===== Logo Butonu ===== */
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mobile-top-logo {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+}
+
+.mobile-top-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-body);
+  font-size: 14px;
+}
+
+.mobile-date-text {
+  font-weight: 600;
+}
+
+.mobile-date-badge {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.mobile-top-chevron {
+  width: 14px;
+  height: 14px;
+  opacity: 0.6;
+  margin-left: 2px;
+}
+
+/* ===== Tema toggle butonu ===== */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0;
+  flex-shrink: 0;
+  transition: color 0.2s;
+}
+
+.theme-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Dark modda güneş görünür, ay gizli */
+:root .theme-icon--moon  { display: none; }
+:root .theme-icon--sun   { display: block; }
+
+/* Light modda ay görünür, güneş gizli */
+[data-theme="light"] .theme-icon--moon {
+  display: block;
+  background: #12375c;
+  border-radius: 50%;
+  padding: 2px;
+}
+
+[data-theme="light"] .theme-icon--sun  { display: none; }
+
+/* ===== Mobile Menu Overlay ===== */
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65); /* fallback: backdrop-filter desteklenmediğinde */
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  z-index: 998;
+}
+
+.mobile-menu-overlay.open {
+  display: block;
+}
+
+/* ===== Mobile Menu Drawer ===== */
+.mobile-menu-drawer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 280px;
+  background: #0e1940;
+  z-index: 999;
+  transform: translateX(-100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.mobile-menu-drawer::-webkit-scrollbar {
+  display: none;
+}
+
+.mobile-menu-drawer.open {
+  transform: translateX(0);
+}
+
+/* ===== Drawer Header ===== */
+.mobile-menu-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 16px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.mobile-menu-user {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mobile-menu-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.mobile-menu-user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mobile-menu-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.mobile-menu-dept {
+  font-size: 12px;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.mobile-menu-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.15s;
+  margin-top: 2px;
+}
+
+/* ===== Drawer Nav ===== */
+.mobile-menu-nav {
+  flex: 1;
+  padding: 8px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 20px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.mobile-menu-item.active {
+  background: #1a294b;
+  border-left-color: #8b94a4;
+  color: #ffffff;
+}
+
+.mobile-menu-item img {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+.mobile-menu-item.active img {
+  filter: none;
+}
+
+/* ===== Drawer Bottom Links ===== */
+.mobile-menu-footer {
+  padding: 8px 0 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.mobile-menu-footer-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s, color 0.15s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.mobile-menu-footer-item svg,
+.mobile-menu-footer-item img {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* ===== Light tema ===== */
+[data-theme="light"] .mobile-menu-drawer {
+  background: #152058;
+}
+
+[data-theme="light"] .mobile-menu-head {
+  border-bottom-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="light"] .mobile-menu-footer {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ===== Theme Panel ===== */
+.theme-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: var(--bg-main);;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.theme-panel.open {
+  transform: translateX(0);
+}
+
+.theme-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 20px 24px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.theme-panel-back {
+  background: none;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.theme-panel-back svg {
+  width: 22px;
+  height: 22px;
+}
+
+.theme-panel-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.theme-option {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+}
+
+.theme-option-text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.theme-option-title {
+  font-size: 15px;
+  color: #ffffff;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.theme-option-desc {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.5;
+  max-width: 85%;
+}
+
+/* Custom radio */
+.theme-option input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  position: relative;
+  margin-top: 1px;
+  transition: border-color 0.15s;
+}
+
+.theme-option input[type="radio"]:checked {
+  border-color: #ffffff;
+}
+
+.theme-option input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: #ffffff;
+  border-radius: 50%;
+}
+
+/* ===== Breakpoint: < 1200px ===== */
+@media (max-width: 1199px) {
+  .mobile-top-bar {
+    display: flex;
+  }
+
+  [data-theme="light"] .mobile-top-bar {
+    background: #12375c;
+  }
+}
