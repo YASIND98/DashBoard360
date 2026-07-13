@@ -115,12 +115,12 @@ function renderTableLegend(containerId, options) {
 }
 
 
-// ===== Shared Report Date =====
-var _reportDateTtlMs = 4 * 60 * 60 * 1000; // 4 saat
-var _reportDate = sessionStorage.getItem('_reportDate') || new Date().toISOString();
+// ===== Shared Today Date (4 saatte bir tazelenir) =====
+var _todayDateTtlMs = 4 * 60 * 60 * 1000; // 4 saat
+var _todayDate = sessionStorage.getItem('todayDate') || new Date().toISOString();
 
-function applyReportDate() {
-    var formatted = formatReportDateTr(_reportDate);
+function applyTodayDate() {
+    var formatted = formatReportDateTr(_todayDate);
     if (formatted) {
         $('.date-text').text(formatted);
         // Mobile top bar senkronizasyonu
@@ -128,6 +128,28 @@ function applyReportDate() {
         $('#mobileTopDateBadge').text($('.date-badge').first().text() || 'Bugün');
     }
 }
+
+// ===== Tarih picker'ını mobil üst bara taşı (<1200px) =====
+var _pickerMq = window.matchMedia('(max-width: 1199px)');
+function relocatePagePicker() {
+    var $home = $('.page-date');
+    var $slot = $('#mobileTopDate');
+    if (!$home.length || !$slot.length) return;
+    if (_pickerMq.matches) {
+        // Mobil/tablet: picker'ı mobil bara taşı, statik metni gizle.
+        $slot.children('.mobile-date-text').hide();
+        $slot.append($home.children());
+    } else {
+        // Masaüstü: picker'ı header'daki .page-date'e geri koy, statik metni göster.
+        $home.append($slot.children().not('.mobile-date-text'));
+        $slot.children('.mobile-date-text').show();
+    }
+}
+$(document).ready(function () {
+    relocatePagePicker();
+    if (_pickerMq.addEventListener) _pickerMq.addEventListener('change', relocatePagePicker);
+    else if (_pickerMq.addListener) _pickerMq.addListener(relocatePagePicker);
+});
 
 /* ===== Tema yönetimi =============================================
    toggleTheme()  → dark ↔ light geçiş yapar, localStorage'a kaydeder.
@@ -181,16 +203,16 @@ $(document).ready(function () {
     });
 });
 
-function _isReportDateCacheFresh() {
-    if (!sessionStorage.getItem('_reportDate')) return false;
-    var fetchedAt = parseInt(sessionStorage.getItem('_reportDateFetchedAt') || '0', 10);
+function _isTodayDateCacheFresh() {
+    if (!sessionStorage.getItem('todayDate')) return false;
+    var fetchedAt = parseInt(sessionStorage.getItem('todayDateFetchedAt') || '0', 10);
     if (!fetchedAt) return false;
-    return (Date.now() - fetchedAt) < _reportDateTtlMs;
+    return (Date.now() - fetchedAt) < _todayDateTtlMs;
 }
 
-function loadReportDates(callback) {
-    if (_isReportDateCacheFresh()) {
-        applyReportDate();
+function loadTodayDate(callback) {
+    if (_isTodayDateCacheFresh()) {
+        applyTodayDate();
         if (callback) callback();
         return;
     }
@@ -202,10 +224,11 @@ function loadReportDates(callback) {
         success: function (data) {
             if (data && data.length > 0) {
                 var picked = data.find(function (d) { return d.IsDefault; }) || data[0];
-                _reportDate = new Date(picked.ReportDate).toISOString();
-                sessionStorage.setItem('_reportDate', _reportDate);
-                sessionStorage.setItem('_reportDateFetchedAt', Date.now().toString());
-                applyReportDate();
+                // Sadece takvim gününü sakla (saat/offset kırpılır): "2026-07-12T00:00:00+03:00" -> "2026-07-12".
+                _todayDate = String(picked.ReportDate).substring(0, 10);
+                sessionStorage.setItem('todayDate', _todayDate);
+                sessionStorage.setItem('todayDateFetchedAt', Date.now().toString());
+                applyTodayDate();
             }
             if (callback) callback();
         },
@@ -213,7 +236,7 @@ function loadReportDates(callback) {
     });
 }
 
-$(document).ready(function () { applyReportDate(); });
+$(document).ready(function () { applyTodayDate(); });
 
 // ===== Filter Data (shared across pages, cached in sessionStorage) =====
 var _regionFilters = JSON.parse(sessionStorage.getItem('_regionFilters') || '[]');
@@ -334,7 +357,7 @@ function loadScoreCardHeaders(filterType, callback) {
       url: '/ProductivityReport/GetProductivityScoreCardReportHeaders',
       type: 'POST',
       contentType: 'application/json',
-      data: JSON.stringify({ sessionId: '1', filterType: filterType, reportDate: _reportDate }),
+      data: JSON.stringify({ sessionId: '1', filterType: filterType, reportDate: _todayDate }),
       success: function (data) {
           sessionStorage.setItem(key, JSON.stringify(data));
           if (callback) callback(data);
