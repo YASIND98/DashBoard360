@@ -499,6 +499,10 @@
   cursor: pointer;
 }
 
+[data-theme="light"] .table-empty-state img {
+  content: url('/images/empty-state-seach-light.svg');
+}
+
 /* ===== Responsive ===== */
 @media (min-width: 1199px) {
   .table-row:hover td {
@@ -581,10 +585,6 @@
 
   [data-theme="light"] .table-empty-state {
     color: #3B4351;
-  }
-
-  [data-theme="light"] .table-empty-state img {
-    content: url('/images/empty-state-seach-light.svg');
   }
 
   [data-theme="light"] .data-table thead th.selected::before {

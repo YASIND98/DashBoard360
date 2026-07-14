@@ -689,6 +689,13 @@
   border-right: 1px solid var(--border-row);
 }
 
+[data-theme="light"] .sc-ranking-card--red .sc-ranking-value .first-number,
+[data-theme="light"] .sc-ranking-card--orange .sc-ranking-value .first-number,
+[data-theme="light"] .sc-ranking-card--green .sc-ranking-value .first-number,
+[data-theme="light"] .sc-ranking-card--blue .sc-ranking-value .first-number {
+  color: #ffffff;
+}
+
 [data-theme="light"] .sc-modal{
     background: #FFFFFF;
   }

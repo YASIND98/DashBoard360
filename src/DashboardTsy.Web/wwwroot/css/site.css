@@ -468,6 +468,10 @@ body:has(.scorecard-panel.open)::before {
     display: none;
   }
 
+  #scReportLegend .download-pdf-btn {
+    display: flex;
+  }
+
   .download-pdf-btn.mobile {
     display: flex;
     color: #ffffff;
