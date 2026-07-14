@@ -395,6 +395,35 @@ body:has(.scorecard-panel.open)::before {
   [data-theme="light"] .period-btn.active .period-icon {
     filter:none;
   }
+
+  [data-theme="light"] .scorecard-nps-wrapper .scorecard-panel {
+    background: #ffffff;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper .scorecard-section {
+    border-color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper .scorecard-table td {
+    border-bottom-color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper .scorecard-table td:first-child {
+    border-right-color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper .scorecard-header {
+    color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper .scorecard-section-title {
+    color: #262A33;
+    border-bottom: 1px solid #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper .scorecard-table td {
+    color: #262A33;
+  }
 }
 
 .desktop {
@@ -421,6 +450,10 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .main-content {
     background: var(--main-bg);
+  }
+
+  [data-theme="light"] .mobile-close-btn {
+    color: #536076;
   }
 
   .page-header {
@@ -582,6 +615,36 @@ body:has(.scorecard-panel.open)::before {
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-btn {
     background: #12375C;
   }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-panel {
+    background: #ffffff;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-section {
+    border-color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-table td {
+    border-bottom-color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-table td:first-child {
+    border-right-color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-header {
+    color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-section-title {
+    color: #262A33;
+    border-bottom: 1px solid #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-table td {
+    color: #262A33;
+  }
+  
 }
 
 @media (max-width: 950px) {

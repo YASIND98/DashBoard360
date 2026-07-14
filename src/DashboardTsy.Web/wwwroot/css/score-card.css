@@ -830,6 +830,63 @@
     filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
   }
 
+  /* Hedef Detayı — Filtreler */
+  [data-theme="light"] .sc-filter {
+    border-color: #12375C;
+    color: #12375C;
+  }
+
+  [data-theme="light"] .sc-filter.active {
+    background: #12375C;
+    color: #ffffff;
+  }
+
+  [data-theme="light"] .sc-filter-icon {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
+  }
+
+  [data-theme="light"] .sc-filter.active .sc-filter-icon {
+    filter: brightness(0) invert(1);
+  }
+
+  /* Hedef Detayı — Tablo */
+  [data-theme="light"] .sc-table-wrapper {
+    border-color: rgba(18, 55, 92, 0.2);
+  }
+
+  [data-theme="light"] .sc-table thead th {
+    color: #8795A9;
+    border-bottom-color: rgba(18, 55, 92, 0.12);
+  }
+
+  [data-theme="light"] .sc-table tbody td {
+    color: #3B4351;
+    border-right-color: rgba(18, 55, 92, 0.12);
+    border-bottom-color: rgba(18, 55, 92, 0.1);
+  }
+
+  [data-theme="light"] .sc-table tbody tr.sc-zebra {
+    background: rgba(18, 55, 92, 0.03);
+  }
+
+  [data-theme="light"] .sc-account {
+    color: #1565C0;
+  }
+
+  /* Hedef Detayı — Sayfalama */
+  [data-theme="light"] .sc-page-arrow {
+    background: rgba(18, 55, 92, 0.08);
+    color: #12375C;
+  }
+
+  [data-theme="light"] .sc-page-info {
+    color: #3B4351;
+  }
+
+  [data-theme="light"] .sc-empty-state {
+    color: #3B4351;
+  }
+
 @media (max-width: 1199px) {
   .sc-ranking-bar {
    flex-wrap: wrap; 
