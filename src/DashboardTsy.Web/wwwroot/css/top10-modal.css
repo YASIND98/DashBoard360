@@ -153,6 +153,56 @@
   color: #f44336;
 }
 
+/* ===== Light Mode ===== */
+[data-theme="light"] .top10-overlay {
+  background: rgba(18, 55, 92, 0.35);
+}
+
+[data-theme="light"] .top10-modal {
+  background: #ffffff;
+  border-color: rgba(18, 55, 92, 0.12);
+}
+
+[data-theme="light"] .top10-title {
+  color: #12375C;
+}
+
+[data-theme="light"] .top10-column-title {
+  color: #12375C;
+}
+
+[data-theme="light"] .toggle-btn {
+  color: #3B4351;
+  border: 1px solid rgba(18, 55, 92, 0.25);
+}
+
+[data-theme="light"] .toggle-btn.active {
+  background: #12375C;
+  border-color: #12375C;
+  color: #ffffff;
+}
+
+[data-theme="light"] .toggle-btn .top10-toggle-icon {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(40%) saturate(800%) hue-rotate(185deg) brightness(80%);
+}
+
+[data-theme="light"] .toggle-btn.active .top10-toggle-icon {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="light"] .top10-name {
+  color: #12375C;
+}
+
+[data-theme="light"] .top10-id {
+  color: rgba(18, 55, 92, 0.45);
+}
+
+[data-theme="light"] .top10-close img,
+[data-theme="light"] .top10-close svg {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(40%) saturate(800%) hue-rotate(185deg) brightness(80%);
+}
+
 @media (max-width: 1199px) {
   .top10-modal {
     background: #12375c;
@@ -187,5 +237,23 @@
 
   .top10-toggle-icon {
     display: none;
+  }
+
+  [data-theme="light"] .top10-modal {
+    background: #ffffff;
+  }
+
+  [data-theme="light"] .top10-period-toggle {
+    background: rgba(18, 55, 92, 0.08);
+  }
+
+  [data-theme="light"] .toggle-btn {
+    color: rgba(18, 55, 92, 0.55);
+    border:none;
+  }
+
+  [data-theme="light"] .toggle-btn.active {
+    background: #12375C;
+    color: #ffffff;
   }
 }
