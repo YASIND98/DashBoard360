@@ -32,8 +32,7 @@
 <div class="page-header">
     <h1 class="page-title" data-menu="ScreenTitle"></h1>
     <div class="page-date">
-      <span class="date-text">@Model.Tarih</span>
-      <span class="date-badge">Bugün</span>
+      @await Html.PartialAsync("_DatePicker")
     </div>
     @await Html.PartialAsync("_AvatarArea")
 </div>
@@ -358,8 +357,10 @@
 </div>
 
 @section Scripts {
+    <link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
+    <script src="~/js/date-picker.js" asp-append-version="true"></script>
     <script src="~/js/target-report.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
     <script>

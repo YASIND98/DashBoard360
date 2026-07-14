@@ -1,3 +1,5 @@
+var _selectedDate =  _todayDate;
+
 // ===== Yield Table Skeleton + Loading =====
 function showYieldTableLoading() {
     // Tablo container'ları gizle, skeleton göster
@@ -316,7 +318,7 @@ function loadGeneralRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode || null,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -398,7 +400,7 @@ function loadTableHeaders(toggleId, tabId, subTabId, filterType, callback) {
             midTabId: tabId || null,
             subTabId: subTabId || null,
             filterType: filterType,
-            reportDate: _reportDate
+            reportDate: _selectedDate
         }),
         success: function (data) {
             _cachedHeaders = data;
@@ -511,7 +513,7 @@ function loadVolumeRegionReport(regionCode, subTabId) {
             sessionId: '1',
             regionCode: regionCode,
             subTabId: subTabId || 0,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -579,7 +581,7 @@ function loadVolumeBranchReport(branchCode, subTabId) {
             sessionId: '1',
             branchCode: branchCode,
             subTabId: subTabId || 0,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -651,7 +653,7 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             sessionId: '1',
             regionCode: regionCode,
             subTabId: subTabId || 0,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -713,7 +715,7 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             sessionId: '1',
             branchCode: branchCode,
             subTabId: subTabId || 0,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -776,7 +778,7 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             sessionId: '1',
             branchCode: branchCode,
             tabId: tabId,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -836,7 +838,7 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             sessionId: '1',
             regionCode: regionCode,
             tabId: tabId,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -894,7 +896,7 @@ function loadCountCardPosRatioRegionReport(regionCode, tabId) {
         data: JSON.stringify({
             sessionId: '1',
             tabId: tabId,
-            reportDate: _reportDate
+            reportDate: _selectedDate
         }),
         success: function (headers) {
             renderCountCardPosRatioRegionHeaders(headers);
@@ -907,7 +909,7 @@ function loadCountCardPosRatioRegionReport(regionCode, tabId) {
                     sessionId: '1',
                     regionCode: regionCode,
                     tabId: tabId,
-                    reportDate: _reportDate
+                    reportDate: _selectedDate
                 }),
                 success: function (response) {
                     var data = extractResponseData(response);
@@ -964,7 +966,7 @@ function loadCountCardPosRatioBranchReport(branchCode, tabId) {
         data: JSON.stringify({
             sessionId: '1',
             tabId: tabId,
-            reportDate: _reportDate
+            reportDate: _selectedDate
         }),
         success: function (headers) {
             renderCountCardPosRatioBranchHeaders(headers);
@@ -977,7 +979,7 @@ function loadCountCardPosRatioBranchReport(branchCode, tabId) {
                     sessionId: '1',
                     branchCode: branchCode,
                     tabId: tabId,
-                    reportDate: _reportDate
+                    reportDate: _selectedDate
                 }),
                 success: function (response) {
                     var data = extractResponseData(response);
@@ -1037,7 +1039,7 @@ function loadProfitTotalRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -1106,7 +1108,7 @@ function loadProfitRatioRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -1191,7 +1193,7 @@ function loadProfitRatioBranchReport(branchCode) {
         data: JSON.stringify({
             sessionId: '1',
             branchCode: branchCode,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -1254,7 +1256,7 @@ function loadProfitTotalBranchReport(branchCode) {
         data: JSON.stringify({
             sessionId: '1',
             branchCode: branchCode,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -1323,7 +1325,7 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
         data: JSON.stringify({
             sessionId: '1',
             regionCode: regionCode,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
@@ -1383,7 +1385,7 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
         data: JSON.stringify({
             sessionId: '1',
             branchCode: branchCode,
-            reportDate: _reportDate,
+            reportDate: _selectedDate,
             sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),

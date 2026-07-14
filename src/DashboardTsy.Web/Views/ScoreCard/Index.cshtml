@@ -3,23 +3,24 @@
 
 
 
+<link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/score-card.css" asp-append-version="true" />
 
 <!-- Page Header -->
 <div class="page-header sc-page-header">
 <h1 class="page-title">Skor Kart</h1>
     <div class="page-date">
-        <div class="sc-date-picker" id="scDatePicker">
-            <button type="button" class="sc-dp-nav" id="scDpPrev">&#8249;</button>
-            <div class="sc-dp-trigger-wrap">
-                <button type="button" class="sc-dp-trigger" id="scDpTrigger">
+        <div class="date-picker" id="scDatePicker">
+            <button type="button" class="dp-nav" id="scDpPrev">&#8249;</button>
+            <div class="dp-trigger-wrap">
+                <button type="button" class="dp-trigger" id="scDpTrigger">
                     <strong id="scDpLabel"></strong>
-                    <span class="sc-dp-badge" id="scDpBadge"></span>
-                    <img src="~/images/down.svg" alt="" class="sc-dp-arrow" />
+                    <span class="dp-badge" id="scDpBadge"></span>
+                    <img src="~/images/down.svg" alt="" class="dp-arrow" />
                 </button>
-                <div class="sc-dp-panel" id="scDpPanel"></div>
+                <div class="dp-panel" id="scDpPanel"></div>
             </div>
-            <button type="button" class="sc-dp-nav" id="scDpNext">&#8250;</button>
+            <button type="button" class="dp-nav" id="scDpNext">&#8250;</button>
         </div>
     </div>
     @await Html.PartialAsync("_AvatarArea")

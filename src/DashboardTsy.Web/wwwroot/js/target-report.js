@@ -9,6 +9,7 @@ $(document).ready(function () {
   var currentSortBy = 0;
   var currentSortState = null;
   var monthlyHeadersLoaded = false;
+  var _selectedReportDate = _todayDate;
 
   // ===== Load Menu Texts =====
   var cachedMenu = sessionStorage.getItem('_menuTexts');
@@ -142,7 +143,7 @@ $(document).ready(function () {
           sessionId: '1',
           tabId: getActiveTabId(),
           subTabId: getActiveSubTabId(),
-          reportDate: _reportDate,
+          reportDate: _selectedReportDate,
           regionId: selectedRegion ? [selectedRegion.code] : [],
           branchId: selectedBranch ? [selectedBranch.code] : [],
           showDifferences: true,
@@ -263,7 +264,7 @@ $(document).ready(function () {
 
   // ===== PDF verisi (window.PdfReport) — servis cevabından kurulur, DOM'dan okunmaz =====
   function _pdfInfoLines() {
-    var date = ($('.date-text').text() || '').trim();
+    var date = ($('#dpLabel').text() || $('.date-text').text() || '').trim();
     var region = (selectedRegion && selectedRegion.name) ? selectedRegion.name : 'Tüm Bölgeler';
     var branch = (selectedBranch && selectedBranch.name) ? selectedBranch.name : 'Tüm Şubeler';
     var type = ($('.segment[data-type].active').text() || '').trim();                                       // Hacim / Adet
@@ -746,7 +747,19 @@ $(document).ready(function () {
   });
 
   // ===== Init =====
-  loadReportDates(function () {
+  loadTodayDate(function () {
+      _selectedReportDate = _todayDate;
+      if (window.DatePicker) {
+          DatePicker.init({
+              initial: new Date(_todayDate),
+              max: new Date(_todayDate),
+              onChange: function (iso) {
+                  _selectedReportDate = iso;
+                  showLoadingOverlay();
+                  loadActiveReport();
+              }
+          });
+      }
       loadRegionFilters(function () {
           var single = renderRegionDropdown();
           if (single) {
