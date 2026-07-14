@@ -81,7 +81,6 @@ public static class MockProductivityReportData
             new() { TabId = 10, TabName = "Müşteri", ParentId = 2, TabLevel = 2 },
             new() { TabId = 11, TabName = "Kredi Kartı", ParentId = 2, TabLevel = 2 },
             new() { TabId = 12, TabName = "POS", ParentId = 2, TabLevel = 2 },
-            new() { TabId = 13, TabName = "Nakit Yönetimi", ParentId = 2, TabLevel = 2 },
 
             new() { TabId = 20, TabName = "Tümü", ParentId = 10, TabLevel = 3 },
             new() { TabId = 21, TabName = "Kurumsal", ParentId = 10, TabLevel = 3 },
@@ -89,13 +88,6 @@ public static class MockProductivityReportData
             new() { TabId = 23, TabName = "KOBİ", ParentId = 10, TabLevel = 3 },
             new() { TabId = 24, TabName = "Tarım", ParentId = 10, TabLevel = 3 },
             new() { TabId = 25, TabName = "Bireysel", ParentId = 10, TabLevel = 3 },
-
-            new() { TabId = 50, TabName = "Tümü", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 51, TabName = "Kurumsal", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 52, TabName = "Ticari", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 53, TabName = "KOBİ", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 54, TabName = "Tarım", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 55, TabName = "Bireysel", ParentId = 13, TabLevel = 3 },
 
             new() { TabId = 30, TabName = "Tümü", ParentId = 3, TabLevel = 2 },
             new() { TabId = 31, TabName = "Kurumsal", ParentId = 3, TabLevel = 2 },
@@ -487,98 +479,6 @@ public static class MockProductivityReportData
         return new GetProductivityCountCustomerRegionReportResponse
         {
             GetProductivityCountCustomerRegionReports = roots
-        };
-    }
-
-    public static GetProductivityCountCashManagementRegionReportResponse GetProductivityCountCashManagementRegionReport(GetProductivityCountCashManagementRegionReportRequest request)
-    {
-        var segmentName = GetCustomerSegmentName(request.SubTabId);
-
-        var products = new List<(int Id, string Name)>
-        {
-            (1, $"Nakit Yönetimi - {segmentName} - Toplam"),
-            (2, $"Nakit Yönetimi - {segmentName} - Ürün A"),
-            (3, $"Nakit Yönetimi - {segmentName} - Ürün B"),
-            (4, $"Nakit Yönetimi - {segmentName} - Ürün C"),
-            (5, $"Nakit Yönetimi - {segmentName} - Ürün D"),
-            (6, $"Nakit Yönetimi - {segmentName} - Ürün E"),
-            (7, $"Nakit Yönetimi - {segmentName} - Ürün F"),
-            (8, $"Nakit Yönetimi - {segmentName} - Ürün G")
-        };
-
-        var items = products.Select(p => new GetProductivityCountCashManagementRegionReportResponse.GetProductivityCountCashManagementRegionReportItem
-        {
-            Id = p.Id,
-            ProductName = p.Name,
-
-            RealizationRegionValue = 54.8m,
-            RealizationRegionAverageValue = 51.2m,
-            RealizationRegionAverageValueDiff = 3.2m,
-            RealizationBankAverageValue = 50.7m,
-            RealizationBankAverageValueDiff = 4.1m,
-
-            YtdNominalChangeRegionValue = 10.6m,
-            YtdNominalChangeRegionAverageValue = 9.1m,
-            YtdNominalChangeRegionAverageValueDiff = 1.5m,
-            YtdNominalChangeBankAverageValue = 8.3m,
-            YtdNominalChangeBankAverageValueDiff = 2.3m,
-
-            QtdNominalChangeRegionValue = 3.9m,
-            QtdNominalChangeRegionAverageValue = 2.4m,
-            QtdNominalChangeRegionAverageValueDiff = 1.5m,
-            QtdNominalChangeBankAverageValue = 1.8m,
-            QtdNominalChangeBankAverageValueDiff = 2.1m
-        }).ToList();
-
-        return new GetProductivityCountCashManagementRegionReportResponse
-        {
-            GetProductivityCountCashManagementRegionReports = items
-        };
-    }
-
-    public static GetProductivityCountCashManagementBranchReportResponse GetProductivityCountCashManagementBranchReport(GetProductivityCountCashManagementBranchReportRequest request)
-    {
-        var segmentName = GetCustomerSegmentName(request.SubTabId);
-
-        var products = new List<(int Id, string Name)>
-        {
-            (1, $"Nakit Yönetimi - {segmentName} - Toplam"),
-            (2, $"Nakit Yönetimi - {segmentName} - Ürün A"),
-            (3, $"Nakit Yönetimi - {segmentName} - Ürün B"),
-            (4, $"Nakit Yönetimi - {segmentName} - Ürün C"),
-            (5, $"Nakit Yönetimi - {segmentName} - Ürün D"),
-            (6, $"Nakit Yönetimi - {segmentName} - Ürün E"),
-            (7, $"Nakit Yönetimi - {segmentName} - Ürün F"),
-            (8, $"Nakit Yönetimi - {segmentName} - Ürün G")
-        };
-
-        var items = products.Select(p => new GetProductivityCountCashManagementBranchReportResponse.GetProductivityCountCashManagementBranchReportItem
-        {
-            Id = p.Id,
-            ProductName = p.Name,
-
-            RealizationBranchValue = 54.8m,
-            RealizationRegionAverageValue = 51.2m,
-            RealizationRegionAverageValueDiff = 3.2m,
-            RealizationBankAverageValue = 50.7m,
-            RealizationBankAverageValueDiff = 4.1m,
-
-            YtdNominalChangeBranchValue = 10.6m,
-            YtdNominalChangeRegionAverageValue = 9.1m,
-            YtdNominalChangeRegionAverageValueDiff = 1.5m,
-            YtdNominalChangeBankAverageValue = 8.3m,
-            YtdNominalChangeBankAverageValueDiff = 2.3m,
-
-            QtdNominalChangeBranchValue = 3.9m,
-            QtdNominalChangeRegionAverageValue = 2.4m,
-            QtdNominalChangeRegionAverageValueDiff = 1.5m,
-            QtdNominalChangeBankAverageValue = 1.8m,
-            QtdNominalChangeBankAverageValueDiff = 2.1m
-        }).ToList();
-
-        return new GetProductivityCountCashManagementBranchReportResponse
-        {
-            GetProductivityCountCashManagementBranchReports = items
         };
     }
 
@@ -1311,10 +1211,6 @@ public static class MockProductivityReportData
 
     public static IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)
     {
-        // Adet > Nakit Yönetimi
-        if (request.MainTabId == 2 && request.MidTabId == 13)
-            return GetCashManagementTableHeaders(request.FilterType);
-
         return new List<GetProductivityReportTableHeaderItem>
         {
             new() { Id = 1, HeaderName = "Genel Bilgiler", ParentId = 0, OrderNo = 1, Sortable = false },
@@ -1325,33 +1221,6 @@ public static class MockProductivityReportData
             new() { Id = 5, HeaderName = "Adet", ParentId = 4, OrderNo = 1, Sortable = true },
             new() { Id = 6, HeaderName = "Hacim", ParentId = 4, OrderNo = 2, Sortable = true },
             new() { Id = 7, HeaderName = "Karlılık", ParentId = 4, OrderNo = 3, Sortable = true }
-        };
-    }
-
-    private static IReadOnlyList<GetProductivityReportTableHeaderItem> GetCashManagementTableHeaders(int filterType)
-    {
-        // FilterType: 1=Region (Bölge), 2=Branch (Şube)
-        var scopeLabel = filterType == 2 ? "Şube" : "Bölge";
-
-        return new List<GetProductivityReportTableHeaderItem>
-        {
-            new() { Id = 1, HeaderName = "#", ParentId = 0, OrderNo = 1, Sortable = false },
-            new() { Id = 2, HeaderName = "Ürün Adı", ParentId = 0, OrderNo = 2, Sortable = true },
-
-            new() { Id = 10, HeaderName = "Gerçekleşen", ParentId = 0, OrderNo = 3, Sortable = false },
-            new() { Id = 11, HeaderName = scopeLabel, ParentId = 10, OrderNo = 1, Sortable = true },
-            new() { Id = 12, HeaderName = "Bölge Ort", ParentId = 10, OrderNo = 2, Sortable = true },
-            new() { Id = 13, HeaderName = "Banka Ort", ParentId = 10, OrderNo = 3, Sortable = true },
-
-            new() { Id = 20, HeaderName = "YTD Nominal Dağılım", ParentId = 0, OrderNo = 4, Sortable = false },
-            new() { Id = 21, HeaderName = scopeLabel, ParentId = 20, OrderNo = 1, Sortable = true },
-            new() { Id = 22, HeaderName = "Bölge Ort", ParentId = 20, OrderNo = 2, Sortable = true },
-            new() { Id = 23, HeaderName = "Banka Ort", ParentId = 20, OrderNo = 3, Sortable = true },
-
-            new() { Id = 30, HeaderName = "QTD Nominal Dağılım", ParentId = 0, OrderNo = 5, Sortable = false },
-            new() { Id = 31, HeaderName = scopeLabel, ParentId = 30, OrderNo = 1, Sortable = true },
-            new() { Id = 32, HeaderName = "Bölge Ort", ParentId = 30, OrderNo = 2, Sortable = true },
-            new() { Id = 33, HeaderName = "Banka Ort", ParentId = 30, OrderNo = 3, Sortable = true }
         };
     }
 
@@ -1443,12 +1312,12 @@ public static class MockProductivityReportData
 
     private static string GetCustomerSegmentName(int subTabId) => subTabId switch
     {
-        20 or 50 or 0 => "Tümü",
-        21 or 51 or 1 => "Kurumsal",
-        22 or 52 or 2 => "Ticari",
-        23 or 53 or 3 => "KOBİ",
-        24 or 54 or 4 => "Tarım",
-        25 or 55 or 5 => "Bireysel",
+        20 or 0 => "Tümü",
+        21 or 1 => "Kurumsal",
+        22 or 2 => "Ticari",
+        23 or 3 => "KOBİ",
+        24 or 4 => "Tarım",
+        25 or 5 => "Bireysel",
         _ => "Tümü"
     };
 
