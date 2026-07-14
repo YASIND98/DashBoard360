@@ -792,6 +792,47 @@
     color: #3B4351;
   }
 
+  /* ===== Date Picker Panel (sc-dp-*) Light Mode ===== */
+  [data-theme="light"] .sc-dp-year-nav {
+    border-bottom-color: rgba(18, 55, 92, 0.1);
+  }
+
+  [data-theme="light"] .sc-dp-year-btn {
+    color: #12375C;
+  }
+
+  [data-theme="light"] .sc-dp-year-label {
+    color: #12375C;
+  }
+
+  [data-theme="light"] .sc-dp-cell {
+    color: #3B4351;
+  }
+
+  [data-theme="light"] .sc-dp-cell:hover {
+    background: rgba(18, 55, 92, 0.07);
+    color: #12375C;
+  }
+
+  [data-theme="light"] .sc-dp-cell.sc-dp-active {
+    background: #7db5f3;
+    color: #0f4570;
+  }
+
+  [data-theme="light"] .sc-dp-year-item {
+    color: #3B4351;
+  }
+
+  [data-theme="light"] .sc-dp-year-item:hover {
+    background: rgba(18, 55, 92, 0.07);
+    color: #12375C;
+  }
+
+  [data-theme="light"] .sc-dp-year-item.sc-dp-active {
+    background: #7db5f3;
+    color: #0f4570;
+  }
+
 @media (max-width: 1199px) {
   .sc-ranking-bar {
    flex-wrap: wrap;
