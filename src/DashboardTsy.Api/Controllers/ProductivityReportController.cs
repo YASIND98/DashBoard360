@@ -178,6 +178,22 @@ public class ProductivityReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountCashManagementRegionReport
+    /// Verimlilik ekranı için Nakit Yönetimi adet bölge raporunu döner (Adet/Nakit Yönetimi).
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    [HttpPost("GetProductivityCountCashManagementRegionReport")]
+    public ActionResult<GetProductivityCountCashManagementRegionReportResponse> GetProductivityCountCashManagementRegionReport(
+        [FromBody] GetProductivityCountCashManagementRegionReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountCashManagementRegionReport(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /ProductivityReport/GetProductivityVolumeRegionReport
     /// Verimlilik ekranı için hacim bölge raporunu döner.
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
@@ -384,6 +400,22 @@ public class ProductivityReportController : ControllerBase
             return BadRequest();
 
         var result = _reportDataProvider.GetProductivityCountCustomerBranchReport(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountCashManagementBranchReport
+    /// Verimlilik ekranı için Nakit Yönetimi adet şube raporunu döner (Adet/Nakit Yönetimi).
+    /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
+    /// </summary>
+    [HttpPost("GetProductivityCountCashManagementBranchReport")]
+    public ActionResult<GetProductivityCountCashManagementBranchReportResponse> GetProductivityCountCashManagementBranchReport(
+        [FromBody] GetProductivityCountCashManagementBranchReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountCashManagementBranchReport(request);
         return Ok(result);
     }
 

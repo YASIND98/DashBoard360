@@ -78,6 +78,12 @@ public interface IReportDataProvider
     GetProductivityCountCustomerRegionReportResponse? GetProductivityCountCustomerRegionReport(GetProductivityCountCustomerRegionReportRequest request);
 
     /// <summary>
+    /// Verimlilik ekranı için Nakit Yönetimi adet bölge raporunu döner (Adet/Nakit Yönetimi).
+    /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
+    /// </summary>
+    GetProductivityCountCashManagementRegionReportResponse? GetProductivityCountCashManagementRegionReport(GetProductivityCountCashManagementRegionReportRequest request);
+
+    /// <summary>
     /// Verimlilik ekranı için hacim bölge raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
@@ -144,6 +150,12 @@ public interface IReportDataProvider
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
     GetProductivityCountCustomerBranchReportResponse? GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request);
+
+    /// <summary>
+    /// Verimlilik ekranı için Nakit Yönetimi adet şube raporunu döner (Adet/Nakit Yönetimi).
+    /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
+    /// </summary>
+    GetProductivityCountCashManagementBranchReportResponse? GetProductivityCountCashManagementBranchReport(GetProductivityCountCashManagementBranchReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için hacim şube raporunu döner.
