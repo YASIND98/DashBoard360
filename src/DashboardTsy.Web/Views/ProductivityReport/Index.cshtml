@@ -3,13 +3,13 @@
 
 
 <link rel="stylesheet" href="~/css/ai.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
 
 <!-- Page Title & Date -->
 <div class="page-header">
     <h1 class="page-title">Verim Performans Raporları</h1>
     <div class="page-date">
-        <span class="date-text">@Model.Tarih</span>
-        <span class="date-badge">Bugün</span>
+        @await Html.PartialAsync("_DatePicker")
     </div>
     @await Html.PartialAsync("_AvatarArea")
 </div>
@@ -179,6 +179,7 @@
     <script src="~/js/productivity-report.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
     <script src="~/js/ai-insights.js" asp-append-version="true"></script>
+    <script src="~/js/date-picker.js" asp-append-version="true"></script>
     <script>
     $(document).ready(function () {
 
@@ -218,7 +219,24 @@
             return renderBranchList('#yieldSubeList', selectedBranch ? selectedBranch.code : null, selectedRegion ? selectedRegion.code : null);
         }
 
-        loadReportDates(function () {
+        function reloadCurrent() {
+            if (selectedRegion || selectedBranch) updateUI();
+            else updateYieldTable();
+        }
+
+        loadTodayDate(function () {
+            _selectedDate = _todayDate;
+            if (window.DatePicker) {
+                DatePicker.init({
+                    initial: new Date(_todayDate),
+                    min: new Date(2026, 4, 30),
+                    max: new Date(_todayDate),
+                    onChange: function (iso) {
+                        _selectedDate = iso;
+                        reloadCurrent();
+                    }
+                });
+            }
             loadRegionFilters(function () {
                 var single = renderRegionDropdown();
                 if (single) {
@@ -382,8 +400,8 @@
                 : '/ProductivityReport/GetProductivityRegionScoreCardReport';
 
             var payload = isBranch
-                ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: _reportDate }
-                : { sessionId: '1', regionCode: selectedRegion.code, reportDate: _reportDate };
+                ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: _selectedDate }
+                : { sessionId: '1', regionCode: selectedRegion.code, reportDate: _selectedDate };
 
             loadScoreCardHeaders(filterType, function (headers) {
                 $.ajax({

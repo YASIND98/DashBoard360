@@ -1,0 +1,223 @@
+.date-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+
+.dp-nav {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 2px;
+  color: white;
+  font-size: 22px;
+  line-height: 1;
+  background: transparent;
+  border: 1.5px solid rgba(255, 255, 255, 0.75);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dp-nav:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dp-nav:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.dp-trigger-wrap {
+  position: relative;
+}
+
+.dp-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  color: white;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dp-trigger:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.dp-trigger.open {
+  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dp-badge {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.dp-arrow {
+  width: 13px;
+  height: 13px;
+  filter: brightness(0) invert(1);
+  transition: transform 0.2s ease;
+}
+
+.dp-trigger.open .dp-arrow {
+  transform: rotate(180deg);
+}
+
+/* ===== Açılır panel ===== */
+
+.dp-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 340px;
+  padding: 10px;
+  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 500;
+}
+
+.dp-panel.open {
+  display: block;
+}
+
+/* Panel açıkken header okları (‹ ›) gizli — masaüstü davranışı (tamamen kaldır). */
+#datePicker.dp-panel-open .dp-nav {
+  display: none;
+}
+
+/* ----- Ay gezinme satırı (‹ Mayıs 2026 ›) ----- */
+
+.dp-month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.dp-month-btn {
+  padding: 0 4px;
+  color: white;
+  font-size: 22px;
+  line-height: 1;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.dp-month-btn:disabled {
+  opacity: 0.25;
+  cursor: not-allowed;
+}
+
+.dp-month-label {
+  min-width: 120px;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* ----- Hafta günleri başlığı + gün ızgarası (7 kolon) ----- */
+
+.dp-weekdays,
+.dp-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dp-weekdays {
+  margin-bottom: 6px;
+}
+
+.dp-weekday {
+  padding: 6px 0;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.dp-day {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  color: white;
+  font-size: 14px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dp-day:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Seçili gün: açık mavi daire (sc-dp aktif hücresiyle aynı renk). */
+.dp-day.dp-active {
+  background: #7db5f3;
+  color: #0f4570;
+  font-weight: 600;
+}
+
+/* İçinde bulunulan ay dışındaki günler (önceki/sonraki ay). */
+.dp-day.dp-muted {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+/* Aralık dışı (seçilemez) günler. */
+.dp-day.dp-disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@media (max-width: 1199px) {
+  .dp-panel {
+    left: auto;
+    right: 0;
+    transform: none;
+  }
+
+  .dp-nav {
+    width: 26px;
+    height: 26px;
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 767px) {
+  .date-picker {
+    gap: 0;
+  }
+
+  .dp-nav {
+    width: 20px;
+    height: 20px;
+    font-size: 16px;
+  }
+}

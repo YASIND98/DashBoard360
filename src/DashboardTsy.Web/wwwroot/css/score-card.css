@@ -556,100 +556,6 @@
   margin: 0;
 }
 
-.sc-date-picker {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.sc-dp-nav {
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  border: 1.5px solid rgba(255, 255, 255, 0.75);
-  background: transparent;
-  color: white;
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 0 2px;
-  transition: background 0.2s ease;
-}
-
-.sc-dp-nav:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.sc-dp-trigger-wrap {
-  position: relative;
-}
-
-.sc-dp-trigger {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 7px 14px;
-  border: 1px solid;
-  border-color: transparent;
-  border-radius: 10px;
-  background: transparent;
-  color: white;
-  cursor: pointer;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  white-space: nowrap;
-  transition: background 0.2s ease;
-}
-
-.sc-dp-trigger.open {
-  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.sc-dp-trigger:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.sc-dp-badge {
-  font-size: 13px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.sc-dp-arrow {
-  width: 13px;
-  height: 13px;
-  filter: brightness(0) invert(1);
-  transition: transform 0.2s ease;
-}
-
-.sc-dp-trigger.open .sc-dp-arrow {
-  transform: rotate(180deg);
-}
-
-.sc-dp-panel {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  left: 50%;
-  transform: translateX(-50%);
-  min-width: 300px;
-  background: linear-gradient(160deg, #2f65b3 0%, #2e60a0 100%);
-  border-radius: 8px;
-  z-index: 500;
-  padding: 6px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-.sc-dp-panel.open {
-  display: block;
-}
-
 .sc-dp-year-nav {
   display: flex;
   align-items: center;
@@ -720,13 +626,12 @@
   pointer-events: none;
 }
 
-.sc-dp-nav:disabled,
 .sc-dp-year-btn:disabled {
   opacity: 0.25;
   cursor: not-allowed;
 }
 
-.sc-dp-panel.sc-dp-panel--yearly {
+.dp-panel.sc-dp-panel--yearly {
   min-width: unset;
   width: fit-content;
 }
@@ -786,7 +691,7 @@
 
 @media (max-width: 1199px) {
   .sc-ranking-bar {
-   flex-wrap: wrap; 
+   flex-wrap: wrap;
   }
   .page-scorecard .period-toggle {
     margin-bottom: 16px;
