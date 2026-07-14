@@ -1,8 +1,6 @@
-using DashboardTsy.Application.Common.Requests;
-
 namespace DashboardTsy.Application.TargetReport.Requests;
 
-public class GetMonthlyTargetReportRequest : BaseReportRequest
+public class GetMonthlyTargetReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
 

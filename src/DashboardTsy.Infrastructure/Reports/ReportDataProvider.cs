@@ -86,9 +86,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SearchText"] = string.IsNullOrWhiteSpace(request.SearchText) ? (object)DBNull.Value : request.SearchText.Trim(),
             ["@ShowDifferences"] = request.ShowDifferences,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyTargetReport", parameters);
@@ -133,9 +131,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SearchText"] = string.IsNullOrWhiteSpace(request.SearchText) ? (object)DBNull.Value : request.SearchText.Trim(),
             ["@ShowDifferences"] = request.ShowDifferences,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetDailyQuantityTargetReport", parameters);
@@ -251,9 +247,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@PortfolioId"] = ToCsv(request.PortfolioId) ?? (object)DBNull.Value,
             ["@SearchText"] = string.IsNullOrWhiteSpace(request.SearchText) ? (object)DBNull.Value : request.SearchText.Trim(),
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetMonthlyTargetReport", parameters);
@@ -470,9 +464,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@RegionCode"] = string.IsNullOrWhiteSpace(request.RegionCode) ? (object)DBNull.Value : request.RegionCode,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -506,9 +498,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@TabId"] = request.TabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -593,9 +583,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SubTabId"] = request.SubTabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -665,9 +653,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SubTabId"] = request.SubTabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -733,9 +719,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@RegionCode"] = request.RegionCode ?? string.Empty,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -768,9 +752,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@RegionCode"] = request.RegionCode ?? string.Empty,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -803,9 +785,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@BranchCode"] = string.IsNullOrWhiteSpace(request.BranchCode) ? (object)DBNull.Value : request.BranchCode,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -839,9 +819,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@TabId"] = request.TabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -958,9 +936,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@BranchCode"] = string.IsNullOrWhiteSpace(request.BranchCode) ? (object)DBNull.Value : request.BranchCode,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -1042,9 +1018,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SubTabId"] = request.SubTabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -1114,9 +1088,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SubTabId"] = request.SubTabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(

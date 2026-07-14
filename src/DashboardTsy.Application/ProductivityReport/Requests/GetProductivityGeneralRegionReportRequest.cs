@@ -1,8 +1,6 @@
-using DashboardTsy.Application.Common.Requests;
-
 namespace DashboardTsy.Application.ProductivityReport.Requests;
 
-public class GetProductivityGeneralRegionReportRequest : BaseReportRequest
+public class GetProductivityGeneralRegionReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
     public string? RegionCode { get; set; }
