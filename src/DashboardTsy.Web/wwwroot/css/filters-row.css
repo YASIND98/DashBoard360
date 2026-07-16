@@ -257,10 +257,6 @@
   .dropdown-item:hover {
     background: var(--bg-hover);
   }
-
-  .dropdown-item.selected:hover {
-    background: var(--bg-hover-selected);
-  }
   
   [data-theme="light"] .filter-dropdown,
   [data-theme="light"] .filter-search {

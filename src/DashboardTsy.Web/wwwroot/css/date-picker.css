@@ -210,6 +210,10 @@
     color: #12375C;
   }
 
+  [data-theme="light"] .dp-trigger.open {
+    background: #f0f6fe;
+  }
+
   [data-theme="light"] .dp-badge {
     color: rgba(18, 55, 92, 0.5);
   }

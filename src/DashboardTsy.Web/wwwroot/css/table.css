@@ -722,7 +722,8 @@
     font-style: normal;
   }
 
-  [data-theme="light"] .table-container {
+  [data-theme="light"] .table-container,
+  [data-theme="light"] #nplTableContainer.table-container {
     background: var(--main-bg);
   }
 
