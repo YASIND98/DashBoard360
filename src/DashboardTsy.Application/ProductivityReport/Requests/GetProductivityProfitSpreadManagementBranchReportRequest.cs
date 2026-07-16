@@ -1,6 +1,8 @@
+using DashboardTsy.Application.Common.Requests;
+
 namespace DashboardTsy.Application.ProductivityReport.Requests;
 
-public class GetProductivityProfitSpreadManagementBranchReportRequest
+public class GetProductivityProfitSpreadManagementBranchReportRequest : BaseReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
     public string BranchCode { get; set; } = string.Empty;

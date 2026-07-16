@@ -1,6 +1,8 @@
+using DashboardTsy.Application.Common.Requests;
+
 namespace DashboardTsy.Application.TargetReport.Requests;
 
-public class GetDailyQuantityTargetReportRequest
+public class GetDailyQuantityTargetReportRequest : BaseReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
 
