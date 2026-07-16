@@ -191,6 +191,17 @@ public class ProductivityReportController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("GetProductivityCountCashManagementRegionReport")]
+    public async Task<ActionResult<GetProductivityCountCashManagementRegionReportResponse>> GetProductivityCountCashManagementRegionReport(
+        [FromBody] GetProductivityCountCashManagementRegionReportRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountCashManagementRegionReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
     [HttpPost("GetProductivityVolumeRegionReport")]
     public async Task<ActionResult<GetProductivityVolumeRegionReportResponse>> GetProductivityVolumeRegionReport(
         [FromBody] GetProductivityVolumeRegionReportRequest? request,
@@ -333,6 +344,17 @@ public class ProductivityReportController : ControllerBase
         if (request == null) return BadRequest();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityCountCustomerBranchReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    [HttpPost("GetProductivityCountCashManagementBranchReport")]
+    public async Task<ActionResult<GetProductivityCountCashManagementBranchReportResponse>> GetProductivityCountCashManagementBranchReport(
+        [FromBody] GetProductivityCountCashManagementBranchReportRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountCashManagementBranchReportAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
 

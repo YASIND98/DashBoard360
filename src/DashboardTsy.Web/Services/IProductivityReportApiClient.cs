@@ -16,6 +16,7 @@ public interface IProductivityReportApiClient
     Task<IReadOnlyList<GetProductivityCountCardPosRatioRegionReportItem>> GetProductivityCountCardPosRatioRegionReportAsync(GetProductivityCountCardPosRatioRegionReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityCountCardPosRatioRegionReportTableHeadersItem?> GetProductivityCountCardPosRatioRegionReportTableHeadersAsync(GetProductivityCountCardPosRatioRegionReportTableHeadersRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityCountCustomerRegionReportResponse?> GetProductivityCountCustomerRegionReportAsync(GetProductivityCountCustomerRegionReportRequest request, CancellationToken cancellationToken = default);
+    Task<GetProductivityCountCashManagementRegionReportResponse?> GetProductivityCountCashManagementRegionReportAsync(GetProductivityCountCashManagementRegionReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityVolumeRegionReportResponse?> GetProductivityVolumeRegionReportAsync(GetProductivityVolumeRegionReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityProfitRatioRegionReportResponse?> GetProductivityProfitRatioRegionReportAsync(GetProductivityProfitRatioRegionReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityProfitTotalRegionReportResponse?> GetProductivityProfitTotalRegionReportAsync(GetProductivityProfitTotalRegionReportRequest request, CancellationToken cancellationToken = default);
@@ -29,6 +30,7 @@ public interface IProductivityReportApiClient
     Task<GetProductivityBranchScoreCardReportItem?> GetProductivityBranchScoreCardReportAsync(GetProductivityBranchScoreCardReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityRegionScoreCardReportItem?> GetProductivityRegionScoreCardReportAsync(GetProductivityRegionScoreCardReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityCountCustomerBranchReportResponse?> GetProductivityCountCustomerBranchReportAsync(GetProductivityCountCustomerBranchReportRequest request, CancellationToken cancellationToken = default);
+    Task<GetProductivityCountCashManagementBranchReportResponse?> GetProductivityCountCashManagementBranchReportAsync(GetProductivityCountCashManagementBranchReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityVolumeBranchReportResponse?> GetProductivityVolumeBranchReportAsync(GetProductivityVolumeBranchReportRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<GetReportSidebarItem>> GetReportSidebarItemsAsync(GetReportSidebarItemsRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<GetReportDatesItem>> GetReportDatesAsync(CancellationToken cancellationToken = default);

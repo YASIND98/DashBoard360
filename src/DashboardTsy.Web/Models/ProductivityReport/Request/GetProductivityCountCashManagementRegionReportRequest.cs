@@ -1,9 +1,9 @@
-namespace DashboardTsy.Application.ProductivityReport.Requests;
+namespace DashboardTsy.Web.Models.ProductivityReport.Request;
 
-public class GetProductivityCountCashManagementBranchReportRequest
+public class GetProductivityCountCashManagementRegionReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
-    public string BranchCode { get; set; } = string.Empty;
+    public string RegionCode { get; set; } = string.Empty;
     /// <summary>Tümü / Kurumsal / Ticari / KOBİ / Tarım / Bireysel</summary>
     public int SubTabId { get; set; }
     public DateTime ReportDate { get; set; }

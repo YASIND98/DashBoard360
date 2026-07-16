@@ -629,9 +629,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SubTabId"] = request.SubTabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -1078,9 +1076,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@SubTabId"] = request.SubTabId,
             ["@ReportDate"] = request.ReportDate,
             ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IsAscending"] = request.IsAscending
         };
 
         var ds = _spExecutor.ExecuteDataSet(

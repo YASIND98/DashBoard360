@@ -1,4 +1,4 @@
-namespace DashboardTsy.Application.ProductivityReport.Requests;
+namespace DashboardTsy.Web.Models.ProductivityReport.Request;
 
 public class GetProductivityCountCashManagementBranchReportRequest
 {

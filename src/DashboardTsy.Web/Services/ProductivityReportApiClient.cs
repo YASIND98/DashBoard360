@@ -105,6 +105,14 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return JsonSerializer.Deserialize<GetProductivityCountCustomerRegionReportResponse>(json, _jsonOptions);
     }
 
+    public async Task<GetProductivityCountCashManagementRegionReportResponse?> GetProductivityCountCashManagementRegionReportAsync(GetProductivityCountCashManagementRegionReportRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCashManagementRegionReport", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<GetProductivityCountCashManagementRegionReportResponse>(json, _jsonOptions);
+    }
+
     public async Task<GetProductivityVolumeRegionReportResponse?> GetProductivityVolumeRegionReportAsync(GetProductivityVolumeRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityVolumeRegionReport", request, cancellationToken).ConfigureAwait(false);
@@ -208,6 +216,14 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         return JsonSerializer.Deserialize<GetProductivityCountCustomerBranchReportResponse>(json, _jsonOptions);
+    }
+
+    public async Task<GetProductivityCountCashManagementBranchReportResponse?> GetProductivityCountCashManagementBranchReportAsync(GetProductivityCountCashManagementBranchReportRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCashManagementBranchReport", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<GetProductivityCountCashManagementBranchReportResponse>(json, _jsonOptions);
     }
 
     public async Task<GetProductivityVolumeBranchReportResponse?> GetProductivityVolumeBranchReportAsync(GetProductivityVolumeBranchReportRequest request, CancellationToken cancellationToken = default)
