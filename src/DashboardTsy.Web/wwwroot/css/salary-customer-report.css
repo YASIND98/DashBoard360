@@ -1,0 +1,323 @@
+#volumeTableContainer.table-container,
+#crossSellTableContainer.table-container,
+#bankShareTableContainer.table-container {
+  padding-top: 16px;
+}
+
+#volumeDataTable,
+#crossSellDataTable {
+  border-bottom: 1px solid var(--border-row);
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
+
+#volumeDataTable tbody tr.last-visible-row td:first-child,
+#volumeDataTable tbody tr.last-visible-row td:nth-child(2),
+#crossSellDataTable tbody tr.last-visible-row td:first-child,
+#crossSellDataTable tbody tr.last-visible-row td:nth-child(2) {
+  border-bottom: none;
+}
+
+#volumeDataTable tbody tr:first-child td,
+#crossSellDataTable tbody tr:first-child td {
+  border-top: 1px solid var(--border-row);
+}
+
+.col-metric {
+  min-width: 150px;
+  padding-top: 14px !important;
+  padding-bottom: 14px !important;
+  vertical-align: top;
+  padding: 24px 8px 8px !important;
+}
+
+.col-product-header {
+  vertical-align: top;
+  padding: 24px 8px 8px !important;
+}
+
+.data-table thead th.col-product-header {
+  vertical-align: middle;
+  padding: 17px 6px !important;
+}
+
+.col-product-header span {
+  line-height: 18px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.sc-total {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-body);
+}
+
+.sc-sub {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-muted);
+  white-space: nowrap;
+  line-height: 12px;
+}
+
+.sc-sub-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sc-divider {
+  border-top: 1px dashed var(--border-divider);
+  margin-top: 8px;
+}
+
+.col-left .sc-sub {
+  justify-content: flex-start;
+}
+
+.sc-metric-flex {
+  display: flex;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.sc-metric-main,
+.sc-metric-diff {
+  flex: 1;
+  min-width: 0;
+}
+
+.sc-metric-main {
+  flex: 176;
+}
+
+.sc-metric-diff {
+  flex: 112;
+}
+
+.sc-metric-diff.diff-details {
+  display: block;
+  margin-top: 0;
+}
+
+.sc-tag {
+  color: var(--text-muted);
+  line-height: 12px !important;
+}
+
+.sc-sub-amount {
+  color: var(--text-light);
+  font-weight: 500;
+}
+
+.sc-sub-rate {
+  color: var(--bg-subtab);
+}
+
+#volumeDataTable thead th.col-cmp,
+#crossSellDataTable thead th.col-cmp {
+  position: relative;
+  padding: 8px;
+}
+
+#volumeDataTable thead th.col-cmp::before,
+#crossSellDataTable thead th.col-cmp::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-top: 1px dashed var(--border-divider);
+  border-right: 1px dashed var(--border-divider);
+  pointer-events: none;
+}
+
+#volumeDataTable thead th.col-cmp::before,
+#crossSellDataTable thead th.col-cmp::before {
+  border-left: 1px dashed var(--border-divider);
+  border-top-left-radius: 30px;
+}
+
+#volumeDataTable thead th.col-cmp::before,
+#crossSellDataTable thead th.col-cmp::before {
+  border-top-right-radius: 30px;
+}
+
+#volumeDataTable tbody td.col-cmp,
+#crossSellDataTable tbody td.col-cmp {
+  border-right: 1px dashed var(--border-divider);
+}
+
+#volumeDataTable tbody td.col-cmp-first,
+#crossSellDataTable tbody td.col-cmp-first {
+  border-left: 1px dashed var(--border-divider);
+}
+
+#volumeDataTable tbody tr:last-child td.col-cmp,
+#crossSellDataTable tbody tr:last-child td.col-cmp {
+  border-bottom: 1px dashed var(--border-divider);
+}
+
+#volumeDataTable tbody tr:last-child td.col-cmp-first,
+#crossSellDataTable tbody tr:last-child td.col-cmp-first {
+  border-bottom-left-radius: 30px;
+}
+
+#volumeDataTable tbody tr:last-child td.col-cmp-last,
+#crossSellDataTable tbody tr:last-child td.col-cmp-last {
+  border-bottom-right-radius: 30px;
+}
+
+#volumeDataTable thead th .cs-th-row,
+#crossSellDataTable thead th .cs-th-row {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#volumeDataTable thead th .cs-th-text,
+#crossSellDataTable thead th .cs-th-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#volumeDataTable thead th .cs-th-text small,
+#crossSellDataTable thead th .cs-th-text small {
+  display: inline;
+  margin-top: 0;
+  font-size: 12px;
+  font-weight: 300;
+  color: #B1BAC8;
+  line-height: 18px;
+}
+
+#volumeDataTable thead th .cs-th-text span,
+#crossSellDataTable thead th .cs-th-text span {
+  line-height: 18px;
+}
+
+#volumeDataTable thead th .sc-th-flex,
+#crossSellDataTable thead th .sc-th-flex {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+#volumeDataTable thead th .sc-th-main,
+#crossSellDataTable thead th .sc-th-main {
+  flex: 176;
+  min-width: 0;
+}
+
+#volumeDataTable thead th .sc-th-diff,
+#crossSellDataTable thead th .sc-th-diff {
+  flex: 112;
+  min-width: 0;
+  font-size: 12px;
+  font-weight: 300;
+  color: #B1BAC8;
+  line-height: 18px;
+}
+
+#crossSellDataTable thead th.col-cmp-last::before {
+  border: none;
+  border-radius: 0;
+}
+
+#crossSellDataTable tbody td.col-cmp-last {
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
+}
+
+#crossSellDataTable tbody tr:last-child td.col-cmp-last {
+  border-bottom: none;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+#crossSellDataTable tbody td:last-child {
+  border-right: none;
+}
+
+#bankShareDataTable tbody tr.last-visible-row td {
+  border-bottom: 1px solid var(--text-gray);
+}
+
+#bankShareDataTable tbody tr:first-child td {
+  border-top: 1px solid var(--text-gray);
+}
+
+#bankShareDataTable tbody td:first-child {
+  border-left: 1px solid var(--text-gray);
+}
+
+#bankShareDataTable tbody td:last-child {
+  border-right: 1px solid var(--text-gray);
+}
+
+#bankShareDataTable thead tr:first-child th:nth-child(2),
+#bankShareDataTable thead tr:first-child th:nth-child(3),
+#bankShareDataTable thead tr:last-child th:nth-child(2),
+#bankShareDataTable thead tr:last-child th:nth-child(4),
+#bankShareDataTable tbody td:nth-child(3),
+#bankShareDataTable tbody td:nth-child(5) {
+  border-right: 1px dashed var(--border-divider);
+}
+
+#bankShareDataTable .col-group-header::after {
+  left: 0;
+  right: 0;
+}
+
+#bankShareDataTable thead th {
+  padding: 8px;
+  line-height: 18px;
+}
+
+#bankShareDataTable thead tr:nth-child(2) th {
+  top: 32px;
+}
+
+#bankShareDataTable .col-left {
+  width: 200px;
+}
+
+#bankShareDataTable tbody td.col-left {
+  white-space: normal;
+}
+
+#bankShareTableBody .col-left {
+  padding: 16px 20px;
+}
+
+.sc-customer-toggle {
+  display: flex;
+  justify-content: flex-end;
+  padding: 4px 0 16px;
+}
+
+[data-theme="light"] .sc-sub-amount {
+  color: #262A33;
+}
+
+[data-theme="light"] .sc-sub,
+[data-theme="light"] .sc-tag,
+[data-theme="light"] .sc-sub-rate {
+  color: #68778f;
+}
+
+@media (max-width: 767px) {
+  .sc-customer-toggle {
+    justify-content: center;
+  }
+}

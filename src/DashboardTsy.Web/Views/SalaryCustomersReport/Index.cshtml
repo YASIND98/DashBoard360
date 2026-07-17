@@ -1,0 +1,245 @@
+@model ReportViewModel
+
+<link rel="stylesheet" href="~/css/salary-customer-report.css" asp-append-version="true" />
+
+<!-- Page Title & Date -->
+<div class="page-header">
+    <h1 class="page-title">Maaş Müşterileri Raporları</h1>
+    <div class="page-date">
+        <span class="date-text">@Model.Tarih</span>
+        <span class="date-badge">Bugün</span>
+    </div>
+    @await Html.PartialAsync("_AvatarArea")
+</div>
+
+<!-- Filters -->
+<div class="filters-row">
+    <h1 class="page-title page-title-mobile mobile">Maaş Müşterileri Raporları</h1>
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="salaryRegionSelect">
+                <span class="filter-label" id="salaryRegionLabel">Bölge</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="salaryRegionPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="salaryRegionSearch" />
+                </div>
+                <div class="dropdown-list" id="salaryRegionList"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="salaryBranchSelect">
+                <span class="filter-label" id="salaryBranchLabel">Şube</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="salaryBranchPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="salaryBranchSearch" />
+                </div>
+                <div class="dropdown-list" id="salaryBranchList"></div>
+            </div>
+        </div>
+
+        <div class="filter-search">
+            <img src="~/images/search.svg" alt="" />
+            <input type="text" placeholder="Ara" id="salarySearchInput" />
+        </div>
+    </div>
+    <div class="desktop">
+        <div class="segmented-control salary-main-tabs"></div>
+    </div>
+</div>
+
+<!-- Tabs: Tümü / Kurumsal / Ticari / KOBİ / Tarım / Bireysel -->
+<div class="tab-bar">
+    <div class="tab-list" id="salarySubTabList"></div>
+    <div class="sc-customer-toggle" id="bankShareCustomerToggleWrap" style="display:none;">
+        <div class="diff-toggle sc-customer-switch" id="bankShareCustomerToggle" data-active="false">
+            <span class="sc-switch-label sc-switch-label-salary" data-bs-header="SalaryCustomersLabel">Maaş Müşterileri</span>
+            <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+            <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+            <span class="sc-switch-label sc-switch-label-retired" data-bs-header="RetiredCustomersLabel">Emekli Müşterileri</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Segments (mobile): Hacim / Çapraz Satış Gelişimi / Banka Payı -->
+<div class="mobile period-toggle-row">
+    <div class="segmented-control salary-main-tabs"></div>
+</div>
+
+<!-- Hacim Table -->
+<div class="table-container" id="volumeTableContainer">
+    <div class="table-wrapper">
+        <table class="data-table" id="volumeDataTable">
+            <thead>
+                <tr>
+                    <th class="col-index"></th>
+                    <th class="col-left col-product-header"><span data-vol-header="ProductColumnName"></span></th>
+                    <th class="col-cmp col-cmp-first">
+                        <div class="cs-th-row">
+                            <span class="cs-th-text">
+                                <span data-vol-header="LastYearColumnName"></span>
+                                <small data-vol-header="LastYearColumnDate"></small>
+                            </span>
+                            <i class="sort-icon" data-sort-by="2"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                        </div>
+                    </th>
+                    <th class="col-cmp">
+                        <div class="cs-th-row">
+                            <span class="cs-th-text">
+                                <span data-vol-header="LastWeekColumnName"></span>
+                                <small data-vol-header="LastWeekColumnDate"></small>
+                            </span>
+                            <i class="sort-icon" data-sort-by="3"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                        </div>
+                    </th>
+                    <th class="col-cmp">
+                        <div class="cs-th-row">
+                            <span class="cs-th-text">
+                                <span data-vol-header="PreviousDayColumnName"></span>
+                                <small data-vol-header="PreviousDayColumnDate"></small>
+                            </span>
+                            <i class="sort-icon" data-sort-by="4"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                        </div>
+                    </th>
+                    <th class="col-cmp col-cmp-last">
+                        <div class="cs-th-row">
+                            <span class="cs-th-text">
+                                <span data-vol-header="YesterdayColumnName"></span>
+                                <small data-vol-header="YesterdayColumnDate"></small>
+                            </span>
+                            <i class="sort-icon" data-sort-by="5"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="volumeTableBody"></tbody>
+        </table>
+    </div>
+    <div class="table-legend">
+        <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
+        <div class="legend-actions">
+            <div class="diff-toggle" id="volumeDiffToggle">
+                <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+                <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+                <span>Farkları Göster</span>
+            </div>
+            <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
+                <img src="~/images/download.svg" alt="PDF İndir" />
+                <span>PDF İndir</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Çapraz Satış Gelişimi Table -->
+<div class="table-container" id="crossSellTableContainer" style="display:none;">
+    <div class="table-wrapper">
+        <table class="data-table" id="crossSellDataTable">
+            <thead>
+                <tr>
+                    <th class="col-index"></th>
+                    <th class="col-left col-product-header"><span data-cs-header="ProductColumnName"></span></th>
+                    <th class="col-cmp col-cmp-first">
+                        <div class="sc-th-flex">
+                            <div class="sc-th-main">
+                                <div class="cs-th-row">
+                                    <span class="cs-th-text">
+                                        <span data-cs-header="LastYearColumnName"></span>
+                                        <small data-cs-header="LastYearColumnDate"></small>
+                                    </span>
+                                    <i class="sort-icon" data-sort-by="2"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                                </div>
+                            </div>
+                            <div class="sc-th-diff diff-details" style="display:none;"><span data-cs-header="LastYearDifferenceColumnName"></span></div>
+                        </div>
+                    </th>
+                    <th class="col-cmp">
+                        <div class="sc-th-flex">
+                            <div class="sc-th-main">
+                                <div class="cs-th-row">
+                                    <span class="cs-th-text">
+                                        <span data-cs-header="TwoMonthsAgoColumnName"></span>
+                                        <small data-cs-header="TwoMonthsAgoColumnDate"></small>
+                                    </span>
+                                    <i class="sort-icon" data-sort-by="3"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                                </div>
+                            </div>
+                            <div class="sc-th-diff diff-details" style="display:none;"><span data-cs-header="TwoMonthsAgoDifferenceColumnName"></span></div>
+                        </div>
+                    </th>
+                    <th class="col-cmp col-cmp-last">
+                        <div class="cs-th-row">
+                            <span class="cs-th-text">
+                                <span data-cs-header="LastMonthColumnName"></span>
+                                <small data-cs-header="LastMonthColumnDate"></small>
+                            </span>
+                            <i class="sort-icon" data-sort-by="4"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                        </div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="crossSellTableBody"></tbody>
+        </table>
+    </div>
+    <div class="table-legend">
+        <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
+        <div class="legend-actions">
+            <div class="diff-toggle" id="crossSellDiffToggle">
+                <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+                <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+                <span>Farkları Göster</span>
+            </div>
+            <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
+                <img src="~/images/download.svg" alt="PDF İndir" />
+                <span>PDF İndir</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Banka Payı Table -->
+<div class="table-container" id="bankShareTableContainer" style="display:none;">
+    <div class="table-wrapper">
+        <table class="data-table" id="bankShareDataTable">
+            <thead>
+                <tr>
+                    <th class="col-left valign-center" rowspan="2"><span data-bs-header="ProductColumnName"></span></th>
+                    <th colspan="2" class="col-group-header"><span data-bs-header="DenizbankCreditGroupName"></span></th>
+                    <th colspan="2" class="col-group-header"><span data-bs-header="OtherBanksCreditGroupName"></span></th>
+                    <th colspan="2" class="col-group-header"><span data-bs-header="WalletShareGroupName"></span></th>
+                </tr>
+                <tr>
+                    <th><span data-bs-header="FirstMonthName"></span></th>
+                    <th><span data-bs-header="SecondMonthName"></span></th>
+                    <th><span data-bs-header="FirstMonthName"></span></th>
+                    <th><span data-bs-header="SecondMonthName"></span></th>
+                    <th><span data-bs-header="FirstMonthName"></span></th>
+                    <th><span data-bs-header="SecondMonthName"></span></th>
+                </tr>
+            </thead>
+            <tbody id="bankShareTableBody"></tbody>
+        </table>
+    </div>
+    <div class="table-legend">
+        <span class="legend-note">Tablodaki değerler /1000 olarak verilmektedir.</span>
+        <div class="legend-actions">
+            <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
+                <img src="~/images/download.svg" alt="PDF İndir" />
+                <span>PDF İndir</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
+    <script src="~/js/salary-customer-report.js" asp-append-version="true"></script>
+    <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+}

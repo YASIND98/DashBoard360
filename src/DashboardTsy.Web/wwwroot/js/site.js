@@ -28,6 +28,7 @@ var _sidebarIcons = {
     'ScoreCard': '/images/score-card.svg',
     'NplReport': '/images/npl.svg',
     'FinancialMap': '/images/financial-map.svg',
+    'SalaryCustomersReport': '/images/salary-customers.svg',
 };
 
 function renderSidebar(items) {
