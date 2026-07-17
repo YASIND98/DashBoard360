@@ -196,6 +196,81 @@
   pointer-events: none;
 }
 
+@media (min-width: 1200px) {
+  [data-theme="light"] .dp-nav {
+    border-color: rgba(18, 55, 92, 0.3);
+    color: #12375C;
+  }
+
+  [data-theme="light"] .dp-nav:hover {
+    background: rgba(18, 55, 92, 0.06);
+  }
+
+  [data-theme="light"] .dp-trigger {
+    color: #12375C;
+  }
+
+  [data-theme="light"] .dp-trigger.open {
+    background: #f0f6fe;
+  }
+
+  [data-theme="light"] .dp-badge {
+    color: rgba(18, 55, 92, 0.5);
+  }
+
+  [data-theme="light"] .dp-arrow {
+    filter: brightness(0) saturate(100%) invert(13%) sepia(40%) saturate(800%) hue-rotate(185deg) brightness(80%);
+  }
+}
+
+/* ===== Light Mode ===== */
+
+[data-theme="light"] .dp-trigger:hover {
+  background: rgba(18, 55, 92, 0.06);
+}
+
+[data-theme="light"] .dp-trigger.open {
+  border-color: rgba(18, 55, 92, 0.2);
+}
+
+[data-theme="light"] .dp-panel {
+  background: #ffffff;
+  box-shadow: 0 8px 32px rgba(18, 55, 92, 0.16);
+}
+
+[data-theme="light"] .dp-month-nav {
+  border-bottom-color: rgba(18, 55, 92, 0.1);
+}
+
+[data-theme="light"] .dp-month-btn {
+  color: #12375C;
+}
+
+[data-theme="light"] .dp-month-label {
+  color: #12375C;
+}
+
+[data-theme="light"] .dp-weekday {
+  color: rgba(18, 55, 92, 0.5);
+}
+
+[data-theme="light"] .dp-day {
+  color: #3B4351;
+}
+
+[data-theme="light"] .dp-day:hover {
+  background: rgba(18, 55, 92, 0.07);
+}
+
+[data-theme="light"] .dp-day.dp-active {
+  background: #12375C;
+  color: #ffffff;
+}
+
+[data-theme="light"] .dp-day.dp-muted {
+  color: rgba(18, 55, 92, 0.3);
+}
+
 @media (max-width: 1199px) {
   .dp-panel {
     left: auto;
