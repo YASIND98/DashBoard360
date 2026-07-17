@@ -218,6 +218,21 @@ body {
   height: 24px;
 }
 
+.usd-kur-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.usd-kur-btn svg {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
 .pdf-spinner {
   display: inline-block;
   width: 16px;
@@ -461,6 +476,14 @@ body:has(.scorecard-panel.open)::before {
   }
 
   .legend-actions {
+    display: none;
+  }
+
+  .page-home .legend-actions {
+    display: flex;
+  }
+
+  .page-home .legend-actions .diff-toggle {
     display: none;
   }
 
@@ -723,6 +746,9 @@ body:has(.scorecard-panel.open)::before {
   }
   .scorecard-nps-wrapper.mobile .scorecard-btn {
     padding: 8px;
+  }
+  .usd-kur-btn {
+    margin-bottom: 6px;
   }
 }
 

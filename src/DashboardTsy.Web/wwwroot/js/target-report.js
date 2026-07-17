@@ -867,4 +867,74 @@ $(document).ready(function () {
     currentTop10FilterType = $(this).data('top10-period') === 'weekly' ? 1 : 0;
     loadTop10Data(currentTop10ProductId, currentTop10FilterType);
   });
+
+  // ===== USD Kur Detayı Modal =====
+  function formatUsdRate(rate) {
+    if (rate == null) return '-';
+    return Number(rate).toLocaleString('tr-TR', { minimumFractionDigits: 4, maximumFractionDigits: 4 });
+  }
+
+  function renderUsdKurRows(data) {
+    var rows = [
+      { label: 'Geçen Yıl',         date: data.PreviousYearDate,  rate: data.PreviousYearRate },
+      { label: 'Geçen Hafta',        date: data.PreviousWeekDate,  rate: data.PreviousWeekRate },
+      { label: 'Önceki Gün (T-2)',   date: data.PreviousDayDate,   rate: data.PreviousDayRate  },
+      { label: 'Dün (T-1)',          date: data.YesterdayDate,      rate: data.YesterdayRate   }
+    ];
+    var html = '';
+    for (var i = 0; i < rows.length; i++) {
+      if (i > 0) html += '<div class="usd-kur-divider"></div>';
+      var r = rows[i];
+      html += '<div class="usd-kur-row">' +
+        '<span class="usd-kur-label">' + r.label + '</span>' +
+        '<span class="usd-kur-date">' + fmtIsoDate(r.date) + '</span>' +
+        '<span class="usd-kur-rate">1 USD = ' + formatUsdRate(r.rate) + ' ₺</span>' +
+        '</div>';
+    }
+    $('#usdKurRows').html(html);
+    $('#usdKurFooter').html(
+      'Seçili rapor tarihi: <strong>' + formatReportDateTr(_selectedReportDate) + '</strong>'
+    );
+  }
+
+  function openUsdKurModal(triggerEl) {
+    if (triggerEl && window.innerWidth > 767) {
+      var rect = triggerEl.getBoundingClientRect();
+      var modalW = 440;
+      var gap = 10;
+      var left = rect.left + rect.width / 2 - modalW / 2;
+      var bottom = window.innerHeight - rect.top + gap;
+      left = Math.max(16, Math.min(left, window.innerWidth - modalW - 16));
+      $('.usd-kur-modal').css({ left: left + 'px', bottom: bottom + 'px', top: 'auto', right: 'auto' });
+    }
+    $('#usdKurRows').html('<div class="usd-kur-loading">Yükleniyor…</div>');
+    $('#usdKurFooter').html('');
+    $('#usdKurOverlay').fadeIn(150);
+    $.ajax({
+      url: '/ExchangeRate/GetUsdExchangeRates',
+      type: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ sessionId: '1', reportDate: _selectedReportDate }),
+      success: function (data) {
+        renderUsdKurRows(data);
+      },
+      error: function () {
+        $('#usdKurRows').html('<div class="usd-kur-loading">Veriler yüklenemedi.</div>');
+      }
+    });
+  }
+
+  $('#usdKurBtn, #usdKurBtnQuantity, #mobileUsdKurBtn').on('click', function () {
+    openUsdKurModal(this);
+  });
+
+  $('#usdKurClose').on('click', function () {
+    $('#usdKurOverlay').fadeOut(200);
+  });
+
+  $('#usdKurOverlay').on('click', function (e) {
+    if ($(e.target).is('#usdKurOverlay')) {
+      $('#usdKurOverlay').fadeOut(200);
+    }
+  });
 });

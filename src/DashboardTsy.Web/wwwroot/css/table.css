@@ -503,6 +503,14 @@
   content: url('/images/empty-state-seach-light.svg');
 }
 
+[data-theme="light"] .usd-kur-btn {
+  color: #536076;
+}
+
+[data-theme="light"] .usd-kur-btn svg {
+  stroke: #536076;
+}
+
 /* ===== Responsive ===== */
 @media (min-width: 1199px) {
   .table-row:hover td {
