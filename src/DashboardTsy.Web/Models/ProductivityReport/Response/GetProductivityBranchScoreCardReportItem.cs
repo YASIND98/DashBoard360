@@ -18,4 +18,7 @@ public class GetProductivityBranchScoreCardReportItem
     public decimal BankNpsScore { get; set; }
 
     public decimal? PhoneGreetingScore { get; set; }
+
+    public string? BranchManagerPhoto { get; set; }
+    public string? BranchPhoto { get; set; }
 }

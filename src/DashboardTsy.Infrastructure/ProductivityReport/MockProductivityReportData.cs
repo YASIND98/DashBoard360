@@ -1284,7 +1284,9 @@ public static class MockProductivityReportData
             PrivateBankingScore = 90m,
             BranchNpsScore = 72.5m,
             BankNpsScore = 68.0m,
-            PhoneGreetingScore = 91m
+            PhoneGreetingScore = 91m,
+            BranchManagerPhoto = "/images/mock/branch-manager.jpg",
+            BranchPhoto = "/images/mock/branch.jpg"
         };
     }
 
@@ -1305,7 +1307,8 @@ public static class MockProductivityReportData
             AffluentScore = 88m,
             PrivateBankingScore = 91m,
             RegionNpsScore = 75.0m,
-            BankNpsScore = 68.0m
+            BankNpsScore = 68.0m,
+            RegionManagerPhoto = "/images/mock/region-manager.jpg"
         };
     }
 
