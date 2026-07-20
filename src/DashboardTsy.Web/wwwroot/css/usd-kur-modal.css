@@ -72,11 +72,13 @@
 .usd-kur-close svg {
     width: 20px;
     height: 20px;
+    color: #ffffff;
 }
 
 /* --- Rows --- */
 .usd-kur-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     gap: 12px;
     padding: 14px 0;
@@ -90,14 +92,13 @@
 .usd-kur-label {
     font-size: 14px;
     color: rgba(255, 255, 255, 0.75);
-    flex: 1;
-    min-width: 120px;
 }
 
 .usd-kur-date {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.5);
     white-space: nowrap;
+    text-align: center;
 }
 
 .usd-kur-rate {
@@ -105,7 +106,7 @@
     font-weight: 600;
     color: #7db5f3;
     white-space: nowrap;
-    margin-left: auto;
+    text-align: right;
 }
 
 /* --- Footer --- */
@@ -146,8 +147,9 @@
     color: rgba(18, 55, 92, 0.55);
 }
 
-[data-theme="light"] .usd-kur-close {
-    color: rgba(18, 55, 92, 0.45);
+[data-theme="light"] .usd-kur-close,
+[data-theme="light"] .usd-kur-close svg {
+    color: #12375C;
 }
 
 [data-theme="light"] .usd-kur-close:hover {
@@ -187,7 +189,7 @@
    Mobile
    ========================================================= */
 
-@media (max-width: 767px) {
+@media (max-width: 1199px) {
     .usd-kur-modal {
         padding: 24px 20px;
         border-radius: 16px 16px 0 0;
@@ -201,6 +203,8 @@
 
     .usd-kur-overlay {
         background: rgba(0, 0, 0, 0.4);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
     }
 
     .usd-kur-modal-title {

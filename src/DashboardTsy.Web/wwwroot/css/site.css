@@ -479,14 +479,6 @@ body:has(.scorecard-panel.open)::before {
     display: none;
   }
 
-  .page-home .legend-actions {
-    display: flex;
-  }
-
-  .page-home .legend-actions .diff-toggle {
-    display: none;
-  }
-
   .download-pdf-btn {
     display: none;
   }
@@ -746,9 +738,6 @@ body:has(.scorecard-panel.open)::before {
   }
   .scorecard-nps-wrapper.mobile .scorecard-btn {
     padding: 8px;
-  }
-  .usd-kur-btn {
-    margin-bottom: 6px;
   }
 }
 
