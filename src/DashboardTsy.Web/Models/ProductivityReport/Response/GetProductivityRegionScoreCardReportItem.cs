@@ -16,4 +16,6 @@ public class GetProductivityRegionScoreCardReportItem
     public decimal? PrivateBankingScore { get; set; }
     public decimal RegionNpsScore { get; set; }
     public decimal BankNpsScore { get; set; }
+
+    public string? RegionManagerPhoto { get; set; }
 }
