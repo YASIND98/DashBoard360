@@ -334,3 +334,69 @@
     font-size: 12px;
   }
 }
+
+/* ===== Light Mode ===== */
+[data-theme="light"] .report-detail-overlay {
+  background: rgba(18, 55, 92, 0.35);
+}
+
+[data-theme="light"] .report-detail-modal {
+  background: #ffffff;
+  border-color: rgba(18, 55, 92, 0.12);
+}
+
+[data-theme="light"] .report-detail-title {
+  color: #12375C;
+}
+
+[data-theme="light"] .report-detail-tab {
+  color: #3B4351;
+}
+
+[data-theme="light"] .report-detail-tab.active {
+  color: #12375C;
+  border-bottom-color: #12375C;
+}
+
+[data-theme="light"] .report-detail-close img,
+[data-theme="light"] .report-detail-close svg {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(40%) saturate(800%) hue-rotate(185deg) brightness(80%);
+}
+
+/* Bölge/Şube/Portföy ağaç bağlantı çizgileri: light modda koyu. */
+[data-theme="light"] #reportDetailBdBody {
+  --bd-line: #12375C;
+}
+
+/* Top-10 sekmesi — bu sınıflar score-card.css ile ortak; score-card.css bu sayfada yüklenmediği
+   için modale özel (.report-detail-modal) scope ile eklenir. */
+[data-theme="light"] .report-detail-modal .top10-column-title {
+  color: #12375C;
+}
+
+[data-theme="light"] .report-detail-modal .toggle-btn {
+  color: #3B4351;
+  border: 1px solid rgba(18, 55, 92, 0.25);
+}
+
+[data-theme="light"] .report-detail-modal .toggle-btn.active {
+  background: #12375C;
+  border-color: #12375C;
+  color: #ffffff;
+}
+
+[data-theme="light"] .report-detail-modal .toggle-btn .top10-toggle-icon {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(40%) saturate(800%) hue-rotate(185deg) brightness(80%);
+}
+
+[data-theme="light"] .report-detail-modal .toggle-btn.active .top10-toggle-icon {
+  filter: brightness(0) invert(1);
+}
+
+[data-theme="light"] .report-detail-modal .top10-name {
+  color: #12375C;
+}
+
+[data-theme="light"] .report-detail-modal .top10-id {
+  color: rgba(18, 55, 92, 0.45);
+}
