@@ -565,6 +565,8 @@ function renderVolumeRegionTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
         html += '<td>' + item.YtdRegionValue + '</td>';
         html += '<td class="has-diff">' + item.YtdBankAverageValue + formatDiff(item.YtdBankAverageDiff) + '</td>';
+        html += '<td>' + item.QtdRegionValue + '</td>';
+        html += '<td class="has-diff">' + item.QtdBankAverageValue + formatDiff(item.QtdBankAverageDiff) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -635,6 +637,9 @@ function renderVolumeBranchTable(items) {
         html += '<td>' + item.YtdBranchValue + '</td>';
         html += '<td class="has-diff">' + item.YtdRegionValue + formatDiff(item.YtdRegionValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.YtdBankValue + formatDiff(item.YtdBankValueDiff) + '</td>';
+        html += '<td>' + item.QtdBranchValue + '</td>';
+        html += '<td class="has-diff">' + item.QtdRegionValue + formatDiff(item.QtdRegionValueDiff) + '</td>';
+        html += '<td class="has-diff">' + item.QtdBankValue + formatDiff(item.QtdBankValueDiff) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -696,6 +701,8 @@ function renderCountCustomerRegionTable(items) {
         html += '<td class="has-diff">' + fmt(item.RealizationBankAverage) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
         html += '<td>' + fmt(item.YtdChangeRegion) + '</td>';
         html += '<td class="has-diff">' + fmt(item.YtdChangeBankAverage) + formatDiff(item.YtdChangeBankAverageDiff, true) + '</td>';
+        html += '<td>' + fmt(item.QtdChangeRegion) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.QtdChangeBankAverage) + formatDiff(item.QtdChangeBankAverageDiff, true) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -757,6 +764,9 @@ function renderCountCustomerBranchTable(items) {
         html += '<td>' + formatNumber(item.YtdNominalChangeBranchValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeRegionAverageValue) + formatDiff(item.YtdNominalChangeRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeBankAverageValue) + formatDiff(item.YtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.QtdNominalChangeBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
