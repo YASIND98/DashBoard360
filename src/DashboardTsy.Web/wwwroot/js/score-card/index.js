@@ -1058,10 +1058,12 @@ $(function () {
             html += '<td>' + r.productType + '</td>';
             html += '<td class="' + _selCol('Hedef') + '">' + formatNumber(r.targetValue) + '</td>';
             html += '<td class="' + _selCol('Gerçekleşen') + '">' + formatNumber(r.realizedValue) + '</td>';
-            var hgBase = (r.targetRealizationPercentageBase)
+            var hgBase = (r.targetRealizationPercentageBase && r.targetRealizationPercentageBase !== r.targetRealizationPercentage)
                 ? ' <span class="' + percentColor(r.targetRealizationPercentageBase) + '">(' + formatPercent(r.targetRealizationPercentageBase) + ')</span>'
                 : '';
-            var hgMain = r.targetRealizationPercentage ? formatPercent(r.targetRealizationPercentage) : '';
+            var hgMain = (r.targetRealizationPercentage != null)
+                ? (r.targetRealizationPercentage === 0 ? '0.00' : formatPercent(r.targetRealizationPercentage))
+                : '';
             html += '<td class="' + (percentColor(r.targetRealizationPercentage) + ' ' + _selCol('H/G %')).trim() + '">' + hgMain + hgBase + '</td>';
             html += '<td class="' + _selCol('Ağırlık %') + '">' + formatPercent(r.productWeight) + '</td>';
             html += '<td class="' + _selCol('Ağırlıklı H/G %') + '">' + formatPercent(r.weightedPercentage) + '</td>';
