@@ -775,6 +775,134 @@ function renderCountCustomerBranchTable(items) {
     updateProductivityStripes();
 }
 
+// ===== Count Cash Management Region Report (Adet — Nakit Yönetimi — Bölge) =====
+function loadCountCashManagementRegionReport(regionCode, subTabId) {
+    $.ajax({
+        url: '/ProductivityReport/GetProductivityCountCashManagementRegionReport',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            sessionId: '1',
+            regionCode: regionCode,
+            subTabId: subTabId || 0,
+            reportDate: _selectedDate,
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
+        }),
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderCountCashManagementRegionTable(items);
+        }
+    });
+}
+
+function renderCountCashManagementRegionTable(items) {
+    var html = '';
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
+
+    items.forEach(function (item, i) {
+        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
+
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+        html += '<td class="col-index">' + (i + 1) + '</td>';
+
+        if (hasExpandable) {
+            if (item._hasChildren) {
+                html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
+            } else {
+                html += '<td class="col-expand"></td>';
+            }
+        }
+
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        html += '<td class="col-left">' + indent + '</td>';
+
+        html += '<td>' + formatNumber(item.RealizationRegionValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.YtdNominalChangeRegionValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeRegionAverageValue) + formatDiff(item.YtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeBankAverageValue) + formatDiff(item.YtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.QtdNominalChangeRegionValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += buildProductivityDetailCell(item);
+        html += '</tr>';
+    });
+
+    $('#dynamicTableBody').html(html);
+    updateProductivityStripes();
+}
+
+// ===== Count Cash Management Branch Report (Adet — Nakit Yönetimi — Şube) =====
+function loadCountCashManagementBranchReport(branchCode, subTabId) {
+    $.ajax({
+        url: '/ProductivityReport/GetProductivityCountCashManagementBranchReport',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+            sessionId: '1',
+            branchCode: branchCode,
+            subTabId: subTabId || 0,
+            reportDate: _selectedDate,
+            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
+            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
+        }),
+        success: function (response) {
+            var data = extractResponseData(response);
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderCountCashManagementBranchTable(items);
+        }
+    });
+}
+
+function renderCountCashManagementBranchTable(items) {
+    var html = '';
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
+
+    items.forEach(function (item, i) {
+        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
+
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+        html += '<td class="col-index">' + (i + 1) + '</td>';
+
+        if (hasExpandable) {
+            if (item._hasChildren) {
+                html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
+            } else {
+                html += '<td class="col-expand"></td>';
+            }
+        }
+
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
+        html += '<td class="col-left">' + indent + '</td>';
+
+        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.YtdNominalChangeBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeRegionAverageValue) + formatDiff(item.YtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeBankAverageValue) + formatDiff(item.YtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.QtdNominalChangeBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += buildProductivityDetailCell(item);
+        html += '</tr>';
+    });
+
+    $('#dynamicTableBody').html(html);
+    updateProductivityStripes();
+}
+
 // ===== Count Card/POS Branch Report (Adet — Kredi Kartı / POS — Şube) =====
 function loadCountCardPosBranchReport(branchCode, tabId) {
     $.ajax({
