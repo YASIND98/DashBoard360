@@ -489,14 +489,15 @@
   display: table-row;
 }
 
-.col-top10 {
+.col-detail {
   padding: 12px !important;
 }
 
-.top10-icon {
+.detail-icon {
   width: 24px;
   height: 24px;
   cursor: pointer;
+  transform: rotate(90deg);
 }
 
 [data-theme="light"] .table-empty-state img {
@@ -667,6 +668,12 @@
     overflow: hidden;
     text-overflow: ellipsis;
     border-right: 1px solid var(--border-row);
+  }
+  
+  .page-home .data-table th.col-left:first-child,
+  .page-home .data-table td.col-left:first-child {
+    left: 0;
+    max-width: none;
   }
 
   /* Header sticky → z-index thead'den yüksek olmalı (thead th zaten z-index:3) */

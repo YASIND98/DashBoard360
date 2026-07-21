@@ -180,6 +180,17 @@ $(document).ready(function () {
       return html;
   }
 
+  // Tüm tablolardaki "Detay" hücresi: kırılım modalını açan ikon. tableKey = daily|quantity|monthly.
+  // Top-10 sekmesi yalnızca hacim/bakiye (daily) + TOP10 ürününde açılır (data-top10).
+  function buildDetailCell(p, tableKey) {
+      var isTop10 = tableKey === 'daily' && TOP10_PRODUCT_NAMES.includes(p.ProductName);
+      return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +
+          ' data-table="' + tableKey + '"' +
+          ' data-product-id="' + p.ProductId + '"' +
+          ' data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '"' +
+          ' data-top10="' + (isTop10 ? '1' : '0') + '" /></td>';
+  }
+
   function buildDailyRows(products, depth, isSub, parentIndex) {
       var html = '';
       products.forEach(function (p, i) {
@@ -199,11 +210,7 @@ $(document).ready(function () {
           html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0, false) + '</span></span>';
           html += '</div>';
           html += '</td>';
-          if (TOP10_PRODUCT_NAMES.includes(p.ProductName)) {
-              html += '<td class="col-top10"><img src="/images/top-ten.svg" alt="Top 10" class="top10-icon" data-product-id="' + p.ProductId + '" data-product-name="' + (p.ProductName || '').replace(/"/g, '&quot;') + '" /></td>';
-          } else {
-              html += '<td class="col-top10"></td>';
-          }
+          html += buildDetailCell(p, 'daily');
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
@@ -233,6 +240,7 @@ $(document).ready(function () {
           html += '<span class="diff-value ' + (p.DiffByLastTwoMonthEarlierAmount < 0 ? 'negative' : (p.DiffByLastTwoMonthEarlierAmount > 0 ? 'positive' : '')) + '">' + qVal(p.DiffByLastTwoMonthEarlierAmount || 0, pct) + '</span></span>';
           html += '</div>';
           html += '</td>';
+          html += buildDetailCell(p, 'quantity');
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
@@ -253,6 +261,7 @@ $(document).ready(function () {
           html += '<td>' + formatNumber(p.YearActualAmount) + '</td>';
           html += '<td>' + formatNumber(p.YearTargetAmount) + '</td>';
           html += '<td class="' + percentColor(p.YearRatio) + '">' + formatPercent(p.YearRatio) + '</td>';
+          html += buildDetailCell(p, 'monthly');
           html += '</tr>';
 
           if (p.SubProducts && p.SubProducts.length > 0) {
@@ -264,6 +273,7 @@ $(document).ready(function () {
 
   // ===== PDF verisi (window.PdfReport) — servis cevabından kurulur, DOM'dan okunmaz =====
   function _pdfInfoLines() {
+    // Tarih artık date-picker'dan (#dpLabel) okunur; .date-text fallback (başka bağlamlar için).
     var date = ($('#dpLabel').text() || $('.date-text').text() || '').trim();
     var region = (selectedRegion && selectedRegion.name) ? selectedRegion.name : 'Tüm Bölgeler';
     var branch = (selectedBranch && selectedBranch.name) ? selectedBranch.name : 'Tüm Şubeler';
@@ -282,6 +292,11 @@ $(document).ready(function () {
   }
 
   function setHomePdfReport(kind, products) {
+    // Kırılım modalı (report-detail.js) aktif tab'ın GERÇEK servis cevabını (data.Products)
+    // buradan okur; ayrı mock üretmez -> ekranda görünen veri kırılımda da görünür.
+    // kind: daily / quantity / monthly (detay ikonundaki data-table ile aynı anahtar).
+    window.TargetReportData = window.TargetReportData || {};
+    window.TargetReportData[kind] = products || [];
     // Başlık altı tarih (varsa) -> "(gg.aa.yyyy)" — paylaşımlı fmtIsoDate kullanılır
     var _fmtDateHeader = function (v) { return v ? '(' + fmtIsoDate(v) + ')' : ''; };                                 // düz tutar (para birimsiz)
     var _price = function (v, p) { return formatNumber(v, true, p.ProductName); };          // para birimli tutar
@@ -748,7 +763,9 @@ $(document).ready(function () {
 
   // ===== Init =====
   loadTodayDate(function () {
+      // İstekte kullanılacak rapor tarihi başlangıçta _todayDate (session); tarih seçilince güncellenir.
       _selectedReportDate = _todayDate;
+      // Date picker: geçerli rapor tarihiyle başlat; gün değişince o günün raporu yüklenir.
       if (window.DatePicker) {
           DatePicker.init({
               initial: new Date(_todayDate),
@@ -831,7 +848,7 @@ $(document).ready(function () {
         $('#top10First').html(firstHtml);
         $('#top10Last').html(lastHtml);
         hideLoadingOverlay();
-        if (openModal) $('#top10Overlay').addClass('active');
+        if (openModal) $('#reportDetailOverlay').addClass('active');
       },
       error: function () {
         hideLoadingOverlay();
@@ -839,27 +856,48 @@ $(document).ready(function () {
     });
   }
 
-  $(document).on('click', '.top10-icon', function (e) {
+  // Kırılım verisi: bulunulan tablonun (daily/quantity/monthly) servisine ana request + ek
+  // productId + userCode ile istek at; gelen Products'ı global'e koyup detail.js'e event ile bildir.
+  var BREAKDOWN_URLS = {
+      daily: '/TargetReport/GetDailyTargetReport',
+      quantity: '/TargetReport/GetDailyQuantityTargetReport',
+      monthly: '/TargetReport/GetMonthlyTargetReport'
+  };
+  function loadBreakdown(tableKey, productId) {
+      var url = BREAKDOWN_URLS[tableKey] || BREAKDOWN_URLS.daily;
+      var body = $.extend({}, buildRequest(), {
+          productId: productId,
+          userCode: window.USER_CODE   // session User.DomainName (Index.cshtml -> window.USER_CODE)
+      });
+      $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(body) })
+          .done(function (data) { window.ReportBreakdownData = (data && data.Products) || []; })
+          .fail(function () { window.ReportBreakdownData = []; })
+          .always(function () { $(document).trigger('reportBreakdown:loaded', { table: tableKey }); });
+  }
+
+  // Detay ikonu (tüm tablolarda): kırılım modalını açar. Kırılımı report-detail.js render eder.
+  // Top-10 verisi/sekmesi yalnızca hacim/bakiye (daily) + TOP10 ürününde (data-top10="1") yüklenir.
+  $(document).on('click', '.detail-icon', function (e) {
     e.stopPropagation();
-    var productId = $(this).data('product-id');
     var productName = $(this).data('product-name');
-    currentTop10ProductId = productId;
-    currentTop10FilterType = 0;
-    $('.top10-title').text(productName);
-    $('.toggle-btn').removeClass('active');
-    $('.toggle-btn[data-top10-period="daily"]').addClass('active');
-    loadTop10Data(productId, 0, true);
-  });
+    var isTop10 = String($(this).data('top10')) === '1';
+    $('.report-detail-title').text(productName);
 
-  $('#top10Close').on('click', function () {
-    $('#top10Overlay').removeClass('active');
-  });
+    // Kırılım: bulunulan tablonun servisine productId + userCode ile istek at (response -> event).
+    loadBreakdown($(this).data('table') || 'daily', $(this).data('product-id'));
 
-  $('#top10Overlay').on('click', function (e) {
-    if ($(e.target).is('#top10Overlay')) {
-      $('#top10Overlay').removeClass('active');
+    if (isTop10) {
+      currentTop10ProductId = $(this).data('product-id');
+      currentTop10FilterType = 0;
+      $('.toggle-btn').removeClass('active');
+      $('.toggle-btn[data-top10-period="daily"]').addClass('active');
+      loadTop10Data(currentTop10ProductId, 0, true);   // başarınca modalı açar
+    } else {
+      $('#reportDetailOverlay').addClass('active');
     }
   });
+
+  // Modalı kapatma (X + overlay tıklama) artık ortak report-detail.js'te — her iki sayfada çalışır.
 
   $('.toggle-btn').on('click', function () {
     $('.toggle-btn').removeClass('active');
