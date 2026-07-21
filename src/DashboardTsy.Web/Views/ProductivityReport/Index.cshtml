@@ -172,10 +172,20 @@
     </div>
 </aside>
 
+@await Html.PartialAsync("_ReportDetailModal")
+
 
 @section Scripts {
+    @{
+        var sessionUser = System.Text.Json.JsonSerializer.Deserialize<DashboardTsy.Web.Models.UsersDto>(
+            Context.Session.GetString("User") ?? "null");
+    }
+    <script>
+        window.USER_CODE = @Html.Raw(Json.Serialize(sessionUser?.DomainName));
+    </script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
+    <script src="~/js/report-detail.js" asp-append-version="true"></script>
     <script src="~/js/productivity-report.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
     <script src="~/js/ai-insights.js" asp-append-version="true"></script>
@@ -229,12 +239,8 @@
             if (window.DatePicker) {
                 DatePicker.init({
                     initial: new Date(_todayDate),
-                    min: new Date(2026, 4, 30),
-                    max: new Date(_todayDate),
-                    onChange: function (iso) {
-                        _selectedDate = iso;
-                        reloadCurrent();
-                    }
+                    readOnly: true,
+                    label: 'Haziran 2026'
                 });
             }
             loadRegionFilters(function () {

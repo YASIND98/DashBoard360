@@ -154,7 +154,7 @@
                     <i class="sort-icon" data-sort-by="5"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
                     <small data-daily-header="YesterdayDate"></small>
                 </th>
-                <th></th>
+                <th class="col-detail"></th>
             </tr>
         </thead>
         <tbody id="dailyTableBody">
@@ -217,6 +217,7 @@
                     <i class="sort-icon" data-sort-by="4"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
                     <small data-quantity-header="LastMonthDate"></small>
                 </th>
+                <th class="col-detail"></th>
             </tr>
         </thead>
         <tbody id="quantityTableBody">
@@ -299,6 +300,7 @@
                       </span>
                     </div>
                   </th>
+                  <th class="col-detail" rowspan="2"></th>
               </tr>
               <tr>
                   <th class="col-selected col-selected-first"><span data-monthly-header="MonthActualTitle"></span> <i class="sort-icon" data-sort-by="2"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i></th>
@@ -334,41 +336,8 @@
     </div>
 </div>
 
-<!-- Top 10 Modal -->
-<div class="top10-overlay" id="top10Overlay">
-  <div class="top10-modal">
-    <div class="top10-header">
-      <h2 class="top10-title"></h2>
-      <div class="top10-header-right">
-        <div class="desktop">
-          @await Html.PartialAsync("_Top10PeriodToggle")
-        </div>
-        <button class="top10-close" id="top10Close">
-          <img class="desktop" src="~/images/close-circle.svg" alt="Kapat" />
-          <svg class="mobile mobile-close-btn" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="mobile">
-      @await Html.PartialAsync("_Top10PeriodToggle")
-    </div>
-
-    <div class="top10-body">
-      <div class="top10-column">
-        <h3 class="top10-column-title">İlk 10</h3>
-        <div class="top10-list" id="top10First"></div>
-      </div>
-      <div class="top10-column">
-        <h3 class="top10-column-title">Son 10</h3>
-        <div class="top10-list" id="top10Last"></div>
-      </div>
-    </div>
-    <span class="legend-note" style="display:inline-block;margin-top:16px">Tablodaki değerler /1000 olarak verilmektedir.</span>
-  </div>
-</div>
+@* Ürün Detay Modalı paylaşılan partial'a taşındı (hedef + verim ortak kullanır). *@
+@await Html.PartialAsync("_ReportDetailModal")
 
 <!-- USD Kur Detayı Modal -->
 <div class="usd-kur-overlay" id="usdKurOverlay">
@@ -390,6 +359,13 @@
 </div>
 
 @section Scripts {
+    @{
+        var sessionUser = System.Text.Json.JsonSerializer.Deserialize<DashboardTsy.Web.Models.UsersDto>(
+            Context.Session.GetString("User") ?? "null");
+    }
+    <script>
+        window.USER_CODE = @Html.Raw(Json.Serialize(sessionUser?.DomainName));
+    </script>
     <link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/usd-kur-modal.css" asp-append-version="true" />
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
@@ -397,12 +373,26 @@
     <script src="~/js/date-picker.js" asp-append-version="true"></script>
     <script src="~/js/target-report.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+    <script src="~/js/report-detail.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
+            // Aktif tipe (Hacim/Adet) göre ilgili fark toggle'ı — mobil menü onu yönetir.
+            function activeDiffToggle() {
+                var type = $('.segment[data-type].active').attr('data-type');
+                return type === 'adet' ? '#quantityDiffToggle' : '#diffToggle';
+            }
+            // Etiketi GERÇEK toggle durumuna göre yaz: farklar açıkken "Gizle", kapalıyken "Göster".
+            function syncMobileDiffLabel() {
+                var active = $(activeDiffToggle()).attr('data-active') === 'true';
+                $('#mobileDiffBtnText').text(active ? 'Farkları Gizle' : 'Farkları Göster');
+            }
+            syncMobileDiffLabel();
+            // Hacim/Adet değişince aktif toggle değişir → etiketi güncelle.
+            $(document).on('click', '.segment[data-type]', function () { setTimeout(syncMobileDiffLabel, 0); });
+
             $('#mobileDiffBtn').on('click', function () {
-                $('#diffToggle').trigger('click');
-                var $txt = $('#mobileDiffBtnText');
-                $txt.text($txt.text() === 'Farkları Göster' ? 'Farkları Gizle' : 'Farkları Göster');
+                $(activeDiffToggle()).trigger('click');
+                syncMobileDiffLabel();
                 $(this).closest('details').removeAttr('open');
             });
             $('#mobilePdfBtn').on('click', function () {

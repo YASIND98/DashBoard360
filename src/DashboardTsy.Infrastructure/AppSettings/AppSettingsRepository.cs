@@ -6,7 +6,7 @@ namespace DashboardTsy.Infrastructure.AppSettings;
 
 public sealed class AppSettingsRepository : IAppSettingsRepository
 {
-    private const string ConnectionKey = "Main";
+    private const string ConnectionKey = "YoneticiRaporu";
     private const string Sql = @"SELECT [Key], [Value], [ValueType], [Description] FROM dbo.AppSettings WHERE [IsActive] = 1";
 
     private readonly IStoredProcedureExecutor _executor;
