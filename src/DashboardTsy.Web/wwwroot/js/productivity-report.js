@@ -560,7 +560,7 @@ function renderVolumeRegionTable(items) {
         html += '<td>' + formatNumber(item.RealizationRegionValue) +'</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + item.HgRate + '</td>';
+        html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
         html += '<td>' + item.YtdRegionValue + '</td>';
@@ -628,7 +628,7 @@ function renderVolumeBranchTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + item.HgRate + '</td>';
+        html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthBranchValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionAverageValue) + formatDiff(item.NetGrowthRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageValueDiff, true) + '</td>';
