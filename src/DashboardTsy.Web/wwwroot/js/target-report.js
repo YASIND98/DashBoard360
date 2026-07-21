@@ -931,7 +931,7 @@ $(document).ready(function () {
     }
     $('#usdKurRows').html(html);
     $('#usdKurFooter').html(
-      'Seçili rapor tarihi: <strong>' + formatReportDateTr(_selectedReportDate) + '</strong>'
+     '<span>Seçili rapor tarihi:</span> <strong>' + formatReportDateTr(_selectedReportDate) + '</strong>'
     );
   }
 
