@@ -17,6 +17,7 @@ $(function () {
     var panel = { year: 0, month: 0 };
     var minDate = null, maxDate = null;
     var onChange = null;
+    var readOnly = false, staticLabel = null;
 
     // ── Tarih yardımcıları ──
     function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
@@ -36,6 +37,11 @@ $(function () {
 
     // ── Header (etiket + rozet + ok durumları) ──
     function refreshHeader() {
+        if (readOnly) {
+            $label.text(staticLabel || fmtLong(selected));
+            $badge.hide();
+            return;
+        }
         var isToday = sameDay(selected, today());
         $label.text(fmtLong(selected));
         $badge.text(isToday ? 'Bugün' : '').toggle(isToday);
@@ -116,13 +122,14 @@ $(function () {
     // ── Eventler ──
     $trigger.on('click', function (e) {
         e.stopPropagation();
+        if (readOnly) return;
         $panel.hasClass('open') ? closePanel() : openPanel();
     });
     $(document).on('click.date-picker', function (e) {
         if (!$(e.target).closest('#datePicker').length) closePanel();
     });
-    $prev.on('click', function () { navigate(-1); });
-    $next.on('click', function () { navigate(1); });
+    $prev.on('click', function () { if (!readOnly) navigate(-1); });
+    $next.on('click', function () { if (!readOnly) navigate(1); });
     $(document).on('click', '[data-dp="prev-month"]', function (e) { e.stopPropagation(); shiftPanelMonth(-1); });
     $(document).on('click', '[data-dp="next-month"]', function (e) { e.stopPropagation(); shiftPanelMonth(1); });
     $(document).on('click', '[data-dp-date]', function (e) {
@@ -138,6 +145,9 @@ $(function () {
             minDate = toDate(opts.min);
             maxDate = toDate(opts.max);
             onChange = typeof opts.onChange === 'function' ? opts.onChange : null;
+            readOnly = !!opts.readOnly;          // panel açılmaz, oklar gizli
+            staticLabel = opts.label || null;    // sabit etiket (ör. "Haziran 2026")
+            $root.toggleClass('dp-readonly', readOnly);
             setSelected(toDate(opts.initial) || today(), false);
         },
         setDate: function (d, notify) { setSelected(toDate(d) || today(), !!notify); },

@@ -417,7 +417,7 @@ function sortIcon(h) {
     return ' <i class="sort-icon" data-sort-id="' + h.Id + '"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>';
 }
 
-function renderDynamicHeaders(headers, hasExpandable) {
+function renderDynamicHeaders(headers, hasExpandable, withDetail) {
     var $thead = $('#dynamicTableHead');
     $thead.empty();
 
@@ -445,6 +445,7 @@ function renderDynamicHeaders(headers, hasExpandable) {
     var hasGroupHeaders = Object.keys(childMap).length > 0;
     var rowspan = hasGroupHeaders ? 2 : 1;
     var expandTh = hasExpandable ? '<th rowspan="' + rowspan + '" class="col-expand"></th>' : '';
+    var detailTh = withDetail ? '<th rowspan="' + rowspan + '" class="col-detail"></th>' : '';
 
     if (!hasGroupHeaders) {
         var row = '<tr>';
@@ -452,6 +453,7 @@ function renderDynamicHeaders(headers, hasExpandable) {
             row += '<th' + getClasses(h, false) + '>' + h.HeaderName + sortIcon(h) + '</th>';
             if (i === 0) row += expandTh;
         });
+        row += detailTh;
         row += '</tr>';
         $thead.append(row);
     } else {
@@ -481,6 +483,7 @@ function renderDynamicHeaders(headers, hasExpandable) {
             if (i === 0) row1 += expandTh;
         });
 
+        row1 += detailTh;
         row1 += '</tr>';
         row2 += '</tr>';
         $thead.append(row1);
@@ -521,7 +524,7 @@ function loadVolumeRegionReport(regionCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderVolumeRegionTable(items);
         }
     });
@@ -557,11 +560,14 @@ function renderVolumeRegionTable(items) {
         html += '<td>' + formatNumber(item.RealizationRegionValue) +'</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + item.HgRate + '</td>';
+        html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
         html += '<td>' + item.YtdRegionValue + '</td>';
         html += '<td class="has-diff">' + item.YtdBankAverageValue + formatDiff(item.YtdBankAverageDiff) + '</td>';
+        html += '<td>' + item.QtdRegionValue + '</td>';
+        html += '<td class="has-diff">' + item.QtdBankAverageValue + formatDiff(item.QtdBankAverageDiff) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -587,7 +593,7 @@ function loadVolumeBranchReport(branchCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderVolumeBranchTable(items);
         }
     });
@@ -624,13 +630,17 @@ function renderVolumeBranchTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + item.HgRate + '</td>';
+        html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthBranchValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionAverageValue) + formatDiff(item.NetGrowthRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageValueDiff, true) + '</td>';
         html += '<td>' + item.YtdBranchValue + '</td>';
         html += '<td class="has-diff">' + item.YtdRegionValue + formatDiff(item.YtdRegionValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.YtdBankValue + formatDiff(item.YtdBankValueDiff) + '</td>';
+        html += '<td>' + item.QtdBranchValue + '</td>';
+        html += '<td class="has-diff">' + item.QtdRegionValue + formatDiff(item.QtdRegionValueDiff) + '</td>';
+        html += '<td class="has-diff">' + item.QtdBankValue + formatDiff(item.QtdBankValueDiff) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -656,7 +666,7 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderCountCustomerRegionTable(items);
         }
     });
@@ -691,6 +701,9 @@ function renderCountCustomerRegionTable(items) {
         html += '<td class="has-diff">' + fmt(item.RealizationBankAverage) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
         html += '<td>' + fmt(item.YtdChangeRegion) + '</td>';
         html += '<td class="has-diff">' + fmt(item.YtdChangeBankAverage) + formatDiff(item.YtdChangeBankAverageDiff, true) + '</td>';
+        html += '<td>' + fmt(item.QtdChangeRegion) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.QtdChangeBankAverage) + formatDiff(item.QtdChangeBankAverageDiff, true) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -716,7 +729,7 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderCountCustomerBranchTable(items);
         }
     });
@@ -751,6 +764,10 @@ function renderCountCustomerBranchTable(items) {
         html += '<td>' + formatNumber(item.YtdNominalChangeBranchValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeRegionAverageValue) + formatDiff(item.YtdNominalChangeRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.YtdNominalChangeBankAverageValue) + formatDiff(item.YtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.QtdNominalChangeBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -776,7 +793,7 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderCountCardPosBranchTable(items);
         }
     });
@@ -811,6 +828,7 @@ function renderCountCardPosBranchTable(items) {
         html += '<td>' + item.ThreeMonthHgBranchValue + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgRegionAverageValue + formatDiff(item.ThreeMonthHgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgBankAverageValue + formatDiff(item.ThreeMonthHgBankAverageValueDiff) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -836,7 +854,7 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderCountCardPosRegionTable(items);
         }
     });
@@ -869,6 +887,7 @@ function renderCountCardPosRegionTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.CurrentMonthBankAverage) + formatDiff(item.CurrentMonthBankAverageDiff, true) + '</td>';
         html += '<td>' + item.ThreeMonthHgRegion + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgBankAverage + formatDiff(item.ThreeMonthHgBankAverageDiff) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -921,6 +940,7 @@ function renderCountCardPosRatioRegionHeaders(h) {
     row += '<th>' + h.PreviousQuarterRegionTitle + '</th>';
     row += '<th>' + h.CurrentRegionTitle + '</th>';
     row += '<th>' + h.CurrentBankAverageTitle + '</th>';
+    row += '<th class="col-detail"></th>';
     row += '</tr>';
 
     $thead.append(row);
@@ -940,6 +960,7 @@ function renderCountCardPosRatioRegionTable(items) {
         html += '<td>' + fmt(item.PreviousQuarterRegionValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.CurrentRegionValue) + formatDiff(item.CurrentRegionDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.CurrentBankAverageValue) + formatDiff(item.CurrentBankAverageDiff, !isPercent) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -992,6 +1013,7 @@ function renderCountCardPosRatioBranchHeaders(h) {
     row += '<th>' + h.CurrentBranchTitle + '</th>';
     row += '<th>' + h.CurrentRegionAverageTitle + '</th>';
     row += '<th>' + h.CurrentBankAverageTitle + '</th>';
+    row += '<th class="col-detail"></th>';
     row += '</tr>';
 
     $thead.append(row);
@@ -1012,6 +1034,7 @@ function renderCountCardPosRatioBranchTable(items) {
         html += '<td class="has-diff">' + fmt(item.CurrentBranchValue) + formatDiff(item.CurrentBranchValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.CurrentRegionAverageValue) + formatDiff(item.CurrentRegionAverageValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.CurrentBankAverageValue) + formatDiff(item.CurrentBankAverageValueDiff, !isPercent) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1037,7 +1060,7 @@ function loadProfitTotalRegionReport(regionCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderProfitTotalRegionTable(items);
         }
     });
@@ -1081,6 +1104,7 @@ function renderProfitTotalRegionTable(items) {
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1130,6 +1154,7 @@ function renderProfitRatioRegionHeaders(hasExpandable) {
     row += '<th>KOBİ</th>';
     row += '<th>Tarım</th>';
     row += '<th>Ticari</th>';
+    row += '<th class="col-detail"></th>';
     row += '</tr>';
 
     $thead.append(row);
@@ -1167,6 +1192,7 @@ function renderProfitRatioRegionTable(items) {
         html += '<td>' + fmt(item.KobiValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1230,6 +1256,7 @@ function renderProfitRatioBranchTable(items) {
         html += '<td>' + fmt(item.KobiValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1254,7 +1281,7 @@ function loadProfitTotalBranchReport(branchCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderProfitTotalBranchTable(items);
         }
     });
@@ -1299,6 +1326,7 @@ function renderProfitTotalBranchTable(items) {
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1323,7 +1351,7 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderProfitSpreadManagementRegionTable(items);
         }
     });
@@ -1359,6 +1387,7 @@ function renderProfitSpreadManagementRegionTable(items) {
         html += '<td>' + item.NetReturnBankAverageValue + '</td>';
         html += '<td>' + item.NetReturnHgRegionValue + '</td>';
         html += '<td>' + item.NetReturnHgBankAverageValue + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1383,7 +1412,7 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
             renderProfitSpreadManagementBranchTable(items);
         }
     });
@@ -1422,6 +1451,7 @@ function renderProfitSpreadManagementBranchTable(items) {
         html += '<td>' + item.NetReturnHgBranchValue + '</td>';
         html += '<td class="has-diff">' + item.NetReturnHgRegionAverageValue + formatDiff(item.NetReturnHgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.NetReturnHgBankAverageValue + formatDiff(item.NetReturnHgBankAverageValueDiff) + '</td>';
+        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1522,4 +1552,125 @@ function formatDiff(val, useFormatNumber) {
 // ===== Yield Search =====
 $(function () {
     handleTableSearch('#yieldSearchInput');
+});
+
+
+// ===== Detay (kırılım) — verim raporu ↔ ortak modal (report-detail.js 'productivity' provider) =====
+// Hedef raporundaki akışın aynısı: satırdaki detay ikonu, aynı endpoint'i productId (=item.Id) +
+// userCode ile yeniden çağırır; dönen kırılımı ortak modal 'productivity' provider ile render eder.
+// GetProductivityGeneralRegionReport hariç tüm tablolarda detay ikonu vardır. Top-10 asla gösterilmez.
+
+function buildProductivityDetailCell(item) {
+    var name = (item.ProductName || item.Description || item.RatioName || '').replace(/"/g, '&quot;');
+    return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +
+        ' data-table="productivity"' +
+        ' data-product-id="' + (item.Id != null ? item.Id : '') + '"' +
+        ' data-product-name="' + name + '"' +
+        ' data-top10="0" /></td>';
+}
+
+var _yieldBreakdownCtx = {};
+var _bdHeaderNames = [];
+
+$(document).ajaxSend(function (ev, jqXHR, settings) {
+    var url = settings.url || '';
+    if ((settings.type || '').toUpperCase() !== 'POST') return;
+    if (!/\/ProductivityReport\/GetProductivity\w+Report$/.test(url)) return;
+    if (/TableHeaders$/.test(url) || /GeneralRegion/.test(url) || /ScoreCard/.test(url)) return;
+    var isRatio = /Ratio/.test(url);
+    var payload = {};
+    try { payload = JSON.parse(settings.data); } catch (e) { payload = {}; }
+    _yieldBreakdownCtx[isRatio ? '#dynamicTableBody2' : '#dynamicTableBody'] = {
+        url: url,
+        payload: payload,
+        headSelector: isRatio ? '#dynamicTableHead2' : '#dynamicTableHead'
+    };
+});
+
+function _bdFirstArray(resp) {
+    if (Array.isArray(resp)) return resp;
+    for (var k in resp) { if (resp.hasOwnProperty(k) && Array.isArray(resp[k])) return resp[k]; }
+    return [];
+}
+
+function loadProductivityBreakdown(ctx, productId) {
+    if (!ctx || !ctx.url) {
+        window.ReportBreakdownData = [];
+        $(document).trigger('reportBreakdown:loaded', { table: 'productivity' });
+        return;
+    }
+    var body = $.extend({}, ctx.payload, { productId: productId, userCode: window.USER_CODE });
+    $.ajax({ url: ctx.url, type: 'POST', contentType: 'application/json', data: JSON.stringify(body) })
+        .done(function (resp) { window.ReportBreakdownData = _bdFirstArray(resp); })
+        .fail(function () { window.ReportBreakdownData = []; })
+        .always(function () { $(document).trigger('reportBreakdown:loaded', { table: 'productivity' }); });
+}
+
+function _productivityBuildHead(ctx) {
+    var sel = (ctx && ctx.headSelector) || '#dynamicTableHead';
+    var $thead = $(sel).clone();
+    $thead.find('th.col-index, th.col-expand, th.col-detail').remove();
+    $thead.find('.sort-icon, .info-icon').remove();
+    $thead.find('.col-group-header').removeClass('selected');
+    $thead.find('th').removeClass('col-selected col-selected-first col-selected-mid col-selected-last');
+    var $firstTh = $thead.find('tr').first().find('th').first();
+    $firstTh.removeClass('valign-bottom valign-top').text('Bölge/Şube/Portföy');
+    _bdHeaderNames = [];
+    $thead.find('tr').last().find('th').each(function (i) {
+        if (i === 0) return;
+        _bdHeaderNames.push($.trim($(this).text()));
+    });
+    return { html: $thead.html() };
+}
+
+function _productivityValueCells(node) {
+    return _yieldFields(node).slice(1).map(function (f) {
+        return '<td>' + _yieldFmt(f, node[f]) + '</td>';
+    }).join('');
+}
+
+function _productivityNameOf(node) {
+    return node.ProductName || node.Description || node.RatioName || node.BranchName || '';
+}
+
+function _productivityPdf() {
+    var data = window.ReportBreakdownData || [];
+    var fields = _yieldFields((data && data[0]) || null);
+    var columns = [{ header: 'Bölge/Şube/Portföy', key: 'c0', align: 'left' }];
+    _bdHeaderNames.forEach(function (nm, i) { columns.push({ header: nm, key: 'c' + (i + 1) }); });
+    return {
+        title: ($('.report-detail-title').text() || 'Kırılım').trim(),
+        infoLines: ['Bölge/Şube/Portföy Kırılımı'],
+        columns: columns,
+        rows: _yieldRows(data, fields),
+        childrenKey: 'children',
+        footerNote: 'Tablodaki değerler /1000 olarak verilmektedir.',
+        filename: 'VerimRapor-Kirilim.pdf'
+    };
+}
+
+$(function () {
+    if (window.ReportDetail) {
+        window.ReportDetail.registerProvider('productivity', {
+            buildHead: function (tableKey, ctx) { return _productivityBuildHead(ctx); },
+            valueCells: function (node, tableKey, ctx) { return _productivityValueCells(node); },
+            nameOf: _productivityNameOf,
+            legendHtml: function () {
+                return $('#tableLegend .legend-colors').map(function () { return $(this).html(); }).get().join('');
+            },
+            pdf: function () { return _productivityPdf(); }
+        });
+    }
+
+    $(document).on('click', '.detail-icon[data-table="productivity"]', function (e) {
+        e.stopPropagation();
+        var $icon = $(this);
+        $('.report-detail-title').text($icon.data('product-name') || '');
+        var $tbody = $icon.closest('tbody');
+        var tbodySel = $tbody.attr('id') ? ('#' + $tbody.attr('id')) : '#dynamicTableBody';
+        var ctx = _yieldBreakdownCtx[tbodySel] || {};
+        if (window.ReportDetail) window.ReportDetail.setContext(ctx);
+        loadProductivityBreakdown(ctx, $icon.data('product-id'));
+        $('#reportDetailOverlay').addClass('active');
+    });
 });
