@@ -239,12 +239,8 @@
             if (window.DatePicker) {
                 DatePicker.init({
                     initial: new Date(_todayDate),
-                    min: new Date(2026, 4, 30),
-                    max: new Date(_todayDate),
-                    onChange: function (iso) {
-                        _selectedDate = iso;
-                        reloadCurrent();
-                    }
+                    readOnly: true,
+                    label: 'Haziran 2026'
                 });
             }
             loadRegionFilters(function () {

@@ -793,20 +793,12 @@
     filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
   }
 
+  /* Light modda yalnız sticky col-left kenarlık rengini override et. position/left/max-width
+     (ve modaldaki first-child reset'i) base kurallardan gelir → tek yerden hem dark hem light
+     doğru: modalda col-left first-child olunca sol boşluk oluşmaz. */
   [data-theme="light"] .page-home .data-table th.col-left,
   [data-theme="light"] .page-home .data-table td.col-left {
-    position: sticky;
-    left: 93px;
-    z-index: 5;
-    max-width: 140px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-right: 1px solid #B6D6F8;
-  }
-
-  [data-theme="light"] .page-home .data-table th.col-left{
-    z-index: 6;
+    border-right-color: #B6D6F8;
   }
 }
 

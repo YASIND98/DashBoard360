@@ -368,6 +368,11 @@
   --bd-line: #12375C;
 }
 
+/* Yaprak (açılamayan) satır ikonu light modda koyu (expand ikonuyla aynı filtre). */
+[data-theme="light"] #reportDetailBdBody .bd-noexpand {
+  filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
+}
+
 /* Top-10 sekmesi — bu sınıflar score-card.css ile ortak; score-card.css bu sayfada yüklenmediği
    için modale özel (.report-detail-modal) scope ile eklenir. */
 [data-theme="light"] .report-detail-modal .top10-column-title {

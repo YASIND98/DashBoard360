@@ -104,6 +104,15 @@
   display: none;
 }
 
+.date-picker.dp-readonly .dp-nav,
+.date-picker.dp-readonly .dp-arrow {
+  display: none;
+}
+
+.date-picker.dp-readonly .dp-trigger {
+  cursor: default;
+}
+
 /* ----- Ay gezinme satırı (‹ Mayıs 2026 ›) ----- */
 
 .dp-month-nav {
