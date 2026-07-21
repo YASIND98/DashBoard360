@@ -242,12 +242,27 @@
 }
 
 [data-theme="light"] .dropdown-panel {
-  background: #12375c;
+  background: #e7f2fd;
+  border: 1px solid #b6d6f8;
 }
 
+[data-theme="light"] .dropdown-item:nth-child(even) {
+  background: #f0f6fe;
+}
+
+[data-theme="light"] .dropdown-item,
+[data-theme="light"] .dropdown-search-input,
 [data-theme="light"] .dropdown-item.selected {
-  background: #e8f3fe;
-  color: #6b7a99;
+  color: #262a33;
+}
+
+[data-theme="light"] .dropdown-item.selected,
+[data-theme="light"] .dropdown-item:hover {
+  background: #B6D6F8;
+}
+
+[data-theme="light"] .dropdown-search img {
+  filter: brightness(0) saturate(100%) invert(27%) sepia(0%) saturate(0%) hue-rotate(187deg) brightness(92%) contrast(88%);
 }
 
 /* mobile-more desktop'ta gizli */
