@@ -108,9 +108,9 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
     public async Task<GetProductivityCountCashManagementRegionReportResponse?> GetProductivityCountCashManagementRegionReportAsync(GetProductivityCountCashManagementRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCashManagementRegionReport", request, cancellationToken).ConfigureAwait(false);
-        if (!response.IsSuccessStatusCode) return null;
+        if (!response.IsSuccessStatusCode) return new GetProductivityCountCashManagementRegionReportResponse();
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        return JsonSerializer.Deserialize<GetProductivityCountCashManagementRegionReportResponse>(json, _jsonOptions);
+        return JsonSerializer.Deserialize<GetProductivityCountCashManagementRegionReportResponse>(json, _jsonOptions) ?? new GetProductivityCountCashManagementRegionReportResponse();
     }
 
     public async Task<GetProductivityVolumeRegionReportResponse?> GetProductivityVolumeRegionReportAsync(GetProductivityVolumeRegionReportRequest request, CancellationToken cancellationToken = default)

@@ -199,7 +199,7 @@ public class ProductivityReportController : ControllerBase
         if (request == null) return BadRequest();
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityCountCashManagementRegionReportAsync(request, cancellationToken).ConfigureAwait(false);
-        return Ok(result);
+        return Ok(result ?? new GetProductivityCountCashManagementRegionReportResponse());
     }
 
     [HttpPost("GetProductivityVolumeRegionReport")]

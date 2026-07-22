@@ -189,7 +189,8 @@ public class ProductivityReportController : ControllerBase
         if (request == null)
             return BadRequest();
 
-        var result = _reportDataProvider.GetProductivityCountCashManagementRegionReport(request);
+        var result = _reportDataProvider.GetProductivityCountCashManagementRegionReport(request)
+                     ?? new GetProductivityCountCashManagementRegionReportResponse();
         return Ok(result);
     }
 
