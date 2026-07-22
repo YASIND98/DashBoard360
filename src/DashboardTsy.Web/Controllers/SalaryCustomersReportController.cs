@@ -5,7 +5,7 @@ namespace DashboardTsy.Web.Controllers
 {
     public class SalaryCustomersReportController : Controller
     {
-        [Route("/maas-musterileri-raporu")]
+        [Route("/mm-raporlari")]
         public IActionResult Index()
         {
             var userId = HttpContext.Session.GetInt32("UserId") ?? 0;

@@ -1403,10 +1403,10 @@ public static class MockProductivityReportData
             },
             new()
             {
-                Code = "SalaryCustomersReport",
-                Name = "Maaş Müşterileri Raporu",
-                Url = "/maas-musterileri-raporu",
-                IsVisible = false,
+                Code = "MMReport",
+                Name = "Maaş Müşterileri Raporları",
+                Url = "/mm-raporlari",
+                IsVisible = true,
                 OrderNo = 6
             },
         };
