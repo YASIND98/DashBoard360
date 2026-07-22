@@ -8,155 +8,6 @@ $(document).ready(function () {
   var currentSortState = null;
   var bankShareCustomerType = 1; // 1: Maaş Müşterileri, 2: Emekli Müşterileri
 
-  // ===== mock Data (servisler hazır olana kadar ekranı beslemek için) =====
-  var MOCK_TABS = [
-      { TabId: 1, TabName: 'Hacim', ParentId: 0, TabLevel: 1 },
-      { TabId: 2, TabName: 'Çapraz Satış Gelişimi', ParentId: 0, TabLevel: 1 },
-      { TabId: 3, TabName: 'Banka Payı', ParentId: 0, TabLevel: 1 },
-
-      { TabId: 10, TabName: 'Tümü', ParentId: 1, TabLevel: 2 },
-      { TabId: 11, TabName: 'Kurumsal', ParentId: 1, TabLevel: 2 },
-      { TabId: 12, TabName: 'Ticari', ParentId: 1, TabLevel: 2 },
-      { TabId: 13, TabName: 'KOBİ', ParentId: 1, TabLevel: 2 },
-      { TabId: 14, TabName: 'Tarım', ParentId: 1, TabLevel: 2 },
-      { TabId: 15, TabName: 'Bireysel', ParentId: 1, TabLevel: 2 },
-
-      { TabId: 20, TabName: 'Tümü', ParentId: 2, TabLevel: 2 },
-      { TabId: 21, TabName: 'Kurumsal', ParentId: 2, TabLevel: 2 },
-      { TabId: 22, TabName: 'Ticari', ParentId: 2, TabLevel: 2 },
-      { TabId: 23, TabName: 'KOBİ', ParentId: 2, TabLevel: 2 },
-      { TabId: 24, TabName: 'Tarım', ParentId: 2, TabLevel: 2 },
-      { TabId: 25, TabName: 'Bireysel', ParentId: 2, TabLevel: 2 },
-
-      { TabId: 30, TabName: 'Tümü', ParentId: 3, TabLevel: 2 },
-      { TabId: 31, TabName: 'Kurumsal', ParentId: 3, TabLevel: 2 },
-      { TabId: 32, TabName: 'Ticari', ParentId: 3, TabLevel: 2 },
-      { TabId: 33, TabName: 'KOBİ', ParentId: 3, TabLevel: 2 },
-      { TabId: 34, TabName: 'Tarım', ParentId: 3, TabLevel: 2 },
-      { TabId: 35, TabName: 'Bireysel', ParentId: 3, TabLevel: 2 }
-  ];
-
-  var MOCK_VOLUME_HEADERS = {
-      ProductColumnName: 'Ürün',
-      LastYearColumnName: 'Geçen Yıl', LastYearColumnDate: '2025-07-13T00:00:00',
-      LastYearDifferenceColumnName: 'Geçen Yıla Göre Fark',
-      LastWeekColumnName: 'Geçen Hafta', LastWeekColumnDate: '2026-07-06T00:00:00',
-      LastWeekDifferenceColumnName: 'Geçen Haftaya Göre Fark',
-      PreviousDayColumnName: 'Önceki Gün', PreviousDayColumnDate: '2026-07-11T00:00:00',
-      PreviousDayDifferenceColumnName: 'Önceki Güne Göre Fark',
-      YesterdayColumnName: 'Dün', YesterdayColumnDate: '2026-07-12T00:00:00',
-      SalaryLabel: 'Maaş', RetiredLabel: 'Emekli'
-  };
-
-  var MOCK_CROSSSELL_HEADERS = {
-      ProductColumnName: 'Ürün',
-      LastYearColumnName: 'Geçen Yıl', LastYearColumnDate: '2025-07-31T00:00:00',
-      LastYearDifferenceColumnName: 'Geçen Yıla Göre Fark',
-      TwoMonthsAgoColumnName: 'İki Ay Önce', TwoMonthsAgoColumnDate: '2026-05-31T00:00:00',
-      TwoMonthsAgoDifferenceColumnName: 'İki Ay Önceye Göre Fark',
-      LastMonthColumnName: 'Geçen Ay', LastMonthColumnDate: '2026-06-30T00:00:00',
-      SalaryLabel: 'Maaş', RetiredLabel: 'Emekli'
-  };
-
-  var MOCK_BANKSHARE_HEADERS = {
-      ProductColumnName: 'Ürün',
-      DenizbankCreditGroupName: 'Denizbank Kredisi Olan',
-      OtherBanksCreditGroupName: 'Kredisi Diğer Bankalarda Olan',
-      WalletShareGroupName: 'Cüzdan Payı',
-      FirstMonthName: "Haziran'26",
-      SecondMonthName: "Temmuz'26",
-      SalaryCustomersLabel: 'Maaş Müşterileri',
-      RetiredCustomersLabel: 'Emekli Müşterileri'
-  };
-
-  function pct(part, total) {
-      if (!total) return 0;
-      return Math.round((part / total) * 1000) / 10;
-  }
-
-  function mkPeriod(prefix, total, salaryShare, diff, withDiff) {
-      var salary = Math.round(total * salaryShare * 100) / 100;
-      var retired = Math.round((total - salary) * 100) / 100;
-      var o = {};
-      o[prefix + 'TotalAmount'] = total;
-      o[prefix + 'SalaryAmount'] = salary;
-      o[prefix + 'SalaryRate'] = pct(salary, total);
-      o[prefix + 'RetiredAmount'] = retired;
-      o[prefix + 'RetiredRate'] = pct(retired, total);
-      if (withDiff) {
-          o[prefix + 'TotalDifference'] = diff.t;
-          o[prefix + 'TotalDifferenceStatus'] = diff.t >= 0 ? 1 : 2;
-          o[prefix + 'SalaryDifference'] = diff.s;
-          o[prefix + 'SalaryDifferenceStatus'] = diff.s >= 0 ? 1 : 2;
-          o[prefix + 'RetiredDifference'] = diff.r;
-          o[prefix + 'RetiredDifferenceStatus'] = diff.r >= 0 ? 1 : 2;
-      }
-      return o;
-  }
-
-  var VOLUME_ROW_DEFS = [
-      { name: 'Çalışma Büyüklüğü', share: 0.62, ly: 32609591452, lw: 810, pd: 828, y: 834, dLy: { t: 54, s: 36, r: 18 }, dLw: { t: 24, s: 16, r: 8 }, dPd: { t: 6, s: 4, r: 2 } },
-      { name: 'Aktif Büyüklük', share: 0.58, ly: 610, lw: 632, pd: 645, y: 651, dLy: { t: 41, s: 26, r: 15 }, dLw: { t: 19, s: 12, r: 7 }, dPd: { t: 6, s: 4, r: 2 } },
-      { name: 'Vadesiz TL', share: 0.71, ly: 298, lw: 305, pd: 311, y: 309, dLy: { t: 11, s: 9, r: 2 }, dLw: { t: 6, s: 5, r: 1 }, dPd: { t: -2, s: -1, r: -1 } },
-      { name: 'Vadeli TL', share: 0.55, ly: 462, lw: 470, pd: 481, y: 484, dLy: { t: 22, s: 13, r: 9 }, dLw: { t: 14, s: 8, r: 6 }, dPd: { t: 3, s: 2, r: 1 } },
-      { name: 'Vadesiz YP', share: 0.40, ly: 88, lw: 91, pd: 90, y: 87, dLy: { t: -1, s: -1, r: 0 }, dLw: { t: -4, s: -2, r: -2 }, dPd: { t: -3, s: -2, r: -1 } },
-      { name: 'Vadeli YP', share: 0.47, ly: 132, lw: 137, pd: 141, y: 143, dLy: { t: 11, s: 6, r: 5 }, dLw: { t: 6, s: 3, r: 3 }, dPd: { t: 2, s: 1, r: 1 } }
-  ];
-
-  var MOCK_VOLUME_ROWS = VOLUME_ROW_DEFS.map(function (d, i) {
-      return $.extend({ Id: i + 1, SortOrder: i + 1, ProductName: d.name },
-          mkPeriod('LastYear', d.ly, d.share, d.dLy, true),
-          mkPeriod('LastWeek', d.lw, d.share, d.dLw, true),
-          mkPeriod('PreviousDay', d.pd, d.share, d.dPd, true),
-          mkPeriod('Yesterday', d.y, d.share, null, false));
-  });
-
-  var CROSSSELL_ROW_DEFS = [
-      { name: 'Toplam Müşteri', share: 0.65, ly: 920, tma: 946, lm: 955, dLy: { t: 35, s: 24, r: 11 }, dTma: { t: 9, s: 6, r: 3 } },
-      { name: 'Aktif Büyüklük', share: 0.60, ly: 615, tma: 628, lm: 634, dLy: { t: 19, s: 12, r: 7 }, dTma: { t: 6, s: 4, r: 2 } },
-      { name: 'Vadesiz TL', share: 0.72, ly: 301, tma: 306, lm: 304, dLy: { t: 3, s: 3, r: 0 }, dTma: { t: -2, s: -1, r: -1 } },
-      { name: 'Vadeli TL', share: 0.56, ly: 470, tma: 479, lm: 486, dLy: { t: 16, s: 9, r: 7 }, dTma: { t: 7, s: 4, r: 3 } },
-      { name: 'Vadesiz YP', share: 0.41, ly: 89, tma: 90, lm: 86, dLy: { t: -3, s: -2, r: -1 }, dTma: { t: -4, s: -2, r: -2 } },
-      { name: 'Vadeli YP', share: 0.48, ly: 134, tma: 139, lm: 141, dLy: { t: 7, s: 4, r: 3 }, dTma: { t: 2, s: 1, r: 1 } }
-  ];
-
-  var MOCK_CROSSSELL_ROWS = CROSSSELL_ROW_DEFS.map(function (d, i) {
-      return $.extend({ Id: i + 1, SortOrder: i + 1, ProductName: d.name },
-          mkPeriod('LastYear', d.ly, d.share, d.dLy, true),
-          mkPeriod('TwoMonthsAgo', d.tma, d.share, d.dTma, true),
-          mkPeriod('LastMonth', d.lm, d.share, null, false));
-  });
-
-  var BANKSHARE_ROW_DEFS = [
-      { name: 'Tüketici Kredisi Müşteri (Adet)', valueType: 1, dFirst: 12500, dSecond: 12840, oFirst: 3200, oSecond: 3050, wFirst: 79.6, wSecond: 80.8, wStatus: 1 },
-      { name: 'Tüketici Kredisi Müşteri (Hacim)', valueType: 2, dFirst: 845000, dSecond: 872300, oFirst: 210500, oSecond: 198700, wFirst: 80.1, wSecond: 81.4, wStatus: 1 },
-      { name: 'Kredi Kartı (Adet)', valueType: 1, dFirst: 28400, dSecond: 28950, oFirst: 9600, oSecond: 9820, wFirst: 74.7, wSecond: 74.6, wStatus: 2 },
-      { name: 'Kredi Kartı (Hacim)', valueType: 2, dFirst: 512000, dSecond: 528600, oFirst: 168400, oSecond: 171200, wFirst: 75.3, wSecond: 75.5, wStatus: 1 },
-      { name: 'KMH (Adet)', valueType: 1, dFirst: 6100, dSecond: 6080, oFirst: 2450, oSecond: 2510, wFirst: 71.3, wSecond: 70.8, wStatus: 2 },
-      { name: 'KMH (Hacim)', valueType: 2, dFirst: 98400, dSecond: 99650, oFirst: 41200, oSecond: 42800, wFirst: 70.5, wSecond: 69.9, wStatus: 2 }
-  ];
-
-  function buildBankShareRows(mult) {
-      return BANKSHARE_ROW_DEFS.map(function (d, i) {
-          return {
-              Id: i + 1,
-              SortOrder: i + 1,
-              ProductName: d.name,
-              ValueType: d.valueType,
-              DenizbankFirstMonthValue: Math.round(d.dFirst * mult),
-              DenizbankSecondMonthValue: Math.round(d.dSecond * mult),
-              OtherBanksFirstMonthValue: Math.round(d.oFirst * mult),
-              OtherBanksSecondMonthValue: Math.round(d.oSecond * mult),
-              WalletShareFirstMonthRate: d.wFirst,
-              WalletShareSecondMonthRate: d.wSecond,
-              WalletShareSecondMonthRateStatus: d.wStatus
-          };
-      });
-  }
-
-  var MOCK_BANKSHARE_ROWS_SALARY = buildBankShareRows(1);
-  var MOCK_BANKSHARE_ROWS_RETIRED = buildBankShareRows(0.35);
-
   // ===== Tab Helpers =====
   function tabKindFromName(name) {
       name = (name || '').toLocaleLowerCase('tr');
@@ -352,10 +203,6 @@ $(document).ready(function () {
   }
 
   // ===== PDF verisi (window.PdfReport) — ekranda görünenle aynı veriden kurulur =====
-  var lastVolumeRows = [];
-  var lastCrossSellRows = [];
-  var lastBankShareRows = [];
-
   function pdfMetricCellHtml(row, prefix) {
       var name = row.ProductName;
       return '<div style="font-weight:600;">' + formatNumber(row[prefix + 'TotalAmount'], true, name) + '</div>' +
@@ -411,7 +258,7 @@ $(document).ready(function () {
       var cols;
 
       if (kind === 'bankshare') {
-          var bh = window._bsHeaders || MOCK_BANKSHARE_HEADERS;
+          var bh = window._bsHeaders;
           var valCol = function (key) {
               return { header: '', key: key, format: function (v, row) { return formatBankShareValue(v, row.ValueType, row.ProductName); } };
           };
@@ -429,7 +276,7 @@ $(document).ready(function () {
               filename: safeTitle + '-BankaPayi.pdf'
           };
       } else if (kind === 'crosssell') {
-          var ch = window._csHeaders || MOCK_CROSSSELL_HEADERS;
+          var ch = window._csHeaders;
           var csDiffOn = $('#crossSellDiffToggle').attr('data-active') === 'true';
           cols = [
               { header: ch.ProductColumnName, key: 'ProductName', align: 'left' },
@@ -442,7 +289,7 @@ $(document).ready(function () {
               filename: safeTitle + '-CaprazSatisGelisimi.pdf'
           };
       } else {
-          var vh = window._volHeaders || MOCK_VOLUME_HEADERS;
+          var vh = window._volHeaders;
           var volDiffOn = $('#volumeDiffToggle').attr('data-active') === 'true';
           cols = [
               { header: vh.ProductColumnName, key: 'ProductName', align: 'left' },
@@ -458,99 +305,77 @@ $(document).ready(function () {
       }
   }
 
-  // ===== Sorting (client-side, mock veriler üzerinde) =====
-  function sortRows(list, kind) {
-      if (!currentSortBy) return list;
-      var fieldMap = kind === 'volume'
-          ? { 1: 'ProductName', 2: 'LastYearTotalAmount', 3: 'LastWeekTotalAmount', 4: 'PreviousDayTotalAmount', 5: 'YesterdayTotalAmount' }
-          : { 1: 'ProductName', 2: 'LastYearTotalAmount', 3: 'TwoMonthsAgoTotalAmount', 4: 'LastMonthTotalAmount' };
-      var field = fieldMap[currentSortBy];
-      if (!field) return list;
-      var dir = currentSortState === 'asc' ? 1 : -1;
-      list.sort(function (a, b) {
-          if (field === 'ProductName') return dir * String(a[field]).localeCompare(String(b[field]), 'tr');
-          return dir * ((a[field] || 0) - (b[field] || 0));
-      });
-      return list;
-  }
-
-  // ===== Loaders (servisler yazılana kadar ajax istekleri yorum satırında, mock veriler kullanılıyor) =====
+  // ===== Loaders =====
   function loadSalaryTabs(callback) {
-      // $.ajax({
-      //     url: '/SalaryCustomersReport/GetSalaryCustomerReportTabs',
-      //     type: 'GET',
-      //     data: { sessionId: '1' },
-      //     success: function (data) { callback(data); }
-      // });
-      callback(MOCK_TABS);
+      $.ajax({
+          url: '/SalaryCustomerReport/GetSalaryCustomerReportTabs',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ sessionId: '1' }),
+          success: function (data) { callback(data); }
+      });
   }
 
   function loadVolumeHeaders(callback) {
-      // $.ajax({
-      //     url: '/SalaryCustomersReport/GetSalaryCustomerVolumeReportHeaders',
-      //     type: 'POST',
-      //     contentType: 'application/json',
-      //     data: JSON.stringify({ sessionId: '1', reportDate: _reportDate }),
-      //     success: function (data) { callback(data); }
-      // });
-      callback(MOCK_VOLUME_HEADERS);
+      $.ajax({
+          url: '/SalaryCustomerReport/GetSalaryCustomerVolumeReportHeaders',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ sessionId: '1', reportDate: _todayDate }),
+          success: function (data) { callback(data); }
+      });
   }
 
   function loadVolumeReport(callback) {
-      // $.ajax({
-      //     url: '/SalaryCustomersReport/GetSalaryCustomerVolumeReport',
-      //     type: 'POST',
-      //     contentType: 'application/json',
-      //     data: JSON.stringify(buildDiffSortRequest('#volumeDiffToggle')),
-      //     success: function (data) { callback(data); }
-      // });
-      callback(sortRows(MOCK_VOLUME_ROWS.slice(), 'volume'));
+      $.ajax({
+          url: '/SalaryCustomerReport/GetSalaryCustomerVolumeReport',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(buildDiffSortRequest('#volumeDiffToggle')),
+          success: function (data) { callback(data); }
+      });
   }
 
   function loadCrossSellHeaders(callback) {
-      // $.ajax({
-      //     url: '/SalaryCustomersReport/GetSalaryCustomerCrossSellReportHeaders',
-      //     type: 'POST',
-      //     contentType: 'application/json',
-      //     data: JSON.stringify({ sessionId: '1', reportDate: _reportDate }),
-      //     success: function (data) { callback(data); }
-      // });
-      callback(MOCK_CROSSSELL_HEADERS);
+      $.ajax({
+          url: '/SalaryCustomerReport/GetSalaryCustomerCrossSellReportHeaders',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ sessionId: '1', reportDate: _todayDate }),
+          success: function (data) { callback(data); }
+      });
   }
 
   function loadCrossSellReport(callback) {
-      // $.ajax({
-      //     url: '/SalaryCustomersReport/GetSalaryCustomerCrossSellReport',
-      //     type: 'POST',
-      //     contentType: 'application/json',
-      //     data: JSON.stringify(buildDiffSortRequest('#crossSellDiffToggle')),
-      //     success: function (data) { callback(data); }
-      // });
-      callback(sortRows(MOCK_CROSSSELL_ROWS.slice(), 'crosssell'));
+      $.ajax({
+          url: '/SalaryCustomerReport/GetSalaryCustomerCrossSellReport',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(buildDiffSortRequest('#crossSellDiffToggle')),
+          success: function (data) { callback(data); }
+      });
   }
 
   function loadBankShareHeaders(callback) {
-      // $.ajax({
-      //     url: '/SalaryCustomersReport/GetSalaryCustomerBankShareReportHeaders',
-      //     type: 'POST',
-      //     contentType: 'application/json',
-      //     data: JSON.stringify({ sessionId: '1', reportDate: _reportDate }),
-      //     success: function (data) { callback(data); }
-      // });
-      callback(MOCK_BANKSHARE_HEADERS);
+      $.ajax({
+          url: '/SalaryCustomerReport/GetSalaryCustomerBankShareReportHeaders',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ sessionId: '1', reportDate: _todayDate }),
+          success: function (data) { callback(data); }
+      });
   }
 
   function loadBankShareReport(callback) {
       var req = buildCommonRequest();
       req.customerType = bankShareCustomerType;
-      // $.ajax({
-      //     url: '/SalaryCustomersReport/GetSalaryCustomerBankShareReport',
-      //     type: 'POST',
-      //     contentType: 'application/json',
-      //     data: JSON.stringify(req),
-      //     success: function (data) { callback(data); }
-      // });
-      callback(bankShareCustomerType === 2 ? MOCK_BANKSHARE_ROWS_RETIRED : MOCK_BANKSHARE_ROWS_SALARY);
+      $.ajax({
+          url: '/SalaryCustomerReport/GetSalaryCustomerBankShareReport',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(req),
+          success: function (data) { callback(data); }
+      });
   }
 
   // ===== Active Table Loading =====
@@ -561,29 +386,26 @@ $(document).ready(function () {
       if (kind === 'bankshare') {
           loadBankShareReport(function (data) {
               $('#bankShareTableBody').html(buildBankShareRowsHtml(data));
-              lastBankShareRows = data;
               setSalaryPdfReport('bankshare', data);
               updateStripes();
               hideLoadingOverlay();
           });
       } else if (kind === 'crosssell') {
           loadCrossSellReport(function (data) {
-              $('#crossSellTableBody').html(buildCrossSellRows(data, window._csHeaders || MOCK_CROSSSELL_HEADERS));
+              $('#crossSellTableBody').html(buildCrossSellRows(data, window._csHeaders));
               var showDiff = $('#crossSellDiffToggle').attr('data-active') === 'true';
               if (!showDiff) $('#crossSellTableBody .diff-details').hide();
               if (showDiff) $('#crossSellTableBody .sc-sub-rate').hide();
-              lastCrossSellRows = data;
               setSalaryPdfReport('crosssell', data);
               updateStripes();
               hideLoadingOverlay();
           });
       } else {
           loadVolumeReport(function (data) {
-              $('#volumeTableBody').html(buildVolumeRows(data, window._volHeaders || MOCK_VOLUME_HEADERS));
+              $('#volumeTableBody').html(buildVolumeRows(data, window._volHeaders));
               var showDiff = $('#volumeDiffToggle').attr('data-active') === 'true';
               if (!showDiff) $('#volumeTableBody .diff-details').hide();
               if (showDiff) $('#volumeTableBody .sc-sub-rate').hide();
-              lastVolumeRows = data;
               setSalaryPdfReport('volume', data);
               updateStripes();
               hideLoadingOverlay();
@@ -603,7 +425,7 @@ $(document).ready(function () {
       $('#salarySearchInput').val('');
 
       showActiveTableContainer($(this).data('tab-kind'));
-      renderSubTabs(window._salaryTabs || MOCK_TABS, getActiveMainTabId());
+      renderSubTabs(window._salaryTabs, getActiveMainTabId());
       loadActiveTable();
   });
 
@@ -638,22 +460,18 @@ $(document).ready(function () {
       loadActiveTable();
   });
 
-  // ===== Farkları Göster Toggles =====
+  // ===== Farkları Göster Toggles (sunucudan showDifferences'a göre farklı veri geldiği için yeniden istek atılır) =====
   $(document).on('click', '#volumeDiffToggle', function () {
       var willShowDiff = $(this).attr('data-active') !== 'true';
       $(this).attr('data-active', willShowDiff ? 'true' : 'false');
-      $('#volumeTableBody .diff-details').toggle(willShowDiff);
-      $('#volumeTableBody .sc-sub-rate').toggle(!willShowDiff);
-      setSalaryPdfReport('volume', lastVolumeRows);
+      loadActiveTable();
   });
   $('#volumeDiffToggle').attr('data-active', 'false');
 
   $(document).on('click', '#crossSellDiffToggle', function () {
       var willShowDiff = $(this).attr('data-active') !== 'true';
       $(this).attr('data-active', willShowDiff ? 'true' : 'false');
-      $('#crossSellDataTable .diff-details').toggle(willShowDiff);
-      $('#crossSellTableBody .sc-sub-rate').toggle(!willShowDiff);
-      setSalaryPdfReport('crosssell', lastCrossSellRows);
+      loadActiveTable();
   });
   $('#crossSellDiffToggle').attr('data-active', 'false');
 
