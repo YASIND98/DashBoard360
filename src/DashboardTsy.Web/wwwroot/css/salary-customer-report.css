@@ -11,6 +11,11 @@
   border-bottom-right-radius: 30px;
 }
 
+[data-theme="light"] #volumeDataTable,
+[data-theme="light"] #crossSellDataTable {
+  border-bottom-color: #B6D6F8;
+}
+
 #volumeDataTable tbody tr.last-visible-row td:first-child,
 #volumeDataTable tbody tr.last-visible-row td:nth-child(2),
 #crossSellDataTable tbody tr.last-visible-row td:first-child,
@@ -21,6 +26,11 @@
 #volumeDataTable tbody tr:first-child td,
 #crossSellDataTable tbody tr:first-child td {
   border-top: 1px solid var(--border-row);
+}
+
+[data-theme="light"] #volumeDataTable tbody tr:first-child td,
+[data-theme="light"] #crossSellDataTable tbody tr:first-child td {
+  border-top-color: #B6D6F8;
 }
 
 .col-metric {
@@ -304,6 +314,10 @@
   display: flex;
   justify-content: flex-end;
   padding: 4px 0 16px;
+}
+
+[data-theme="light"] .sc-total {
+  color: #262A33;
 }
 
 [data-theme="light"] .sc-sub-amount {
