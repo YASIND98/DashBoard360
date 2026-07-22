@@ -86,7 +86,7 @@
 
   /* Sticky tablo başlığı: 1. başlık satırının yüksekliği.
      İki satırlı başlıklarda 2. satır (alt başlıklar) bu kadar aşağıdan yapışır. */
-  --table-head-row-height: 42px;
+  --table-head-row-height: 40px;
 
   /* ===== Tema token'ları (dark default) ===========================
      Tüm tema-duyarlı bileşenler bu değişkenleri kullanır.

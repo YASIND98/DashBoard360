@@ -681,14 +681,6 @@
   font-size: 12px;
 }
 
-.data-table tbody tr.sc-total-row td:first-child {
-  border-left: 1px solid var(--border-row);
-}
-
-.data-table tbody tr.sc-total-row td:last-child {
-  border-right: 1px solid var(--border-row);
-}
-
 [data-theme="light"] .sc-ranking-card--red .sc-ranking-value .first-number,
 [data-theme="light"] .sc-ranking-card--orange .sc-ranking-value .first-number,
 [data-theme="light"] .sc-ranking-card--green .sc-ranking-value .first-number,

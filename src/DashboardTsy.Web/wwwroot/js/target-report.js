@@ -85,7 +85,7 @@ $(document).ready(function () {
   }
 
   function getActivePeriod() {
-      return $('.period-btn.active').data('period') || 'daily';
+      return $('[data-period].active').data('period') || 'daily';
   }
 
   // Ürün adı "oran" içeriyorsa (ör. aktiflik oranı) değerler % ile gösterilir.
@@ -278,7 +278,7 @@ $(document).ready(function () {
     var region = (selectedRegion && selectedRegion.name) ? selectedRegion.name : 'Tüm Bölgeler';
     var branch = (selectedBranch && selectedBranch.name) ? selectedBranch.name : 'Tüm Şubeler';
     var type = ($('.segment[data-type].active').text() || '').trim();                                       // Hacim / Adet
-    var period = $('.period-toggle:visible').length ? ($('.period-btn.active').text() || '').trim() : '';   // Bakiye / H / G (Adet'te yok)
+    var period = $('.period-toggle:visible').length ? ($('[data-period].active').text() || '').trim() : '';   // Bakiye / H / G (Adet'te yok)
     var tab = ($('.tab.active').text() || '').trim();
     var subtab = ($('.sub-tab-bar:visible .sub-tab.active').text() || '').trim();
 
@@ -537,7 +537,6 @@ $(document).ready(function () {
           .find('.sub-tab').removeClass('active')
           .first().addClass('active');
       updateBireyselOzelVisibility();
-      $('#searchInput').val('');
       showLoadingOverlay();
       loadActiveReport();
   });
@@ -545,7 +544,6 @@ $(document).ready(function () {
   $('.sub-tab').on('click', function () {
       $(this).closest('.sub-tab-bar').find('.sub-tab').removeClass('active');
       $(this).addClass('active');
-      $('#searchInput').val('');
       showLoadingOverlay();
       loadActiveReport();
   });
@@ -565,7 +563,7 @@ $(document).ready(function () {
           $('.date-badge').text('Bu Ay');
           $('#dailyTable').hide();
           $('#monthlyTable').hide();
-          $('.period-toggle').hide();
+          $('[data-period]').closest('.period-toggle').hide();
           $('#quantityTable').show();
           loadQuantityReport();
       } else {
@@ -573,9 +571,9 @@ $(document).ready(function () {
           $('.date-text').text(dd + ' ' + trMonths[now.getMonth()] + ' ' + now.getFullYear());
           $('.date-badge').text('Bugün');
           $('#quantityTable').hide();
-          $('.period-toggle').show();
-          $('.period-btn').removeClass('active');
-          $('.period-btn[data-period="daily"]').addClass('active');
+          $('[data-period]').closest('.period-toggle').show();
+          $('[data-period]').removeClass('active');
+          $('[data-period="daily"]').addClass('active');
           $('#monthlyTable').hide();
           $('#dailyTable').show();
           $('#diffToggle').show();
@@ -585,11 +583,11 @@ $(document).ready(function () {
   });
 
   // ===== Period Toggle (Günlük / Aylık) =====
-  $('.period-btn').on('click', function () {
-      $('.period-btn').removeClass('active');
-      $(this).addClass('active');
-
+  $('[data-period]').on('click', function () {
       var period = $(this).data('period');
+      $('[data-period]').removeClass('active');
+      $('[data-period="' + period + '"]').addClass('active');
+
       var now = new Date();
       var trMonths = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 
@@ -666,6 +664,8 @@ $(document).ready(function () {
           });
           if ($lastVisible) $lastVisible.addClass('last-visible-row');
       });
+      var _q = $('#searchInput').val();
+      if (_q && _q.trim()) $('#searchInput').trigger('input');
   }
 
   // ===== Expandable Rows =====
@@ -889,8 +889,8 @@ $(document).ready(function () {
     if (isTop10) {
       currentTop10ProductId = $(this).data('product-id');
       currentTop10FilterType = 0;
-      $('.toggle-btn').removeClass('active');
-      $('.toggle-btn[data-top10-period="daily"]').addClass('active');
+      $('[data-top10-period]').removeClass('active');
+      $('[data-top10-period="daily"]').addClass('active');
       loadTop10Data(currentTop10ProductId, 0, true);   // başarınca modalı açar
     } else {
       $('#reportDetailOverlay').addClass('active');
@@ -899,8 +899,8 @@ $(document).ready(function () {
 
   // Modalı kapatma (X + overlay tıklama) artık ortak report-detail.js'te — her iki sayfada çalışır.
 
-  $('.toggle-btn').on('click', function () {
-    $('.toggle-btn').removeClass('active');
+  $('[data-top10-period]').on('click', function () {
+    $('[data-top10-period]').removeClass('active');
     $(this).addClass('active');
     currentTop10FilterType = $(this).data('top10-period') === 'weekly' ? 1 : 0;
     loadTop10Data(currentTop10ProductId, currentTop10FilterType);
