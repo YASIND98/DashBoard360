@@ -79,9 +79,8 @@ public static class MockProductivityReportData
             new() { TabId = 4, TabName = "Karlılık", ParentId = 0, TabLevel = 1 },
 
             new() { TabId = 10, TabName = "Müşteri", ParentId = 2, TabLevel = 2 },
-            new() { TabId = 11, TabName = "Kredi Kartı", ParentId = 2, TabLevel = 2 },
-            new() { TabId = 12, TabName = "POS", ParentId = 2, TabLevel = 2 },
-            new() { TabId = 13, TabName = "Nakit Yönetimi", ParentId = 2, TabLevel = 2 },
+            new() { TabId = 11, TabName = "Ödeme Sistemleri", ParentId = 2, TabLevel = 2 },
+            new() { TabId = 12, TabName = "Nakit Yönetimi", ParentId = 2, TabLevel = 2 },
 
             new() { TabId = 20, TabName = "Tümü", ParentId = 10, TabLevel = 3 },
             new() { TabId = 21, TabName = "Kurumsal", ParentId = 10, TabLevel = 3 },
@@ -90,12 +89,12 @@ public static class MockProductivityReportData
             new() { TabId = 24, TabName = "Tarım", ParentId = 10, TabLevel = 3 },
             new() { TabId = 25, TabName = "Bireysel", ParentId = 10, TabLevel = 3 },
 
-            new() { TabId = 50, TabName = "Tümü", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 51, TabName = "Kurumsal", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 52, TabName = "Ticari", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 53, TabName = "KOBİ", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 54, TabName = "Tarım", ParentId = 13, TabLevel = 3 },
-            new() { TabId = 55, TabName = "Bireysel", ParentId = 13, TabLevel = 3 },
+            new() { TabId = 50, TabName = "Tümü", ParentId = 12, TabLevel = 3 },
+            new() { TabId = 51, TabName = "Kurumsal", ParentId = 12, TabLevel = 3 },
+            new() { TabId = 52, TabName = "Ticari", ParentId = 12, TabLevel = 3 },
+            new() { TabId = 53, TabName = "KOBİ", ParentId = 12, TabLevel = 3 },
+            new() { TabId = 54, TabName = "Tarım", ParentId = 12, TabLevel = 3 },
+            new() { TabId = 55, TabName = "Bireysel", ParentId = 12, TabLevel = 3 },
 
             new() { TabId = 30, TabName = "Tümü", ParentId = 3, TabLevel = 2 },
             new() { TabId = 31, TabName = "Kurumsal", ParentId = 3, TabLevel = 2 },

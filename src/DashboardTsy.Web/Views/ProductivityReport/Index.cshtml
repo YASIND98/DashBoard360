@@ -525,28 +525,26 @@
                 else if (toggleId === 3 && selectedBranch) {
                     loadVolumeBranchReport(branchCode, tabIds.tabId || 0);
                 }
-                // Count - branch - Card/POS
-                else if (toggleId === 2 && selectedBranch && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
-                    var cardPosBranchTabId = tabIds.tabId === 11 ? 1 : 2;
-                    loadCountCardPosRatioBranchReport(branchCode, cardPosBranchTabId);
-                    loadCountCardPosBranchReport(branchCode, cardPosBranchTabId);
+                // Count - branch - Ödeme Sistemleri
+                else if (toggleId === 2 && selectedBranch && tabIds.tabId === 11) {
+                    loadCountCardPosRatioBranchReport(branchCode, 1);
+                    loadCountCardPosBranchReport(branchCode, 1);
                 }
                 // Count - branch - Cash Management
-                else if (toggleId === 2 && selectedBranch && tabIds.tabId === 13) {
+                else if (toggleId === 2 && selectedBranch && tabIds.tabId === 12) {
                     loadCountCashManagementBranchReport(branchCode, tabIds.subTabId || 0);
                 }
                 // Count - branch - Customer
                 else if (toggleId === 2 && selectedBranch) {
                     loadCountCustomerBranchReport(branchCode, tabIds.subTabId || 0);
                 }
-                // Count - region - Card/POS
-                else if (toggleId === 2 && selectedRegion && !selectedBranch && (tabIds.tabId === 11 || tabIds.tabId === 12)) {
-                    var cardPosTabId = tabIds.tabId === 11 ? 1 : 2;
-                    loadCountCardPosRatioRegionReport(regionCode, cardPosTabId);
-                    loadCountCardPosRegionReport(regionCode, cardPosTabId);
+                // Count - region - Ödeme Sistemleri
+                else if (toggleId === 2 && selectedRegion && !selectedBranch && tabIds.tabId === 11) {
+                    loadCountCardPosRatioRegionReport(regionCode, 1);
+                    loadCountCardPosRegionReport(regionCode, 1);
                 }
                 // Count - region - Cash Management
-                else if (toggleId === 2 && selectedRegion && !selectedBranch && tabIds.tabId === 13) {
+                else if (toggleId === 2 && selectedRegion && !selectedBranch && tabIds.tabId === 12) {
                     loadCountCashManagementRegionReport(regionCode, tabIds.subTabId || 0);
                 }
                 // Count - region - Customer
