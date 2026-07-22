@@ -180,6 +180,13 @@
         <img src="~/images/download.svg" alt="PDF İndir" />
         <span>PDF İndir</span>
       </div>
+      <div class="usd-kur-btn" id="usdKurBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="3"/>
+          <path d="M12 9v6M14 9.5a2 2 0 0 0-4 0v.1c0 .9.6 1.7 1.4 2l1.2.5c.8.3 1.4 1.1 1.4 2v.1a2 2 0 0 1-4 0"/>
+        </svg>
+        <span>USD Kur Detayı</span>
+      </div>
     </div>
   </div>
 </div>
@@ -235,6 +242,13 @@
       <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
         <img src="~/images/download.svg" alt="PDF İndir" />
         <span>PDF İndir</span>
+      </div>
+      <div class="usd-kur-btn" id="usdKurBtnQuantity" style="cursor:pointer;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="3"/>
+          <path d="M12 9v6M14 9.5a2 2 0 0 0-4 0v.1c0 .9.6 1.7 1.4 2l1.2.5c.8.3 1.4 1.1 1.4 2v.1a2 2 0 0 1-4 0"/>
+        </svg>
+        <span>USD Kur Detayı</span>
       </div>
     </div>
   </div>
@@ -325,6 +339,25 @@
 @* Ürün Detay Modalı paylaşılan partial'a taşındı (hedef + verim ortak kullanır). *@
 @await Html.PartialAsync("_ReportDetailModal")
 
+<!-- USD Kur Detayı Modal -->
+<div class="usd-kur-overlay" id="usdKurOverlay">
+  <div class="usd-kur-modal" role="dialog" aria-modal="true" aria-labelledby="usdKurModalTitle">
+    <div class="usd-kur-modal-header">
+      <div class="usd-kur-modal-titles">
+        <h2 class="usd-kur-modal-title" id="usdKurModalTitle">Hesaplamada Kullanılan USD Kurları</h2>
+        <p class="usd-kur-modal-subtitle">Vadesiz YP değerleri aşağıdaki USD kurları kullanılarak hesaplanmıştır.</p>
+      </div>
+      <button class="usd-kur-close" id="usdKurClose" aria-label="Kapat">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+      </button>
+    </div>
+    <div class="usd-kur-rows" id="usdKurRows"></div>
+    <div class="usd-kur-footer" id="usdKurFooter"></div>
+  </div>
+</div>
+
 @section Scripts {
     @{
         var sessionUser = System.Text.Json.JsonSerializer.Deserialize<DashboardTsy.Web.Models.UsersDto>(
@@ -334,6 +367,7 @@
         window.USER_CODE = @Html.Raw(Json.Serialize(sessionUser?.DomainName));
     </script>
     <link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/usd-kur-modal.css" asp-append-version="true" />
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/date-picker.js" asp-append-version="true"></script>
@@ -363,6 +397,9 @@
             });
             $('#mobilePdfBtn').on('click', function () {
                 $('#downloadPdfBtn').trigger('click');
+                $(this).closest('details').removeAttr('open');
+            });
+            $('#mobileUsdKurBtn').on('click', function () {
                 $(this).closest('details').removeAttr('open');
             });
         });

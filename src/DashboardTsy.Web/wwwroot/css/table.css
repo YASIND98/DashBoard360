@@ -503,6 +503,14 @@
   content: url('/images/empty-state-seach-light.svg');
 }
 
+[data-theme="light"] .usd-kur-btn {
+  color: #536076;
+}
+
+[data-theme="light"] .usd-kur-btn svg {
+  stroke: #536076;
+}
+
 [data-theme="light"] .diff-label {
   color: #262A33;
 }
@@ -707,6 +715,7 @@
     right: 0;
     padding-bottom: 20px;
     background: #011137;
+    z-index: 7;
   }
 
   .legend-note,
