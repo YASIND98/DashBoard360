@@ -531,6 +531,10 @@
                     loadCountCardPosRatioBranchReport(branchCode, cardPosBranchTabId);
                     loadCountCardPosBranchReport(branchCode, cardPosBranchTabId);
                 }
+                // Count - branch - Cash Management
+                else if (toggleId === 2 && selectedBranch && tabIds.tabId === 13) {
+                    loadCountCashManagementBranchReport(branchCode, tabIds.subTabId || 0);
+                }
                 // Count - branch - Customer
                 else if (toggleId === 2 && selectedBranch) {
                     loadCountCustomerBranchReport(branchCode, tabIds.subTabId || 0);
@@ -540,6 +544,10 @@
                     var cardPosTabId = tabIds.tabId === 11 ? 1 : 2;
                     loadCountCardPosRatioRegionReport(regionCode, cardPosTabId);
                     loadCountCardPosRegionReport(regionCode, cardPosTabId);
+                }
+                // Count - region - Cash Management
+                else if (toggleId === 2 && selectedRegion && !selectedBranch && tabIds.tabId === 13) {
+                    loadCountCashManagementRegionReport(regionCode, tabIds.subTabId || 0);
                 }
                 // Count - region - Customer
                 else if (toggleId === 2 && selectedRegion && !selectedBranch) {
