@@ -1401,6 +1401,14 @@ public static class MockProductivityReportData
                 IsVisible = true,
                 OrderNo = 5
             },
+            new()
+            {
+                Code = "MMReport",
+                Name = "Maaş Müşterileri Raporları",
+                Url = "/mm-raporlari",
+                IsVisible = true,
+                OrderNo = 6
+            },
         };
     }
 
