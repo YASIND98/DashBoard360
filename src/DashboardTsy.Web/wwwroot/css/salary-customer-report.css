@@ -132,7 +132,6 @@
 
 #volumeDataTable thead th.col-cmp,
 #crossSellDataTable thead th.col-cmp {
-  position: relative;
   padding: 8px;
 }
 
