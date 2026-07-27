@@ -85,7 +85,9 @@ public class TargetReportController : ControllerBase
             SearchText = request.SearchText,
             ShowDifferences = request.ShowDifferences,
             SortBy = request.SortBy,
-            IsAscending = request.IsAscending
+            IsAscending = request.IsAscending,
+            ProductId = request.ProductId,
+            UserCode = request.UserCode,
         };
 
         var result = await _apiClient.GetDailyTargetReportAsync(req, cancellationToken).ConfigureAwait(false);
@@ -147,7 +149,9 @@ public class TargetReportController : ControllerBase
             SearchText = request.SearchText,
             ShowDifferences = request.ShowDifferences,
             SortBy = request.SortBy,
-            IsAscending = request.IsAscending
+            IsAscending = request.IsAscending,
+            ProductId = request.ProductId,
+            UserCode = request.UserCode
         };
 
         var result = await _apiClient.GetDailyQuantityTargetReportAsync(req, cancellationToken).ConfigureAwait(false);
@@ -231,7 +235,9 @@ public class TargetReportController : ControllerBase
             PortfolioId = request.PortfolioId,
             SearchText = request.SearchText,
             SortBy = request.SortBy,
-            IsAscending = request.IsAscending
+            IsAscending = request.IsAscending,
+            ProductId = request.ProductId,
+            UserCode = request.UserCode
         };
 
         var result = await _apiClient.GetMonthlyTargetReportAsync(req, cancellationToken).ConfigureAwait(false);

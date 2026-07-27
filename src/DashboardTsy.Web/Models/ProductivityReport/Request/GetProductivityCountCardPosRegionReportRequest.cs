@@ -1,6 +1,8 @@
-﻿namespace DashboardTsy.Web.Models.ProductivityReport.Request;
+﻿using DashboardTsy.Web.Models.Common.Request;
 
-public class GetProductivityCountCardPosRegionReportRequest
+namespace DashboardTsy.Web.Models.ProductivityReport.Request;
+
+public class GetProductivityCountCardPosRegionReportRequest : BaseReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
     public string RegionCode { get; set; } = string.Empty;

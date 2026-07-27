@@ -1,6 +1,8 @@
+using DashboardTsy.Web.Models.Common.Request;
+
 namespace DashboardTsy.Web.Models.TargetReport;
 
-public class GetDailyTargetReportRequest
+public class GetDailyTargetReportRequest : BaseReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
     public int TabId { get; set; }

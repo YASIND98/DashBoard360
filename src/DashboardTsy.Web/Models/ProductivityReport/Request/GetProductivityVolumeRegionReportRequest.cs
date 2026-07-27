@@ -1,6 +1,8 @@
-﻿namespace DashboardTsy.Web.Models.ProductivityReport.Request;
+﻿using DashboardTsy.Web.Models.Common.Request;
 
-public class GetProductivityVolumeRegionReportRequest
+namespace DashboardTsy.Web.Models.ProductivityReport.Request;
+
+public class GetProductivityVolumeRegionReportRequest : BaseReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
     public string RegionCode { get; set; } = string.Empty;

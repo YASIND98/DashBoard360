@@ -1,6 +1,8 @@
-﻿namespace DashboardTsy.Web.Models.ProductivityReport.Request;
+﻿using DashboardTsy.Web.Models.Common.Request;
 
-public class GetProductivityCountCustomerBranchReportRequest
+namespace DashboardTsy.Web.Models.ProductivityReport.Request;
+
+public class GetProductivityCountCustomerBranchReportRequest : BaseReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
     public string BranchCode { get; set; } = string.Empty;
