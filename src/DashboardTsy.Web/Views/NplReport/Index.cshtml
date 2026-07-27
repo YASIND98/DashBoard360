@@ -1,14 +1,12 @@
 @model ReportViewModel
 
 <link rel="stylesheet" href="~/css/npl-report.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/npl-filters.css" asp-append-version="true" />
 
 
 <!-- Page Header -->
 <div class="page-header">
-    <h1 class="page-title">NPL ve Gecikmeli Krediler Raporu</h1>
-    <div class="page-date">
-        <span class="date-text">Rapor Tarihi: <span id="nplReportDate">19 Şubat 2026</span></span>
-    </div>
+    <h1 class="page-title">NPL Girişleri</h1>
     @await Html.PartialAsync("_AvatarArea")
 </div>
 
@@ -19,9 +17,20 @@
     </div>
 </div>
 
+@{
+    Func<object, Microsoft.AspNetCore.Html.IHtmlContent> nplViewToggle = @<div class="segmented-control npl-view-toggle">
+        <button type="button" class="segment active" data-view="chart">Grafik</button>
+        <div class="divider"></div>
+        <button type="button" class="segment" data-view="table">Tablo</button>
+    </div>;
+}
+
 <!-- Filters -->
 <div class="filters-row">
-    <h1 class="page-title page-title-mobile mobile">NPL ve Gecikmeli Krediler Raporu</h1>
+    <div class="mobile filters-mobile-header">
+        <h1 class="page-title page-title-mobile">NPL Girişleri</h1>
+        @nplViewToggle("")
+    </div>
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="nplRegionSelect">
@@ -51,12 +60,83 @@
             </div>
         </div>
 
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="nplPeriodSelect">
+                <span class="filter-label" id="nplPeriodLabel">Dönem</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="nplPeriodPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" />
+                </div>
+                <div class="dropdown-list" id="nplPeriodList" data-filter="period"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="nplProductSelect">
+                <span class="filter-label" id="nplProductLabel">Ürün</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="nplProductPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" />
+                </div>
+                <div class="dropdown-list" id="nplProductList" data-filter="product"></div>
+            </div>
+        </div>
+
+        <div class="npl-filters-wrapper">
+            <div class="filter-dropdown npl-filters-btn" id="nplFiltersBtn">
+                <img src="~/images/filter.svg" alt="" />
+                <span class="filter-label">Filtreler</span>
+            </div>
+
+            <!-- Karartma (yalnız tablet/mobil bottom-sheet'te görünür) -->
+            <div class="npl-filters-overlay" id="nplFiltersOverlay"></div>
+
+            <!-- Filtreler paneli: masaüstünde butonun altında, tablet/mobilde alttan bottom-sheet -->
+            <div class="npl-filters-panel" id="nplFiltersPanel" role="dialog" aria-labelledby="nplFiltersTitle">
+                <div class="npl-filters-header">
+                    <h2 class="npl-filters-title" id="nplFiltersTitle">Filtreler</h2>
+                    <button type="button" class="npl-filters-close" id="nplFiltersClose" aria-label="Kapat">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="npl-filters-body" id="nplFilterGroups"></div>
+                <div class="npl-filters-footer">
+                    <button type="button" class="npl-filters-clear" id="nplFiltersClear">Filtreleri Temizle</button>
+                    <button type="button" class="npl-filters-apply" id="nplFiltersApply">Sonuçları Göster</button>
+                </div>
+            </div>
+        </div>
+
         <div class="filter-search">
             <img src="~/images/search.svg" alt="" />
             <input type="text" placeholder="Ara" id="nplSearchInput" />
         </div>
+
+        @await Html.PartialAsync("_MobileMoreMenu")
+    </div>
+    <div class="desktop">
+        @nplViewToggle("")
     </div>
 </div>
+
+@{
+    Func<object, Microsoft.AspNetCore.Html.IHtmlContent> nplMetricToggle = @<div class="period-toggle npl-metric-toggle">
+        <button class="period-btn active" data-metric="balance">
+            <img src="~/images/balance.svg" alt="" class="period-icon" /> Bakiye
+        </button>
+        <button class="period-btn" data-metric="ratio">
+            <img src="~/images/percentage.svg" alt="" class="period-icon" /> Oran
+        </button>
+    </div>;
+}
 
 <!-- Tabs -->
 <div class="tab-bar">
@@ -68,18 +148,48 @@
         <button class="tab" data-npltab="tarim">Tarım</button>
         <button class="tab" data-npltab="bireysel">Bireysel</button>
     </div>
+    <div class="desktop">
+        @nplMetricToggle("")
+    </div>
 </div>
 
-<!-- NPL Report Table -->
-<div class="table-container" id="nplTableContainer">
-    <div class="table-wrapper">
-        <table class="data-table" id="nplDataTable">
-            <thead id="nplReportHead"></thead>
-            <tbody id="nplReportBody"></tbody>
-        </table>
+<!-- Bakiye / Oran (mobil) -->
+<div class="mobile period-toggle-row">
+    @nplMetricToggle("")
+</div>
+
+<!-- NPL Report Chart / Table -->
+<div class="npl-chart-container">
+    <div class="npl-chart-card" id="nplChartCard">
+        <div class="npl-chart" id="nplChart"></div>
+    </div>
+
+    <div class="table-container" id="nplTableContainer" style="display:none;">
+        <div class="table-wrapper">
+            <table class="data-table" id="nplDataTable">
+                <thead id="nplTableHead"></thead>
+                <tbody id="nplTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="table-legend">
+        <span class="legend-note">Değerler milyon TL olarak gösterilmektedir.</span>
+        <div class="npl-chart-legend" id="nplChartLegend">
+            <span class="npl-legend-item"><i class="npl-legend-dot npl-legend-principal"></i>NPL Anapara</span>
+            <span class="npl-legend-item"><i class="npl-legend-dot npl-legend-interest"></i>NPL Kat Öncesi Faiz</span>
+        </div>
+        <div class="legend-actions">
+            <div class="download-pdf-btn" data-pdf="nplReport" style="cursor:pointer;">
+                <img src="~/images/download.svg" alt="PDF İndir" />
+                <span>PDF İndir</span>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
-    <script src="~/js/npl-report.js" asp-append-version="true"></script>
+    <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+    <script src="~/js/npl-report/filter.js" asp-append-version="true"></script>
+    <script src="~/js/npl-report/index.js" asp-append-version="true"></script>
 }

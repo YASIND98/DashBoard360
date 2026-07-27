@@ -8,6 +8,8 @@
     var _avatarUrl = !string.IsNullOrEmpty(_profilePhoto)
         ? _profilePhoto
         : $"https://ui-avatars.com/api/?name={System.Net.WebUtility.UrlEncode(_initials)}&background=c44&color=fff&size=48&rounded=true";
+    // NPL Girişleri ekranında tarih gösterimi yoktur; mobil üst barda da gizlenir.
+    var _showTopDate = ViewContext.RouteData.Values["controller"]?.ToString() != "NplReport";
 }
 
 <div class="mobile-top-bar" id="mobileTopBar">
@@ -15,7 +17,10 @@
         <img src="~/images/denizbank-logo.svg" alt="Logo" class="mobile-top-logo" id="mobileTopLogo" />
     </button>
     <div class="mobile-top-date" id="mobileTopDate">
-        <span class="mobile-date-text" id="mobileTopDateText"></span>
+        @if (_showTopDate)
+        {
+            <span class="mobile-date-text" id="mobileTopDateText"></span>
+        }
         <!-- <span class="mobile-date-badge" id="mobileTopDateBadge"></span>
         <img src="~/images/down.svg" alt="" class="mobile-top-chevron" /> -->
     </div>

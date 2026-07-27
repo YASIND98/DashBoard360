@@ -1,0 +1,258 @@
+/* =========================================================
+   NPL - "Filtreler" paneli ("Filtreler" butonunun altına açılır)
+   Segment kutuları paylaşılan .segmented-control bileşenidir;
+   burada yalnızca panel yerleşimi tanımlanır.
+   ========================================================= */
+
+.npl-filters-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.npl-filters-panel {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  flex-direction: column;
+  width: 398px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 220px);
+  background: var(--bg-dropdown-panel);
+  border-radius: 24px;
+  box-shadow: var(--shadow-dropdown);
+  overflow: hidden;
+  z-index: 200;
+}
+
+.npl-filters-panel.open {
+  display: flex;
+}
+
+/* --- Başlık --- */
+.npl-filters-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px 12px;
+  border-bottom: 1px solid rgba(221, 221, 221, 0.2)
+}
+
+.npl-filters-title {
+  margin: 0;
+  color: var(--white);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.npl-filters-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  border: none;
+  background: none;
+  color: var(--white);
+  cursor: pointer;
+}
+
+.npl-filters-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* --- Gövde (uzun liste: kaydırılır) --- */
+.npl-filters-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 24px 16px;
+}
+
+.npl-filter-group + .npl-filter-group {
+  margin-top: 16px;
+}
+
+.npl-filter-group-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Panel içinde segmentler genişliği paylaşır (mobil segmented-control gibi).
+   Zemin/metin renkleri sabitlenir; aksi hâlde 1199px altındaki mobil override devreye girer.
+   Dar panelde 4 uzun seçenek (Yapılandırma/Modifikasyon/Yok) sığsın diye gap küçültülür. */
+.npl-filters-panel .segmented-control {
+  width: 100%;
+  gap: 4px;
+  border-radius: 50px;
+  background: var(--bg-period);
+}
+
+/* Tasarımdaki gibi beyaz ve iki yanı boşluklu ayraç; daralmada yok olmasın */
+.npl-filters-panel .segmented-control .divider {
+  display: block;
+  flex: 0 0 1px;
+  height: 24px;
+  background: var(--white);
+}
+
+/* flex:1 tüm segmentleri EŞİT genişliğe zorluyordu; uzun etiket kendi kutusuna sığmayıp
+   taşıyordu. flex:1 1 auto = önce içerik kadar, artan boşluk eşit paylaşılır. */
+.npl-filters-panel .segmented-control .segment {
+  flex: 1 1 auto;
+  text-align: center;
+  padding: 8px 6px;
+  font-size: 13px;
+  border-radius: 50px;
+  color: var(--text-gray);
+}
+
+.npl-filters-panel .segmented-control .segment.active {
+  background: #0033A1;
+  border-radius: 50px;
+  border: 1px solid #5E5ADB;
+  color: white;
+}
+
+/* --- Alt aksiyonlar --- */
+.npl-filters-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px 20px;
+  border-top: 1px solid var(--border-white-alpha);
+}
+
+.npl-filters-footer button {
+  flex: 1;
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.npl-filters-clear {
+  border: 1px solid var(--white);
+  background: var(--white);
+  color: var(--blue-dark);
+}
+
+.npl-filters-apply {
+  border: 1px solid #4E8DF5;
+  background: #4E8DF5;
+  color: var(--white);
+}
+
+/* Karartma yalnız mobil bottom-sheet'te kullanılır; masaüstü/tablette hep gizli */
+.npl-filters-overlay {
+  display: none;
+}
+
+/* Tablette de masaüstü gibi: panel butonun soluna doğru açılır (right:0 taban stilinden).
+   Ayrı bir tablet override yok; aksi hâlde panel sağa taşıyordu. */
+
+/* ===== Yalnız mobil: alttan açılan bottom-sheet ===== */
+@media (max-width: 767px) {
+  .npl-filters-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1090;
+    background: rgba(3, 10, 35, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.28s ease;
+  }
+
+  .npl-filters-overlay.open {
+    display: block;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Panel: butonun altında değil, ekranın altına sabitlenir ve yukarı kayar */
+  .npl-filters-panel {
+    display: flex;
+    position: fixed;
+    inset: auto 0 0 0;            /* left/right/bottom: 0; top: auto */
+    width: 100%;
+    max-width: none;
+    max-height: 70vh;
+    border-radius: 24px 24px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 1100;
+  }
+
+  .npl-filters-panel.open {
+    transform: translateY(0);
+  }
+
+  /* Üstte tutamaç çizgisi (bottom-sheet görünümü) */
+  .npl-filters-header {
+    position: relative;
+    padding: 22px 16px 10px;
+  }
+
+  .npl-filters-header::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 36px;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--border-white-alpha);
+  }
+
+  /* ===== Mobilde her şey daha küçük ===== */
+  .npl-filters-title {
+    font-size: 15px;
+  }
+
+  .npl-filters-close svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .npl-filters-body {
+    padding: 4px 16px 12px;
+  }
+
+  .npl-filter-group + .npl-filter-group {
+    margin-top: 12px;
+  }
+
+  .npl-filter-group-label {
+    margin-bottom: 6px;
+    font-size: 12px;
+  }
+
+  .npl-filters-panel .segmented-control {
+    padding: 3px;
+  }
+
+  .npl-filters-panel .segmented-control .segment {
+    padding: 6px 4px;
+    font-size: 12px;
+  }
+
+  .npl-filters-panel .segmented-control .divider {
+    height: 18px;
+  }
+
+  .npl-filters-footer {
+    gap: 8px;
+    padding: 10px 16px 16px;
+  }
+
+  .npl-filters-footer button {
+    padding: 10px 12px;
+    font-size: 13px;
+  }
+}

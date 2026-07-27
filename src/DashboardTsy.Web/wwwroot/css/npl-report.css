@@ -1,53 +1,211 @@
-#nplDataTable .table-row td {
-    font-size: 14px;
-    padding: 14px 16px;
+/* ===== NPL Girişleri - yığılmış bar grafik ===== */
+
+/* "Filtreler" butonu: dropdown'larla aynı çerçeve, ama içeriği kadar genişlik
+   (.filter-dropdown-wrapper'ın min-width'i olmadan) */
+.npl-filters-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
-
-#nplDataTable .table-row td,
-#nplDataTable .table-row td:first-child,
-#nplDataTable .table-row td:last-child {
-    border-radius: 0 !important;
-}
-
-#nplDataTable .col-group-header::after {
+/* Tablet/mobil: "Filtreler" metnini gizle, yalnız ikon kalsın (arama/kebab ikonlarıyla uyumlu) */
+@media (max-width: 1199px) {
+  .npl-filters-btn .filter-label {
     display: none;
+  }
 }
 
-#nplDataTable .col-group-header {
-    border-left: 1px solid rgba(212, 230, 252, 0.2);
+/* Kenar boşluğu .table-container ile aynı olsun diye kart/footer'a ayrı ayrı verilir
+   (konteynere verilirse tablo görünümünde 16px'ler üst üste binerdi) */
+.npl-chart-container {
+  user-select: none;
 }
 
-#nplDataTable thead tr:nth-child(2) th.col-group-start{
-    border-left: 1px solid rgba(212, 230, 252, 0.2) !important;
+.npl-chart-card {
+  margin: 0 16px;
+  background: var(--bg-table2);
+  border: 1px solid var(--border-white-alpha);
+  border-radius: var(--radius-xl);
+  padding: 16px 24px;
 }
 
-/* Hücreler arası dikey ayraç (tasarımdaki gibi) - başlıkla aynı kenarda (border-left) hizalı */
-#nplDataTable .table-row td:not(.col-left) {
-    border-left: 1px solid rgba(212, 230, 252, 0.2);
+/* Barlar sabit 36px; SVG içeriğe göre gerçek genişlikte. Sığmazsa burada yatay kaydırılır. */
+.npl-chart {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
-#nplDataTable thead th {
-    background: transparent;
-    text-align: left;
+.npl-chart svg {
+  display: block;
+  margin: 0 auto;      /* sığdığında ortalanır; taşınca sola yaslanıp kaydırılır */
+  overflow: visible;
 }
 
-#nplTableContainer.table-container {
-    background: var(--bg-table2);
-    padding: 0;
+/* Boş durum: kart yüksekliğini korusun */
+.npl-chart-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 320px;
 }
 
-#nplTableContainer .data-table tbody tr.stripe-odd {
-    background: rgba(246, 247, 249, 0.2);
+/* ===== Eksenler ===== */
+.npl-chart-axis {
+  fill: var(--text-muted);
+  font-size: 11px;
 }
 
-#nplTableContainer .data-table tbody tr:first-child td:first-child,
-#nplTableContainer .data-table tbody tr:first-child td:last-child {
+.npl-chart-grid {
+  stroke: #8795A9;
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+/* ===== Barlar ===== */
+.npl-bar-principal {
+  fill: #2C5DA8;
+}
+
+.npl-bar-interest {
+  fill: #3B76F0;
+}
+
+.npl-bar-hover {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.npl-chart-total,
+.npl-chart-value {
+  fill: var(--white);
+  font-size: 10px;
+  pointer-events: none;
+}
+
+.npl-chart-total {
+  font-weight: 600;
+}
+
+/* ===== Tooltip: bar'ın toplam değeri (tam / küsüratlı) ===== */
+.npl-chart-tooltip {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  padding: 12px 20px;
+  background: var(--white);
+  border-radius: 8px;
+  box-shadow: var(--shadow-dropdown);
+  pointer-events: none;
+  white-space: nowrap;
+  color: #052560;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+/* Ok bar'ın dikey ortasını gösterir (--npl-tt-arrow JS'te hesaplanır) */
+.npl-chart-tooltip::before {
+  content: '';
+  position: absolute;
+  top: var(--npl-tt-arrow, 50%);
+  left: -7px;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent var(--white) transparent transparent;
+}
+
+/* Bar'ın soluna geçtiyse ok sağa bakar */
+.npl-chart-tooltip.npl-tt-left::before {
+  left: auto;
+  right: -7px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent var(--white);
+}
+
+/* ===== Grafik açıklaması =====
+   Footer paylaşılan .table-legend'i kullanır: not solda, PDF sağda (.legend-actions),
+   ve .legend-actions ≤1199px'te otomatik gizlenir (PDF 3-nokta menüsüne geçer).
+   Burada yalnız renkli legend noktaları + legend'i tam ortalayan yan-eşitleme var. */
+.table-legend .legend-note,
+.table-legend .legend-actions {
+  flex: 1 1 0;                 /* iki yan eşit genişlik → orta legend tam ortada */
+}
+
+.table-legend .legend-actions {
+  justify-content: flex-end;   /* PDF sağa yaslı */
+}
+
+.npl-chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.npl-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-blue-light);
+  font-size: 13px;
+}
+
+.npl-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.npl-legend-principal {
+  background: #2C5DA8;
+}
+
+.npl-legend-interest {
+  background: #3B76F0;
+}
+
+/* ===== Açık tema ===== */
+[data-theme="light"] .npl-chart-card {
+  background: var(--white);
+  border-color: var(--border-input);
+}
+
+[data-theme="light"] .npl-chart-axis {
+  fill: var(--text-gray);
+}
+
+/* Bar üstündeki toplam etiketi kart zemini üzerinde kalır */
+[data-theme="light"] .npl-chart-total {
+  fill: #262A33;
+}
+
+/* Beyaz kart üzerinde beyaz balon kaybolmasın diye tooltip ters çevrilir */
+[data-theme="light"] .npl-chart-tooltip {
+  background: #052560;
+  color: var(--white);
+}
+
+[data-theme="light"] .npl-chart-tooltip::before {
+  border-color: transparent #052560 transparent transparent;
+}
+
+[data-theme="light"] .npl-chart-tooltip.npl-tt-left::before {
+  border-color: transparent transparent transparent #052560;
+}
+
+[data-theme="light"] .npl-legend-item {
+  color: var(--navy);
+}
+
+/* ===== Tablet + Mobil ===== */
+@media (max-width: 1199px) {
+  .npl-chart-card {
+    padding: 12px;
     border-radius: 0;
+    overflow-x: auto;
+    margin: 0;
+  }
 }
-#nplTableContainer .data-table tbody tr.last-visible-row td:first-child {
-    border-radius: 0 0 0 40px;
-}
-#nplTableContainer .data-table tbody tr.last-visible-row td:last-child {
-    border-radius: 0 0 40px 0;
-}
+
