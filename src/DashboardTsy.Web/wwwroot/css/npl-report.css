@@ -209,3 +209,16 @@
   }
 }
 
+@media (max-width: 768px) {
+  .filters-left {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .filters-left .filter-dropdown-wrapper {
+    flex: 1 1 calc(33.333% - 8px);
+    min-width: 0;
+    max-width: none;
+  }
+}
+

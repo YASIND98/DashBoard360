@@ -1,20 +1,14 @@
-// ===== NPL Girişleri - filtre alanı =====
-// Bölge / Şube / Dönem / Tahsis Kolu / Ürün dropdown'ları, "Filtreler" paneli ve breadcrumb.
-// Seçili değerler NplReport.getFilters() ile okunur; her değişimde NplReport.reload() (index.js) çağrılır.
+// NPL Girişleri - filtre alanı (Bölge/Şube/Dönem/Ürün dropdown'ları, Filtreler paneli, breadcrumb)
 (function () {
     var NPL = window.NplReport = window.NplReport || {};
 
-    // ===== Statik filtreler (Dönem / Ürün) =====
-    // Servis bağlanınca seçenekler buradan değil ilgili endpoint'ten gelecek; seçim akışı aynı kalır.
     var STATIC_FILTERS = {
         period:  { placeholder: 'Dönem', label: '#nplPeriodLabel',  list: '#nplPeriodList',  panel: '#nplPeriodPanel',  items: ['2026', '2025', '2024'] },
         product: { placeholder: 'Ürün',  label: '#nplProductLabel', list: '#nplProductList', panel: '#nplProductPanel', items: ['İhtiyaç', 'KMH', 'KK', 'ÜK', 'Konut', 'Taşıt', 'Ticari', 'Diğer'] }
     };
     var _filters = { period: '', product: '' };   // boş = Tümü
 
-    // ===== "Filtreler" paneli =====
-    // Eski ekranlardaki 0/1 kolonlarının karşılığı; her grup tek seçim, boş değer = Tümü.
-    // Tahsis Kolu yalnız bu modalda (üstteki dropdown kaldırıldı).
+    // Filtreler paneli grupları (her grup tek seçim, boş = Tümü)
     var FILTER_GROUPS = [
         { key: 'allocation',           label: 'Tahsis Kolu',          options: ['Bireysel', 'İşletme', 'Tarım', 'Tanımsız'] },
         { key: 'authorityCode',        label: 'Yetki Kodu',           options: ['BY', 'Diğer', 'GM', 'SY'] },
@@ -38,12 +32,16 @@
     var _groupFilters = emptyGroupState();   // uygulanmış seçim
     var _groupDraft = emptyGroupState();     // panel açıkken üzerinde oynanan kopya
 
+    var _selectedRegion = null;   // { code, name }
+    var _selectedBranch = null;   // { code, name }
+
     // Seçili tüm filtreler; index.js servis isteğini bununla kurar.
     NPL.getFilters = function () {
-        // allocation (Tahsis Kolu) artık modal grubudur; _groupFilters içinden gelir.
         return $.extend({
-            region: $('#nplRegionLabel').text(),
-            branch: $('#nplBranchLabel').text(),
+            region: _selectedRegion ? _selectedRegion.name : '',
+            regionCode: _selectedRegion ? _selectedRegion.code : null,
+            branch: _selectedBranch ? _selectedBranch.name : '',
+            branchCode: _selectedBranch ? _selectedBranch.code : null,
             period: _filters.period,
             product: _filters.product
         }, _groupFilters);
@@ -56,48 +54,127 @@
     $(function () {
         if (!document.getElementById('nplChart')) return;
 
-        // ===== Breadcrumb (Tüm Bölgeler / Bölge / Şube) =====
-        function updateBreadcrumb() {
-            var region = $('#nplRegionLabel').text();
-            var branch = $('#nplBranchLabel').text();
-            var items = ['<span class="breadcrumb-item' + ((region === 'Bölge' || !region) ? ' active' : '') + '">Tüm Bölgeler</span>'];
-            if (region && region !== 'Bölge') {
-                items.push('<span class="breadcrumb-separator">/</span>');
-                items.push('<span class="breadcrumb-item' + ((branch === 'Şube' || !branch) ? ' active' : '') + '">' + region + '</span>');
-            }
-            if (branch && branch !== 'Şube') {
-                items.push('<span class="breadcrumb-separator">/</span>');
-                items.push('<span class="breadcrumb-item active">' + branch + '</span>');
-            }
-            $('#nplBreadcrumb').html(items.join(''));
+        // ===== Bölge / Şube listeleri (paylaşılan veri) =====
+        function renderRegionDropdown() {
+            return renderRegionList('#nplRegionList', _selectedRegion ? _selectedRegion.code : null);
         }
 
-        // ===== Bölge / Şube filtreleri (paylaşılan veri) =====
-        if (typeof loadRegionFilters === 'function') {
-            loadRegionFilters(function () { renderRegionList('#nplRegionList', null); updateBreadcrumb(); });
+        function renderBranchDropdown() {
+            return renderBranchList('#nplBranchList', _selectedBranch ? _selectedBranch.code : null, _selectedRegion ? _selectedRegion.code : null);
         }
-        if (typeof loadBranchFilters === 'function') {
-            loadBranchFilters(function () { renderBranchList('#nplBranchList', null, null); });
+
+        // ===== Breadcrumb (Verim Raporları ile aynı) =====
+        function crumb(text, action, disabled) {
+            var cls = disabled ? ' disabled' : '';
+            var attr = (!disabled && action) ? ' data-npl-breadcrumb="' + action + '"' : '';
+            return '<span class="breadcrumb-item' + cls + '"' + attr + '>' + text + '</span>';
         }
-        $(document).on('click', '#nplRegionList .dropdown-item', function () {
-            var code = $(this).data('code') || '';
-            $('#nplRegionLabel').text($(this).text());
-            $('#nplRegionPanel').removeClass('open');
-            // Bölge değişince şube listesini filtrele ve şube seçimini sıfırla
+
+        function updateBreadcrumb() {
+            if (!_selectedRegion && !_selectedBranch) {
+                $('#nplBreadcrumbBar').hide();
+                return;
+            }
+            $('#nplBreadcrumbBar').show();
+
+            // Tek bölge dönen kullanıcıda (şube/bölge müdürü) üst kademeye dönüş anlamsızdır
+            var singleRegion = (typeof _regionFilters !== 'undefined') && _regionFilters.length === 1;
+            var parts = [crumb('Tüm Bölgeler', 'allRegions', singleRegion)];
+
+            if (_selectedRegion) {
+                parts.push(crumb(_selectedRegion.name, 'region', singleRegion || !_selectedBranch));
+            }
+            if (_selectedBranch) {
+                parts.push(crumb(_selectedBranch.name, null, true));
+            }
+            $('#nplBreadcrumb').html(parts.join('<span class="breadcrumb-separator">/</span>'));
+        }
+
+        $(document).on('click', '[data-npl-breadcrumb="allRegions"]', function () {
+            _selectedRegion = null;
+            _selectedBranch = null;
+            $('#nplRegionLabel').text('Bölge');
             $('#nplBranchLabel').text('Şube');
-            if (typeof renderBranchList === 'function') renderBranchList('#nplBranchList', null, code || null);
+            renderRegionDropdown();
+            renderBranchDropdown();
             updateBreadcrumb();
             reload();
         });
+        $(document).on('click', '[data-npl-breadcrumb="region"]', function () {
+            _selectedBranch = null;
+            $('#nplBranchLabel').text('Şube');
+            renderBranchDropdown();
+            updateBreadcrumb();
+            reload();
+        });
+
+        // ===== İlk yükleme: tek bölge/şube dönerse otomatik seçili kabul edilir =====
+        if (typeof loadRegionFilters === 'function') {
+            loadRegionFilters(function () {
+                var single = renderRegionDropdown();
+                if (single) _selectedRegion = { code: single.Code, name: single.Name };
+
+                if (typeof loadBranchFilters !== 'function') { updateBreadcrumb(); return; }
+                loadBranchFilters(function () {
+                    var singleBranch = renderBranchDropdown();
+                    if (singleBranch) _selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+                    updateBreadcrumb();
+                    if (_selectedRegion || _selectedBranch) reload();
+                });
+            });
+        }
+
+        // ===== Bölge seçimi =====
+        $(document).on('click', '#nplRegionList .dropdown-item', function () {
+            var code = $(this).attr('data-code') || '';
+            var name = $(this).text();
+
+            _selectedRegion = code ? { code: code, name: name } : null;
+            $('#nplRegionLabel').text(code ? name : 'Bölge');
+
+            // Bölge değişince şube seçimi sıfırlanır, liste yeni bölgeye göre filtrelenir
+            _selectedBranch = null;
+            $('#nplBranchLabel').text('Şube');
+
+            renderRegionDropdown();
+            renderBranchDropdown();
+            $('#nplRegionPanel').removeClass('open');
+            $('#nplRegionSearch').val('');
+
+            updateBreadcrumb();
+            reload();
+        });
+
+        // ===== Şube seçimi =====
         $(document).on('click', '#nplBranchList .dropdown-item', function () {
-            $('#nplBranchLabel').text($(this).text());
+            var code = $(this).attr('data-code') || '';
+            var name = $(this).text();
+
+            if (!code) {
+                _selectedBranch = null;
+                $('#nplBranchLabel').text('Şube');
+            } else {
+                _selectedBranch = { code: code, name: name };
+                $('#nplBranchLabel').text(name);
+
+                // Şube doğrudan seçilse de ait olduğu bölge otomatik seçilir
+                var region = (typeof findRegion === 'function') ? findRegion($(this).attr('data-region')) : null;
+                if (region) {
+                    _selectedRegion = { code: region.Code, name: region.Name };
+                    $('#nplRegionLabel').text(region.Name);
+                }
+            }
+
+            renderRegionDropdown();
+            renderBranchDropdown();
             $('#nplBranchPanel').removeClass('open');
+            $('#nplBranchSearch').val('');
+
             updateBreadcrumb();
             reload();
         });
 
         // ===== Dönem / Ürün =====
-        // Bölge/şube listeleriyle aynı düzen: başta "Tümü", seçili olan .selected
         function renderStaticFilter(key) {
             var f = STATIC_FILTERS[key];
             var selected = _filters[key];
@@ -118,7 +195,6 @@
         });
 
         // ===== "Filtreler" paneli =====
-        // Segment kutuları paylaşılan .segmented-control bileşeniyle çizilir
         function renderFilterGroups() {
             var html = '';
             FILTER_GROUPS.forEach(function (g) {
@@ -142,8 +218,7 @@
         function openFiltersPanel() {
             _groupDraft = $.extend({}, _groupFilters);   // iptal edilirse uygulanmış hâle dönülür
             renderFilterGroups();
-            $('.dropdown-panel').removeClass('open');    // açık bir filtre dropdown'ı varsa kapansın
-            // Panel + karartma birlikte açılır (mobil/tablet'te bottom-sheet + overlay)
+            $('.dropdown-panel').removeClass('open');
             $('#nplFiltersPanel, #nplFiltersOverlay').addClass('open');
         }
 
@@ -156,7 +231,6 @@
             if ($('#nplFiltersPanel').hasClass('open')) closeFiltersPanel(); else openFiltersPanel();
         });
         $('#nplFiltersClose').on('click', closeFiltersPanel);
-        // Karartmaya tıklanınca kapat (bottom-sheet dışına dokunma)
         $('#nplFiltersOverlay').on('click', closeFiltersPanel);
 
         // Panelin içine tıklayınca kapanmasın; dışına tıklayınca / Esc ile kapansın
@@ -173,8 +247,11 @@
         });
 
         $('#nplFiltersClear').on('click', function () {
+            var hadApplied = FILTER_GROUPS.some(function (g) { return _groupFilters[g.key]; });
             _groupDraft = emptyGroupState();
+            _groupFilters = emptyGroupState();
             renderFilterGroups();
+            if (hadApplied) reload();
         });
 
         $('#nplFiltersApply').on('click', function () {

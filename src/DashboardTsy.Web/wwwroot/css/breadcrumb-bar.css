@@ -19,11 +19,6 @@
   cursor: pointer;
 }
 
-.breadcrumb-item.active {
-  color: var(--white);
-  cursor: pointer;
-}
-
 .breadcrumb-item.disabled {
   cursor: default;
   pointer-events: none;
