@@ -38,6 +38,9 @@ builder.Services.AddScoped<DashboardTsy.Application.AppSettings.IAppSettingsServ
 // SalaryCustomerReport
 builder.Services.AddScoped<DashboardTsy.Application.SalaryCustomerReport.ISalaryCustomerReportProvider, DashboardTsy.Infrastructure.SalaryCustomerReport.SalaryCustomerReportProvider>();
 
+// NplReport
+builder.Services.AddScoped<DashboardTsy.Application.NplReport.INplReportProvider, DashboardTsy.Infrastructure.NplReport.NplReportProvider>();
+
 // ScoreCard proxy: ServiceBus OAuth token (singleton cache) + Pupa API HttpClient
 builder.Services.Configure<PupaApiOptions>(builder.Configuration.GetSection(PupaApiOptions.SectionName));
 builder.Services.Configure<ServiceBusOptions>(builder.Configuration.GetSection(ServiceBusOptions.SectionName));
