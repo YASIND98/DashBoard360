@@ -842,11 +842,6 @@
 }
 
 @media (max-width: 767px) {
-  .page-scorecard .filters-left {
-    flex-wrap: wrap;
-    row-gap: 8px;
-  }
-
   .page-scorecard .filter-dropdown-wrapper {
     flex: 1 1 calc(50% - 4px);
     max-width: calc(50% - 4px);

@@ -493,6 +493,20 @@ function handleTableSearch(inputSelector) {
 
 $(document).ready(function () {
 
+  $('.filter-dropdown-wrapper').each(function () {
+      var $panel = $(this).children('.dropdown-panel');
+      if (!$panel.length || $panel.children('.dropdown-sheet-header').length) return;
+      var title = $(this).find('.filter-label').first().text().trim();
+      $panel.prepend(
+          '<div class="dropdown-sheet-header">' +
+              '<span class="dropdown-sheet-title">' + title + '</span>' +
+              '<button type="button" class="dropdown-sheet-close" aria-label="Kapat">' +
+                  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>' +
+              '</button>' +
+          '</div>'
+      );
+  });
+
   // Dropdown open/close
   $(document).on('click', '.filter-dropdown', function (e) {
       e.stopPropagation();
@@ -504,6 +518,11 @@ $(document).ready(function () {
           $panel.addClass('open');
           $panel.find('.dropdown-search-input').val('').focus();
       }
+  });
+
+  $(document).on('click', '.dropdown-sheet-close', function (e) {
+      e.stopPropagation();
+      $(this).closest('.dropdown-panel').removeClass('open');
   });
 
   // Close panels on outside click
