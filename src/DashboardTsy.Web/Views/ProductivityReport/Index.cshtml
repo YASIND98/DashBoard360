@@ -315,7 +315,7 @@
 
         $(document).on('click', '.sc-zoom-btn', function () {
             var src  = $(this).siblings('.sc-branch-photo').attr('src');
-            var name = $(this).closest('.sc-branch-photo-block').find('.sc-manager-name').text();
+            var name = $(this).closest('.sc-branch-photo-block').find('.sc-manager-role').text();
             $('.sc-lightbox-img').attr('src', src);
             $('.sc-lightbox-title').text(name);
             $('.sc-lightbox-overlay').fadeIn(180);
