@@ -39,4 +39,36 @@ public class NplReportApiController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPost("GetNplFilters")]
+    public async Task<ActionResult<IReadOnlyList<GetNplFiltersItem>>> GetNplFilters(
+        [FromBody] GetNplFiltersRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient
+            .GetNplFiltersAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Ok(result);
+    }
+
+    [HttpPost("GetNplProducts")]
+    public async Task<ActionResult<IReadOnlyList<GetNplProductsItem>>> GetNplProducts(
+        [FromBody] GetNplProductsRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient
+            .GetNplProductsAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Ok(result);
+    }
 }

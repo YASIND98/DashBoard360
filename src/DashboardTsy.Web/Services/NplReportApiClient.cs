@@ -34,4 +34,36 @@ public class NplReportApiClient : INplReportApiClient
         var list = JsonSerializer.Deserialize<List<GetNplBalanceRatioItem>>(json, _jsonOptions);
         return list ?? (IReadOnlyList<GetNplBalanceRatioItem>)Array.Empty<GetNplBalanceRatioItem>();
     }
+
+    public async Task<IReadOnlyList<GetNplFiltersItem>> GetNplFiltersAsync(
+        GetNplFiltersRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient
+            .PostAsJsonAsync(BasePath + "GetNplFilters", request, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!response.IsSuccessStatusCode)
+            return Array.Empty<GetNplFiltersItem>();
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var list = JsonSerializer.Deserialize<List<GetNplFiltersItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<GetNplFiltersItem>)Array.Empty<GetNplFiltersItem>();
+    }
+
+    public async Task<IReadOnlyList<GetNplProductsItem>> GetNplProductsAsync(
+        GetNplProductsRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient
+            .PostAsJsonAsync(BasePath + "GetNplProducts", request, cancellationToken)
+            .ConfigureAwait(false);
+
+        if (!response.IsSuccessStatusCode)
+            return Array.Empty<GetNplProductsItem>();
+
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var list = JsonSerializer.Deserialize<List<GetNplProductsItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<GetNplProductsItem>)Array.Empty<GetNplProductsItem>();
+    }
 }

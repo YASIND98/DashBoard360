@@ -30,4 +30,34 @@ public class NplReportController : ControllerBase
         var result = _reportProvider.GetNplBalanceRatio(request);
         return Ok(result);
     }
+
+    /// <summary>
+    /// POST /NplReport/GetNplFilters
+    /// NPL rapor ekranının filter dropdown/multiselect seçeneklerini döner (Ürün, Yetki, İş Kolu, Tahsis Kolu vs.).
+    /// </summary>
+    [HttpPost("GetNplFilters")]
+    public ActionResult<IReadOnlyList<GetNplFiltersItem>> GetNplFilters(
+        [FromBody] GetNplFiltersRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportProvider.GetNplFilters(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /NplReport/GetNplProducts
+    /// NPL raporlarında kullanılan ürün lookup listesini döner (Ihtiyaç, KMH, KK, ÜK, Traktör, Diğer).
+    /// </summary>
+    [HttpPost("GetNplProducts")]
+    public ActionResult<IReadOnlyList<GetNplProductsItem>> GetNplProducts(
+        [FromBody] GetNplProductsRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportProvider.GetNplProducts(request);
+        return Ok(result);
+    }
 }
