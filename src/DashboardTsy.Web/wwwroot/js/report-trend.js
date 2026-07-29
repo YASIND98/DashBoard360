@@ -81,9 +81,7 @@ $(function () {
         }
 
         var W = 760, H = 320;
-        var ml = 70, mr = 20, mt = 20, mb = 40;
-        var plotW = W - ml - mr;
-        var plotH = H - mt - mb;
+        var mr = 20, mt = 20, mb = 40;
 
         // Y ekseni dinamik: veri aralığına göre ölçeklenir (skorkart'taki sabit %0-20 ölçeğinin aksine).
         var maxVal = Math.max.apply(null, data.values);
@@ -96,8 +94,16 @@ $(function () {
         var TICK_COUNT = 5;
         var yTicks = [];
         for (var t = 0; t <= TICK_COUNT; t++) {
-            yTicks.push(bottom + (top - bottom) * t / TICK_COUNT);
+            var tickVal = bottom + (top - bottom) * t / TICK_COUNT;
+            yTicks.push({ val: tickVal, label: axisLabel(tickVal, data.isVolume, data.productName) });
         }
+
+        // Sol marj en uzun eksen etiketine göre hesaplanır; büyük tutarlarda
+        // sabit marjda kırpılmaması için font sabit kalıp marj genişler.
+        var maxLabelLen = yTicks.reduce(function (m, tk) { return Math.max(m, tk.label.length); }, 0);
+        var ml = Math.max(46, 22 + maxLabelLen * 6);
+        var plotW = W - ml - mr;
+        var plotH = H - mt - mb;
 
         var n = data.values.length;
         var step = n > 1 ? plotW / (n - 1) : 0;
@@ -121,10 +127,10 @@ $(function () {
             ' L' + areaLeft + ',' + (mt + plotH) + ' Z';
 
         var yLabels = '', yGrid = '';
-        yTicks.forEach(function (val) {
-            var y = yAt(val);
+        yTicks.forEach(function (tk) {
+            var y = yAt(tk.val);
             yGrid += '<line x1="' + ml + '" y1="' + y + '" x2="' + (W - mr) + '" y2="' + y + '" class="rd-trend-grid" />';
-            yLabels += '<text x="' + (ml - 12) + '" y="' + (y + 4) + '" text-anchor="end" class="rd-trend-axis">' + axisLabel(val, data.isVolume, data.productName) + '</text>';
+            yLabels += '<text x="' + (ml - 12) + '" y="' + (y + 4) + '" text-anchor="end" class="rd-trend-axis">' + tk.label + '</text>';
         });
 
         var xLabels = '', xGrid = '', xDots = '', hovers = '';
