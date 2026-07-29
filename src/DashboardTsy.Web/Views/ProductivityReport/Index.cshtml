@@ -313,6 +313,20 @@
             updateUI();
         });
 
+        $(document).on('click', '.sc-zoom-btn', function () {
+            var src  = $(this).siblings('.sc-branch-photo').attr('src');
+            var name = $(this).closest('.sc-branch-photo-block').find('.sc-manager-name').text();
+            $('.sc-lightbox-img').attr('src', src);
+            $('.sc-lightbox-title').text(name);
+            $('.sc-lightbox-overlay').fadeIn(180);
+        });
+
+        $(document).on('click', '.sc-lightbox-close, .sc-lightbox-overlay', function (e) {
+            if ($(e.target).is('.sc-lightbox-overlay') || $(e.target).is('.sc-lightbox-close')) {
+                $('.sc-lightbox-overlay').fadeOut(180);
+            }
+        });
+
         // ===== UI Update =====
         function updateUI() {
             updateBreadcrumb();
@@ -417,6 +431,7 @@
                     data: JSON.stringify(payload),
                     success: function (d) {
                         renderScorecardHtml(headers, d, isBranch);
+                        updateManagerCard(d, isBranch);
                     }
                 });
             });
@@ -482,6 +497,34 @@
             updateYieldTable();
         };
 
+        // ─── Manager Row / append & hide  ─────────────────────────────────────────────────────────
+        function updateManagerCard(d, isBranch) {
+            var $card  = $('.sc-manager-card');
+            var $photo = $card.find('.sc-branch-photo-block');
+            var $info  = $card.find('.sc-manager-info');
+
+            $card.show();
+            if (isBranch && d.BranchPhoto) {
+                $photo.find('.sc-branch-photo').attr('src', d.BranchPhoto);
+                $photo.find('.sc-manager-avatar').attr('src', d.BranchManagerPhoto || '');
+                $photo.find('.sc-manager-name').text(d.ManagerName || '-');
+                $photo.find('.sc-manager-role').text((selectedBranch ? selectedBranch.name + ' ' : '') + 'Şube Müdürü');
+                $photo.show().addClass('with-bg');
+                $card.removeClass('area');
+                $info.hide();
+            } else {
+                $info.find('.sc-manager-avatar').attr('src', (isBranch ? d.RegionManagerPhoto : d.RegionManagerPhoto) || '');
+                $info.find('.sc-manager-name').text((isBranch ? d.ManagerName : d.managerName) || '-');
+                $info.find('.sc-manager-role').text(
+                    isBranch
+                        ? (selectedBranch ? selectedBranch.name + ' ' : '') + 'Şube Müdürü'
+                        : (selectedRegion ? selectedRegion.name + ' ' : '') + 'Bölge Müdürü'
+                );
+                $photo.hide().removeClass('with-bg');
+                $card.addClass('area');
+                $info.show();
+            }
+        }
         // ===== Table Update =====
         function updateYieldTable() {
             $('#yieldSearchInput').val('');

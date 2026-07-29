@@ -377,6 +377,210 @@ body:has(.scorecard-panel.open)::before {
   height: 20px;
   color: #fff;
 }
+/* ────────────────────────────────────────────────
+  Score Card Manager Card
+──────────────────────────────────────────────── */
+.sc-manager-card {
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #536076;
+  border-radius: 12px;
+}
+
+/* ────────────────────────────────────────────────
+  Score Card Branch Photo
+──────────────────────────────────────────────── */
+.sc-branch-photo-block {
+  position: relative;
+  height: auto;
+}
+
+.sc-branch-photo-block.with-bg {
+  height: 113px;
+}
+
+.sc-branch-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ────────────────────────────────────────────────
+  Score Card Manager Info
+──────────────────────────────────────────────── */
+.sc-manager-info,
+.sc-manager-info-overlay {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sc-manager-info {
+  padding: 12px 14px;
+}
+
+.sc-manager-info-overlay {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  gap: 10px;
+  padding: 8px 12px;
+  background: var(--text-gray);
+  border-radius: 20px;
+}
+
+.area .sc-manager-info-overlay {
+  position: relative;
+}
+
+.sc-manager-avatar {
+  position: relative;
+  top: 0;
+  flex-shrink: 0;
+  width: 46px;
+  height: 46px;
+  object-fit: cover;
+  background: #1a3a6b;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+}
+
+.sc-branch-photo-block.with-bg .sc-manager-avatar {
+  top: -11px;
+}
+
+.sc-manager-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sc-manager-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.sc-manager-role {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* ────────────────────────────────────────────────
+  Score Card Zoom Button
+──────────────────────────────────────────────── */
+.sc-zoom-btn {
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  color: #fff;
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.55);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transform: translateX(-50%);
+  transition: background 0.2s;
+}
+
+.sc-zoom-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* ────────────────────────────────────────────────
+  Score Card Light Theme
+──────────────────────────────────────────────── */
+[data-theme="light"] .sc-manager-card {
+  background: #fff;
+  border-color: #c5d3e8;
+}
+
+[data-theme="light"] .sc-manager-name {
+  color: #0d1b3e;
+}
+
+[data-theme="light"] .sc-manager-role {
+  color: #262a33;
+}
+
+@media (max-width: 768px) {
+  [data-theme="light"] .sc-manager-card {
+    background: #fff;
+    border-color: #536076;
+  }
+  .sc-branch-photo{
+    border-radius: 20px;
+  }
+}
+/* ────────────────────────────────────────────────
+  Score Card Lightbox
+──────────────────────────────────────────────── */
+.sc-lightbox-overlay {
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.sc-lightbox-overlay.active {
+  display: flex;
+}
+
+.sc-lightbox-box {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  max-width: 680px;
+  overflow: hidden;
+  background: #0e1f45;
+  border-radius: 12px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.6);
+  transform: translate(-50%, -50%);
+}
+
+.sc-lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.07);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sc-lightbox-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  color: #fff;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.sc-lightbox-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.sc-lightbox-img {
+  display: block;
+  width: 100%;
+  max-height: 500px;
+  object-fit: contain;
+}
 
 @media (min-width: 1200px) {
   #mobileScorecardWrapper {
@@ -738,6 +942,9 @@ body:has(.scorecard-panel.open)::before {
   }
   .scorecard-nps-wrapper.mobile .scorecard-btn {
     padding: 8px;
+  }
+  .sc-manager-card {
+    margin: 0px 16px;
   }
 }
 
