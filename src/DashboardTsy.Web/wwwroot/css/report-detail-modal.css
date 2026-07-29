@@ -148,6 +148,21 @@
 
 .report-detail-tab-content.report-detail-hidden { display: none; }
 
+.report-detail-modal .table-container {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.report-detail-modal .table-wrapper {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+}
+
 
 .report-detail-header {
   display: grid;
@@ -250,7 +265,11 @@
 #reportDetailBdBody .bd-name { display: flex; align-items: center; padding-left: 10px; white-space: nowrap; }
 
 @media (max-width: 1199px) {
-  /* Kırılım/Top-10 sekme başlıkları responsive'de küçülür (masaüstü: 18px / gap 44px). */
+  /* İlk 10 / Son 10 kolonları tablet ve altında alt alta dizilsin. */
+  .top10-body {
+    flex-direction: column;
+  }
+
   .report-detail-tabs {
     gap: 20px;
   }

@@ -625,6 +625,7 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper .scorecard-table td {
     border-bottom-color: #262A33;
+    color: #262A33;
   }
 
   [data-theme="light"] .scorecard-nps-wrapper .scorecard-table td:first-child {
@@ -638,10 +639,6 @@ body:has(.scorecard-panel.open)::before {
   [data-theme="light"] .scorecard-nps-wrapper .scorecard-section-title {
     color: #262A33;
     border-bottom: 1px solid #262A33;
-  }
-
-  [data-theme="light"] .scorecard-nps-wrapper .scorecard-table td {
-    color: #262A33;
   }
 }
 
@@ -849,6 +846,7 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-table td {
     border-bottom-color: #262A33;
+    color: #262A33;
   }
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-table td:first-child {
@@ -863,28 +861,9 @@ body:has(.scorecard-panel.open)::before {
     color: #262A33;
     border-bottom: 1px solid #262A33;
   }
-
-  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-table td {
-    color: #262A33;
-  }
-  
 }
 
 @media (max-width: 950px) {
-  .sidebar {
-    padding: 16px 10px;
-  }
-
-  .sidebar-logo img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .sidebar-nav img {
-    width: 20px;
-    height: 20px;
-  }
-
   .page-title {
     font-size: 20px;
   }
@@ -895,27 +874,6 @@ body:has(.scorecard-panel.open)::before {
 
   .period-btn {
     font-size: 13px;
-    gap: 6px;
-  }
-
-  .legend-actions {
-    gap: 16px;
-  }
-
-  .download-pdf-btn {
-    font-size: 12px;
-  }
-  
-  .diff-toggle {
-    font-size: 12px;
-  }
-
-  .diff-toggle .switch-icon {
-    width: 26px;
-  }
-
-  .top10-body {
-    flex-direction: column;
   }
 
   .scorecard-btn span {
@@ -928,11 +886,6 @@ body:has(.scorecard-panel.open)::before {
 
   .scorecard-section-title {
     font-size: 14px;
-  }
-
-  .download-pdf-btn img {
-    width: 22px;
-    height: 22px;
   }
 }
 
