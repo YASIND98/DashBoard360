@@ -264,6 +264,115 @@
 
 #reportDetailBdBody .bd-name { display: flex; align-items: center; padding-left: 10px; white-space: nowrap; }
 
+/* Trend Analizi sekmesi (Hedef Raporları > Hacim > H/G ve Adet ürün detayı). */
+#reportDetailTrendChart {
+  position: relative;
+}
+
+.report-detail-trend-empty {
+  padding: 60px 0;
+  text-align: center;
+  color: #97a3b5;
+  font-size: 14px;
+}
+
+.rd-trend-axis {
+  fill: #FFFFFF;
+  font-size: 10px;
+}
+
+.rd-trend-dot {
+  fill: #B1BAC8;
+}
+
+.rd-trend-grid {
+  stroke: #8795A9;
+  stroke-width: 1;
+  stroke-dasharray: 2 4;
+}
+
+.rd-trend-plot-bg {
+  fill: rgba(255, 255, 255, 0.04);
+}
+
+.rd-trend-area {
+  fill: #17345D;
+}
+
+.rd-trend-line {
+  fill: none;
+  stroke: #0573CC;
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.rd-trend-marker {
+  fill: #14BEDD;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.rd-trend-vline {
+  stroke: #14BEDD;
+  stroke-width: 1;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.rd-trend-hover {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.rd-trend-point:hover .rd-trend-vline,
+.rd-trend-point:hover .rd-trend-marker {
+  opacity: 1;
+}
+
+.rd-trend-tooltip {
+  display: none;
+  position: absolute;
+  z-index: 10;
+  min-width: 140px;
+  padding: 12px 16px;
+  background: #14BEDD;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  font-size: 13px;
+}
+
+.rd-trend-tooltip::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 8px 8px 8px 0;
+  border-color: transparent #14BEDD transparent transparent;
+}
+
+.rd-trend-tooltip.rd-tt-left::before {
+  left: auto;
+  right: -7px;
+  border-width: 8px 0 8px 8px;
+  border-color: transparent transparent transparent #14BEDD;
+}
+
+.rd-tt-title {
+  color: #FFFFFF;
+  font-weight: 700;
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.rd-tt-row {
+  margin-top: 4px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.92);
+}
+
 @media (max-width: 1199px) {
   /* İlk 10 / Son 10 kolonları tablet ve altında alt alta dizilsin. */
   .top10-body {
@@ -339,4 +448,33 @@
 
 [data-theme="light"] .report-detail-modal .top10-id {
   color: rgba(18, 55, 92, 0.45);
+}
+
+/* Trend Analizi grafiği: modal light modda beyaz zemine geçtiği için renkler ayrıca override edilir. */
+[data-theme="light"] .rd-trend-axis {
+  fill: #12375C;
+}
+
+[data-theme="light"] .rd-trend-grid {
+  stroke: #C7D1DE;
+}
+
+[data-theme="light"] .rd-trend-plot-bg {
+  fill: rgba(18, 55, 92, 0.03);
+}
+
+[data-theme="light"] .rd-trend-area {
+  fill: #DCEBFF;
+}
+
+[data-theme="light"] .rd-trend-line {
+  stroke: #0F62B4;
+}
+
+[data-theme="light"] .rd-trend-dot {
+  fill: #9FB0C6;
+}
+
+[data-theme="light"] .report-detail-trend-empty {
+  color: #6b7688;
 }

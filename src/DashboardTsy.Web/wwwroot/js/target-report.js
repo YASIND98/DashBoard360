@@ -152,6 +152,17 @@ $(document).ready(function () {
       };
   }
 
+  // Trend Analizi (report-trend.js) sayfadaki aktif bölge/şube/tab filtrelerini buradan okur.
+  window.getTargetReportFilterContext = function () {
+      var $subTab = $('.sub-tab-bar:visible .sub-tab.active');
+      return {
+          regionName: selectedRegion ? selectedRegion.name : '',
+          branchCode: selectedBranch ? selectedBranch.code : '',
+          tabLabel: ($('.tab.active').text() || '').trim(),
+          subTabLabel: $subTab.length ? ($subTab.text() || '').trim() : ''
+      };
+  };
+
   // ===== Row Builders =====
   function buildRowStart(product, depth, isSub, indexLabel) {
       var isExpandable = product.SubProducts && product.SubProducts.length > 0;

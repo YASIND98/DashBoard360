@@ -12,7 +12,8 @@
     </div>
     <div class="report-detail-tabs" id="reportDetailTabs">
       <button type="button" class="report-detail-tab active" data-report-detail-tab="breakdown">Bölge/Şube/Portföy Kırılımı</button>
-      <button type="button" class="report-detail-tab" data-report-detail-tab="top10">İlk 10 &amp; Son 10 Sıralaması</button>
+      <button type="button" class="report-detail-tab" data-report-detail-tab="top10" id="reportDetailTop10TabBtn">İlk 10 &amp; Son 10 Sıralaması</button>
+      <button type="button" class="report-detail-tab" data-report-detail-tab="trend" id="reportDetailTrendTabBtn" style="display:none;">Trend Analizi</button>
     </div>
 
     <div class="report-detail-tab-content" id="reportDetailBreakdownTab">
@@ -53,6 +54,17 @@
         </div>
       </div>
       <span class="legend-note" style="display:inline-block;margin-top:16px">Tablodaki değerler /1000 olarak verilmektedir.</span>
+    </div>
+
+    <div class="report-detail-tab-content report-detail-hidden" id="reportDetailTrendTab">
+      <div id="reportDetailTrendChart"></div>
+      <div class="table-legend">
+        <div class="legend-actions" style="margin-left:auto;">
+          <div class="download-pdf-btn" data-pdf="reportTrend" style="cursor:pointer;">
+            <img src="~/images/download.svg" alt="PDF İndir" /><span>PDF İndir</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
