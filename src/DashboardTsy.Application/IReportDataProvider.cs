@@ -34,6 +34,18 @@ public interface IReportDataProvider
     GetMonthlyTargetReportTableHeadersResponse? GetMonthlyTargetReportTableHeaders(GetMonthlyTargetReportTableHeadersRequest request);
 
     /// <summary>
+    /// Hedef Raporları > Hacim ekranında ürün detayından açılan Trend Analizi — Hacim (TL) serisi.
+    /// EXEC dbo.RP_Hacimler_Trend_Analizi @bolge, @sube_kodu, @IsKolu, @segment, @Urun
+    /// </summary>
+    IReadOnlyList<GetVolumeTrendAnalysisItem> GetVolumeTrendAnalysis(GetTrendAnalysisRequest request);
+
+    /// <summary>
+    /// Hedef Raporları > Hacim > H/G ve Adet tablarında ürün detayından açılan Trend Analizi — Adet serisi.
+    /// EXEC dbo.RP_Adetler_Trend_Analizi @bolge, @sube_kodu, @IsKolu, @segment, @Urun
+    /// </summary>
+    IReadOnlyList<GetQuantityTrendAnalysisItem> GetQuantityTrendAnalysis(GetTrendAnalysisRequest request);
+
+    /// <summary>
     /// Verimlilik raporu için sekme hiyerarşisini döner.
     /// SP henüz yok; şimdilik mock veri üzerinden çalışıyor.
     /// </summary>

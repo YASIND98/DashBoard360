@@ -273,4 +273,42 @@ public class TargetReportController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// POST /TargetReport/GetVolumeTrendAnalysis - Hedef Raporları > Hacim ekranı ürün detayı Trend Analizi (TL serisi).
+    /// </summary>
+    [HttpPost("GetVolumeTrendAnalysis")]
+    public async Task<ActionResult<IReadOnlyList<GetVolumeTrendAnalysisItem>>> GetVolumeTrendAnalysis(
+        [FromBody] GetTrendAnalysisRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+
+        request.SessionId = string.IsNullOrEmpty(request.SessionId)
+            ? HttpContext.Session.GetString("UserId") ?? string.Empty
+            : request.SessionId;
+
+        var result = await _apiClient.GetVolumeTrendAnalysisAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /TargetReport/GetQuantityTrendAnalysis - Hedef Raporları > Hacim > H/G ve Adet ürün detayı Trend Analizi (adet serisi).
+    /// </summary>
+    [HttpPost("GetQuantityTrendAnalysis")]
+    public async Task<ActionResult<IReadOnlyList<GetQuantityTrendAnalysisItem>>> GetQuantityTrendAnalysis(
+        [FromBody] GetTrendAnalysisRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+
+        request.SessionId = string.IsNullOrEmpty(request.SessionId)
+            ? HttpContext.Session.GetString("UserId") ?? string.Empty
+            : request.SessionId;
+
+        var result = await _apiClient.GetQuantityTrendAnalysisAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
 }

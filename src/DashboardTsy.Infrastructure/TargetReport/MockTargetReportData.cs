@@ -547,5 +547,70 @@ public static class MockTargetReportData
                 n.SubProducts = SortDailyQuantityTree(n.SubProducts, sortBy, asc);
         return ordered;
     }
+
+    public static IReadOnlyList<GetVolumeTrendAnalysisItem> GetVolumeTrendAnalysis(GetTrendAnalysisRequest request)
+    {
+        var product = string.IsNullOrWhiteSpace(request.Urun) ? "AKTIF BUYUKLUK" : request.Urun!;
+
+        var series = new (int Year, int Month, decimal Amount)[]
+        {
+            (2025, 6,  1_645_499_144m),
+            (2025, 7,  1_687_038_954m),
+            (2025, 8,  1_770_688_938m),
+            (2025, 9,  1_550_405_154m),
+            (2025, 10, 1_557_622_318m),
+            (2025, 11, 1_575_809_975m),
+            (2025, 12, 1_718_603_499m),
+            (2026, 1,  1_736_081_879m),
+            (2026, 2,  1_799_297_824m),
+            (2026, 3,  1_887_294_756m),
+            (2026, 4,  1_958_369_886m),
+            (2026, 5,  2_037_299_362m),
+            (2026, 6,  2_141_048_714m)
+        };
+
+        return series
+            .Select(s => new GetVolumeTrendAnalysisItem
+            {
+                ProductName = product,
+                ReportDate = EndOfMonth(s.Year, s.Month),
+                Amount = s.Amount
+            })
+            .ToList();
+    }
+
+    public static IReadOnlyList<GetQuantityTrendAnalysisItem> GetQuantityTrendAnalysis(GetTrendAnalysisRequest request)
+    {
+        var product = string.IsNullOrWhiteSpace(request.Urun) ? "Aktif Emekli Maaş Müşteri Adedi" : request.Urun!;
+
+        var series = new (int Year, int Month, long Count)[]
+        {
+            (2025, 6,  899_942L),
+            (2025, 7,  894_131L),
+            (2025, 8,  892_560L),
+            (2025, 9,  892_274L),
+            (2025, 10, 899_140L),
+            (2025, 11, 902_957L),
+            (2025, 12, 911_173L),
+            (2026, 1,  933_033L),
+            (2026, 2,  948_383L),
+            (2026, 3,  976_087L),
+            (2026, 4,  989_538L),
+            (2026, 5,  997_222L),
+            (2026, 6,  1_002_812L)
+        };
+
+        return series
+            .Select(s => new GetQuantityTrendAnalysisItem
+            {
+                ProductName = product,
+                ReportDate = EndOfMonth(s.Year, s.Month),
+                Count = s.Count
+            })
+            .ToList();
+    }
+
+    private static DateTime EndOfMonth(int year, int month)
+        => new DateTime(year, month, DateTime.DaysInMonth(year, month));
 }
 

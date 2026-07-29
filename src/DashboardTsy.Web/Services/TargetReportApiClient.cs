@@ -115,4 +115,30 @@ public class TargetReportApiClient : ITargetReportApiClient
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         return JsonSerializer.Deserialize<GetMonthlyTargetReportTableHeadersResponse>(json, _jsonOptions);
     }
+
+    public async Task<IReadOnlyList<GetVolumeTrendAnalysisItem>> GetVolumeTrendAnalysisAsync(
+        GetTrendAnalysisRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetVolumeTrendAnalysis", request, cancellationToken)
+            .ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+            return Array.Empty<GetVolumeTrendAnalysisItem>();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var list = JsonSerializer.Deserialize<List<GetVolumeTrendAnalysisItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<GetVolumeTrendAnalysisItem>)Array.Empty<GetVolumeTrendAnalysisItem>();
+    }
+
+    public async Task<IReadOnlyList<GetQuantityTrendAnalysisItem>> GetQuantityTrendAnalysisAsync(
+        GetTrendAnalysisRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync("TargetReport/GetQuantityTrendAnalysis", request, cancellationToken)
+            .ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode)
+            return Array.Empty<GetQuantityTrendAnalysisItem>();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        var list = JsonSerializer.Deserialize<List<GetQuantityTrendAnalysisItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<GetQuantityTrendAnalysisItem>)Array.Empty<GetQuantityTrendAnalysisItem>();
+    }
 }

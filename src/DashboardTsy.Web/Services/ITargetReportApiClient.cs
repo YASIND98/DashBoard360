@@ -13,4 +13,6 @@ public interface ITargetReportApiClient
     Task<GetDailyTargetReportTableHeadersResponse?> GetDailyTargetReportTableHeadersAsync(GetDailyTargetReportTableHeadersRequest request, CancellationToken cancellationToken = default);
     Task<GetMonthlyTargetReportResponse?> GetMonthlyTargetReportAsync(GetMonthlyTargetReportRequest request, CancellationToken cancellationToken = default);
     Task<GetMonthlyTargetReportTableHeadersResponse?> GetMonthlyTargetReportTableHeadersAsync(GetMonthlyTargetReportTableHeadersRequest request, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<GetVolumeTrendAnalysisItem>> GetVolumeTrendAnalysisAsync(GetTrendAnalysisRequest request, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<GetQuantityTrendAnalysisItem>> GetQuantityTrendAnalysisAsync(GetTrendAnalysisRequest request, CancellationToken cancellationToken = default);
 }

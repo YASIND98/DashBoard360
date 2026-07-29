@@ -146,4 +146,36 @@ public class TargetReportController : ControllerBase
             return NotFound();
         return Ok(result);
     }
+
+    /// <summary>
+    /// POST /api/TargetReport/GetVolumeTrendAnalysis
+    /// EXEC dbo.RP_Hacimler_Trend_Analizi @bolge, @sube_kodu, @IsKolu, @segment, @Urun
+    /// Hedef Raporları > Hacim ekranındaki ürün detayının Trend Analizi (TL serisi).
+    /// </summary>
+    [HttpPost("GetVolumeTrendAnalysis")]
+    public ActionResult<IReadOnlyList<GetVolumeTrendAnalysisItem>> GetVolumeTrendAnalysis(
+        [FromBody] GetTrendAnalysisRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetVolumeTrendAnalysis(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /api/TargetReport/GetQuantityTrendAnalysis
+    /// EXEC dbo.RP_Adetler_Trend_Analizi @bolge, @sube_kodu, @IsKolu, @segment, @Urun
+    /// Hedef Raporları > Hacim > H/G ve Adet tablarındaki ürün detayının Trend Analizi (adet serisi).
+    /// </summary>
+    [HttpPost("GetQuantityTrendAnalysis")]
+    public ActionResult<IReadOnlyList<GetQuantityTrendAnalysisItem>> GetQuantityTrendAnalysis(
+        [FromBody] GetTrendAnalysisRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetQuantityTrendAnalysis(request);
+        return Ok(result);
+    }
 }

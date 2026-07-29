@@ -293,6 +293,98 @@ public class ReportDataProvider : IReportDataProvider
         return DataTableHelper.ToObject<GetMonthlyTargetReportTableHeadersResponse>(ds.Tables[0].Rows[0]);
     }
 
+    public IReadOnlyList<GetVolumeTrendAnalysisItem> GetVolumeTrendAnalysis(GetTrendAnalysisRequest request)
+    {
+        request ??= new GetTrendAnalysisRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetVolumeTrendAnalysis(request);
+
+        var parameters = BuildTrendAnalysisParameters(request);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "RP_Hacimler_Trend_Analizi", parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetVolumeTrendAnalysisItem>();
+
+        return MapTrendRows(ds.Tables[0], row => new GetVolumeTrendAnalysisItem
+        {
+            ProductName = ReadString(row, "URUN"),
+            ReportDate = ReadDate(row, "TARIH_DETAY"),
+            Amount = ReadDecimal(row, "HACIM")
+        });
+    }
+
+    public IReadOnlyList<GetQuantityTrendAnalysisItem> GetQuantityTrendAnalysis(GetTrendAnalysisRequest request)
+    {
+        request ??= new GetTrendAnalysisRequest();
+
+        if (MockEnabled)
+            return MockTargetReportData.GetQuantityTrendAnalysis(request);
+
+        var parameters = BuildTrendAnalysisParameters(request);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "RP_Adetler_Trend_Analizi", parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetQuantityTrendAnalysisItem>();
+
+        return MapTrendRows(ds.Tables[0], row => new GetQuantityTrendAnalysisItem
+        {
+            ProductName = ReadString(row, "URUN"),
+            ReportDate = ReadDate(row, "TARIH_DETAY"),
+            Count = ReadLong(row, "ADET")
+        });
+    }
+
+    private static Dictionary<string, object?> BuildTrendAnalysisParameters(GetTrendAnalysisRequest request)
+        => new()
+        {
+            ["@bolge"] = string.IsNullOrWhiteSpace(request.Bolge) ? (object)DBNull.Value : request.Bolge,
+            ["@sube_kodu"] = string.IsNullOrWhiteSpace(request.SubeKodu) ? (object)DBNull.Value : request.SubeKodu,
+            ["@IsKolu"] = string.IsNullOrWhiteSpace(request.IsKolu) ? (object)DBNull.Value : request.IsKolu,
+            ["@segment"] = string.IsNullOrWhiteSpace(request.Segment) ? (object)DBNull.Value : request.Segment,
+            ["@Urun"] = string.IsNullOrWhiteSpace(request.Urun) ? (object)DBNull.Value : request.Urun
+        };
+
+    private static List<T> MapTrendRows<T>(DataTable table, Func<DataRow, T> selector)
+    {
+        var list = new List<T>(table.Rows.Count);
+        foreach (DataRow row in table.Rows)
+            list.Add(selector(row));
+        return list;
+    }
+
+    private static string ReadString(DataRow row, string column)
+    {
+        if (!row.Table.Columns.Contains(column)) return string.Empty;
+        var raw = row[column];
+        return raw is DBNull or null ? string.Empty : (raw.ToString() ?? string.Empty);
+    }
+
+    private static DateTime ReadDate(DataRow row, string column)
+    {
+        if (!row.Table.Columns.Contains(column)) return default;
+        var raw = row[column];
+        if (raw is DBNull or null) return default;
+        if (raw is DateTime dt) return dt.Date;
+        return DateTime.TryParse(raw.ToString(), out var parsed) ? parsed.Date : default;
+    }
+
+    private static decimal ReadDecimal(DataRow row, string column)
+    {
+        if (!row.Table.Columns.Contains(column)) return 0m;
+        var raw = row[column];
+        if (raw is DBNull or null) return 0m;
+        if (raw is decimal d) return d;
+        return decimal.TryParse(raw.ToString(), out var parsed) ? parsed : 0m;
+    }
+
+    private static long ReadLong(DataRow row, string column)
+    {
+        if (!row.Table.Columns.Contains(column)) return 0L;
+        var raw = row[column];
+        if (raw is DBNull or null) return 0L;
+        if (raw is long l) return l;
+        return long.TryParse(raw.ToString(), out var parsed) ? parsed : 0L;
+    }
+
     public IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
     {
         request ??= new GetProductivityReportTabsRequest();
