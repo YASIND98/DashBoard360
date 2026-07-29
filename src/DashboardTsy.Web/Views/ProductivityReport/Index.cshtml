@@ -322,7 +322,7 @@
         });
 
         $(document).on('click', '.sc-lightbox-close, .sc-lightbox-overlay', function (e) {
-            e.stopPropagation();
+            e.stopPropagation(); 
             if ($(e.target).is('.sc-lightbox-overlay') || $(e.target).is('.sc-lightbox-close')) {
                 $('.sc-lightbox-overlay').fadeOut(180);
             }
