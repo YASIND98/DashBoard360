@@ -622,6 +622,19 @@
 
   .filter-dropdown-wrapper .dropdown-panel .dropdown-list {
     padding: 0 4px;
-    max-height: calc(80vh - 150px);   /* tutamaç + başlık + arama düşülür */
+    max-height: calc(80vh - 150px);
+  }
+
+  [data-theme="light"] .dropdown-sheet-title,
+  [data-theme="light"] .dropdown-sheet-close {
+    color: var(--navy);
+  }
+
+  [data-theme="light"] .filter-dropdown-wrapper .dropdown-panel::before {
+    background: rgba(18, 55, 92, 0.25);
+  }
+
+  [data-theme="light"] .filter-dropdown-wrapper .dropdown-panel .dropdown-search {
+    border-color: #536076;
   }
 }
