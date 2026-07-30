@@ -1,4 +1,4 @@
-﻿namespace DashboardTsy.Web.Models.ProductivityReport.Response;
+namespace DashboardTsy.Web.Models.ProductivityReport.Response;
 
 public class GetProductivityGeneralRegionReportResponse
 {
@@ -6,22 +6,14 @@ public class GetProductivityGeneralRegionReportResponse
 
     public class GetProductivityGeneralRegionReportItem
     {
-        public int Id { get; set; }
-        public string BranchName { get; set; } = string.Empty;
-
-        public decimal FirstMonthRealizationRate { get; set; }
-        public decimal SecondMonthRealizationRate { get; set; }
-        public decimal ThirdMonthRealizationRate { get; set; }
-
-        public decimal CorporateRate { get; set; }
-        public decimal CommercialRate { get; set; }
-        public decimal KbiRate { get; set; }
-        public decimal ObiRate { get; set; }
-        public decimal AgricultureRate { get; set; }
-        public decimal MassRate { get; set; }
-        public decimal AffluentRate { get; set; }
-        public decimal PrivateBankingRate { get; set; }
-
-        public List<GetProductivityGeneralRegionReportItem> SubProducts { get; set; } = new();
+        public string Urun { get; set; } = string.Empty;
+        public decimal BankaGerceklesen { get; set; }
+        public decimal BankaOrt { get; set; }
+        public decimal BankaHedef { get; set; }
+        public decimal HgYuzde { get; set; }
+        public decimal NetBuyumeBanka { get; set; }
+        public decimal NetBuyumeBankaOrt { get; set; }
+        public decimal YtdBanka { get; set; }
+        public decimal QtdBanka { get; set; }
     }
 }

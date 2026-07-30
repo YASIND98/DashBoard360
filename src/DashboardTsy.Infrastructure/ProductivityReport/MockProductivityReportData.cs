@@ -110,63 +110,47 @@ public static class MockProductivityReportData
 
     public static GetProductivityGeneralRegionReportResponse GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request)
     {
-        var root = new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
-        {
-            Id = 1,
-            BranchName = "Marmara Bölgesi",
-            FirstMonthRealizationRate = 0.85m,
-            SecondMonthRealizationRate = 0.88m,
-            ThirdMonthRealizationRate = 0.90m,
-            CorporateRate = 0.82m,
-            CommercialRate = 0.86m,
-            KbiRate = 0.80m,
-            ObiRate = 0.78m,
-            AgricultureRate = 0.75m,
-            MassRate = 0.88m,
-            AffluentRate = 0.92m,
-            PrivateBankingRate = 0.95m
-        };
-
-        root.SubProducts.Add(new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
-        {
-            Id = 2,
-            BranchName = "İstanbul - Merkez",
-            FirstMonthRealizationRate = 0.87m,
-            SecondMonthRealizationRate = 0.89m,
-            ThirdMonthRealizationRate = 0.91m,
-            CorporateRate = 0.84m,
-            CommercialRate = 0.88m,
-            KbiRate = 0.81m,
-            ObiRate = 0.79m,
-            AgricultureRate = 0.00m,
-            MassRate = 0.89m,
-            AffluentRate = 0.93m,
-            PrivateBankingRate = 0.96m
-        });
-
-        root.SubProducts.Add(new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
-        {
-            Id = 3,
-            BranchName = "Bursa - Nilüfer",
-            FirstMonthRealizationRate = 0.82m,
-            SecondMonthRealizationRate = 0.85m,
-            ThirdMonthRealizationRate = 0.88m,
-            CorporateRate = 0.80m,
-            CommercialRate = 0.83m,
-            KbiRate = 0.78m,
-            ObiRate = 0.76m,
-            AgricultureRate = 0.72m,
-            MassRate = 0.86m,
-            AffluentRate = 0.90m,
-            PrivateBankingRate = 0.92m
-        });
-
-        var roots = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> { root };
-        roots = SortGeneralRegionTree(roots, request.SortBy, request.IsAscending);
-
         return new GetProductivityGeneralRegionReportResponse
         {
-            GetProductivityGeneralRegionReports = roots
+            GetProductivityGeneralRegionReports = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>
+            {
+                new()
+                {
+                    Urun = "Vadesiz TL Mevduat",
+                    BankaGerceklesen = 125_430_000m,
+                    BankaOrt = 118_200_000m,
+                    BankaHedef = 130_000_000m,
+                    HgYuzde = 96.48m,
+                    NetBuyumeBanka = 7_230_000m,
+                    NetBuyumeBankaOrt = 5_400_000m,
+                    YtdBanka = 12.35m,
+                    QtdBanka = 3.12m
+                },
+                new()
+                {
+                    Urun = "Vadeli TL Mevduat",
+                    BankaGerceklesen = 342_180_000m,
+                    BankaOrt = 335_900_000m,
+                    BankaHedef = 350_000_000m,
+                    HgYuzde = 97.77m,
+                    NetBuyumeBanka = 6_280_000m,
+                    NetBuyumeBankaOrt = 4_950_000m,
+                    YtdBanka = 8.42m,
+                    QtdBanka = 1.87m
+                },
+                new()
+                {
+                    Urun = "Ticari Krediler",
+                    BankaGerceklesen = 512_600_000m,
+                    BankaOrt = 495_100_000m,
+                    BankaHedef = 520_000_000m,
+                    HgYuzde = 98.58m,
+                    NetBuyumeBanka = 17_500_000m,
+                    NetBuyumeBankaOrt = 12_300_000m,
+                    YtdBanka = 15.21m,
+                    QtdBanka = 4.65m
+                }
+            }
         };
     }
 
@@ -1461,35 +1445,6 @@ public static class MockProductivityReportData
         25 or 55 or 5 => "Bireysel",
         _ => "Tümü"
     };
-
-    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> SortGeneralRegionTree(
-        List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> nodes, int? sortBy, bool asc)
-    {
-        Func<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem, object> key = sortBy switch
-        {
-            1 => p => p.BranchName ?? string.Empty,
-            2 => p => p.FirstMonthRealizationRate,
-            3 => p => p.SecondMonthRealizationRate,
-            4 => p => p.ThirdMonthRealizationRate,
-            5 => p => p.CorporateRate,
-            6 => p => p.CommercialRate,
-            7 => p => p.KbiRate,
-            8 => p => p.ObiRate,
-            9 => p => p.AgricultureRate,
-            10 => p => p.MassRate,
-            11 => p => p.AffluentRate,
-            12 => p => p.PrivateBankingRate,
-            _ => p => p.Id
-        };
-
-        var ordered = asc ? nodes.OrderBy(key).ToList() : nodes.OrderByDescending(key).ToList();
-
-        foreach (var n in ordered)
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortGeneralRegionTree(n.SubProducts, sortBy, asc);
-
-        return ordered;
-    }
 
     private static List<GetProductivityCountCardPosRegionReportResponse.GetProductivityCountCardPosRegionReportItem> SortCountCardPosRegionTree(
         List<GetProductivityCountCardPosRegionReportResponse.GetProductivityCountCardPosRegionReportItem> nodes, int? sortBy, bool asc)

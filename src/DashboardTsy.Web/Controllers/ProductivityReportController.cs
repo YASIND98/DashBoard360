@@ -142,7 +142,6 @@ public class ProductivityReportController : ControllerBase
         CancellationToken cancellationToken)
     {
         if (request == null) return BadRequest();
-        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityGeneralRegionReportAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }

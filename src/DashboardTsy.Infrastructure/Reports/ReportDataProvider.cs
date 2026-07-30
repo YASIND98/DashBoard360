@@ -558,18 +558,13 @@ public class ReportDataProvider : IReportDataProvider
 
         var parameters = new Dictionary<string, object?>
         {
-            ["@SessionId"] = request.SessionId ?? string.Empty,
-            ["@RegionCode"] = string.IsNullOrWhiteSpace(request.RegionCode) ? (object)DBNull.Value : request.RegionCode,
-            ["@ReportDate"] = request.ReportDate,
-            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@IS_KOLU_ADI"] = string.IsNullOrWhiteSpace(request.IsKoluAdi) ? (object)DBNull.Value : request.IsKoluAdi,
+            ["@SEGMENT"] = string.IsNullOrWhiteSpace(request.Segment) ? (object)DBNull.Value : request.Segment
         };
 
         var ds = _spExecutor.ExecuteDataSet(
             "YoneticiRaporu",
-            "SP_RP_GetProductivityGeneralRegionReport",
+            "usp_Verim_Hacim_Metrikleri_Banka",
             parameters);
 
         var response = new GetProductivityGeneralRegionReportResponse();
@@ -577,11 +572,29 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
-        var roots = BuildProductivityGeneralRegionReportTree(ds, request.ReportDate);
-        roots = SortProductivityGeneralRegionTree(roots, request.SortBy, request.IsAscending);
-
-        response.GetProductivityGeneralRegionReports = roots;
+        response.GetProductivityGeneralRegionReports = MapProductivityGeneralRegionReportItems(ds.Tables[0]);
         return response;
+    }
+
+    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> MapProductivityGeneralRegionReportItems(DataTable table)
+    {
+        var items = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>(table.Rows.Count);
+        foreach (DataRow row in table.Rows)
+        {
+            items.Add(new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Urun = ReadString(row, "URUN"),
+                BankaGerceklesen = ReadDecimal(row, "BANKA_GERCEKLESEN"),
+                BankaOrt = ReadDecimal(row, "BANKA_ORT"),
+                BankaHedef = ReadDecimal(row, "BANKA_HEDEF"),
+                HgYuzde = ReadDecimal(row, "HG_YUZDE"),
+                NetBuyumeBanka = ReadDecimal(row, "NET_BUYUME_BANKA"),
+                NetBuyumeBankaOrt = ReadDecimal(row, "NET_BUYUME_BANKA_ORT"),
+                YtdBanka = ReadDecimal(row, "YTD_BANKA"),
+                QtdBanka = ReadDecimal(row, "QTD_BANKA")
+            });
+        }
+        return items;
     }
 
     public GetProductivityCountCardPosRegionReportResponse? GetProductivityCountCardPosRegionReport(GetProductivityCountCardPosRegionReportRequest request)
@@ -2317,133 +2330,6 @@ public class ReportDataProvider : IReportDataProvider
         {
             if (n.SubProducts != null && n.SubProducts.Count > 0)
                 n.SubProducts = SortProductivityVolumeRegionTree(n.SubProducts, sortBy, isAscending);
-        }
-
-        return ordered;
-    }
-
-    private sealed class ProductivityGeneralRegionRow
-    {
-        public int Id { get; set; }
-        public int? ParentProductId { get; set; }
-
-        public string BranchName { get; set; } = string.Empty;
-
-        public decimal FirstMonthRealizationRate { get; set; }
-        public decimal SecondMonthRealizationRate { get; set; }
-        public decimal ThirdMonthRealizationRate { get; set; }
-
-        public decimal CorporateRate { get; set; }
-        public decimal CommercialRate { get; set; }
-        public decimal KbiRate { get; set; }
-        public decimal ObiRate { get; set; }
-        public decimal AgricultureRate { get; set; }
-        public decimal MassRate { get; set; }
-        public decimal AffluentRate { get; set; }
-        public decimal PrivateBankingRate { get; set; }
-    }
-
-    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> BuildProductivityGeneralRegionReportTree(DataSet ds, DateTime reportDate)
-    {
-        var t0 = ds.Tables[0];
-        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
-
-        if (hasParentInT0)
-        {
-            var rows = DataTableHelper.ToList<ProductivityGeneralRegionRow>(t0);
-            return ProductivityGeneralRegionReportTreeFromRows(rows);
-        }
-
-        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
-        {
-            var roots = DataTableHelper.ToList<ProductivityGeneralRegionRow>(ds.Tables[0]);
-            var children = DataTableHelper.ToList<ProductivityGeneralRegionRow>(ds.Tables[1]);
-
-            var all = new List<ProductivityGeneralRegionRow>(roots.Count + children.Count);
-            all.AddRange(roots);
-            all.AddRange(children);
-
-            return ProductivityGeneralRegionReportTreeFromRows(all);
-        }
-
-        var flat = DataTableHelper.ToList<ProductivityGeneralRegionRow>(t0);
-        return flat.Select(MapProductivityGeneralRegionReportItem).ToList();
-    }
-
-    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> ProductivityGeneralRegionReportTreeFromRows(List<ProductivityGeneralRegionRow> rows)
-    {
-        var byId = rows
-            .GroupBy(r => r.Id)
-            .ToDictionary(g => g.Key, g => MapProductivityGeneralRegionReportItem(g.First()));
-
-        foreach (var r in rows)
-        {
-            if (!byId.TryGetValue(r.Id, out var node))
-            {
-                node = MapProductivityGeneralRegionReportItem(r);
-                byId[r.Id] = node;
-            }
-
-            var parentId = r.ParentProductId;
-            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
-                parent.SubProducts.Add(node);
-        }
-
-        var rootIds = rows
-            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
-            .Select(r => r.Id)
-            .Distinct()
-            .ToList();
-
-        return rootIds.Select(id => byId[id]).ToList();
-    }
-
-    private static GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem MapProductivityGeneralRegionReportItem(ProductivityGeneralRegionRow r)
-    {
-        return new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
-        {
-            Id = r.Id,
-            BranchName = r.BranchName ?? string.Empty,
-            FirstMonthRealizationRate = r.FirstMonthRealizationRate,
-            SecondMonthRealizationRate = r.SecondMonthRealizationRate,
-            ThirdMonthRealizationRate = r.ThirdMonthRealizationRate,
-            CorporateRate = r.CorporateRate,
-            CommercialRate = r.CommercialRate,
-            KbiRate = r.KbiRate,
-            ObiRate = r.ObiRate,
-            AgricultureRate = r.AgricultureRate,
-            MassRate = r.MassRate,
-            AffluentRate = r.AffluentRate,
-            PrivateBankingRate = r.PrivateBankingRate,
-            SubProducts = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>()
-        };
-    }
-
-    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> SortProductivityGeneralRegionTree(List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> nodes, int? sortBy, bool isAscending)
-    {
-        Func<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem, object> keySelector = sortBy switch
-        {
-            1 => p => p.BranchName ?? string.Empty,
-            2 => p => p.FirstMonthRealizationRate,
-            3 => p => p.SecondMonthRealizationRate,
-            4 => p => p.ThirdMonthRealizationRate,
-            5 => p => p.CorporateRate,
-            6 => p => p.CommercialRate,
-            7 => p => p.KbiRate,
-            8 => p => p.ObiRate,
-            9 => p => p.AgricultureRate,
-            10 => p => p.MassRate,
-            11 => p => p.AffluentRate,
-            12 => p => p.PrivateBankingRate,
-            _ => p => p.Id
-        };
-
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
-
-        foreach (var n in ordered)
-        {
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortProductivityGeneralRegionTree(n.SubProducts, sortBy, isAscending);
         }
 
         return ordered;
