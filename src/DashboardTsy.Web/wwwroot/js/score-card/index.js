@@ -3,8 +3,6 @@ $(function () {
 
     if (!document.getElementById('scReportBody')) return;
 
-    var COLUMNS = SCORE_CARD_REPORT_COLUMNS;
-
     // Ürün Tipi sütun filtresi (productTypeId üzerinden; '' = Tümü)
     var selectedTypeId = '';
 
