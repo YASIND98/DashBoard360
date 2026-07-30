@@ -445,7 +445,9 @@ function renderDynamicHeaders(headers, hasExpandable, withDetail) {
     var hasGroupHeaders = Object.keys(childMap).length > 0;
     var rowspan = hasGroupHeaders ? 2 : 1;
     var expandTh = hasExpandable ? '<th rowspan="' + rowspan + '" class="col-expand"></th>' : '';
-    var detailTh = withDetail ? '<th rowspan="' + rowspan + '" class="col-detail"></th>' : '';
+    // Detay (kırılım) kolonu şimdilik kapalı; geri açmak için alttaki satırı yorumdan çıkarın.
+    // var detailTh = withDetail ? '<th rowspan="' + rowspan + '" class="col-detail"></th>' : '';
+    var detailTh = '';
 
     if (!hasGroupHeaders) {
         var row = '<tr>';
@@ -1068,7 +1070,8 @@ function renderCountCardPosRatioRegionHeaders(h) {
     row += '<th>' + h.PreviousQuarterRegionTitle + '</th>';
     row += '<th>' + h.CurrentRegionTitle + '</th>';
     row += '<th>' + h.CurrentBankAverageTitle + '</th>';
-    row += '<th class="col-detail"></th>';
+    // Detay kolonu şimdilik kapalı
+    // row += '<th class="col-detail"></th>';
     row += '</tr>';
 
     $thead.append(row);
@@ -1141,7 +1144,8 @@ function renderCountCardPosRatioBranchHeaders(h) {
     row += '<th>' + h.CurrentBranchTitle + '</th>';
     row += '<th>' + h.CurrentRegionAverageTitle + '</th>';
     row += '<th>' + h.CurrentBankAverageTitle + '</th>';
-    row += '<th class="col-detail"></th>';
+    // Detay kolonu şimdilik kapalı
+    // row += '<th class="col-detail"></th>';
     row += '</tr>';
 
     $thead.append(row);
@@ -1282,7 +1286,8 @@ function renderProfitRatioRegionHeaders(hasExpandable) {
     row += '<th>KOBİ</th>';
     row += '<th>Tarım</th>';
     row += '<th>Ticari</th>';
-    row += '<th class="col-detail"></th>';
+    // Detay kolonu şimdilik kapalı
+    // row += '<th class="col-detail"></th>';
     row += '</tr>';
 
     $thead.append(row);
@@ -1688,13 +1693,17 @@ $(function () {
 // userCode ile yeniden çağırır; dönen kırılımı ortak modal 'productivity' provider ile render eder.
 // GetProductivityGeneralRegionReport hariç tüm tablolarda detay ikonu vardır. Top-10 asla gösterilmez.
 
+// Detay (kırılım) şimdilik kapalı: satırlarda detay ikonu basılmaz, kolon da çizilmez
+// (renderDynamicHeaders içindeki detailTh ve statik tablolardaki th.col-detail satırları da yorumda).
+// Geri açmak için aşağıdaki gövdeyi yorumdan çıkarıp `return '';` satırını silmek yeterli.
 function buildProductivityDetailCell(item) {
-    var name = (item.ProductName || item.Description || item.RatioName || '').replace(/"/g, '&quot;');
-    return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +
-        ' data-table="productivity"' +
-        ' data-product-id="' + (item.Id != null ? item.Id : '') + '"' +
-        ' data-product-name="' + name + '"' +
-        ' data-top10="0" /></td>';
+    return '';
+    // var name = (item.ProductName || item.Description || item.RatioName || '').replace(/"/g, '&quot;');
+    // return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +
+    //     ' data-table="productivity"' +
+    //     ' data-product-id="' + (item.Id != null ? item.Id : '') + '"' +
+    //     ' data-product-name="' + name + '"' +
+    //     ' data-top10="0" /></td>';
 }
 
 var _yieldBreakdownCtx = {};
