@@ -31,6 +31,18 @@ var _sidebarIcons = {
     'MMReport': '/images/salary-customers.svg',
 };
 
+function withUsername(url) {
+    var username = window.USER_CODE;
+    if (!url || !username) return url;
+    return url + (url.indexOf('?') > -1 ? '&' : '?') + 'username=' + encodeURIComponent(username);
+}
+
+$(document).on('click', 'a[data-sidebar-code="FinancialMap"]', function () {
+    var $a = $(this);
+    if ($a.attr('data-username-applied')) return;
+    $a.attr('href', withUsername($a.attr('href'))).attr('data-username-applied', '1');
+});
+
 function renderSidebar(items) {
     var $container = $('#sidebar-nav-items');
     var currentPath = window.location.pathname.replace(/\/$/, '') || '/';
@@ -45,7 +57,7 @@ function renderSidebar(items) {
         var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
         var sideCode = String(item.Code || '').replace(/"/g, '');
         var targetAttr = isFinancialMap ? ' target="_blank" rel="noopener noreferrer"' : '';
-        html += '<a href="' + item.Url + '" class="sidebar-nav' + isActive + '" data-sidebar-code="' + sideCode + '"' + targetAttr + '>';
+        html += '<a href="' + (isFinancialMap ? withUsername(item.Url) : item.Url) + '" class="sidebar-nav' + isActive + '" data-sidebar-code="' + sideCode + '"' + targetAttr + '>';
         html += '<img src="' + icon + '" alt="' + item.Name + '" />';
         html += '<span class="sidebar-label">' + item.Name + '</span>';
         if (isFinancialMap) {
@@ -71,7 +83,8 @@ function renderMobileMenu(items) {
         var isActive = (!isFinancialMap && currentPath === itemPath) ? ' active' : '';
         var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
         var targetAttr = isFinancialMap ? ' target="_blank" rel="noopener noreferrer"' : '';
-        html += '<a href="' + item.Url + '" class="mobile-menu-item' + isActive + '"' + targetAttr + '>';
+        var mobileCode = String(item.Code || '').replace(/"/g, '');
+        html += '<a href="' + (isFinancialMap ? withUsername(item.Url) : item.Url) + '" class="mobile-menu-item' + isActive + '" data-sidebar-code="' + mobileCode + '"' + targetAttr + '>';
         html += '<img src="' + icon + '" alt="" />';
         html += '<span>' + item.Name + '</span>';
         html += '</a>';
