@@ -45,7 +45,7 @@ $(function () {
 
     // Tablo hücresi + bar etiketi: Bakiye'de Mn TL, Oran'da yüzde
     function fmtValue(v) {
-        return isRatio() ? ('%' + fmtTr(v, 2)) : fmtMn(v);
+        return isRatio() ? v ? formatPercent(v) : 0 : fmtMn(v);
     }
 
     // Adımı tam gösteren en az ondalık (40 -> 0; 2,5 -> 1; 0,025 -> 3), etiket yanıltmasın.
