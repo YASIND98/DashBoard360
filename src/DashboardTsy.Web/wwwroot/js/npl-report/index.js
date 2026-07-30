@@ -37,10 +37,15 @@ $(function () {
             .format(Number(v) || 0);
     }
 
+    // Grafik etiketleri (bar + eksen) tasarımda ondalık nokta ile: fmtDot(97.5) -> "97.5"
+    function fmtDot(v, digits) {
+        return fmtTr(v, digits).replace(',', '.');
+    }
+
     // Değeri Mn olarak göster; ondalık nokta ile, yuvarlamadan kırparak (122,97... -> "122.9Mn").
     function fmtMn(v) {
         var mn = Math.trunc(Number(v) / TL_PER_MN * 10 + 1e-6) / 10;
-        return fmtTr(mn, 1).replace(',', '.') + 'Mn';
+        return fmtDot(mn, 1) + 'Mn';
     }
 
     // Tablo hücresi + bar etiketi: Bakiye'de Mn TL, Oran'da yüzde
@@ -56,9 +61,10 @@ $(function () {
         }
         return 3;
     }
-    // Y ekseni etiketi: Bakiye'de birim (Mn/bn) tavana göre, Oran'da "%25"
+    // Y ekseni etiketi: Bakiye'de birim (Mn/bn) tavana göre, Oran'da "%25".
+    // Bar etiketleriyle aynı biçim: ondalık ayırıcı nokta ("97.5Mn").
     function fmtTick(v, unit, suffix, decimals) {
-        return isRatio() ? ('%' + fmtNum(v)) : (fmtTr(Number(v) / unit, decimals) + suffix);
+        return isRatio() ? ('%' + fmtNum(v)) : (fmtDot(Number(v) / unit, decimals) + suffix);
     }
 
     // ISO tarih -> "Aralık 2025" (tablo dönem kolonu)
