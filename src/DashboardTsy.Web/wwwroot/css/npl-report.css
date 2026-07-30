@@ -37,7 +37,7 @@
 
 .npl-chart svg {
   display: block;
-  margin: 0 auto;      /* sığdığında ortalanır; taşınca sola yaslanıp kaydırılır */
+  margin: 0;
   overflow: visible;
 }
 

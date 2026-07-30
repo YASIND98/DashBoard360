@@ -1,39 +1,106 @@
-// NPL Girişleri - filtre alanı (Bölge/Şube/Dönem/Ürün dropdown'ları, Filtreler paneli, breadcrumb)
 (function () {
     var NPL = window.NplReport = window.NplReport || {};
 
     var STATIC_FILTERS = {
-        period:  { placeholder: 'Dönem', label: '#nplPeriodLabel',  list: '#nplPeriodList',  panel: '#nplPeriodPanel',  items: ['2026', '2025', '2024'] },
-        product: { placeholder: 'Ürün',  label: '#nplProductLabel', list: '#nplProductList', panel: '#nplProductPanel', items: ['İhtiyaç', 'KMH', 'KK', 'ÜK', 'Konut', 'Taşıt', 'Ticari', 'Diğer'] }
+        period:  { placeholder: 'Dönem', label: '#nplPeriodLabel',  list: '#nplPeriodList',  panel: '#nplPeriodPanel',  items: [{ value: '2026', text: '2026' }, { value: '2025', text: '2025' }] },
+        product: { placeholder: 'Ürün',  label: '#nplProductLabel', list: '#nplProductList', panel: '#nplProductPanel', items: [] }
     };
-    var _filters = { period: '', product: '' };   // boş = Tümü
+    var _filters = { period: '', product: '' };
 
-    // Filtreler paneli grupları (her grup tek seçim, boş = Tümü)
-    var FILTER_GROUPS = [
-        { key: 'allocation',           label: 'Tahsis Kolu',          options: ['Bireysel', 'İşletme', 'Tarım', 'Tanımsız'] },
-        { key: 'authorityCode',        label: 'Yetki Kodu',           options: ['BY', 'Diğer', 'GM', 'SY'] },
-        { key: 'bonusBusiness',        label: 'Bonus Business',       options: ['Hayır', 'Evet'] },
-        { key: 'retailMicro',          label: 'Bireysel Mikro',       options: ['Hayır', 'Evet'] },
-        { key: 'irs',                  label: 'IRS',                  options: ['Hayır', 'Evet'] },
-        { key: 'restructuredCustomer', label: 'Yapılandırma Müşteri', options: ['Hayır', 'Evet'] },
-        { key: 'restructuredLoan',     label: 'Yapılandırma Kredi',   options: ['Yapılandırma', 'Modifikasyon', 'Yok'] },
-        { key: 'commercialConsumer',   label: 'İhtiyaç Ticari',       options: ['Hayır', 'Evet'] },
-        { key: 'kgfLoan',              label: "KGF'li Kredi",         options: ['Hayır', 'Evet'] },
-        { key: 'retired',              label: 'Emekli',               options: ['Hayır', 'Evet'] },
-        { key: 'salaryCustomer',       label: 'Maaş Müşterisi',       options: ['Hayır', 'Evet'] }
-    ];
+    function itemText(key, value) {
+        var items = STATIC_FILTERS[key].items;
+        for (var i = 0; i < items.length; i++) {
+            if (items[i].value === value) return items[i].text;
+        }
+        return '';
+    }
+    var PRODUCT_FILTER_CODE = 'PRODUCT';
+
+    var _filterGroups = [];
+
+    function buildFilterGroups(rows) {
+        var byId = {};
+        var groups = [];
+
+        (rows || []).forEach(function (r) {
+            var g = byId[r.FilterGroupId];
+            if (!g) {
+                g = byId[r.FilterGroupId] = {
+                    id: r.FilterGroupId,
+                    code: r.FilterCode,
+                    name: r.FilterName,
+                    order: r.DisplayOrder,
+                    options: []
+                };
+                groups.push(g);
+            }
+
+            if (r.ItemCode === 'TUMU') return;
+            g.options.push({ id: r.FilterItemId, code: r.ItemCode, name: r.ItemName, order: r.ItemOrder });
+        });
+
+        groups.sort(function (a, b) { return (a.order - b.order) || (a.id - b.id); });
+        groups.forEach(function (g) {
+            g.options.sort(function (a, b) { return (a.order - b.order) || (a.id - b.id); });
+        });
+        return groups;
+    }
+
+    function loadNplFilters(callback) {
+        $.ajax({
+            url: '/NplReport/GetNplFilters',
+            type: 'POST',
+            contentType: 'application/json',
+            data: '{}',
+            success: function (data) {
+                var groups = buildFilterGroups(data);
+
+                var product = groups.filter(function (g) { return g.code === PRODUCT_FILTER_CODE; })[0];
+                STATIC_FILTERS.product.items = product ? product.options.map(function (o) {
+                    return { value: o.code, text: o.name };
+                }) : [];
+
+                _filterGroups = groups.filter(function (g) { return g.code !== PRODUCT_FILTER_CODE; });
+                if (callback) callback();
+            },
+            error: function () { if (callback) callback(); }
+        });
+    }
+
+    function findGroup(code) {
+        for (var i = 0; i < _filterGroups.length; i++) {
+            if (_filterGroups[i].code === code) return _filterGroups[i];
+        }
+        return null;
+    }
 
     function emptyGroupState() {
         var s = {};
-        FILTER_GROUPS.forEach(function (g) { s[g.key] = ''; });
+        _filterGroups.forEach(function (g) { s[g.code] = ''; });
         return s;
     }
 
-    var _groupFilters = emptyGroupState();   // uygulanmış seçim
-    var _groupDraft = emptyGroupState();     // panel açıkken üzerinde oynanan kopya
+    function cloneGroupState(state) {
+        var s = {};
+        _filterGroups.forEach(function (g) { s[g.code] = state[g.code] || ''; });
+        return s;
+    }
 
-    var _selectedRegion = null;   // { code, name }
-    var _selectedBranch = null;   // { code, name }
+    function hasGroupSelection(state, g) {
+        return !!state[g.code];
+    }
+
+    function groupSelectionValues(state) {
+        var out = {};
+        _filterGroups.forEach(function (g) { out[g.code] = state[g.code] || ''; });
+        return out;
+    }
+
+    var _groupFilters = {}; 
+    var _groupDraft = {}; 
+
+    var _selectedRegion = null;
+    var _selectedBranch = null;
 
     // Seçili tüm filtreler; index.js servis isteğini bununla kurar.
     NPL.getFilters = function () {
@@ -43,8 +110,9 @@
             branch: _selectedBranch ? _selectedBranch.name : '',
             branchCode: _selectedBranch ? _selectedBranch.code : null,
             period: _filters.period,
-            product: _filters.product
-        }, _groupFilters);
+            product: itemText('product', _filters.product),
+            productCode: _filters.product || null
+        }, groupSelectionValues(_groupFilters));
     };
 
     function reload() {
@@ -54,7 +122,6 @@
     $(function () {
         if (!document.getElementById('nplChart')) return;
 
-        // ===== Bölge / Şube listeleri (paylaşılan veri) =====
         function renderRegionDropdown() {
             return renderRegionList('#nplRegionList', _selectedRegion ? _selectedRegion.code : null);
         }
@@ -63,7 +130,6 @@
             return renderBranchList('#nplBranchList', _selectedBranch ? _selectedBranch.code : null, _selectedRegion ? _selectedRegion.code : null);
         }
 
-        // ===== Breadcrumb (Verim Raporları ile aynı) =====
         function crumb(text, action, disabled) {
             var cls = disabled ? ' disabled' : '';
             var attr = (!disabled && action) ? ' data-npl-breadcrumb="' + action + '"' : '';
@@ -77,7 +143,6 @@
             }
             $('#nplBreadcrumbBar').show();
 
-            // Tek bölge dönen kullanıcıda (şube/bölge müdürü) üst kademeye dönüş anlamsızdır
             var singleRegion = (typeof _regionFilters !== 'undefined') && _regionFilters.length === 1;
             var parts = [crumb('Tüm Bölgeler', 'allRegions', singleRegion)];
 
@@ -108,7 +173,6 @@
             reload();
         });
 
-        // ===== İlk yükleme: tek bölge/şube dönerse otomatik seçili kabul edilir =====
         if (typeof loadRegionFilters === 'function') {
             loadRegionFilters(function () {
                 var single = renderRegionDropdown();
@@ -124,7 +188,6 @@
             });
         }
 
-        // ===== Bölge seçimi =====
         $(document).on('click', '#nplRegionList .dropdown-item', function () {
             var code = $(this).attr('data-code') || '';
             var name = $(this).text();
@@ -179,16 +242,17 @@
             var f = STATIC_FILTERS[key];
             var selected = _filters[key];
             var html = '<div class="dropdown-item tumu-item' + (!selected ? ' selected' : '') + '" data-value="">Tümü</div>';
-            f.items.forEach(function (v) {
-                html += '<div class="dropdown-item' + (selected === v ? ' selected' : '') + '" data-value="' + v + '">' + v + '</div>';
+            f.items.forEach(function (it) {
+                html += '<div class="dropdown-item' + (selected === it.value ? ' selected' : '') + '" data-value="' + it.value + '">' + it.text + '</div>';
             });
             $(f.list).html(html);
-            $(f.label).text(selected || f.placeholder);
+            $(f.label).text(itemText(key, selected) || f.placeholder);
         }
 
         $(document).on('click', '.dropdown-list[data-filter] .dropdown-item', function () {
             var key = $(this).closest('.dropdown-list').data('filter');
-            _filters[key] = $(this).data('value') || '';
+            // .data() sayısal görünen değeri (2026) number'a çevirir; karşılaştırmalar string üzerinden yapılır
+            _filters[key] = $(this).attr('data-value') || '';
             renderStaticFilter(key);
             $(STATIC_FILTERS[key].panel).removeClass('open');
             reload();
@@ -197,26 +261,28 @@
         // ===== "Filtreler" paneli =====
         function renderFilterGroups() {
             var html = '';
-            FILTER_GROUPS.forEach(function (g) {
-                var selected = _groupDraft[g.key];
+            _filterGroups.forEach(function (g) {
+                var selected = _groupDraft[g.code] || '';
+                var isAll = !hasGroupSelection(_groupDraft, g);
                 html += '<div class="npl-filter-group">' +
-                            '<span class="npl-filter-group-label">' + g.label + '</span>' +
-                            '<div class="segmented-control" data-group="' + g.key + '">' +
-                                '<button type="button" class="segment' + (!selected ? ' active' : '') + '" data-value="">Tümü</button>';
+                            '<span class="npl-filter-group-label">' + g.name + '</span>' +
+                            '<div class="segmented-control" data-group="' + g.code + '">' +
+                                '<button type="button" class="segment' + (isAll ? ' active' : '') + '" data-value="">Tümü</button>';
                 g.options.forEach(function (o) {
+                    var active = (selected === o.code);
                     html += '<div class="divider"></div>' +
-                            '<button type="button" class="segment' + (selected === o ? ' active' : '') + '" data-value="' + o + '">' + o + '</button>';
+                            '<button type="button" class="segment' + (active ? ' active' : '') + '" data-value="' + o.code + '">' + o.name + '</button>';
                 });
                 html += '</div></div>';
             });
             $('#nplFilterGroups').html(html);
 
-            var count = FILTER_GROUPS.filter(function (g) { return _groupDraft[g.key]; }).length;
+            var count = _filterGroups.filter(function (g) { return hasGroupSelection(_groupDraft, g); }).length;
             $('#nplFiltersTitle').text(count ? ('Filtreler (' + count + ')') : 'Filtreler');
         }
 
         function openFiltersPanel() {
-            _groupDraft = $.extend({}, _groupFilters);   // iptal edilirse uygulanmış hâle dönülür
+            _groupDraft = cloneGroupState(_groupFilters);   // iptal edilirse uygulanmış hâle dönülür
             renderFilterGroups();
             $('.dropdown-panel').removeClass('open');
             $('#nplFiltersPanel, #nplFiltersOverlay').addClass('open');
@@ -242,12 +308,15 @@
 
         $('#nplFilterGroups').on('click', '.segment', function () {
             var $seg = $(this);
-            _groupDraft[$seg.closest('.segmented-control').data('group')] = $seg.data('value') || '';
+            var code = $seg.closest('.segmented-control').attr('data-group');
+            if (!findGroup(code)) return;
+
+            _groupDraft[code] = $seg.attr('data-value') || '';
             renderFilterGroups();
         });
 
         $('#nplFiltersClear').on('click', function () {
-            var hadApplied = FILTER_GROUPS.some(function (g) { return _groupFilters[g.key]; });
+            var hadApplied = _filterGroups.some(function (g) { return hasGroupSelection(_groupFilters, g); });
             _groupDraft = emptyGroupState();
             _groupFilters = emptyGroupState();
             renderFilterGroups();
@@ -255,13 +324,19 @@
         });
 
         $('#nplFiltersApply').on('click', function () {
-            _groupFilters = $.extend({}, _groupDraft);
+            _groupFilters = cloneGroupState(_groupDraft);
             closeFiltersPanel();
             reload();
         });
 
         // ===== İlk render =====
         Object.keys(STATIC_FILTERS).forEach(renderStaticFilter);
+        loadNplFilters(function () {          // Ürün dropdown'u + Filtreler paneli tek servisten dolar
+            renderStaticFilter('product');
+            _groupFilters = emptyGroupState();
+            _groupDraft = emptyGroupState();
+            renderFilterGroups();
+        });
         updateBreadcrumb();
     });
 })();
