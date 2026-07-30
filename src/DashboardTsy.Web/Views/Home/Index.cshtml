@@ -339,24 +339,7 @@
 @* Ürün Detay Modalı paylaşılan partial'a taşındı (hedef + verim ortak kullanır). *@
 @await Html.PartialAsync("_ReportDetailModal")
 
-<!-- USD Kur Detayı Modal -->
-<div class="usd-kur-overlay" id="usdKurOverlay">
-  <div class="usd-kur-modal" role="dialog" aria-modal="true" aria-labelledby="usdKurModalTitle">
-    <div class="usd-kur-modal-header">
-      <div class="usd-kur-modal-titles">
-        <h2 class="usd-kur-modal-title" id="usdKurModalTitle">Hesaplamada Kullanılan USD Kurları</h2>
-        <p class="usd-kur-modal-subtitle">Vadesiz YP değerleri aşağıdaki USD kurları kullanılarak hesaplanmıştır.</p>
-      </div>
-      <button class="usd-kur-close" id="usdKurClose" aria-label="Kapat">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-    </div>
-    <div class="usd-kur-rows" id="usdKurRows"></div>
-    <div class="usd-kur-footer" id="usdKurFooter"></div>
-  </div>
-</div>
+@await Html.PartialAsync("_UsdKurModal")
 
 @section Scripts {
     @{
@@ -375,6 +358,7 @@
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
     <script src="~/js/report-detail.js" asp-append-version="true"></script>
     <script src="~/js/report-trend.js" asp-append-version="true"></script>
+    <script src="~/js/shared/usd-kur-modal.js" asp-append-version="true"></script>
     <script>
         $(document).ready(function () {
             // Aktif tipe (Hacim/Adet) göre ilgili fark toggle'ı — mobil menü onu yönetir.
@@ -398,9 +382,6 @@
             });
             $('#mobilePdfBtn').on('click', function () {
                 $('#downloadPdfBtn').trigger('click');
-                $(this).closest('details').removeAttr('open');
-            });
-            $('#mobileUsdKurBtn').on('click', function () {
                 $(this).closest('details').removeAttr('open');
             });
         });
