@@ -204,10 +204,33 @@ $(function () {
       $('#reportDetailTabs .report-detail-tab[data-report-detail-tab="' + tab + '"]').addClass('active');
       $('#reportDetailBreakdownTab').toggleClass('report-detail-hidden', tab !== 'breakdown');
       $('#reportDetailTop10Tab').toggleClass('report-detail-hidden', tab !== 'top10');
+      $('#reportDetailTrendTab').toggleClass('report-detail-hidden', tab !== 'trend');
+      if (tab === 'trend' && window.ReportTrend && window.ReportTrend.load) window.ReportTrend.load();
+  }
+
+  // Görünürlük ".is(':visible')" ile DOM'dan okunmaz: #reportDetailTabs gizliyken içindeki
+  // butonlar da "görünmez" ölçülür ve çubuk bir daha açılamaz kalır — bu yüzden state bayrak tutulur.
+  var _showTop10Tab = false;
+  var _showTrendTab = false;
+
+  function updateTabsBarVisibility() {
+      $('#reportDetailTabs').css('display', (_showTop10Tab || _showTrendTab) ? '' : 'none');
   }
 
   function setTabsBar(showTop10) {
-      $('#reportDetailTabs').css('display', showTop10 ? '' : 'none');
+      _showTop10Tab = !!showTop10;
+      $('#reportDetailTop10TabBtn').toggle(_showTop10Tab);
+      updateTabsBarVisibility();
+  }
+
+  // Trend Analizi sekmesi yalnızca Hacim > H/G (monthly) ve Adet (quantity) tablolarında var.
+  // Hangi servisin çağrılacağını (Volume/Quantity) report-trend.js tableKey'e göre kendi seçer.
+  function setTrendTabVisibility() {
+      _showTrendTab = _currentTable === 'quantity' || _currentTable === 'monthly';
+      var $btn = $('#reportDetailTrendTabBtn');
+      $btn.toggle(_showTrendTab);
+      if (!_showTrendTab && $btn.hasClass('active')) showTab('breakdown');
+      updateTabsBarVisibility();
   }
 
   function defaultBreakdownPdf() {
@@ -283,7 +306,13 @@ $(function () {
   $(document).on('click', '.detail-icon', function () {
       _currentTable = $(this).data('table') || 'daily';
       _open = {};
+      window.ReportDetail.iconCtx = {
+          table: _currentTable,
+          productId: $(this).data('product-id'),
+          productName: $(this).data('product-name')
+      };
       setTabsBar(String($(this).data('top10')) === '1');
+      setTrendTabVisibility();
       showTab('breakdown');
   });
 
@@ -298,6 +327,7 @@ $(function () {
 
   window.ReportDetail = {
       registerProvider: function (key, provider) { _providers[key] = provider; },
-      setContext: function (ctx) { _ctx = ctx || {}; }
+      setContext: function (ctx) { _ctx = ctx || {}; },
+      iconCtx: {}
   };
 });
