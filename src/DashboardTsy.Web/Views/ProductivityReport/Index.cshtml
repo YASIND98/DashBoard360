@@ -508,28 +508,40 @@
         }
         
         // ─── Manager Row / append & hide  ─────────────────────────────────────────────────────────
-        function updateManagerCard(d, isBranch) {
+        function updateManagerCard(data, isBranch) {
+            if (!data) return;
             var $card  = $('.sc-manager-card');
             var $photo = $card.find('.sc-branch-photo-block');
             var $info  = $card.find('.sc-manager-info');
 
+            // 1. Doğrudan değerleri oku (PascalCase / camelCase fallback)
+            var managerName        = data.ManagerName        || data.managerName        || '-';
+            var branchPhoto        = data.BranchPhoto        || data.branchPhoto        || null;
+            var branchManagerPhoto = data.BranchManagerPhoto || data.branchManagerPhoto || null;
+            var regionManagerPhoto = data.RegionManagerPhoto || data.regionManagerPhoto || null;
+
+            // 2. Rol metnini belirle
+            var roleText = isBranch 
+                ? ((selectedBranch ? selectedBranch.name + ' ' : '') + 'Şube Müdürü')
+                : ((selectedRegion ? selectedRegion.name + ' ' : '') + 'Bölge Müdürü');
+
+            // 3. Ekrana basma işlemini şartlardan bağımsız en başta yap (HER İKİ ALANA DA YAZ)
+            $photo.find('.sc-manager-name').text(managerName);
+            $photo.find('.sc-manager-role').text(roleText);
+            $info.find('.sc-manager-name').text(managerName);
+            $info.find('.sc-manager-role').text(roleText);
+
             $card.show();
-            if (isBranch && d.BranchPhoto) {
-                setImgWithFallback($photo.find('.sc-branch-photo'), d.BranchPhoto);
-                setImgWithFallback($photo.find('.sc-manager-avatar'), d.BranchManagerPhoto);
-                $photo.find('.sc-manager-name').text(d.ManagerName || '-');
-                $photo.find('.sc-manager-role').text((selectedBranch ? selectedBranch.name + ' ' : '') + 'Şube Müdürü');
+            // 4. Sadece görünürlük ve resim atamalarını koşula bağla
+            if (branchPhoto) {
+                setImgWithFallback($photo.find('.sc-branch-photo'), branchPhoto);
+                setImgWithFallback($photo.find('.sc-manager-avatar'), branchManagerPhoto);
                 $photo.show().addClass('with-bg');
                 $card.removeClass('area');
                 $info.hide();
             } else {
-                setImgWithFallback($info.find('.sc-manager-avatar'), isBranch ? d.BranchManagerPhoto : d.RegionManagerPhoto);
-                $info.find('.sc-manager-name').text((isBranch ? d.ManagerName : d.managerName) || '-');
-                $info.find('.sc-manager-role').text(
-                    isBranch
-                        ? (selectedBranch ? selectedBranch.name + ' ' : '') + 'Şube Müdürü'
-                        : (selectedRegion ? selectedRegion.name + ' ' : '') + 'Bölge Müdürü'
-                );
+                var avatarPhoto = isBranch ? branchManagerPhoto : regionManagerPhoto;
+                setImgWithFallback($info.find('.sc-manager-avatar'), avatarPhoto);
                 $photo.hide().removeClass('with-bg');
                 $card.addClass('area');
                 $info.show();
