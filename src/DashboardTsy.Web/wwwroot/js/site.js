@@ -124,7 +124,18 @@ function renderTableLegend(containerId, options) {
   var html = '<span class="legend-note">' + note + '</span>';
   if (options.diff) html += '<div class="legend-colors">' + buildDiffLegend(options.diff) + '</div>';
   if (options.ratio) html += '<div class="legend-colors">' + LEGEND_RATIO + '</div>';
+  html += '<div class="legend-actions">';
   html += '<div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;"><img src="/images/download.svg" alt="PDF İndir" /><span>PDF İndir</span></div>';
+  if (options.usdKur) {
+    html += '<div class="usd-kur-btn" id="usdKurBtn" style="cursor:pointer;">' +
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' +
+      '<rect x="2" y="5" width="20" height="14" rx="3"/>' +
+      '<path d="M12 9v6M14 9.5a2 2 0 0 0-4 0v.1c0 .9.6 1.7 1.4 2l1.2.5c.8.3 1.4 1.1 1.4 2v.1a2 2 0 0 1-4 0"/>' +
+      '</svg>' +
+      '<span>USD Kur Detayı</span>' +
+    '</div>';
+  }
+  html += '</div>';
   $el.html(html);
 }
 

@@ -4,6 +4,7 @@
 
 <link rel="stylesheet" href="~/css/ai.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/css/usd-kur-modal.css" asp-append-version="true" />
 
 <!-- Page Title & Date -->
 <div class="page-header">
@@ -174,6 +175,7 @@
 
 @await Html.PartialAsync("_ReportDetailModal")
 
+@await Html.PartialAsync("_UsdKurModal")
 
 @section Scripts {
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
@@ -183,8 +185,12 @@
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
     <script src="~/js/ai-insights.js" asp-append-version="true"></script>
     <script src="~/js/date-picker.js" asp-append-version="true"></script>
+    <script src="~/js/shared/usd-kur-modal.js" asp-append-version="true"></script>
     <script>
     $(document).ready(function () {
+
+        // Rapor tarihini paylaşımlı usd-kur-modal.js'e ilet
+        window._getUsdKurDate = function () { return _selectedDate; };
 
         // AI İçgörüleri butonunu backend ayarına göre göster/gizle.
         AppSettings.isVisible('ProductivityReport.AiInsight.Visible').then(function (visible) {
@@ -552,10 +558,10 @@
             } else if (toggleId === 2) {
                 renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
             } else if (toggleId === 3) {
-                renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
+                renderTableLegend('#tableLegend', { note: note, diff: diffLabel, usdKur: true });
             } else if (toggleId === 4 && tabIds.tabId === 41) {
                 renderTableLegend('#tableLegend', { note: note, diff: diffLabel });
-            } else if (toggleId === 4 ) {
+            } else if (toggleId === 4) {
                 renderTableLegend('#tableLegend', { note: note, diff: diffLabel, ratio: isBranch });
             }
 
