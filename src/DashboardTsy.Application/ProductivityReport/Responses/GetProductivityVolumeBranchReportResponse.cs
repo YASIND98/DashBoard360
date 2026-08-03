@@ -9,9 +9,13 @@ public class GetProductivityVolumeBranchReportResponse
         public int Id { get; set; }
         public string ProductName { get; set; } = string.Empty;
 
+        public decimal RealizationBranchLastYearValue { get; set; }
         public decimal RealizationBranchValue { get; set; }
+        public decimal? RealizationBranchDiff { get; set; }
+        public decimal RealizationRegionValue { get; set; }
         public decimal RealizationRegionAverageValue { get; set; }
         public decimal? RealizationRegionAverageValueDiff { get; set; }
+        public decimal RealizationBankValue { get; set; }
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageValueDiff { get; set; }
 
@@ -19,8 +23,11 @@ public class GetProductivityVolumeBranchReportResponse
         public decimal HgRate { get; set; }
 
         public decimal NetGrowthBranchValue { get; set; }
+        public decimal? NetGrowthBranchDiff { get; set; }
+        public decimal NetGrowthRegionValue { get; set; }
         public decimal NetGrowthRegionAverageValue { get; set; }
         public decimal? NetGrowthRegionAverageValueDiff { get; set; }
+        public decimal NetGrowthBankValue { get; set; }
         public decimal NetGrowthBankAverageValue { get; set; }
         public decimal? NetGrowthBankAverageValueDiff { get; set; }
 

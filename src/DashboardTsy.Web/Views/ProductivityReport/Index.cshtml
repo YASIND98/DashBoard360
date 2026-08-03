@@ -217,7 +217,6 @@
         // ===== State =====
         var selectedRegion = null;
         var selectedBranch = null;
-        var _lastFilterType = null;
 
         // ===== Filter Lists =====
         function renderRegionDropdown() {
@@ -242,21 +241,24 @@
                     label: 'Haziran 2026'
                 });
             }
-            loadRegionFilters(function () {
-                var single = renderRegionDropdown();
-                if (single) {
-                    selectedRegion = { code: single.Code, name: single.Name };
-                }
-                loadBranchFilters(function () {
-                    var singleBranch = renderBranchDropdown();
-                    if (singleBranch) {
-                        selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+            // Sekmeler yalnızca sayfa ilk açılışında çekilir; bölge/şube seçimi tekrar tetiklemez
+            loadProductivityTabs(1, function () {
+                loadRegionFilters(function () {
+                    var single = renderRegionDropdown();
+                    if (single) {
+                        selectedRegion = { code: single.Code, name: single.Name };
                     }
-                    if (selectedRegion || selectedBranch) {
-                        updateUI();
-                    } else {
-                        updateYieldTable();
-                    }
+                    loadBranchFilters(function () {
+                        var singleBranch = renderBranchDropdown();
+                        if (singleBranch) {
+                            selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+                        }
+                        if (selectedRegion || selectedBranch) {
+                            updateUI();
+                        } else {
+                            updateYieldTable();
+                        }
+                    });
                 });
             });
         });
@@ -332,26 +334,13 @@
             updateBreadcrumb();
             updateScorecard();
 
-            var filterType = selectedBranch ? 2 : (selectedRegion ? 1 : null);
-
             if (selectedRegion || selectedBranch) {
-                if (filterType !== _lastFilterType) {
-                    _lastFilterType = filterType;
-                    loadProductivityTabs(filterType, function () {
-                        $('#yieldToggle').show();
-                        updateYieldTable();
-                    });
-                } else {
-                    $('#yieldToggle').show();
-                    updateYieldTable();
-                }
+                applyYieldScope(true);
+                $('#yieldToggle').show();
+                updateYieldTable();
             } else {
-                _activeToggleId = null;
-                _activeTabId = null;
-                _activeSubTabId = null;
+                applyYieldScope(false);
                 $('#yieldToggle').hide();
-                $('#tabBar').hide();
-                $('#subTabBar').hide();
                 updateYieldTable();
             }
         }
@@ -578,9 +567,8 @@
             }
 
             loadTableHeaders(toggleId, tabIds.tabId, tabIds.subTabId, filterType, function () {
-                // General
                 if (toggleId === 1) {
-                    loadGeneralRegionReport(regionCode);
+                    loadGeneralRegionReport(tabIds.tabId);
                 }
                 // Volume - region
                 else if (toggleId === 3 && selectedRegion && !selectedBranch) {

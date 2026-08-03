@@ -74,9 +74,16 @@ public static class MockProductivityReportData
         return new List<GetProductivityReportTabItem>
         {
             new() { TabId = 1, TabName = "Genel", ParentId = 0, TabLevel = 1 },
-            new() { TabId = 2, TabName = "Adet", ParentId = 0, TabLevel = 1 },
+            new() { TabId = 60, TabName = "Tümü", ParentId = 1, TabLevel = 2 },
+            new() { TabId = 61, TabName = "Kurumsal", ParentId = 1, TabLevel = 2 },
+            new() { TabId = 62, TabName = "Ticari", ParentId = 1, TabLevel = 2 },
+            new() { TabId = 63, TabName = "KOBİ", ParentId = 1, TabLevel = 2 },
+            new() { TabId = 64, TabName = "Tarım", ParentId = 1, TabLevel = 2 },
+            new() { TabId = 65, TabName = "Bireysel", ParentId = 1, TabLevel = 2 },
             new() { TabId = 3, TabName = "Hacim", ParentId = 0, TabLevel = 1 },
             new() { TabId = 4, TabName = "Karlılık", ParentId = 0, TabLevel = 1 },
+            new() { TabId = 2, TabName = "Adet", ParentId = 0, TabLevel = 1 },
+
 
             new() { TabId = 10, TabName = "Müşteri", ParentId = 2, TabLevel = 2 },
             new() { TabId = 11, TabName = "Ödeme Sistemleri", ParentId = 2, TabLevel = 2 },
@@ -117,6 +124,7 @@ public static class MockProductivityReportData
                 new()
                 {
                     Urun = "Vadesiz TL Mevduat",
+                    BankaGecenYil = 111_600_000m,
                     BankaGerceklesen = 125_430_000m,
                     BankaOrt = 118_200_000m,
                     BankaHedef = 130_000_000m,
@@ -129,6 +137,7 @@ public static class MockProductivityReportData
                 new()
                 {
                     Urun = "Vadeli TL Mevduat",
+                    BankaGecenYil = 315_700_000m,
                     BankaGerceklesen = 342_180_000m,
                     BankaOrt = 335_900_000m,
                     BankaHedef = 350_000_000m,
@@ -141,6 +150,7 @@ public static class MockProductivityReportData
                 new()
                 {
                     Urun = "Ticari Krediler",
+                    BankaGecenYil = 444_800_000m,
                     BankaGerceklesen = 512_600_000m,
                     BankaOrt = 495_100_000m,
                     BankaHedef = 520_000_000m,
@@ -651,12 +661,17 @@ public static class MockProductivityReportData
             ProductName = $"{segmentName} - Hacim Toplam",
             RealizationRegionValue = 1250m,
             RealizationRegionDiff = 150m,
+            RealizationRegionLastYearValue = 1080m,
+            RealizationRegionAverageValue = 1160m,
+            RealizationBankValue = 1420m,
             RealizationBankAverageValue = 1100m,
             RealizationBankAverageDiff = 0m,
             TargetValue = 1200m,
             HgRate = 0.92m,
             NetGrowthRegionValue = 85m,
             NetGrowthRegionDiff = 15m,
+            NetGrowthRegionAverageValue = 78m,
+            NetGrowthBankValue = 95m,
             NetGrowthBankAverageValue = 70m,
             NetGrowthBankAverageDiff = 0m,
             YtdRegionValue = 14200m,
@@ -675,12 +690,17 @@ public static class MockProductivityReportData
             ProductName = $"{segmentName} - Ürün A",
             RealizationRegionValue = 650m,
             RealizationRegionDiff = 70m,
+            RealizationRegionLastYearValue = 560m,
+            RealizationRegionAverageValue = 610m,
+            RealizationBankValue = 740m,
             RealizationBankAverageValue = 580m,
             RealizationBankAverageDiff = 0m,
             TargetValue = 600m,
             HgRate = 0.93m,
             NetGrowthRegionValue = 45m,
             NetGrowthRegionDiff = 7m,
+            NetGrowthRegionAverageValue = 41m,
+            NetGrowthBankValue = 52m,
             NetGrowthBankAverageValue = 38m,
             NetGrowthBankAverageDiff = 0m,
             YtdRegionValue = 7200m,
@@ -699,12 +719,17 @@ public static class MockProductivityReportData
             ProductName = $"{segmentName} - Ürün B",
             RealizationRegionValue = 600m,
             RealizationRegionDiff = 80m,
+            RealizationRegionLastYearValue = 520m,
+            RealizationRegionAverageValue = 550m,
+            RealizationBankValue = 680m,
             RealizationBankAverageValue = 520m,
             RealizationBankAverageDiff = 0m,
             TargetValue = 600m,
             HgRate = 0.90m,
             NetGrowthRegionValue = 40m,
             NetGrowthRegionDiff = 8m,
+            NetGrowthRegionAverageValue = 37m,
+            NetGrowthBankValue = 43m,
             NetGrowthBankAverageValue = 32m,
             NetGrowthBankAverageDiff = 0m,
             YtdRegionValue = 7000m,
@@ -734,16 +759,23 @@ public static class MockProductivityReportData
         {
             Id = 1,
             ProductName = $"{segmentName} - Toplam",
+            RealizationBranchLastYearValue = 106_000_000m,
             RealizationBranchValue = 125_000_000m,
+            RealizationBranchDiff = 19_000_000m,
+            RealizationRegionValue = 121_000_000m,
             RealizationRegionAverageValue = 118_000_000m,
             RealizationRegionAverageValueDiff = 15_000_000m,
+            RealizationBankValue = 142_000_000m,
             RealizationBankAverageValue = 110_000_000m,
             RealizationBankAverageValueDiff = 0m,
             TargetValue = 120_000_000m,
             HgRate = 1.042m,
             NetGrowthBranchValue = 8_500_000m,
+            NetGrowthBranchDiff = 1_300_000m,
+            NetGrowthRegionValue = 8_100_000m,
             NetGrowthRegionAverageValue = 7_200_000m,
             NetGrowthRegionAverageValueDiff = 1_300_000m,
+            NetGrowthBankValue = 9_400_000m,
             NetGrowthBankAverageValue = 6_500_000m,
             NetGrowthBankAverageValueDiff = 0m,
             YtdBranchValue = 1_250_000_000m,
@@ -762,16 +794,23 @@ public static class MockProductivityReportData
         {
             Id = 2,
             ProductName = $"{segmentName} - Ürün A",
+            RealizationBranchLastYearValue = 72_000_000m,
             RealizationBranchValue = 85_000_000m,
+            RealizationBranchDiff = 13_000_000m,
+            RealizationRegionValue = 82_000_000m,
             RealizationRegionAverageValue = 80_000_000m,
             RealizationRegionAverageValueDiff = 10_000_000m,
+            RealizationBankValue = 96_000_000m,
             RealizationBankAverageValue = 75_000_000m,
             RealizationBankAverageValueDiff = 0m,
             TargetValue = 82_000_000m,
             HgRate = 1.037m,
             NetGrowthBranchValue = 5_200_000m,
+            NetGrowthBranchDiff = 700_000m,
+            NetGrowthRegionValue = 4_900_000m,
             NetGrowthRegionAverageValue = 4_500_000m,
             NetGrowthRegionAverageValueDiff = 700_000m,
+            NetGrowthBankValue = 5_800_000m,
             NetGrowthBankAverageValue = 4_000_000m,
             NetGrowthBankAverageValueDiff = 0m,
             YtdBranchValue = 850_000_000m,
@@ -790,16 +829,23 @@ public static class MockProductivityReportData
         {
             Id = 3,
             ProductName = $"{segmentName} - Ürün B",
+            RealizationBranchLastYearValue = 34_000_000m,
             RealizationBranchValue = 40_000_000m,
+            RealizationBranchDiff = 6_000_000m,
+            RealizationRegionValue = 39_000_000m,
             RealizationRegionAverageValue = 38_000_000m,
             RealizationRegionAverageValueDiff = 5_000_000m,
+            RealizationBankValue = 46_000_000m,
             RealizationBankAverageValue = 35_000_000m,
             RealizationBankAverageValueDiff = 0m,
             TargetValue = 38_000_000m,
             HgRate = 1.053m,
             NetGrowthBranchValue = 3_300_000m,
+            NetGrowthBranchDiff = 600_000m,
+            NetGrowthRegionValue = 3_100_000m,
             NetGrowthRegionAverageValue = 2_700_000m,
             NetGrowthRegionAverageValueDiff = 600_000m,
+            NetGrowthBankValue = 3_600_000m,
             NetGrowthBankAverageValue = 2_500_000m,
             NetGrowthBankAverageValueDiff = 0m,
             YtdBranchValue = 400_000_000m,
@@ -956,8 +1002,11 @@ public static class MockProductivityReportData
             TargetValue = 5000m,
             RealizationRegionValue = 4800m,
             RealizationRegionValueDiff = 200m,
+            RegionAverageValue = 4700m,
+            BankAverageValue = 4900m,
             RealizationBankAverageValue = 4600m,
             RealizationBankAverageValueDiff = 0m,
+            BankBudgetValue = 0.92m,
             HgRegionValue = 0.96m,
             HgRegionValueDiff = 0.04m,
             HgBankAverageValue = 0.92m,
@@ -977,8 +1026,11 @@ public static class MockProductivityReportData
             TargetValue = 2800m,
             RealizationRegionValue = 2700m,
             RealizationRegionValueDiff = 100m,
+            RegionAverageValue = 2650m,
+            BankAverageValue = 2750m,
             RealizationBankAverageValue = 2600m,
             RealizationBankAverageValueDiff = 0m,
+            BankBudgetValue = 0.929m,
             HgRegionValue = 0.96m,
             HgRegionValueDiff = 0.03m,
             HgBankAverageValue = 0.93m,
@@ -998,8 +1050,11 @@ public static class MockProductivityReportData
             TargetValue = 1200m,
             RealizationRegionValue = 1150m,
             RealizationRegionValueDiff = 50m,
+            RegionAverageValue = 1120m,
+            BankAverageValue = 1180m,
             RealizationBankAverageValue = 1100m,
             RealizationBankAverageValueDiff = 0m,
+            BankBudgetValue = 0.958m,
             HgRegionValue = 0.96m,
             HgRegionValueDiff = 0.04m,
             HgBankAverageValue = 0.92m,
@@ -1029,10 +1084,16 @@ public static class MockProductivityReportData
             Description = "Toplam Karlılık (Şube)",
             TargetValue = 4200m,
             RealizationBranchValue = 3980m,
+            RealizationBranchValueDiff = 380m,
+            RegionAverageValue = 3900m,
             RealizationRegionAverageValue = 3850m,
             RealizationRegionAverageValueDiff = 250m,
+            BankAverageValue = 3720m,
             RealizationBankAverageValue = 3600m,
             RealizationBankAverageValueDiff = 0m,
+            BranchBudgetValue = 0.947m,
+            RegionBudgetValue = 0.912m,
+            BankBudgetValue = 0.883m,
             HgBranchValue = 0.948m,
             HgBranchValueDiff = 0m,
             HgRegionAverageValue = 0.917m,
@@ -1053,10 +1114,16 @@ public static class MockProductivityReportData
             Description = "Net Faiz Geliri",
             TargetValue = 2200m,
             RealizationBranchValue = 2080m,
+            RealizationBranchValueDiff = 180m,
+            RegionAverageValue = 2040m,
             RealizationRegionAverageValue = 2000m,
             RealizationRegionAverageValueDiff = 100m,
+            BankAverageValue = 1960m,
             RealizationBankAverageValue = 1900m,
             RealizationBankAverageValueDiff = 0m,
+            BranchBudgetValue = 0.945m,
+            RegionBudgetValue = 0.909m,
+            BankBudgetValue = 0.864m,
             HgBranchValue = 0.945m,
             HgBranchValueDiff = 0m,
             HgRegionAverageValue = 0.909m,
@@ -1077,10 +1144,16 @@ public static class MockProductivityReportData
             Description = "Komisyon Geliri",
             TargetValue = 800m,
             RealizationBranchValue = 760m,
+            RealizationBranchValueDiff = 80m,
+            RegionAverageValue = 740m,
             RealizationRegionAverageValue = 720m,
             RealizationRegionAverageValueDiff = 40m,
+            BankAverageValue = 700m,
             RealizationBankAverageValue = 680m,
             RealizationBankAverageValueDiff = 0m,
+            BranchBudgetValue = 0.95m,
+            RegionBudgetValue = 0.90m,
+            BankBudgetValue = 0.85m,
             HgBranchValue = 0.95m,
             HgBranchValueDiff = 0m,
             HgRegionAverageValue = 0.90m,
@@ -1297,6 +1370,10 @@ public static class MockProductivityReportData
 
     public static IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)
     {
+        // Genel
+        if (request.MainTabId == 1)
+            return GetGeneralTableHeaders();
+
         // Adet > Nakit Yönetimi
         if (request.MainTabId == 2 && request.MidTabId == 13)
             return GetCashManagementTableHeaders(request.FilterType);
@@ -1311,6 +1388,34 @@ public static class MockProductivityReportData
             new() { Id = 5, HeaderName = "Adet", ParentId = 4, OrderNo = 1, Sortable = true },
             new() { Id = 6, HeaderName = "Hacim", ParentId = 4, OrderNo = 2, Sortable = true },
             new() { Id = 7, HeaderName = "Karlılık", ParentId = 4, OrderNo = 3, Sortable = true }
+        };
+    }
+
+    // Genel (usp_Verim_Hacim_Metrikleri_Banka) kolonları; gövde alan sırası:
+    // Urun, BankaGecenYil, BankaGerceklesen, BankaOrt, BankaHedef, NetBuyumeBanka, NetBuyumeBankaOrt, YtdBanka, QtdBanka
+    private static IReadOnlyList<GetProductivityReportTableHeaderItem> GetGeneralTableHeaders()
+    {
+        return new List<GetProductivityReportTableHeaderItem>
+        {
+            new() { Id = 0, HeaderName = "#", ParentId = 0, OrderNo = 0, Sortable = false },
+            new() { Id = 1, HeaderName = "Ürün Adı", ParentId = 0, OrderNo = 1, Sortable = true },
+
+            new() { Id = 6, HeaderName = "Gerçekleşen", ParentId = 0, OrderNo = 6, Sortable = true },
+            new() { Id = 7, HeaderName = "Geçen Yıl", ParentId = 6, OrderNo = 7, Sortable = true },
+            new() { Id = 8, HeaderName = "Banka", ParentId = 6, OrderNo = 8, Sortable = true },
+            new() { Id = 9, HeaderName = "Banka Ort.", ParentId = 6, OrderNo = 9, Sortable = true },
+
+            new() { Id = 10, HeaderName = "Hedef", ParentId = 0, OrderNo = 10, Sortable = true },
+
+            new() { Id = 11, HeaderName = "Net Büyüme", ParentId = 0, OrderNo = 11, Sortable = true },
+            new() { Id = 12, HeaderName = "Banka", ParentId = 11, OrderNo = 12, Sortable = true },
+            new() { Id = 13, HeaderName = "Banka Ort.", ParentId = 11, OrderNo = 13, Sortable = true },
+
+            new() { Id = 14, HeaderName = "YTD", ParentId = 0, OrderNo = 14, Sortable = true },
+            new() { Id = 15, HeaderName = "Banka", ParentId = 14, OrderNo = 15, Sortable = true },
+
+            new() { Id = 16, HeaderName = "QTD", ParentId = 0, OrderNo = 16, Sortable = true },
+            new() { Id = 17, HeaderName = "Banka", ParentId = 16, OrderNo = 17, Sortable = true }
         };
     }
 
@@ -1364,7 +1469,7 @@ public static class MockProductivityReportData
             new()
             {
                 Code = "NplReport",
-                Name = "NPL ve Gecikmeli Krediler Raporu",
+                Name = "NPL Girişleri",
                 Url = "/npl-raporlari",
                 IsVisible = true,
                 OrderNo = 3

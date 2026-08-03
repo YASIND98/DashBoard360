@@ -584,6 +584,7 @@ public class ReportDataProvider : IReportDataProvider
             items.Add(new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
             {
                 Urun = ReadString(row, "URUN"),
+                BankaGecenYil = ReadDecimal(row, "BANKA_GECEN_YIL"),
                 BankaGerceklesen = ReadDecimal(row, "BANKA_GERCEKLESEN"),
                 BankaOrt = ReadDecimal(row, "BANKA_ORT"),
                 BankaHedef = ReadDecimal(row, "BANKA_HEDEF"),
@@ -1915,8 +1916,12 @@ public class ReportDataProvider : IReportDataProvider
 
         public decimal RealizationRegionValue { get; set; }
         public decimal? RealizationRegionValueDiff { get; set; }
+        public decimal RegionAverageValue { get; set; }
+        public decimal BankAverageValue { get; set; }
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageValueDiff { get; set; }
+
+        public decimal BankBudgetValue { get; set; }
 
         public decimal HgRegionValue { get; set; }
         public decimal? HgRegionValueDiff { get; set; }
@@ -1998,8 +2003,11 @@ public class ReportDataProvider : IReportDataProvider
             TargetValue = r.TargetValue,
             RealizationRegionValue = r.RealizationRegionValue,
             RealizationRegionValueDiff = r.RealizationRegionValueDiff,
+            RegionAverageValue = r.RegionAverageValue,
+            BankAverageValue = r.BankAverageValue,
             RealizationBankAverageValue = r.RealizationBankAverageValue,
             RealizationBankAverageValueDiff = r.RealizationBankAverageValueDiff,
+            BankBudgetValue = r.BankBudgetValue,
             HgRegionValue = r.HgRegionValue,
             HgRegionValueDiff = r.HgRegionValueDiff,
             HgBankAverageValue = r.HgBankAverageValue,
@@ -2191,6 +2199,10 @@ public class ReportDataProvider : IReportDataProvider
         public decimal RealizationRegionValue { get; set; }
         public decimal? RealizationRegionDiff { get; set; }
 
+        public decimal RealizationRegionLastYearValue { get; set; }
+        public decimal RealizationRegionAverageValue { get; set; }
+        public decimal RealizationBankValue { get; set; }
+
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageDiff { get; set; }
 
@@ -2199,6 +2211,9 @@ public class ReportDataProvider : IReportDataProvider
 
         public decimal NetGrowthRegionValue { get; set; }
         public decimal? NetGrowthRegionDiff { get; set; }
+
+        public decimal NetGrowthRegionAverageValue { get; set; }
+        public decimal NetGrowthBankValue { get; set; }
 
         public decimal NetGrowthBankAverageValue { get; set; }
         public decimal? NetGrowthBankAverageDiff { get; set; }
@@ -2282,12 +2297,17 @@ public class ReportDataProvider : IReportDataProvider
             ProductName = r.ProductName ?? string.Empty,
             RealizationRegionValue = r.RealizationRegionValue,
             RealizationRegionDiff = r.RealizationRegionDiff,
+            RealizationRegionLastYearValue = r.RealizationRegionLastYearValue,
+            RealizationRegionAverageValue = r.RealizationRegionAverageValue,
+            RealizationBankValue = r.RealizationBankValue,
             RealizationBankAverageValue = r.RealizationBankAverageValue,
             RealizationBankAverageDiff = r.RealizationBankAverageDiff,
             TargetValue = r.TargetValue,
             HgRate = r.HgRate,
             NetGrowthRegionValue = r.NetGrowthRegionValue,
             NetGrowthRegionDiff = r.NetGrowthRegionDiff,
+            NetGrowthRegionAverageValue = r.NetGrowthRegionAverageValue,
+            NetGrowthBankValue = r.NetGrowthBankValue,
             NetGrowthBankAverageValue = r.NetGrowthBankAverageValue,
             NetGrowthBankAverageDiff = r.NetGrowthBankAverageDiff,
             YtdRegionValue = r.YtdRegionValue,
@@ -2978,10 +2998,17 @@ public class ReportDataProvider : IReportDataProvider
         public decimal TargetValue { get; set; }
 
         public decimal RealizationBranchValue { get; set; }
+        public decimal? RealizationBranchValueDiff { get; set; }
+        public decimal RegionAverageValue { get; set; }
         public decimal RealizationRegionAverageValue { get; set; }
         public decimal? RealizationRegionAverageValueDiff { get; set; }
+        public decimal BankAverageValue { get; set; }
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageValueDiff { get; set; }
+
+        public decimal BranchBudgetValue { get; set; }
+        public decimal RegionBudgetValue { get; set; }
+        public decimal BankBudgetValue { get; set; }
 
         public decimal HgBranchValue { get; set; }
         public decimal? HgBranchValueDiff { get; set; }
@@ -3062,10 +3089,17 @@ public class ReportDataProvider : IReportDataProvider
             TargetValue = r.TargetValue,
 
             RealizationBranchValue = r.RealizationBranchValue,
+            RealizationBranchValueDiff = r.RealizationBranchValueDiff,
+            RegionAverageValue = r.RegionAverageValue,
             RealizationRegionAverageValue = r.RealizationRegionAverageValue,
             RealizationRegionAverageValueDiff = r.RealizationRegionAverageValueDiff,
+            BankAverageValue = r.BankAverageValue,
             RealizationBankAverageValue = r.RealizationBankAverageValue,
             RealizationBankAverageValueDiff = r.RealizationBankAverageValueDiff,
+
+            BranchBudgetValue = r.BranchBudgetValue,
+            RegionBudgetValue = r.RegionBudgetValue,
+            BankBudgetValue = r.BankBudgetValue,
 
             HgBranchValue = r.HgBranchValue,
             HgBranchValueDiff = r.HgBranchValueDiff,
@@ -3123,9 +3157,13 @@ public class ReportDataProvider : IReportDataProvider
 
         public string ProductName { get; set; } = string.Empty;
 
+        public decimal RealizationBranchLastYearValue { get; set; }
         public decimal RealizationBranchValue { get; set; }
+        public decimal? RealizationBranchDiff { get; set; }
+        public decimal RealizationRegionValue { get; set; }
         public decimal RealizationRegionAverageValue { get; set; }
         public decimal? RealizationRegionAverageValueDiff { get; set; }
+        public decimal RealizationBankValue { get; set; }
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageValueDiff { get; set; }
 
@@ -3133,8 +3171,11 @@ public class ReportDataProvider : IReportDataProvider
         public decimal HgRate { get; set; }
 
         public decimal NetGrowthBranchValue { get; set; }
+        public decimal? NetGrowthBranchDiff { get; set; }
+        public decimal NetGrowthRegionValue { get; set; }
         public decimal NetGrowthRegionAverageValue { get; set; }
         public decimal? NetGrowthRegionAverageValueDiff { get; set; }
+        public decimal NetGrowthBankValue { get; set; }
         public decimal NetGrowthBankAverageValue { get; set; }
         public decimal? NetGrowthBankAverageValueDiff { get; set; }
 
@@ -3213,9 +3254,13 @@ public class ReportDataProvider : IReportDataProvider
             Id = r.Id,
             ProductName = r.ProductName ?? string.Empty,
 
+            RealizationBranchLastYearValue = r.RealizationBranchLastYearValue,
             RealizationBranchValue = r.RealizationBranchValue,
+            RealizationBranchDiff = r.RealizationBranchDiff,
+            RealizationRegionValue = r.RealizationRegionValue,
             RealizationRegionAverageValue = r.RealizationRegionAverageValue,
             RealizationRegionAverageValueDiff = r.RealizationRegionAverageValueDiff,
+            RealizationBankValue = r.RealizationBankValue,
             RealizationBankAverageValue = r.RealizationBankAverageValue,
             RealizationBankAverageValueDiff = r.RealizationBankAverageValueDiff,
 
@@ -3223,8 +3268,11 @@ public class ReportDataProvider : IReportDataProvider
             HgRate = r.HgRate,
 
             NetGrowthBranchValue = r.NetGrowthBranchValue,
+            NetGrowthBranchDiff = r.NetGrowthBranchDiff,
+            NetGrowthRegionValue = r.NetGrowthRegionValue,
             NetGrowthRegionAverageValue = r.NetGrowthRegionAverageValue,
             NetGrowthRegionAverageValueDiff = r.NetGrowthRegionAverageValueDiff,
+            NetGrowthBankValue = r.NetGrowthBankValue,
             NetGrowthBankAverageValue = r.NetGrowthBankAverageValue,
             NetGrowthBankAverageValueDiff = r.NetGrowthBankAverageValueDiff,
 
