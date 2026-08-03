@@ -192,17 +192,9 @@ function renderMainTabs() {
     renderTabBar();
 }
 
-var HIDDEN_TAB_IDS = [11];
-
-function isHiddenTab(tabId) {
-    return HIDDEN_TAB_IDS.indexOf(tabId) > -1;
-}
-
 // ===== Render Tab Bar (Level 2 children of active main tab) =====
 function renderTabBar() {
-    var tabs = _productivityTabs.filter(function (t) {
-        return t.ParentId === _activeToggleId && t.TabLevel === 2 && !isHiddenTab(t.TabId);
-    });
+    var tabs = _productivityTabs.filter(function (t) { return t.ParentId === _activeToggleId && t.TabLevel === 2; });
     var $bar = $('#tabBar');
     var $list = $('#tabBarList');
 
@@ -232,9 +224,7 @@ function renderTabBar() {
 // ===== Render Sub Tab Bar (Level 3 children of active tab bar item) =====
 function renderSubTabBar() {
     var parentId = _activeTabId || _activeToggleId;
-    var tabs = _productivityTabs.filter(function (t) {
-        return t.ParentId === parentId && t.TabLevel === 3 && !isHiddenTab(t.TabId);
-    });
+    var tabs = _productivityTabs.filter(function (t) { return t.ParentId === parentId && t.TabLevel === 3; });
     var $bar = $('#subTabBar');
     var $list = $('#subTabBarList');
 
@@ -1030,6 +1020,7 @@ function renderCountCardPosRegionTable(items) {
 }
 
 // ===== Count Card/POS Ratio Region Report (Adet — Oran Tablosu — Bölge) =====
+// Ödeme Sistemleri tek tablo gösterir; oran tablosu ana konteynere (#dynamicTable) render edilir.
 function loadCountCardPosRatioRegionReport(regionCode, tabId) {
     // Load headers first, then data
     $.ajax({
@@ -1057,16 +1048,31 @@ function loadCountCardPosRatioRegionReport(regionCode, tabId) {
                 success: function (response) {
                     var data = extractResponseData(response);
                     renderCountCardPosRatioRegionTable(data);
-                    $('#dynamicTableContainer2').show();
                 }
             });
         }
     });
 }
 
+
+function setRatioCachedHeaders(names) {
+    _cachedHeaders = names.map(function (name, i) {
+        return { Id: i + 1, HeaderName: name, ParentId: 0, OrderNo: i + 1, Sortable: false };
+    });
+    _lastHeaderParams = null;
+}
+
 function renderCountCardPosRatioRegionHeaders(h) {
-    var $thead = $('#dynamicTableHead2');
+    var $thead = $('#dynamicTableHead');
     $thead.empty();
+
+    setRatioCachedHeaders([
+        h.RowNumberTitle,
+        h.RatioNameTitle,
+        h.PreviousQuarterRegionTitle,
+        h.CurrentRegionTitle,
+        h.CurrentBankAverageTitle
+    ]);
 
     var row = '<tr>';
     row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
@@ -1099,8 +1105,8 @@ function renderCountCardPosRatioRegionTable(items) {
         html += '</tr>';
     });
 
-    $('#dynamicTableBody2').html(html);
-    updateProductivityStripes2();
+    $('#dynamicTableBody').html(html);
+    updateProductivityStripes();
 }
 
 // ===== Count Card/POS Ratio Branch Report (Adet — Oran Tablosu — Şube) =====
@@ -1130,7 +1136,6 @@ function loadCountCardPosRatioBranchReport(branchCode, tabId) {
                 success: function (response) {
                     var data = extractResponseData(response);
                     renderCountCardPosRatioBranchTable(data);
-                    $('#dynamicTableContainer2').show();
                 }
             });
         }
@@ -1138,8 +1143,17 @@ function loadCountCardPosRatioBranchReport(branchCode, tabId) {
 }
 
 function renderCountCardPosRatioBranchHeaders(h) {
-    var $thead = $('#dynamicTableHead2');
+    var $thead = $('#dynamicTableHead');
     $thead.empty();
+
+    setRatioCachedHeaders([
+        h.RowNumberTitle,
+        h.RatioNameTitle,
+        h.PreviousQuarterBranchTitle,
+        h.CurrentBranchTitle,
+        h.CurrentRegionAverageTitle,
+        h.CurrentBankAverageTitle
+    ]);
 
     var row = '<tr>';
     row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
@@ -1174,8 +1188,8 @@ function renderCountCardPosRatioBranchTable(items) {
         html += '</tr>';
     });
 
-    $('#dynamicTableBody2').html(html);
-    updateProductivityStripes2();
+    $('#dynamicTableBody').html(html);
+    updateProductivityStripes();
 }
 
 // ===== Profit Total Region Report (Karlılık — Üst Tablo — Bölge) =====
