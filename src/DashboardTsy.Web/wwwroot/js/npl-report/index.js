@@ -138,21 +138,18 @@ $(function () {
 
     function buildRequest() {
         var f = (typeof NPL.getFilters === 'function') ? NPL.getFilters() : {};
-        var tab = $('#nplTabList .tab.active').attr('data-npltab') || '';
 
         var request = {
             bolgeKodu: toInt(f.regionCode),
             subeKodu: toInt(f.branchCode),
             yil: toInt(f.period),
             urun: f.productCode || null,
-            // Segment tabı iş kolunu belirler; "Tümü" filtre uygulamaz
-            isKolu: (tab && tab !== 'tumu') ? tab.toUpperCase() : null,
+            isKolu: null,
             tahsisKolu: null,
             yetkiKodu: null,
             katDonem: null
         };
 
-        // Panel seçimi tab varsayılanını ezer
         Object.keys(FILTER_CODE_TO_FIELD).forEach(function (code) {
             if (f[code]) request[FILTER_CODE_TO_FIELD[code]] = f[code];
         });
@@ -194,6 +191,8 @@ $(function () {
         var W = Math.max(ML + PLOT_W + MR, available);
         var baseY = MT + PLOT_H;
 
+        var offsetX = Math.max(0, (W - ML - MR - PLOT_W) / 2);
+
         var ticks = yTicks();
         var yMax = ticks[ticks.length - 1] || 1;
         var step = ticks[1] || yMax;                 // kademe büyüklüğü
@@ -214,7 +213,7 @@ $(function () {
 
         var bars = '';
         data.forEach(function (d, i) {
-            var cx = ML + i * band + band / 2;
+            var cx = ML + offsetX + i * band + band / 2;
             var x = cx - barW / 2;
 
             // Yükseklik ham sayıdan; tavanı aşan taşmaz
@@ -454,13 +453,6 @@ $(function () {
 
     // filter.js her filtre değişiminde çağırır
     NPL.reload = loadChart;
-
-    // ===== Sekmeler =====
-    $('#nplTabList').on('click', '.tab', function () {
-        $('#nplTabList .tab').removeClass('active');
-        $(this).addClass('active');
-        loadChart();
-    });
 
     // ===== Bakiye / Oran (metrik) =====
     // İkisi de aynı cevapta; metrik değişince servis çağrılmaz, sadece yeniden çizilir.

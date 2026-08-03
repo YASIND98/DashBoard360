@@ -14,9 +14,13 @@
         }
         return '';
     }
+
     var PRODUCT_FILTER_CODE = 'PRODUCT';
+    var BUSINESS_FILTER_CODE = 'BUSINESS';
 
     var _filterGroups = [];
+    var _businessOptions = [];
+    var _businessFilter = '';
 
     function buildFilterGroups(rows) {
         var byId = {};
@@ -60,7 +64,12 @@
                     return { value: o.code, text: o.name };
                 }) : [];
 
-                _filterGroups = groups.filter(function (g) { return g.code !== PRODUCT_FILTER_CODE; });
+                var business = groups.filter(function (g) { return g.code === BUSINESS_FILTER_CODE; })[0];
+                _businessOptions = business ? business.options : [];
+
+                _filterGroups = groups.filter(function (g) {
+                    return g.code !== PRODUCT_FILTER_CODE && g.code !== BUSINESS_FILTER_CODE;
+                });
                 if (callback) callback();
             },
             error: function () { if (callback) callback(); }
@@ -112,7 +121,7 @@
             period: _filters.period,
             product: itemText('product', _filters.product),
             productCode: _filters.product || null
-        }, groupSelectionValues(_groupFilters));
+        }, groupSelectionValues(_groupFilters), { BUSINESS: _businessFilter });   // iş kolu sekme barından
     };
 
     function reload() {
@@ -237,6 +246,23 @@
             reload();
         });
 
+        function renderBusinessTabs() {
+            var html = '<button class="tab' + (!_businessFilter ? ' active' : '') + '" data-npltab="">Tümü</button>';
+            _businessOptions.forEach(function (o) {
+                var active = (_businessFilter === o.code) ? ' active' : '';
+                html += '<button class="tab' + active + '" data-npltab="' + o.code + '">' + o.name + '</button>';
+            });
+            $('#nplTabList').html(html);
+        }
+
+        $(document).on('click', '#nplTabList .tab', function () {
+            var code = $(this).attr('data-npltab') || '';
+            if (code === _businessFilter) return;
+            _businessFilter = code;
+            renderBusinessTabs();
+            reload();
+        });
+
         // ===== Dönem / Ürün =====
         function renderStaticFilter(key) {
             var f = STATIC_FILTERS[key];
@@ -331,7 +357,9 @@
 
         // ===== İlk render =====
         Object.keys(STATIC_FILTERS).forEach(renderStaticFilter);
-        loadNplFilters(function () {          // Ürün dropdown'u + Filtreler paneli tek servisten dolar
+        renderBusinessTabs();
+        loadNplFilters(function () {
+            renderBusinessTabs();
             renderStaticFilter('product');
             _groupFilters = emptyGroupState();
             _groupDraft = emptyGroupState();
