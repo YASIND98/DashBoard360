@@ -34,6 +34,7 @@ var _sidebarIcons = {
 function withUsername(url) {
     var username = window.USER_CODE;
     if (!url || !username) return url;
+    if (/[?&]username=/i.test(url)) return url;
     return url + (url.indexOf('?') > -1 ? '&' : '?') + 'username=' + encodeURIComponent(username);
 }
 

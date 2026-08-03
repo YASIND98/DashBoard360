@@ -192,9 +192,17 @@ function renderMainTabs() {
     renderTabBar();
 }
 
+var HIDDEN_TAB_IDS = [11];
+
+function isHiddenTab(tabId) {
+    return HIDDEN_TAB_IDS.indexOf(tabId) > -1;
+}
+
 // ===== Render Tab Bar (Level 2 children of active main tab) =====
 function renderTabBar() {
-    var tabs = _productivityTabs.filter(function (t) { return t.ParentId === _activeToggleId && t.TabLevel === 2; });
+    var tabs = _productivityTabs.filter(function (t) {
+        return t.ParentId === _activeToggleId && t.TabLevel === 2 && !isHiddenTab(t.TabId);
+    });
     var $bar = $('#tabBar');
     var $list = $('#tabBarList');
 
@@ -224,7 +232,9 @@ function renderTabBar() {
 // ===== Render Sub Tab Bar (Level 3 children of active tab bar item) =====
 function renderSubTabBar() {
     var parentId = _activeTabId || _activeToggleId;
-    var tabs = _productivityTabs.filter(function (t) { return t.ParentId === parentId && t.TabLevel === 3; });
+    var tabs = _productivityTabs.filter(function (t) {
+        return t.ParentId === parentId && t.TabLevel === 3 && !isHiddenTab(t.TabId);
+    });
     var $bar = $('#subTabBar');
     var $list = $('#subTabBarList');
 
