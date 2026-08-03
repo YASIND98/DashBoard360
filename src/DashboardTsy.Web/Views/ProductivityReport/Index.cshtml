@@ -566,6 +566,12 @@
                 renderTableLegend('#tableLegend', { note: note, diff: diffLabel, ratio: isBranch });
             }
 
+            if (toggleId === 2 && tabIds.tabId === 11 && (selectedRegion || selectedBranch)) {
+                if (selectedBranch) loadCountCardPosRatioBranchReport(branchCode, 1);
+                else loadCountCardPosRatioRegionReport(regionCode, 1);
+                return;
+            }
+
             loadTableHeaders(toggleId, tabIds.tabId, tabIds.subTabId, filterType, function () {
                 if (toggleId === 1) {
                     loadGeneralRegionReport(tabIds.tabId);
@@ -578,11 +584,6 @@
                 else if (toggleId === 3 && selectedBranch) {
                     loadVolumeBranchReport(branchCode, tabIds.tabId || 0);
                 }
-                // Count - branch - Ödeme Sistemleri
-                else if (toggleId === 2 && selectedBranch && tabIds.tabId === 11) {
-                    loadCountCardPosRatioBranchReport(branchCode, 1);
-                    loadCountCardPosBranchReport(branchCode, 1);
-                }
                 // Count - branch - Cash Management
                 else if (toggleId === 2 && selectedBranch && tabIds.tabId === 12) {
                     loadCountCashManagementBranchReport(branchCode, tabIds.subTabId || 0);
@@ -590,11 +591,6 @@
                 // Count - branch - Customer
                 else if (toggleId === 2 && selectedBranch) {
                     loadCountCustomerBranchReport(branchCode, tabIds.subTabId || 0);
-                }
-                // Count - region - Ödeme Sistemleri
-                else if (toggleId === 2 && selectedRegion && !selectedBranch && tabIds.tabId === 11) {
-                    loadCountCardPosRatioRegionReport(regionCode, 1);
-                    loadCountCardPosRegionReport(regionCode, 1);
                 }
                 // Count - region - Cash Management
                 else if (toggleId === 2 && selectedRegion && !selectedBranch && tabIds.tabId === 12) {
