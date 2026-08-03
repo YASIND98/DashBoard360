@@ -157,8 +157,22 @@ function loadProductivityTabs(filterType, callback) {
 }
 
 // ===== Render Main Tabs (Level 1) =====
+// Genel banka geneli rapordur; bölge veya şube seçiliyken sekmelerde gösterilmez.
+var GENERAL_TAB_ID = 1;
+var _yieldScopeSelected = false;
+
+function applyYieldScope(selected) {
+    selected = !!selected;
+    if (selected === _yieldScopeSelected) return;
+    _yieldScopeSelected = selected;
+    renderMainTabs();
+}
+
 function renderMainTabs() {
-    var mainTabs = _productivityTabs.filter(function (t) { return t.TabLevel === 1; });
+    var mainTabs = _productivityTabs.filter(function (t) {
+        if (t.TabLevel !== 1) return false;
+        return !(_yieldScopeSelected && t.TabId === GENERAL_TAB_ID);
+    });
     var $toggle = $('#yieldToggle');
     $toggle.empty();
 
@@ -309,67 +323,37 @@ $(document).on('click', '#dynamicTable thead th, #dynamicTable2 thead th', funct
     }
 });
 
-// ===== General Region Report =====
-function loadGeneralRegionReport(regionCode) {
+function loadGeneralRegionReport(tabId) {
+    var tab = (tabId != null) ? String(tabId) : null;
+
     $.ajax({
         url: '/ProductivityReport/GetProductivityGeneralRegionReport',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
-            sessionId: '1',
-            regionCode: regionCode || null,
-            reportDate: _selectedDate,
-            sortBy: _yieldSortBy !== null ? _yieldSortBy : 0,
-            isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
+            isKoluAdi: tab,
+            segment: tab
         }),
         success: function (response) {
             var data = extractResponseData(response);
-            var flatData = flattenRows(data, 0);
-            var hasExpandable = flatData.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderDynamicHeaders(_cachedHeaders, false);
 
             var html = '';
-            flatData.forEach(function (row, i) {
+            (data || []).forEach(function (row, i) {
                 var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-                var depthClass = row._depth > 0 ? ' sub-row depth-' + row._depth : '';
-                var expandClass = row._hasChildren ? ' expandable' : '';
 
-                html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+                html += '<tr class="table-row ' + cls + '">';
                 html += '<td class="col-index">' + (i + 1) + '</td>';
-
-                if (hasExpandable) {
-                    if (row._hasChildren) {
-                        html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
-                    } else {
-                        html += '<td class="col-expand"></td>';
-                    }
-                }
-
-                var matchBranch = null;
-                if (typeof _branchFilters !== 'undefined' && _branchFilters) {
-                    for (var bi = 0; bi < _branchFilters.length; bi++) {
-                        if (_branchFilters[bi].Name === row.BranchName) {
-                            matchBranch = _branchFilters[bi];
-                            break;
-                        }
-                    }
-                }
-                var nameHtml = matchBranch
-                    ? '<span class="branch-link" data-branch-code="' + matchBranch.Code + '">' + row.BranchName + '</span>'
-                    : row.BranchName;
-                var indent = row._depth > 0 ? '<span style="padding-left:' + (row._depth * 16) + 'px">' + nameHtml + '</span>' : nameHtml;
-                html += '<td class="col-left">' + indent + '</td>';
-                html += '<td class="' + percentColor(row.FirstMonthRealizationRate) + '">' + formatPercent(row.FirstMonthRealizationRate) + '</td>';
-                html += '<td class="' + percentColor(row.SecondMonthRealizationRate) + '">' + formatPercent(row.SecondMonthRealizationRate) + '</td>';
-                html += '<td class="' + percentColor(row.ThirdMonthRealizationRate) + '">' + formatPercent(row.ThirdMonthRealizationRate) + '</td>';
-                html += '<td class="' + percentColor(row.CorporateRate) + '">' + formatPercent(row.CorporateRate) + '</td>';
-                html += '<td class="' + percentColor(row.CommercialRate) + '">' + formatPercent(row.CommercialRate) + '</td>';
-                html += '<td class="' + percentColor(row.KbiRate) + '">' + formatPercent(row.KbiRate) + '</td>';
-                html += '<td class="' + percentColor(row.ObiRate) + '">' + formatPercent(row.ObiRate) + '</td>';
-                html += '<td class="' + percentColor(row.AgricultureRate) + '">' + formatPercent(row.AgricultureRate) + '</td>';
-                html += '<td class="' + percentColor(row.MassRate) + '">' + formatPercent(row.MassRate) + '</td>';
-                html += '<td class="' + percentColor(row.AffluentRate) + '">' + formatPercent(row.AffluentRate) + '</td>';
-                html += '<td class="' + percentColor(row.PrivateBankingRate) + '">' + formatPercent(row.PrivateBankingRate) + '</td>';
+                html += '<td class="col-left">' + row.Urun + '</td>';
+                html += '<td>' + formatNumber(row.BankaGecenYil) + '</td>';
+                html += '<td>' + formatNumber(row.BankaGerceklesen) + '</td>';
+                html += '<td>' + formatNumber(row.BankaOrt) + '</td>';
+                html += '<td>' + formatNumber(row.BankaHedef) + '</td>';
+                html += '<td class="' + percentColor(row.HgYuzde) + '">' + formatPercent(row.HgYuzde) + '</td>';
+                html += '<td>' + formatNumber(row.NetBuyumeBanka) + '</td>';
+                html += '<td>' + formatNumber(row.NetBuyumeBankaOrt) + '</td>';
+                html += '<td>' + formatPercent(row.YtdBanka) + '</td>';
+                html += '<td>' + formatPercent(row.QtdBanka) + '</td>';
                 html += '</tr>';
             });
             $('#dynamicTableBody').html(html);
@@ -559,11 +543,16 @@ function renderVolumeRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-left">' + indent + '</td>';
 
+        html += '<td>' + formatNumber(item.RealizationRegionLastYearValue) + '</td>';
         html += '<td>' + formatNumber(item.RealizationRegionValue) +'</td>';
+        html += '<td>' + formatNumber(item.RealizationRegionAverageValue) + '</td>';
+        html += '<td>' + formatNumber(item.RealizationBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
+        html += '<td>' + formatNumber(item.NetGrowthRegionAverageValue) + '</td>';
+        html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
         html += '<td>' + item.YtdRegionValue + '</td>';
         html += '<td class="has-diff">' + item.YtdBankAverageValue + formatDiff(item.YtdBankAverageDiff) + '</td>';
@@ -628,13 +617,18 @@ function renderVolumeBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.ProductName + '</span>' : item.ProductName;
         html += '<td class="col-left">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
+        html += '<td>' + formatNumber(item.RealizationBranchLastYearValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBranchValue) + formatDiff(item.RealizationBranchDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.RealizationRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.RealizationBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.NetGrowthBranchValue) + formatDiff(item.NetGrowthBranchDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionAverageValue) + formatDiff(item.NetGrowthRegionAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageValueDiff, true) + '</td>';
         html += '<td>' + item.YtdBranchValue + '</td>';
         html += '<td class="has-diff">' + item.YtdRegionValue + formatDiff(item.YtdRegionValueDiff) + '</td>';
@@ -1228,14 +1222,16 @@ function renderProfitTotalRegionTable(items) {
 
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionValue) + formatDiff(item.RealizationRegionValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.RegionAverageValue) + '</td>';
+        html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatPercent(item.BankBudgetValue) + '</td>';
         html += '<td class="has-diff">' + item.HgRegionValue + formatDiff(item.HgRegionValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
         html += '<td>' + formatNumber(item.RetailValue) + '</td>';
         html += '<td>' + formatNumber(item.KobiValue) + '</td>';
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -1279,7 +1275,6 @@ function renderProfitRatioRegionHeaders(hasExpandable) {
     row += '<th class="col-index">#</th>';
     row += expandTh;
     row += '<th class="col-left">Oran Adı</th>';
-    row += '<th>Hedef</th>';
     row += '<th>Bölge</th>';
     row += '<th>Banka</th>';
     row += '<th>Bireysel</th>';
@@ -1317,8 +1312,6 @@ function renderProfitRatioRegionTable(items) {
 
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-left">' + indent + '</td>';
-
-        html += '<td>' + fmt(item.TargetValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent) + '</td>';
         html += '<td>' + fmt(item.RetailValue) + '</td>';
@@ -1381,8 +1374,6 @@ function renderProfitRatioBranchTable(items) {
 
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-left">' + indent + '</td>';
-
-        html += '<td>' + fmt(item.TargetValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent) + '</td>';
         html += '<td>' + fmt(item.RetailValue) + '</td>';
@@ -1448,9 +1439,14 @@ function renderProfitTotalBranchTable(items) {
         html += '<td class="col-left">' + indent + '</td>';
 
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatNumber(item.RealizationBranchValue) + formatDiff(item.RealizationBranchValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.RegionAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
+        html += '<td class="' + percentColor(item.BranchBudgetValue) + '">' + formatPercent(item.BranchBudgetValue) + '</td>';
+        html += '<td>' + formatPercent(item.RegionBudgetValue) + '</td>';
+        html += '<td>' + formatPercent(item.BankBudgetValue) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBranchValue) + '">' + formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
@@ -1458,7 +1454,6 @@ function renderProfitTotalBranchTable(items) {
         html += '<td>' + formatNumber(item.KobiValue) + '</td>';
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.PartnerValue) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -1513,7 +1508,7 @@ function renderProfitSpreadManagementRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-left">' + indent + '</td>';
 
-        html += '<td>' + item.SpreadValue + '</td>';
+        html += '<td>' + formatNumber(item.SpreadValue) + '</td>';
         html += '<td>' + item.RatioRegionValue + '</td>';
         html += '<td>' + item.RatioBankAverageValue + '</td>';
         html += '<td>' + item.NetReturnRegionValue + '</td>';
@@ -1574,7 +1569,7 @@ function renderProfitSpreadManagementBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
         html += '<td class="col-left">' + indent + '</td>';
 
-        html += '<td>' + item.SpreadValue + '</td>';
+        html += '<td>' + formatNumber(item.SpreadValue) + '</td>';
         html += '<td>' + item.RatioBranchValue + '</td>';
         html += '<td class="has-diff">' + item.RatioRegionAverageValue + formatDiff(item.RatioRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.RatioBankAverageValue + formatDiff(item.RatioBankAverageValueDiff) + '</td>';

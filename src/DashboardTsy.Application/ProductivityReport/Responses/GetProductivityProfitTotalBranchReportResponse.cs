@@ -12,10 +12,17 @@ public class GetProductivityProfitTotalBranchReportResponse
         public decimal TargetValue { get; set; }
 
         public decimal RealizationBranchValue { get; set; }
+        public decimal? RealizationBranchValueDiff { get; set; }
+        public decimal RegionAverageValue { get; set; }
         public decimal RealizationRegionAverageValue { get; set; }
         public decimal? RealizationRegionAverageValueDiff { get; set; }
+        public decimal BankAverageValue { get; set; }
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageValueDiff { get; set; }
+
+        public decimal BranchBudgetValue { get; set; }
+        public decimal RegionBudgetValue { get; set; }
+        public decimal BankBudgetValue { get; set; }
 
         public decimal HgBranchValue { get; set; }
         public decimal? HgBranchValueDiff { get; set; }

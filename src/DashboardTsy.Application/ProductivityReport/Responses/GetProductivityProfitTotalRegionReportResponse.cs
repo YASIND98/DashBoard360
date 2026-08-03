@@ -13,8 +13,12 @@ public class GetProductivityProfitTotalRegionReportResponse
 
         public decimal RealizationRegionValue { get; set; }
         public decimal? RealizationRegionValueDiff { get; set; }
+        public decimal RegionAverageValue { get; set; }
+        public decimal BankAverageValue { get; set; }
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageValueDiff { get; set; }
+
+        public decimal BankBudgetValue { get; set; }
 
         public decimal HgRegionValue { get; set; }
         public decimal? HgRegionValueDiff { get; set; }

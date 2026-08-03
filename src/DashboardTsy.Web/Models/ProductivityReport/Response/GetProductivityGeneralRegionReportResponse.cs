@@ -7,6 +7,7 @@ public class GetProductivityGeneralRegionReportResponse
     public class GetProductivityGeneralRegionReportItem
     {
         public string Urun { get; set; } = string.Empty;
+        public decimal BankaGecenYil { get; set; }
         public decimal BankaGerceklesen { get; set; }
         public decimal BankaOrt { get; set; }
         public decimal BankaHedef { get; set; }
