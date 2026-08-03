@@ -12,6 +12,10 @@ public class GetProductivityVolumeRegionReportResponse
         public decimal RealizationRegionValue { get; set; }
         public decimal? RealizationRegionDiff { get; set; }
 
+        public decimal RealizationRegionLastYearValue { get; set; }
+        public decimal RealizationRegionAverageValue { get; set; }
+        public decimal RealizationBankValue { get; set; }
+
         public decimal RealizationBankAverageValue { get; set; }
         public decimal? RealizationBankAverageDiff { get; set; }
 
@@ -20,6 +24,9 @@ public class GetProductivityVolumeRegionReportResponse
 
         public decimal NetGrowthRegionValue { get; set; }
         public decimal? NetGrowthRegionDiff { get; set; }
+
+        public decimal NetGrowthRegionAverageValue { get; set; }
+        public decimal NetGrowthBankValue { get; set; }
 
         public decimal NetGrowthBankAverageValue { get; set; }
         public decimal? NetGrowthBankAverageDiff { get; set; }
