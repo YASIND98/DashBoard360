@@ -1,10 +1,17 @@
 var _selectedDate =  _todayDate;
 
 // ===== Yield Table Skeleton + Loading =====
+var _yieldLoadingActive = false;
+var _yieldHasSecondTable = false;
+
 function showYieldTableLoading() {
+    _yieldLoadingActive = true;
+    _yieldHasSecondTable = false;
     // Tablo container'ları gizle, skeleton göster
     $('#dynamicTableContainer').hide();
     $('#dynamicTableContainer2').hide();
+    $('#dynamicTableHead').html('');
+    $('#dynamicTableHead2').html('');
     $('#dynamicTableBody').html('');
     $('#dynamicTableBody2').html('');
     $('#pageSkeleton').show();
@@ -12,13 +19,25 @@ function showYieldTableLoading() {
         stoppable: false,
         message: '<div><div class="brand-spinner"></div><p class="loading-text">Yükleniyor<span class="loading-dots"><span>.</span><span>.</span><span>.</span></span></p></div>'
     });
+
+    // Hiç istek açılmayan kombinasyonlarda ajaxStop tetiklenmez
+    setTimeout(function () {
+        if (_yieldLoadingActive && !$.active) hideYieldTableLoading();
+    }, 0);
 }
 
 function hideYieldTableLoading() {
+    _yieldLoadingActive = false;
     $('#pageSkeleton').hide();
     $('#dynamicTableContainer').show();
+    $('#dynamicTableContainer2').toggle(_yieldHasSecondTable);
     $('body').loading('stop');
 }
+
+// Loading'i son biten istek kapatır
+$(document).ajaxStop(function () {
+    if (_yieldLoadingActive) hideYieldTableLoading();
+});
 
 // ===== Nested Response Helpers =====
 function flattenRows(items, depth) {
@@ -1294,7 +1313,7 @@ function loadProfitRatioRegionReport(regionCode) {
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderProfitRatioRegionHeaders(hasExpandable);
             renderProfitRatioRegionTable(items);
-            $('#dynamicTableContainer2').show();
+            _yieldHasSecondTable = true;
         }
     });
 }
@@ -1379,7 +1398,7 @@ function loadProfitRatioBranchReport(branchCode) {
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderProfitRatioRegionHeaders(hasExpandable);
             renderProfitRatioBranchTable(items);
-            $('#dynamicTableContainer2').show();
+            _yieldHasSecondTable = true;
         }
     });
 }
@@ -1656,14 +1675,12 @@ function updateProductivityStripes2() {
     applyProductivityStripes($('#dynamicTable2'));
     applyFirstGroupSelected($('#dynamicTable2'));
     reapplySortVisual($('#dynamicTable2'));
-    hideYieldTableLoading();
 }
 
 function updateProductivityStripes() {
     applyProductivityStripes($('#dynamicTable'));
     applyFirstGroupSelected($('#dynamicTable'));
     reapplySortVisual($('#dynamicTable'));
-    hideYieldTableLoading();
 }
 
 function applyFirstGroupSelected($table) {

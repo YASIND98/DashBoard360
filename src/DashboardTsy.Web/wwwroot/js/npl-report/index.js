@@ -123,14 +123,6 @@ $(function () {
         });
     }
 
-    // Panel filtre seçimlerini SP parametrelerine eşler (karşılığı olmayan gönderilmez).
-    var FILTER_CODE_TO_FIELD = {
-        BUSINESS: 'isKolu',
-        ALLOCATION: 'tahsisKolu',
-        AUTHORITY: 'yetkiKodu',
-        PERIOD: 'katDonem'
-    };
-
     function toInt(v) {
         var n = parseInt(v, 10);
         return isNaN(n) ? null : n;
@@ -138,23 +130,13 @@ $(function () {
 
     function buildRequest() {
         var f = (typeof NPL.getFilters === 'function') ? NPL.getFilters() : {};
+        var selections = (typeof NPL.getFilterSelections === 'function') ? NPL.getFilterSelections() : {};
 
-        var request = {
-            bolgeKodu: toInt(f.regionCode),
-            subeKodu: toInt(f.branchCode),
-            yil: toInt(f.period),
-            urun: f.productCode || null,
-            isKolu: null,
-            tahsisKolu: null,
-            yetkiKodu: null,
-            katDonem: null
-        };
-
-        Object.keys(FILTER_CODE_TO_FIELD).forEach(function (code) {
-            if (f[code]) request[FILTER_CODE_TO_FIELD[code]] = f[code];
-        });
-
-        return request;
+        return $.extend({
+            BolgeKodu: toInt(f.regionCode),
+            SubeKodu: toInt(f.branchCode),
+            Yil: toInt(f.period)
+        }, selections);
     }
 
     function fetchChart(callback) {
@@ -235,7 +217,7 @@ $(function () {
                 bars += '<text x="' + cx + '" y="' + (yInterest - 8) + '" text-anchor="middle" class="npl-chart-total">' + fmtValue(d.total) + '</text>';
             }
             if (hInterest >= MIN_LABEL_H) {
-                bars += '<text x="' + cx + '" y="' + (yInterest + hInterest / 2 + 4) + '" text-anchor="middle" class="npl-chart-value npl-chart-value-interest">' + fmtValue(d.kof) + '</text>';
+                bars += '<text x="' + cx + '" y="' + (yInterest + hInterest / 2 + 4) + '" text-anchor="middle" class="npl-chart-value">' + fmtValue(d.kof) + '</text>';
             }
             if (hPrincipal >= MIN_LABEL_H) {
                 bars += '<text x="' + cx + '" y="' + (yPrincipal + hPrincipal / 2 + 4) + '" text-anchor="middle" class="npl-chart-value">' + fmtValue(d.principal) + '</text>';
@@ -486,5 +468,10 @@ $(function () {
     };
 
     // ===== İlk render =====
-    loadChart();
+    // filter.js, GetNplFilters dönene kadar bekletir (bkz. requestReload).
+    if (typeof NPL.requestReload === 'function') {
+        NPL.requestReload();
+    } else {
+        loadChart();
+    }
 });
