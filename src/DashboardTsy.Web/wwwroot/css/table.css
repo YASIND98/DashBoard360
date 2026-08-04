@@ -320,6 +320,10 @@
   gap: 6px;
 }
 
+.page-home .col-left .col-group-header-content {
+  justify-content: flex-start;
+}
+
 
 .col-group-header::after {
   content: '';
