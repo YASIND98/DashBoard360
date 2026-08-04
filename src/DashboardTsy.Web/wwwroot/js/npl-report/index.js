@@ -7,7 +7,7 @@ $(function () {
     var _chartData = [];    // aktif metriğe göre türetilmiş
     var H = 520;
     var ML = 78, MR = 24, MT = 44, MB = 52;
-    var BAR_W = 44;                                 // sabit sütun genişliği
+    var BAR_W = 56;                                 // sabit sütun genişliği
     var BAND = 78;                                  // sütun + boşluk (etiketler sığsın diye geniş)
     var PLOT_H = H - MT - MB;
     var MIN_LABEL_H = 16;                            // etiket parçaya sığan en küçük yükseklik
@@ -235,7 +235,7 @@ $(function () {
                 bars += '<text x="' + cx + '" y="' + (yInterest - 8) + '" text-anchor="middle" class="npl-chart-total">' + fmtValue(d.total) + '</text>';
             }
             if (hInterest >= MIN_LABEL_H) {
-                bars += '<text x="' + cx + '" y="' + (yInterest + hInterest / 2 + 4) + '" text-anchor="middle" class="npl-chart-value">' + fmtValue(d.kof) + '</text>';
+                bars += '<text x="' + cx + '" y="' + (yInterest + hInterest / 2 + 4) + '" text-anchor="middle" class="npl-chart-value npl-chart-value-interest">' + fmtValue(d.kof) + '</text>';
             }
             if (hPrincipal >= MIN_LABEL_H) {
                 bars += '<text x="' + cx + '" y="' + (yPrincipal + hPrincipal / 2 + 4) + '" text-anchor="middle" class="npl-chart-value">' + fmtValue(d.principal) + '</text>';
