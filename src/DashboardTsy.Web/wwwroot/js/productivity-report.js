@@ -433,10 +433,20 @@ function renderDynamicHeaders(headers, hasExpandable, withDetail) {
     // var detailTh = withDetail ? '<th rowspan="' + rowspan + '" class="col-detail"></th>' : '';
     var detailTh = '';
 
+    var INFO_ICON = '<span class="info-icon" data-tooltip="Ürünler konsolide değil solo kalemleri içermektedir." tabindex="0"><img src="/images/info.svg" alt="" /></span>';
+
+    function headerContent(h, idx) {
+        var text = h.HeaderName + sortIcon(h);
+        if (idx === 1) {
+            return '<div class="col-group-header-content" style="justify-content:flex-start;">' + INFO_ICON + '<span>' + h.HeaderName + '</span>' + sortIcon(h) + '</div>';
+        }
+        return text;
+    }
+
     if (!hasGroupHeaders) {
         var row = '<tr>';
         topHeaders.forEach(function (h, i) {
-            row += '<th' + getClasses(h, false) + '>' + h.HeaderName + sortIcon(h) + '</th>';
+            row += '<th' + getClasses(h, false) + '>' + headerContent(h, i) + '</th>';
             if (i === 0) row += expandTh;
         });
         row += detailTh;
@@ -464,7 +474,7 @@ function renderDynamicHeaders(headers, hasExpandable, withDetail) {
                     row2 += '<th' + childCls + '>' + c.HeaderName + sortIcon(c) + '</th>';
                 });
             } else {
-                row1 += '<th rowspan="2"' + getClasses(h, true) + '>' + h.HeaderName + sortIcon(h) + '</th>';
+                row1 += '<th rowspan="2"' + getClasses(h, true) + '>' + headerContent(h, i) + '</th>';
             }
             if (i === 0) row1 += expandTh;
         });

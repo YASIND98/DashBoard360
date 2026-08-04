@@ -622,6 +622,7 @@ $(document).ready(function () {
       showInfoTooltip($(this));
   });
   $(document).on('mouseleave focusout', '[data-tooltip]', hideInfoTooltip);
+  $(document).on('click', '[data-period], [data-type], [data-toggleId], [data-tabId]', hideInfoTooltip);
   $(window).on('scroll resize', hideInfoTooltip);
   $(document).on('scroll', '.table-wrapper, .table-container', hideInfoTooltip);
 });
