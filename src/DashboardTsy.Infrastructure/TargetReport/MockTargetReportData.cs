@@ -583,21 +583,21 @@ public static class MockTargetReportData
     {
         var product = string.IsNullOrWhiteSpace(request.Urun) ? "Aktif Emekli Maaş Müşteri Adedi" : request.Urun!;
 
-        var series = new (int Year, int Month, long Count)[]
+        var series = new (int Year, int Month, decimal Count)[]
         {
-            (2025, 6,  899_942L),
-            (2025, 7,  894_131L),
-            (2025, 8,  892_560L),
-            (2025, 9,  892_274L),
-            (2025, 10, 899_140L),
-            (2025, 11, 902_957L),
-            (2025, 12, 911_173L),
-            (2026, 1,  933_033L),
-            (2026, 2,  948_383L),
-            (2026, 3,  976_087L),
-            (2026, 4,  989_538L),
-            (2026, 5,  997_222L),
-            (2026, 6,  1_002_812L)
+            (2025, 6,  899_942m),
+            (2025, 7,  894_131m),
+            (2025, 8,  892_560m),
+            (2025, 9,  892_274m),
+            (2025, 10, 899_140m),
+            (2025, 11, 902_957m),
+            (2025, 12, 911_173m),
+            (2026, 1,  933_033m),
+            (2026, 2,  948_383m),
+            (2026, 3,  976_087m),
+            (2026, 4,  989_538m),
+            (2026, 5,  997_222m),
+            (2026, 6,  1_002_812m)
         };
 
         return series

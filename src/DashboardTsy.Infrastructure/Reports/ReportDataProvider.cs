@@ -329,7 +329,7 @@ public class ReportDataProvider : IReportDataProvider
         {
             ProductName = ReadString(row, "URUN"),
             ReportDate = ReadDate(row, "TARIH_DETAY"),
-            Count = ReadLong(row, "ADET")
+            Count = ReadDecimal(row, "ADET")
         });
     }
 

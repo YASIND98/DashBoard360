@@ -4,5 +4,5 @@ public class GetQuantityTrendAnalysisItem
 {
     public string ProductName { get; set; } = string.Empty;
     public DateTime ReportDate { get; set; }
-    public long Count { get; set; }
+    public decimal Count { get; set; }
 }
