@@ -35,28 +35,7 @@ public class NplReportProvider : INplReportProvider
         if (MockEnabled)
             return MockNplReportData.GetNplBalanceRatio(request);
 
-        var parameters = new Dictionary<string, object?>
-        {
-            ["@KAT_DONEM"] = string.IsNullOrWhiteSpace(request.KatDonem) ? null : request.KatDonem,
-            ["@ISKOLU"] = string.IsNullOrWhiteSpace(request.IsKolu) ? null : request.IsKolu,
-            ["@TAHSIS_KOLU"] = string.IsNullOrWhiteSpace(request.TahsisKolu) ? null : request.TahsisKolu,
-            ["@SUBE_KODU"] = request.SubeKodu,
-            ["@BOLGE_KODU"] = request.BolgeKodu,
-            ["@URUN"] = string.IsNullOrWhiteSpace(request.Urun) ? null : request.Urun,
-            ["@Yıl"] = request.Yil,
-            ["@YETKI_KODU"] = string.IsNullOrWhiteSpace(request.YetkiKodu) ? null : request.YetkiKodu,
-            ["@BONUS_BUSINESS_FLAG"] = request.BonusBusinessFlag,
-            ["@BIREYSEL_MIKRO_FLAG"] = request.BireyselMikroFlag,
-            ["@IRS_Flag"] = request.IrsFlag,
-            ["@YAPILANDIRMA_FLAG"] = request.YapilandirmaFlag,
-            ["@YAPILANDIRMA_FLAG_KREDI"] = string.IsNullOrWhiteSpace(request.YapilandirmaFlagKredi) ? null : request.YapilandirmaFlagKredi,
-            ["@IHTIYAC_TICARI_FLAG"] = request.IhtiyacTicariFlag,
-            ["@KGFLI_KREDI_FLAG"] = request.KgfliKrediFlag,
-            ["@KGFLI_MUST_FLAG"] = request.KgfliMustFlag,
-            ["@EMEKLI_FLAG"] = request.EmekliFlag,
-            ["@DB_MAAS_ODEMESI_FLAG"] = request.DbMaasOdemesiFlag,
-            ["@OB"] = string.IsNullOrWhiteSpace(request.Ob) ? null : request.Ob
-        };
+        var parameters = NplBalanceRatioSpParameters.Bind(request.Parameters);
 
         var ds = _spExecutor.ExecuteDataSet(ConnectionKey, ProcedureName, parameters);
         if (ds.Tables.Count == 0)
