@@ -36,6 +36,9 @@ public class NplReportProvider : INplReportProvider
             return MockNplReportData.GetNplBalanceRatio(request);
 
         var parameters = NplBalanceRatioSpParameters.Bind(request.Parameters);
+        parameters["@SUBE_KODU"] = request.SubeKodu;
+        parameters["@BOLGE_KODU"] = request.BolgeKodu;
+        parameters["@Yıl"] = request.Yil;
 
         var ds = _spExecutor.ExecuteDataSet(ConnectionKey, ProcedureName, parameters);
         if (ds.Tables.Count == 0)
