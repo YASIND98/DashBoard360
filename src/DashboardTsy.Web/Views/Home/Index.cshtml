@@ -1,4 +1,11 @@
 @model ReportViewModel
+@using Microsoft.AspNetCore.Html
+@{
+    Func<object, IHtmlContent> productNameInfoIcon =
+        @<span class="info-icon" data-tooltip="Ürünler konsolide değil solo kalemleri içermektedir." tabindex="0">
+            <img src="~/images/info.svg" alt="" asp-append-version="true" />
+        </span>;
+}
 
 <!-- Skeleton Loading -->
 <div id="pageSkeleton" class="page-skeleton">
@@ -132,7 +139,10 @@
                 <th class="col-index"></th>
                 <th class="col-expand"></th>
                 <th class="col-left valign-top">
-                  <span data-daily-header="ProductNameTitle"></span>
+                  <div class="col-group-header-content">
+                    @productNameInfoIcon(null)
+                    <span data-daily-header="ProductNameTitle"></span>
+                  </div>
                 </th>
                 <th>
                     <span data-daily-header="LastYearTitle"></span>
@@ -282,7 +292,10 @@
                   <th class="col-index" rowspan="2"></th>
                   <th class="col-expand" rowspan="2"></th>
                   <th class="col-left valign-bottom" rowspan="2">
-                    <span data-monthly-header="ProductNameTitle"></span>
+                    <div class="col-group-header-content">
+                      @productNameInfoIcon(null)
+                      <span data-monthly-header="ProductNameTitle"></span>
+                    </div>
                   </th>
                   <th colspan="3" class="col-group-header selected">
                     <div class="col-group-header-content">
