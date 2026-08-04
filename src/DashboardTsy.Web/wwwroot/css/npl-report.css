@@ -23,7 +23,6 @@
 .npl-chart-card {
   margin: 0 16px;
   background: var(--bg-table2);
-  border: 1px solid var(--border-white-alpha);
   border-radius: var(--radius-xl);
   padding: 16px 24px;
 }
@@ -39,6 +38,8 @@
   display: block;
   margin: 0;
   overflow: visible;
+  border: 1px solid #68788F;
+  border-radius: 24px;
 }
 
 /* Boş durum: kart yüksekliğini korusun */
@@ -65,11 +66,11 @@
 
 /* ===== Barlar ===== */
 .npl-bar-principal {
-  fill: #2C5DA8;
+  fill: #0967B3;
 }
 
 .npl-bar-interest {
-  fill: #3B76F0;
+  fill: #B6D6F8;
 }
 
 .npl-bar-hover {
@@ -86,6 +87,10 @@
 
 .npl-chart-total {
   font-weight: 600;
+}
+
+.npl-chart-value-interest {
+  fill: #104570;
 }
 
 /* ===== Tooltip: bar'ın toplam değeri (tam / küsüratlı) ===== */
@@ -159,17 +164,20 @@
 }
 
 .npl-legend-principal {
-  background: #2C5DA8;
+  background: #0967B3;
 }
 
 .npl-legend-interest {
-  background: #3B76F0;
+  background: #B6D6F8;
 }
 
 /* ===== Açık tema ===== */
 [data-theme="light"] .npl-chart-card {
-  background: var(--white);
-  border-color: var(--border-input);
+  background: #F0F6FE;
+}
+
+[data-theme="light"] .npl-chart svg {
+  border-color: #7DB4F3;
 }
 
 [data-theme="light"] .npl-chart-axis {
@@ -178,7 +186,7 @@
 
 /* Bar üstündeki toplam etiketi kart zemini üzerinde kalır */
 [data-theme="light"] .npl-chart-total {
-  fill: #262A33;
+  fill: #536076;
 }
 
 /* Beyaz kart üzerinde beyaz balon kaybolmasın diye tooltip ters çevrilir */
