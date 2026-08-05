@@ -115,3 +115,16 @@
 .table-skeleton {
     padding: 16px;
 }
+
+[data-theme="light"] .skeleton-table {
+    background: #F0F6FE;
+}
+
+[data-theme="light"] .skeleton-bar {
+    background: linear-gradient(90deg, rgba(16, 32, 115, 0.08) 25%, rgba(16, 32, 115, 0.16) 50%, rgba(16, 32, 115, 0.08) 75%);
+    background-size: 800px 100%;
+}
+
+[data-theme="light"] .skeleton-table-row:nth-child(odd) {
+    background: rgba(16, 32, 115, 0.04);
+}
