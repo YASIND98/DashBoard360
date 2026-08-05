@@ -63,7 +63,7 @@
     $(function () {
         // Event delegation — #usdKurBtn verim sayfasında renderTableLegend ile dinamik oluşturulur.
         // closest('details').removeAttr('open') → mobil menüyü kapatır (tüm sayfalarda).
-        $(document).on('click', '#usdKurBtn, #usdKurBtnQuantity, #mobileUsdKurBtn', function () {
+        $(document).on('click', '#usdKurBtn, #usdKurBtnQuantity, #usdKurBtnMonthly, #mobileUsdKurBtn', function () {
             $(this).closest('details').removeAttr('open');
             openUsdKurModal(this);
         });
