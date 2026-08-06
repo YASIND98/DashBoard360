@@ -37,7 +37,23 @@ builder.Services.AddSingleton(new ReferansDbOptions { ConnectionString = referan
 // ve IConfiguration da Singleton. Bu nedenle Singleton'a alarak per-request DI resolution ve allocation'ı elde ediyoruz.
 builder.Services.AddSingleton<DashboardTsy.Infrastructure.Data.IConnectionStringProvider, ConnectionStringProvider>();
 builder.Services.AddSingleton<DashboardTsy.Infrastructure.Data.IStoredProcedureExecutor, StoredProcedureExecutor>();
-builder.Services.AddSingleton<DashboardTsy.Application.IReportDataProvider, ReportDataProvider>();
+
+// Rapor cache altyapısı: port'lar Application, adaptörler Infrastructure.
+builder.Services.AddSingleton<DashboardTsy.Application.Caching.ICacheStore,
+    DashboardTsy.Infrastructure.Caching.MemoryCacheStore>();
+builder.Services.AddSingleton<DashboardTsy.Application.Caching.ICacheKeyBuilder,
+    DashboardTsy.Infrastructure.Caching.JsonCacheKeyBuilder>();
+
+// IReportDataProvider decorator zinciri:
+//   Controller -> CachingReportDataProvider -> ReportDataProvider (inner) -> StoredProcedureExecutor
+// Concrete ReportDataProvider'ı ayrıca kayıt ediyoruz ki decorator kendi bağımlısı olarak alabilsin.
+builder.Services.AddSingleton<ReportDataProvider>();
+builder.Services.AddSingleton<DashboardTsy.Application.IReportDataProvider>(sp =>
+    new DashboardTsy.Infrastructure.Caching.CachingReportDataProvider(
+        inner: sp.GetRequiredService<ReportDataProvider>(),
+        cache: sp.GetRequiredService<DashboardTsy.Application.Caching.ICacheStore>(),
+        keyBuilder: sp.GetRequiredService<DashboardTsy.Application.Caching.ICacheKeyBuilder>(),
+        configuration: sp.GetRequiredService<IConfiguration>()));
 
 // AppSettings (generic key/value/type feature-flag store)
 // AppSettings bilinçli olarak Scoped bırakıldı — Repository/Service'in state/lifetime denetimi bu kapsamda yapılmadı.
