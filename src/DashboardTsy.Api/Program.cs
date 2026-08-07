@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.IO.Compression;
 using DashboardTsy.Api.Data;
+using DashboardTsy.Api.Middleware;
 using DashboardTsy.Api.Services;
 using DashboardTsy.Infrastructure.Data;
 using DashboardTsy.Infrastructure.Reports;
@@ -120,8 +121,20 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Compression, response yazımından önce; controller'a girmeden pipeline'a bağlanmalı.
+// Compression, mobile envelope'dan ÖNCE — response akışında ters yönde çalışır:
+// Controller ham JSON yazar → MobileEnvelope sarar → Compression sıkıştırır.
+// Compression'ı sonra çağırırsak, mobile envelope zaten sıkıştırılmış byte'ları JSON zannedip parse etmeye çalışır (0x1F 0x8B gzip hatası).
 app.UseResponseCompression();
+
+// Mobile envelope: /mobile/* isteklerini yakalayıp response'u { status, message, data } zarfına sarar.
+// KRİTİK: UseRouting'den ÖNCE çalışmalı. Aksi halde endpoint routing çoktan karar vermiş olur ve
+// path rewrite yeni bir route match tetiklemez — controller'a hiç gitmez, 404 döner.
+app.UseMiddleware<MobileEnvelopeMiddleware>();
+
+// Endpoint routing'i explicit çağırıyoruz ki middleware sırası deterministik olsun.
+// Aksi halde MapControllers implicit olarak pipeline sonuna UseRouting ekler ve mobile envelope'un
+// path rewrite'ı işe yaramaz.
+app.UseRouting();
 
 app.UseAuthorization();
 
