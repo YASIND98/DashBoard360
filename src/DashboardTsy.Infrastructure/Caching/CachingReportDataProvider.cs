@@ -14,8 +14,10 @@ namespace DashboardTsy.Infrastructure.Caching;
 
 /// <summary>
 /// IReportDataProvider decorator'ı: SP çağrılarını read-through cache ile sarar.
-/// - Target* metotları 24 saat sliding TTL ile cache'lenir (prefix: "Target").
-/// - Productivity* metotları 30 gün sliding TTL ile cache'lenir (prefix: "Productivity").
+/// - Target* metotları bir sonraki 08:50 Türkiye saatine kadar cache'lenir (prefix: "Target").
+///   Yani cache girdisi her gün 08:50'de otomatik düşer; sabah ilk çağrı SP'yi tetikler,
+///   gün içindeki tekrar çağrılar cache'ten döner.
+/// - Productivity* metotları yazıldığı andan itibaren 30 gün cache'lenir (prefix: "Productivity").
 /// - Filtre/lookup/AI/kur metotları cache'lenmeden inner'a delege edilir (kapsam dışı).
 /// - Mock mod (ReportMock:Enabled=true) aktifken decorator devre dışıdır; inner mock veriyi doğrudan döner.
 /// </summary>
@@ -24,8 +26,15 @@ public sealed class CachingReportDataProvider : IReportDataProvider
     public const string TargetPrefix = "Target";
     public const string ProductivityPrefix = "Productivity";
 
-    private static readonly TimeSpan TargetTtl = TimeSpan.FromHours(24);
+    // Target cache'inin her gün sıfırlanma zamanı (Türkiye saati).
+    private static readonly TimeSpan TargetDailyResetTime = new(8, 50, 0);
+
     private static readonly TimeSpan ProductivityTtl = TimeSpan.FromDays(30);
+
+    // Türkiye saatini explicit çöz: sunucu farklı bir zaman dilimindeyse de doğru davransın.
+    // .NET 8 hem Windows ("Turkey Standard Time") hem IANA ("Europe/Istanbul") anahtarını tanır,
+    // ama TZ verisi eksik bir imaj olasılığına karşı ikisini birden deniyoruz.
+    private static readonly TimeZoneInfo TurkeyTimeZone = ResolveTurkeyTimeZone();
 
     private readonly IReportDataProvider _inner;
     private readonly ICacheStore _cache;
@@ -49,7 +58,9 @@ public sealed class CachingReportDataProvider : IReportDataProvider
                                 && bool.TryParse(v, out var b) && b;
 
     // Ortak read-through helper: mock aktifse doğrudan inner, aksi halde cache'e sor / miss'te yaz.
-    private T Cached<T>(string prefix, TimeSpan ttl, string methodName, object? arguments, Func<T> loader)
+    // TTL bir Func — set anında taze hesaplanır. Böylece Target gibi "sonraki 08:50'ye kadar" gibi
+    // dinamik hedef zamanlar dogal olarak ifade edilir.
+    private T Cached<T>(string prefix, Func<TimeSpan> ttlProvider, string methodName, object? arguments, Func<T> loader)
     {
         if (MockEnabled)
             return loader();
@@ -60,16 +71,56 @@ public sealed class CachingReportDataProvider : IReportDataProvider
 
         var value = loader();
         if (value is not null)
-            _cache.Set(key, value, ttl);
+            _cache.Set(key, value, ttlProvider());
         return value;
     }
 
     // Primitive parametreleri anonim nesneye sararak deterministik key üretimi.
     private T CachedTarget<T>(string methodName, object? args, Func<T> loader)
-        => Cached(TargetPrefix, TargetTtl, methodName, args, loader);
+        => Cached(TargetPrefix, TimeUntilNextTargetReset, methodName, args, loader);
 
     private T CachedProductivity<T>(string methodName, object? args, Func<T> loader)
-        => Cached(ProductivityPrefix, ProductivityTtl, methodName, args, loader);
+        => Cached(ProductivityPrefix, () => ProductivityTtl, methodName, args, loader);
+
+    /// <summary>
+    /// Şu andan itibaren bir sonraki Türkiye saati 08:50'ye kadar geçen süreyi döner.
+    /// 08:50'den önce çağrılırsa aynı günün 08:50'sine, sonra çağrılırsa ertesi günün 08:50'sine hesaplar.
+    /// TTL asla 0 olmaz — 08:49:59.999'da cache'lenen bir girdi bile en az birkaç milisaniye yaşar.
+    /// </summary>
+    internal static TimeSpan TimeUntilNextTargetReset()
+        => ComputeTimeUntilNextReset(DateTimeOffset.UtcNow, TargetDailyResetTime, TurkeyTimeZone);
+
+    // Saf, deterministik yardımcı — test edilebilir olması için "now" parametreli.
+    // DateTimeOffset.UtcNow'ı üstteki wrapper'da veriyoruz; burada dış dünyaya bağımlılık yok.
+    internal static TimeSpan ComputeTimeUntilNextReset(DateTimeOffset utcNow, TimeSpan resetTimeOfDay, TimeZoneInfo timeZone)
+    {
+        var localNow = TimeZoneInfo.ConvertTime(utcNow, timeZone);
+        var todayReset = new DateTimeOffset(
+            localNow.Year, localNow.Month, localNow.Day,
+            resetTimeOfDay.Hours, resetTimeOfDay.Minutes, resetTimeOfDay.Seconds,
+            localNow.Offset);
+
+        var nextReset = localNow < todayReset ? todayReset : todayReset.AddDays(1);
+        return nextReset - localNow;
+    }
+
+    private static TimeZoneInfo ResolveTurkeyTimeZone()
+    {
+        // Windows kimliği, sonra IANA. .NET 8 tarafında cross-mapping var ama bir imajda TZ verisi eksik
+        // olabileceğinden ikisini de deniyoruz; her ikisi de patlarsa UTC+3 fallback'i (Türkiye 2016'dan beri sabit +03:00).
+        foreach (var id in new[] { "Turkey Standard Time", "Europe/Istanbul" })
+        {
+            try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
+            catch (TimeZoneNotFoundException) { }
+            catch (InvalidTimeZoneException) { }
+        }
+
+        return TimeZoneInfo.CreateCustomTimeZone(
+            id: "Turkey UTC+3 fallback",
+            baseUtcOffset: TimeSpan.FromHours(3),
+            displayName: "Turkey (fixed +03:00)",
+            standardDisplayName: "Turkey");
+    }
 
     // ============================================================
     // TARGET — 24 saat
