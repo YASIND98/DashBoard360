@@ -213,7 +213,7 @@ $(document).ready(function () {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
           html += '<td class="col-diff">';
-          html += '<div>' + formatNumber(p.YesterdayAmount, true, p.ProductName) + '</div>';
+          html += '<div>' + formatNumber(p.YesterdayAmount) + '</div>';
           html += '<div class="diff-details">';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0, false) + '</span></span>';
@@ -223,9 +223,9 @@ $(document).ready(function () {
           html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0, false) + '</span></span>';
           html += '</div>';
           html += '</td>';
-          html += '<td>' + formatNumber(p.PrevDayAmount, true, p.ProductName) + '</td>';
-          html += '<td>' + formatNumber(p.LastWeekAmount, true, p.ProductName) + '</td>';
-          html += '<td>' + formatNumber(p.LastYearAmount, true, p.ProductName) + '</td>';
+          html += '<td>' + formatNumber(p.PrevDayAmount) + '</td>';
+          html += '<td>' + formatNumber(p.LastWeekAmount) + '</td>';
+          html += '<td>' + formatNumber(p.LastYearAmount) + '</td>';
           html += buildDetailCell(p, 'daily');
           html += '</tr>';
 
@@ -315,7 +315,7 @@ $(document).ready(function () {
     window.TargetReportData[kind] = products || [];
     // Başlık altı tarih (varsa) -> "(gg.aa.yyyy)" — paylaşımlı fmtIsoDate kullanılır
     var _fmtDateHeader = function (v) { return v ? '(' + fmtIsoDate(v) + ')' : ''; };                                 // düz tutar (para birimsiz)
-    var _price = function (v, p) { return formatNumber(v, true, p.ProductName); };          // para birimli tutar
+    var _amount = function (v) { return formatNumber(v); };
     var _qty = function (v, p) { return formatNumber(v, false) + (isRatioProduct(p.ProductName) && v ? '%' : ''); };
 
     // Fark detayları (ekrandaki .diff-details karşılığı): değerin altına label + value (renksiz, siyah).
@@ -374,10 +374,10 @@ $(document).ready(function () {
       };
       cols = [
         { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
-        { header: h.YesterdayTitle, subHeader: _fmtDateHeader(h.YesterdayDate), key: 'YesterdayAmount', format: _price, extra: _dailyDiff },
-        { header: h.PrevDayTitle, subHeader: _fmtDateHeader(h.PrevDayDate), key: 'PrevDayAmount', format: _price },
-        { header: h.LastWeekTitle, subHeader: _fmtDateHeader(h.LastWeekDate), key: 'LastWeekAmount', format: _price },
-        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _price }
+        { header: h.YesterdayTitle, subHeader: _fmtDateHeader(h.YesterdayDate), key: 'YesterdayAmount', format: _amount, extra: _dailyDiff },
+        { header: h.PrevDayTitle, subHeader: _fmtDateHeader(h.PrevDayDate), key: 'PrevDayAmount', format: _amount },
+        { header: h.LastWeekTitle, subHeader: _fmtDateHeader(h.LastWeekDate), key: 'LastWeekAmount', format: _amount },
+        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _amount }
       ];
     }
     var title = ($('.page-title').text() || 'Rapor').trim();

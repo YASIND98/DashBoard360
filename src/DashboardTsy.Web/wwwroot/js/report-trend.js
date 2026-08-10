@@ -5,15 +5,12 @@ $(function () {
 
     if (!document.getElementById('reportDetailTrendTab')) return;
 
-    var _trendData = { labels: [], axisLabels: [], values: [], points: [], isVolume: false, productName: '' };
+    var _trendData = { labels: [], axisLabels: [], values: [], points: [], isVolume: false };
 
     // Y ekseni ölçek etiketleri: formatNumber 0 için "-" döndürür (tablo hücreleri için doğru),
     // ama eksen ucundaki 0 noktasının "0" olarak görünmesi gerekir.
-    function axisLabel(v, isVolume, productName) {
-        var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(Math.round(v));
-        if (!isVolume) return num;
-        var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
-        return currency + ' ' + num;
+    function axisLabel(v) {
+        return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 0 }).format(Math.round(v));
     }
 
     function monthParts(iso) {
@@ -33,8 +30,7 @@ $(function () {
             axisLabels: parts.map(function (p) { return p.short; }),   // X ekseni
             values: list.map(function (d) { return isVolume ? d.Amount : d.Count; }),
             points: list,
-            isVolume: isVolume,
-            productName: list.length ? list[0].ProductName : ''
+            isVolume: isVolume
         };
     }
 
@@ -103,7 +99,7 @@ $(function () {
         var yTicks = [];
         for (var t = 0, tickCount = Math.round(top / yStep); t <= tickCount; t++) {
             var tickVal = t * yStep;
-            yTicks.push({ val: tickVal, label: axisLabel(tickVal, data.isVolume, data.productName) });
+            yTicks.push({ val: tickVal, label: axisLabel(tickVal) });
         }
 
         // Sol marj en uzun eksen etiketine göre hesaplanır; büyük tutarlarda
@@ -178,7 +174,7 @@ $(function () {
             .on('mouseenter', function () {
                 var idx = +$(this).attr('data-index');
                 $tip.html(
-                    '<div class="rd-tt-title">' + formatNumber(_trendData.values[idx], _trendData.isVolume, _trendData.productName) + '</div>' +
+                    '<div class="rd-tt-title">' + formatNumber(_trendData.values[idx]) + '</div>' +
                     '<div class="rd-tt-row">' + _trendData.labels[idx] + '</div>'
                 ).show();
 
@@ -214,7 +210,7 @@ $(function () {
             infoLines: ['Trend Analizi'],
             columns: [
                 { header: 'Dönem', key: 'label', align: 'left' },
-                { header: isVolume ? 'Hacim' : 'Adet', key: 'value', format: function (v) { return formatNumber(v, isVolume, _trendData.productName); } }
+                { header: isVolume ? 'Hacim' : 'Adet', key: 'value', format: function (v) { return formatNumber(v); } }
             ],
             rows: (_trendData.values || []).map(function (v, i) { return { value: v, label: _trendData.labels[i] }; }),
             filename: 'HedefRapor-Trend-Analizi.pdf'
