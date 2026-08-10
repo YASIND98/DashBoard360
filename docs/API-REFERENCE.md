@@ -1014,13 +1014,31 @@ Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i
 ```json
 { "sessionId": "a1b2c3d4-0000-0000-0000-000000000000", "filterType": 1 }
 ```
+- `key`, kök tab'dan bu tab'a kadarki yolu nokta ile birleştiren stabil bir tanımlayıcıdır (örn.
+  `"count.customer.all"`). Aynı `tabName` ("Tümü", "Kurumsal", ...) birden çok parent altında
+  tekrar edebildiği için tekillik parent zinciriyle sağlanır — sadece `tabName`'e bakarak
+  ayırt edilemez. Hedef ekranındaki `GetTargetReportMenu` endpoint'inin `key` pattern'iyle tutarlıdır.
+
 **Response** (`GetProductivityReportTabItem[]`):
 ```json
 [
-  { "tabId": 1, "tabName": "Genel", "parentId": 0, "tabLevel": 1 },
-  { "tabId": 2, "tabName": "Kredi Kartı / POS", "parentId": 0, "tabLevel": 1 }
+  { "tabId": 1, "key": "general", "tabName": "Genel", "parentId": 0, "tabLevel": 1 },
+  { "tabId": 60, "key": "general.all", "tabName": "Tümü", "parentId": 1, "tabLevel": 2 },
+  { "tabId": 61, "key": "general.corporate", "tabName": "Kurumsal", "parentId": 1, "tabLevel": 2 },
+  { "tabId": 3, "key": "volume", "tabName": "Hacim", "parentId": 0, "tabLevel": 1 },
+  { "tabId": 4, "key": "profit", "tabName": "Karlılık", "parentId": 0, "tabLevel": 1 },
+  { "tabId": 40, "key": "profit.total", "tabName": "Toplam", "parentId": 4, "tabLevel": 2 },
+  { "tabId": 41, "key": "profit.spread-management", "tabName": "Spread Yönetimi", "parentId": 4, "tabLevel": 2 },
+  { "tabId": 2, "key": "count", "tabName": "Adet", "parentId": 0, "tabLevel": 1 },
+  { "tabId": 10, "key": "count.customer", "tabName": "Müşteri", "parentId": 2, "tabLevel": 2 },
+  { "tabId": 11, "key": "count.payment-systems", "tabName": "Ödeme Sistemleri", "parentId": 2, "tabLevel": 2 },
+  { "tabId": 12, "key": "count.cash-management", "tabName": "Nakit Yönetimi", "parentId": 2, "tabLevel": 2 },
+  { "tabId": 20, "key": "count.customer.all", "tabName": "Tümü", "parentId": 10, "tabLevel": 3 },
+  { "tabId": 50, "key": "count.cash-management.all", "tabName": "Tümü", "parentId": 12, "tabLevel": 3 }
 ]
 ```
+> Tam liste 27 satırdır (her segment grubu Tümü/Kurumsal/Ticari/KOBİ/Tarım/Bireysel kırılımını içerir);
+> yukarıda `key` şemasını göstermek için temsili bir alt küme verildi.
 
 #### POST /ProductivityReport/GetProductivityReportTableHeaders
 **Request:**

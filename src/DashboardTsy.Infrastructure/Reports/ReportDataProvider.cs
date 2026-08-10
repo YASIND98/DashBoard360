@@ -3,6 +3,7 @@ using DashboardTsy.Application;
 using DashboardTsy.Application.TargetReport;
 using DashboardTsy.Application.TargetReport.Requests;
 using DashboardTsy.Application.TargetReport.Responses;
+using DashboardTsy.Application.ProductivityReport;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
 using DashboardTsy.Application.AiInsight.Requests;
@@ -409,7 +410,10 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return Array.Empty<GetProductivityReportTabItem>();
 
-        return DataTableHelper.ToList<GetProductivityReportTabItem>(ds.Tables[0]);
+        var tabs = DataTableHelper.ToList<GetProductivityReportTabItem>(ds.Tables[0]);
+        // SP henüz Key kolonu döndürmüyor; TabId/ParentId/TabName'den aynı algoritmayla türetilir,
+        // böylece mock ve gerçek SP çıktısı arasında Key tutarlı kalır.
+        return ProductivityReportTabKeyBuilder.Build(tabs);
     }
 
     public IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)

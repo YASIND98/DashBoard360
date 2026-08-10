@@ -1,6 +1,7 @@
 using System.Globalization;
 using DashboardTsy.Application.ExchangeRate.Requests;
 using DashboardTsy.Application.ExchangeRate.Responses;
+using DashboardTsy.Application.ProductivityReport;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
 
@@ -70,8 +71,7 @@ public static class MockProductivityReportData
     }
 
     public static IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
-    {
-        return new List<GetProductivityReportTabItem>
+        => ProductivityReportTabKeyBuilder.Build(new List<GetProductivityReportTabItem>
         {
             new() { TabId = 1, TabName = "Genel", ParentId = 0, TabLevel = 1 },
             new() { TabId = 60, TabName = "Tümü", ParentId = 1, TabLevel = 2 },
@@ -112,8 +112,7 @@ public static class MockProductivityReportData
 
             new() { TabId = 40, TabName = "Toplam", ParentId = 4, TabLevel = 2 },
             new() { TabId = 41, TabName = "Spread Yönetimi", ParentId = 4, TabLevel = 2 }
-        };
-    }
+        });
 
     public static GetProductivityGeneralRegionReportResponse GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request)
     {
