@@ -212,9 +212,6 @@ $(document).ready(function () {
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td>' + formatNumber(p.LastYearAmount, true, p.ProductName) + '</td>';
-          html += '<td>' + formatNumber(p.LastWeekAmount, true, p.ProductName) + '</td>';
-          html += '<td>' + formatNumber(p.PrevDayAmount, true, p.ProductName) + '</td>';
           html += '<td class="col-diff">';
           html += '<div>' + formatNumber(p.YesterdayAmount, true, p.ProductName) + '</div>';
           html += '<div class="diff-details">';
@@ -226,6 +223,9 @@ $(document).ready(function () {
           html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0, false) + '</span></span>';
           html += '</div>';
           html += '</td>';
+          html += '<td>' + formatNumber(p.PrevDayAmount, true, p.ProductName) + '</td>';
+          html += '<td>' + formatNumber(p.LastWeekAmount, true, p.ProductName) + '</td>';
+          html += '<td>' + formatNumber(p.LastYearAmount, true, p.ProductName) + '</td>';
           html += buildDetailCell(p, 'daily');
           html += '</tr>';
 
@@ -245,8 +245,6 @@ $(document).ready(function () {
           // Ürün adı "oran" içeriyorsa bu satırın değerleri % ile gösterilir
           var pct = isRatioProduct(p.ProductName) ? '%' : '';
           html += buildRowStart(p, depth, isSub, indexLabel);
-          html += '<td>' + qVal(p.LastYearAmount, pct) + '</td>';
-          html += '<td>' + qVal(p.LastTwoMonthEarlierAmount, pct) + '</td>';
           html += '<td class="col-diff">';
           html += '<div>' + qVal(p.LastMonthAmount, pct) + '</div>';
           html += '<div class="diff-details">';
@@ -256,6 +254,8 @@ $(document).ready(function () {
           html += '<span class="diff-value ' + (p.DiffByLastTwoMonthEarlierAmount < 0 ? 'negative' : (p.DiffByLastTwoMonthEarlierAmount > 0 ? 'positive' : '')) + '">' + qVal(p.DiffByLastTwoMonthEarlierAmount || 0, pct) + '</span></span>';
           html += '</div>';
           html += '</td>';
+          html += '<td>' + qVal(p.LastTwoMonthEarlierAmount, pct) + '</td>';
+          html += '<td>' + qVal(p.LastYearAmount, pct) + '</td>';
           html += buildDetailCell(p, 'quantity');
           html += '</tr>';
 
@@ -358,9 +358,9 @@ $(document).ready(function () {
       };
       cols = [
         { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
-        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _qty },
+        { header: h.LastMonthTitle, subHeader: _fmtDateHeader(h.LastMonthDate), key: 'LastMonthAmount', format: _qty, extra: _qtyDiff },
         { header: h.LastTwoMonthEarlierTitle, subHeader: _fmtDateHeader(h.LastTwoMonthEarlierDate), key: 'LastTwoMonthEarlierAmount', format: _qty },
-        { header: h.LastMonthTitle, subHeader: _fmtDateHeader(h.LastMonthDate), key: 'LastMonthAmount', format: _qty, extra: _qtyDiff }
+        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _qty }
       ];
     } else {
       h = window._dailyHeaders || {};
@@ -374,10 +374,10 @@ $(document).ready(function () {
       };
       cols = [
         { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
-        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _price },
-        { header: h.LastWeekTitle, subHeader: _fmtDateHeader(h.LastWeekDate), key: 'LastWeekAmount', format: _price },
+        { header: h.YesterdayTitle, subHeader: _fmtDateHeader(h.YesterdayDate), key: 'YesterdayAmount', format: _price, extra: _dailyDiff },
         { header: h.PrevDayTitle, subHeader: _fmtDateHeader(h.PrevDayDate), key: 'PrevDayAmount', format: _price },
-        { header: h.YesterdayTitle, subHeader: _fmtDateHeader(h.YesterdayDate), key: 'YesterdayAmount', format: _price, extra: _dailyDiff }
+        { header: h.LastWeekTitle, subHeader: _fmtDateHeader(h.LastWeekDate), key: 'LastWeekAmount', format: _price },
+        { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _price }
       ];
     }
     var title = ($('.page-title').text() || 'Rapor').trim();

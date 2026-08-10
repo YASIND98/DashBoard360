@@ -16,7 +16,6 @@ $(function () {
         return currency + ' ' + num;
     }
 
-    // X ekseninde kısa ay adı (Nis 26), tooltip ve PDF'te tam ay adı (Nisan 2026) kullanılır.
     function monthParts(iso) {
         var d = new Date(iso);
         if (isNaN(d.getTime())) return { full: '', short: '' };
@@ -96,16 +95,14 @@ $(function () {
         var W = 760, H = 320;
         var mr = 20, mt = 20, mb = 40;
 
-        // Y ekseni daima 0'dan başlar ve yuvarlak adımlarla yükselir (875.693 gibi
-        // küsuratlı eşikler yerine 250.000 / 500.000 ... gibi okunur değerler).
         var maxVal = Math.max.apply(null, data.values);
         var TICK_COUNT = 5;
-        var step = maxVal > 0 ? Math.max(1, niceStep(maxVal / TICK_COUNT)) : 1;
-        var top = maxVal > 0 ? Math.ceil(maxVal / step) * step : TICK_COUNT * step;
+        var yStep = maxVal > 0 ? Math.max(1, niceStep(maxVal / TICK_COUNT)) : 1;
+        var top = maxVal > 0 ? Math.ceil(maxVal / yStep) * yStep : TICK_COUNT * yStep;
 
         var yTicks = [];
-        for (var t = 0, tickCount = Math.round(top / step); t <= tickCount; t++) {
-            var tickVal = t * step;
+        for (var t = 0, tickCount = Math.round(top / yStep); t <= tickCount; t++) {
+            var tickVal = t * yStep;
             yTicks.push({ val: tickVal, label: axisLabel(tickVal, data.isVolume, data.productName) });
         }
 

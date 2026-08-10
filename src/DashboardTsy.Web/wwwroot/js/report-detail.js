@@ -112,17 +112,17 @@ $(function () {
       if (tableKey === 'quantity') {
           var qv = function (v, n) { return formatNumber(v, false) + (v && isRatioProduct(n.ProductName) ? '%' : ''); };
           return [
-              { key: 'LastYearAmount', fmt: function (n) { return qv(n.LastYearAmount, n); } },
+              { key: 'LastMonthAmount', fmt: function (n) { return qv(n.LastMonthAmount, n); }, tdClass: 'col-diff', extra: nodeDiffHtml },
               { key: 'LastTwoMonthEarlierAmount', fmt: function (n) { return qv(n.LastTwoMonthEarlierAmount, n); } },
-              { key: 'LastMonthAmount', fmt: function (n) { return qv(n.LastMonthAmount, n); }, tdClass: 'col-diff', extra: nodeDiffHtml }
+              { key: 'LastYearAmount', fmt: function (n) { return qv(n.LastYearAmount, n); } }
           ];
       }
       var price = function (n, k) { return formatNumber(n[k], true, n.ProductName); };
       return [
-          { key: 'LastYearAmount', fmt: function (n) { return price(n, 'LastYearAmount'); } },
-          { key: 'LastWeekAmount', fmt: function (n) { return price(n, 'LastWeekAmount'); } },
+          { key: 'YesterdayAmount', fmt: function (n) { return price(n, 'YesterdayAmount'); }, tdClass: 'col-diff', extra: nodeDiffHtml },
           { key: 'PrevDayAmount', fmt: function (n) { return price(n, 'PrevDayAmount'); } },
-          { key: 'YesterdayAmount', fmt: function (n) { return price(n, 'YesterdayAmount'); }, tdClass: 'col-diff', extra: nodeDiffHtml }
+          { key: 'LastWeekAmount', fmt: function (n) { return price(n, 'LastWeekAmount'); } },
+          { key: 'LastYearAmount', fmt: function (n) { return price(n, 'LastYearAmount'); } }
       ];
   }
 
