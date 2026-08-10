@@ -132,11 +132,13 @@ $(function () {
         var f = (typeof NPL.getFilters === 'function') ? NPL.getFilters() : {};
         var selections = (typeof NPL.getFilterSelections === 'function') ? NPL.getFilterSelections() : {};
 
-        return $.extend({
+        // Sabit filtreler request'in kökünde; SP allow-list parametreleri Parameters altında (bkz. GetNplBalanceRatioRequest).
+        return {
             BolgeKodu: toInt(f.regionCode),
             SubeKodu: toInt(f.branchCode),
-            Yil: toInt(f.period)
-        }, selections);
+            Yil: toInt(f.period),
+            Parameters: selections
+        };
     }
 
     function fetchChart(callback) {
