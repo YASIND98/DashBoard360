@@ -344,11 +344,11 @@ public class ReportDataProvider : IReportDataProvider
     private static Dictionary<string, object?> BuildTrendAnalysisParameters(GetTrendAnalysisRequest request)
         => new()
         {
-            ["@bolge"] = string.IsNullOrWhiteSpace(request.Bolge) ? (object)DBNull.Value : request.Bolge,
-            ["@sube_kodu"] = string.IsNullOrWhiteSpace(request.SubeKodu) ? (object)DBNull.Value : request.SubeKodu,
-            ["@IsKolu"] = string.IsNullOrWhiteSpace(request.IsKolu) ? (object)DBNull.Value : request.IsKolu,
-            ["@segment"] = string.IsNullOrWhiteSpace(request.Segment) ? (object)DBNull.Value : request.Segment,
-            ["@Urun"] = string.IsNullOrWhiteSpace(request.Urun) ? (object)DBNull.Value : request.Urun
+            ["@bolge"] = string.IsNullOrWhiteSpace(request.Bolge) ? (object)DBNull.Value : request.Bolge.Trim(),
+            ["@sube_kodu"] = string.IsNullOrWhiteSpace(request.SubeKodu) ? (object)DBNull.Value : request.SubeKodu.Trim(),
+            ["@IsKolu"] = string.IsNullOrWhiteSpace(request.IsKolu) ? (object)DBNull.Value : request.IsKolu.Trim(),
+            ["@segment"] = string.IsNullOrWhiteSpace(request.Segment) ? (object)DBNull.Value : request.Segment.Trim(),
+            ["@Urun"] = string.IsNullOrWhiteSpace(request.Urun) ? (object)DBNull.Value : request.Urun.Trim()
         };
 
     private static List<T> MapTrendRows<T>(DataTable table, Func<DataRow, T> selector)
