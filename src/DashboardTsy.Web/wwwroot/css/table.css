@@ -559,6 +559,11 @@
   border-right: 1px dashed black;
 }
 
+.page-yieldreports .data-table #dynamicTableHead {
+  position: relative;
+  z-index: 6;
+}
+
 /* ===== Hedef ve Verim raporları sayfası: sticky ===== */
   .page-home .data-table th.col-index,
   .page-home .data-table td.col-index,
