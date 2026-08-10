@@ -5,8 +5,7 @@ $(function () {
 
     if (!document.getElementById('reportDetailTrendTab')) return;
 
-    var _trMonthsShort = (typeof _trMonths !== 'undefined' ? _trMonths : []).map(function (m) { return m.substring(0, 3); });
-    var _trendData = { labels: [], values: [], points: [], isVolume: false, productName: '' };
+    var _trendData = { labels: [], axisLabels: [], values: [], points: [], isVolume: false, productName: '' };
 
     // Y ekseni ölçek etiketleri: formatNumber 0 için "-" döndürür (tablo hücreleri için doğru),
     // ama eksen ucundaki 0 noktasının "0" olarak görünmesi gerekir.
@@ -17,22 +16,36 @@ $(function () {
         return currency + ' ' + num;
     }
 
-    function monthLabel(iso) {
+    // X ekseninde kısa ay adı (Nis 26), tooltip ve PDF'te tam ay adı (Nisan 2026) kullanılır.
+    function monthParts(iso) {
         var d = new Date(iso);
-        if (isNaN(d.getTime())) return '';
-        return _trMonthsShort[d.getMonth()] + ' ' + String(d.getFullYear()).slice(-2);
+        if (isNaN(d.getTime())) return { full: '', short: '' };
+        var name = _trMonths[d.getMonth()];
+        var year = String(d.getFullYear());
+        return { full: name + ' ' + year, short: name.substring(0, 3) + ' ' + year.slice(-2) };
     }
 
     // H/G tablosunda Hacim (TL), Adet tablosunda Adet (Count) serisi gösterilir.
     function buildTrend(raw, isVolume) {
         var list = raw || [];
+        var parts = list.map(function (d) { return monthParts(d.ReportDate); });
         return {
-            labels: list.map(function (d) { return monthLabel(d.ReportDate); }),
+            labels: parts.map(function (p) { return p.full; }),        // tooltip + PDF
+            axisLabels: parts.map(function (p) { return p.short; }),   // X ekseni
             values: list.map(function (d) { return isVolume ? d.Amount : d.Count; }),
             points: list,
             isVolume: isVolume,
             productName: list.length ? list[0].ProductName : ''
         };
+    }
+
+    // Eksen adımını yuvarlak bir değere çeker: 1 / 2 / 2.5 / 5 x 10^n
+    function niceStep(rough) {
+        if (!(rough > 0)) return 1;
+        var exp = Math.pow(10, Math.floor(Math.log(rough) / Math.LN10));
+        var f = rough / exp;
+        var nice = f <= 1 ? 1 : (f <= 2 ? 2 : (f <= 2.5 ? 2.5 : (f <= 5 ? 5 : 10)));
+        return nice * exp;
     }
 
     function filterContext() {
@@ -83,18 +96,16 @@ $(function () {
         var W = 760, H = 320;
         var mr = 20, mt = 20, mb = 40;
 
-        // Y ekseni dinamik: veri aralığına göre ölçeklenir (skorkart'taki sabit %0-20 ölçeğinin aksine).
+        // Y ekseni daima 0'dan başlar ve yuvarlak adımlarla yükselir (875.693 gibi
+        // küsuratlı eşikler yerine 250.000 / 500.000 ... gibi okunur değerler).
         var maxVal = Math.max.apply(null, data.values);
-        var minVal = Math.min.apply(null, data.values);
-        var range = maxVal - minVal;
-        var pad = range > 0 ? range * 0.15 : Math.max(maxVal * 0.1, 1);
-        var top = maxVal + pad;
-        var bottom = Math.max(0, minVal - pad);
-
         var TICK_COUNT = 5;
+        var step = maxVal > 0 ? Math.max(1, niceStep(maxVal / TICK_COUNT)) : 1;
+        var top = maxVal > 0 ? Math.ceil(maxVal / step) * step : TICK_COUNT * step;
+
         var yTicks = [];
-        for (var t = 0; t <= TICK_COUNT; t++) {
-            var tickVal = bottom + (top - bottom) * t / TICK_COUNT;
+        for (var t = 0, tickCount = Math.round(top / step); t <= tickCount; t++) {
+            var tickVal = t * step;
             yTicks.push({ val: tickVal, label: axisLabel(tickVal, data.isVolume, data.productName) });
         }
 
@@ -109,7 +120,7 @@ $(function () {
         var step = n > 1 ? plotW / (n - 1) : 0;
 
         function xAt(i) { return ml + i * step; }
-        function yAt(v) { return mt + plotH - ((v - bottom) / (top - bottom || 1)) * plotH; }
+        function yAt(v) { return mt + plotH - (v / (top || 1)) * plotH; }
 
         var linePath = '';
         if (n === 1) {
@@ -139,7 +150,7 @@ $(function () {
             var hy = yAt(data.values[j]);
             xGrid += '<line x1="' + xAt(j) + '" y1="' + mt + '" x2="' + xAt(j) + '" y2="' + (mt + plotH) + '" class="rd-trend-grid" />';
             xDots += '<circle cx="' + xAt(j) + '" cy="' + (mt + plotH) + '" r="2.5" class="rd-trend-dot" />';
-            xLabels += '<text x="' + xAt(j) + '" y="' + (H - mb + 24) + '" text-anchor="middle" class="rd-trend-axis">' + data.labels[j] + '</text>';
+            xLabels += '<text x="' + xAt(j) + '" y="' + (H - mb + 24) + '" text-anchor="middle" class="rd-trend-axis">' + data.axisLabels[j] + '</text>';
             hovers += '<g class="rd-trend-point">' +
                 '<line x1="' + hx + '" y1="' + mt + '" x2="' + hx + '" y2="' + (mt + plotH) + '" class="rd-trend-vline" />' +
                 '<circle cx="' + hx + '" cy="' + hy + '" r="10" class="rd-trend-hover" data-index="' + j + '" />' +
