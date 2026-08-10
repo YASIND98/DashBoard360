@@ -117,12 +117,11 @@ $(function () {
               { key: 'LastYearAmount', fmt: function (n) { return qv(n.LastYearAmount, n); } }
           ];
       }
-      var price = function (n, k) { return formatNumber(n[k], true, n.ProductName); };
       return [
-          { key: 'YesterdayAmount', fmt: function (n) { return price(n, 'YesterdayAmount'); }, tdClass: 'col-diff', extra: nodeDiffHtml },
-          { key: 'PrevDayAmount', fmt: function (n) { return price(n, 'PrevDayAmount'); } },
-          { key: 'LastWeekAmount', fmt: function (n) { return price(n, 'LastWeekAmount'); } },
-          { key: 'LastYearAmount', fmt: function (n) { return price(n, 'LastYearAmount'); } }
+          { key: 'YesterdayAmount', fmt: function (n) { return formatNumber(n.YesterdayAmount); }, tdClass: 'col-diff', extra: nodeDiffHtml },
+          { key: 'PrevDayAmount', fmt: function (n) { return formatNumber(n.PrevDayAmount); } },
+          { key: 'LastWeekAmount', fmt: function (n) { return formatNumber(n.LastWeekAmount); } },
+          { key: 'LastYearAmount', fmt: function (n) { return formatNumber(n.LastYearAmount); } }
       ];
   }
 
