@@ -131,6 +131,11 @@ public sealed class CachingReportDataProvider : IReportDataProvider
             args: null, // sessionId cache key'ine dahil edilmiyor (SessionId hariç kuralı)
             loader: () => _inner.GetTargetReportMenuTexts(sessionId));
 
+    public GetTargetReportMenuResponse? GetTargetReportMenu(string sessionId)
+        => CachedTarget(nameof(GetTargetReportMenu),
+            args: null, // sessionId cache key'ine dahil edilmiyor (SessionId hariç kuralı)
+            loader: () => _inner.GetTargetReportMenu(sessionId));
+
     public IReadOnlyList<GetTargetReportFiltersItem> GetTargetReportFilters(string sessionId, int filterId, List<string>? filterCode)
         => CachedTarget(nameof(GetTargetReportFilters),
             new { filterId, filterCode }, // sessionId hariç

@@ -19,6 +19,12 @@ public interface IReportDataProvider
 
     GetTargetReportMenuTextsResponse? GetTargetReportMenuTexts(string sessionId);
 
+    /// <summary>
+    /// GetTargetReportMenuTexts ile aynı veriyi mobil istemciler için tabs/subTabs hiyerarşisinde döner.
+    /// Aynı kaynaktan (SP_RP_GetTargetReportMenuTexts) beslenir, web tarafını etkilemez.
+    /// </summary>
+    GetTargetReportMenuResponse? GetTargetReportMenu(string sessionId);
+
     IReadOnlyList<GetTargetReportFiltersItem> GetTargetReportFilters(string sessionId, int filterId, List<string>? filterCode);
 
     GetDailyTargetReportResponse GetDailyTargetReport(GetDailyTargetReportRequest request);

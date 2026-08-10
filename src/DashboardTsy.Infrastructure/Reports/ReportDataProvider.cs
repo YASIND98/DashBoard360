@@ -1,5 +1,6 @@
 using System.Data;
 using DashboardTsy.Application;
+using DashboardTsy.Application.TargetReport;
 using DashboardTsy.Application.TargetReport.Requests;
 using DashboardTsy.Application.TargetReport.Responses;
 using DashboardTsy.Application.ProductivityReport.Requests;
@@ -47,6 +48,12 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return null;
         return DataTableHelper.ToObject<GetTargetReportMenuTextsResponse>(ds.Tables[0].Rows[0]);
+    }
+
+    public GetTargetReportMenuResponse? GetTargetReportMenu(string sessionId)
+    {
+        var texts = GetTargetReportMenuTexts(sessionId);
+        return texts is null ? null : TargetReportMenuMapper.ToTabsResponse(texts);
     }
 
     public IReadOnlyList<GetTargetReportFiltersItem> GetTargetReportFilters(string sessionId, int filterId, List<string>? filterCode)

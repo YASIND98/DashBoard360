@@ -30,6 +30,20 @@ public class TargetReportController : ControllerBase
     }
 
     /// <summary>
+    /// GET /api/TargetReport/GetTargetReportMenu?sessionId=...
+    /// GetTargetReportMenuTexts ile aynı kaynağı (SP_RP_GetTargetReportMenuTexts) tabs/subTabs
+    /// hiyerarşisinde döner. Mobil istemciler için eklendi; web tarafı GetTargetReportMenuTexts'i kullanmaya devam eder.
+    /// </summary>
+    [HttpGet("GetTargetReportMenu")]
+    public ActionResult<GetTargetReportMenuResponse> GetTargetReportMenu([FromQuery] string? sessionId)
+    {
+        var result = _reportDataProvider.GetTargetReportMenu(sessionId ?? string.Empty);
+        if (result == null)
+            return NotFound();
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /api/TargetReport/GetTargetReportFilters
     /// EXEC dbo.SP_RP_GetTargetReportFilters @SessionId='', @FilterId=0, @FilterCode=NULL (FilterCode as "12,23,45")
     /// </summary>

@@ -662,6 +662,51 @@ Ekran başlıkları/menü metinlerini döner (localization amaçlı).
 }
 ```
 
+### GET /TargetReport/GetTargetReportMenu?sessionId={sessionId}
+
+GetTargetReportMenuTexts ile **aynı kaynağı** (`SP_RP_GetTargetReportMenuTexts`) tabs/subTabs hiyerarşisinde döner.
+Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i kullanır, bu endpoint onu değiştirmez.
+
+- **404:** kayıt bulunamazsa
+- Her tab/subTab'ın i18n'den bağımsız stabil bir `key`'i vardır (örn. `"sme"`, `"retail.private"`).
+- `tabId`, `tabs` dizisindeki sırayı yansıtır (0'dan başlar). `subTabId`, her tab'ın kendi `subTabs`
+  dizisindeki sırayı yansıtır — **global unique değildir**, her tab kendi listesinde 0'dan başlar.
+- `subTabs` alt sekmesi olmayan tab'larda boş dizi (`[]`) olarak döner, asla `null` olmaz.
+
+**Response** (`GetTargetReportMenuResponse`):
+```json
+{
+  "screenTitle": "Hedef Raporları",
+  "tabs": [
+    { "tabId": 0, "key": "all", "title": "Tümü", "subTabs": [] },
+    { "tabId": 1, "key": "corporate", "title": "Kurumsal", "subTabs": [] },
+    { "tabId": 2, "key": "commercial", "title": "Ticari", "subTabs": [] },
+    {
+      "tabId": 3,
+      "key": "sme",
+      "title": "KOBİ",
+      "subTabs": [
+        { "subTabId": 0, "key": "sme.all", "title": "Tümü" },
+        { "subTabId": 1, "key": "sme.kbi", "title": "KBİ" },
+        { "subTabId": 2, "key": "sme.obi", "title": "OBİ" }
+      ]
+    },
+    { "tabId": 4, "key": "agriculture", "title": "Tarım", "subTabs": [] },
+    {
+      "tabId": 5,
+      "key": "retail",
+      "title": "Bireysel",
+      "subTabs": [
+        { "subTabId": 0, "key": "retail.all", "title": "Tümü" },
+        { "subTabId": 1, "key": "retail.general", "title": "Genel" },
+        { "subTabId": 2, "key": "retail.affiliate", "title": "Bağlı" },
+        { "subTabId": 3, "key": "retail.private", "title": "Private" }
+      ]
+    }
+  ]
+}
+```
+
 ### POST /TargetReport/GetTargetReportFilters
 
 **Request** (`GetTargetReportFiltersRequest`):
