@@ -559,6 +559,138 @@
   border-right: 1px dashed black;
 }
 
+/* ===== Hedef ve Verim raporları sayfası: sticky ===== */
+  .page-home .data-table th.col-index,
+  .page-home .data-table td.col-index,
+  .page-yieldreports .data-table th.col-index,
+  .page-yieldreports .data-table td.col-index {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+  }
+
+  .page-home .data-table th.col-expand,
+  .page-home .data-table td.col-expand {
+    position: sticky;
+    z-index: 2;
+  }
+
+  .page-home .data-table th.col-expand,
+  .page-home .data-table td.col-expand{
+    left: 57px;
+  }
+
+  .page-home .data-table th.col-left,
+  .page-home .data-table td.col-left,
+  .page-yieldreports .data-table th.col-left,
+  .page-yieldreports .data-table td.col-left {
+    position: sticky;
+    z-index: 2;
+    max-width: 140px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    border-right: 1px solid var(--border-row);
+  }
+
+  .page-home .data-table th.col-left,
+  .page-home .data-table td.col-left{
+    left: 93px;
+  }
+
+  .page-yieldreports .data-table th.col-left,
+  .page-yieldreports .data-table td.col-left,
+  .page-yieldreports .data-table thead tr:nth-child(1) th:nth-child(2) {
+    left: 57px;
+    z-index: 5;
+  }
+
+  .page-yieldreports .data-table .col-expand {
+    position: sticky;
+    left: 57px;
+    z-index: 5;
+  }
+
+  .page-yieldreports .data-table thead .col-expand + *,
+  .page-yieldreports .data-table .col-expand + td.col-left {
+    left: 93px;
+    z-index: 5;
+  }
+
+  /* Light modda yalnız sticky col-left kenarlık rengini override et. position/left/max-width
+     (ve modaldaki first-child reset'i) base kurallardan gelir → tek yerden hem dark hem light
+     doğru: modalda col-left first-child olunca sol boşluk oluşmaz. */
+  [data-theme="light"] .page-home .data-table th.col-left,
+  [data-theme="light"] .page-home .data-table td.col-left,
+  [data-theme="light"] .page-yieldreports .data-table th.col-left,
+  [data-theme="light"] .page-yieldreports .data-table td.col-left {
+    border-right-color: #B6D6F8;
+  }
+
+  .page-home .data-table th.col-left:first-child,
+  .page-home .data-table td.col-left:first-child,
+  .page-yieldreports .data-table th.col-left:first-child,
+  .page-yieldreports .data-table td.col-left:first-child{
+    left: 0;
+    max-width: none;
+  }
+
+  /* Header sticky → z-index thead'den yüksek olmalı (thead th zaten z-index:3) */
+  .page-home .data-table thead th.col-index,
+  .page-home .data-table thead th.col-expand,
+  .page-home .data-table thead th.col-left,
+  .page-yieldreports .data-table thead th.col-index,
+  .page-yieldreports .data-table thead th.col-expand,
+  .page-yieldreports .data-table thead th.col-left {
+    z-index: 5;
+  }
+
+  /* Satır arkaplanları – sticky hücreler şeffaf kalırsa alttan içerik görünür */
+  .page-home .data-table tr.stripe-odd td.col-index,
+  .page-home .data-table tr.stripe-odd td.col-expand,
+  .page-home .data-table tr.stripe-odd td.col-left,
+  .page-yieldreports .data-table tr.stripe-odd td.col-index,
+  .page-yieldreports .data-table tr.stripe-odd td.col-expand,
+  .page-yieldreports .data-table tr.stripe-odd td.col-left {
+    background: var(--bg-stripe);
+  }
+
+  .page-home .data-table tr.stripe-even td.col-index,
+  .page-home .data-table tr.stripe-even td.col-expand,
+  .page-home .data-table tr.stripe-even td.col-left,
+  .page-yieldreports .data-table tr.stripe-even td.col-index,
+  .page-yieldreports .data-table tr.stripe-even td.col-expand,
+  .page-yieldreports .data-table tr.stripe-even td.col-left {
+    background: rgb(21, 32, 88);
+  }
+
+  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-index,
+  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-expand,
+  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-left,
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-odd td.col-index,
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-odd td.col-expand,
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-odd td.col-left {
+    background: #F0F6FE;
+  }
+
+  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-index,
+  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-expand,
+  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-left,
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-even td.col-index,
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-even td.col-expand,
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-even td.col-left {
+    background: #E9F3FE;
+  }
+
+  [data-theme="light"] .data-table tbody tr.stripe-odd,
+  [data-theme="light"] .data-table tbody tr.sc-total-row td {
+    background: #F0F6FE;
+  }
+
+  [data-theme="light"] .custom-last-row td {
+    background: #F0F6FE !important;
+  }
+
 /* ===== Responsive ===== */
 @media (min-width: 1199px) {
   .table-row:hover td {
@@ -582,14 +714,6 @@
   [data-theme="light"] .table-row td {
     color: #262A33;
     border-bottom: 1px solid #B6D6F8;
-  }
-
-  [data-theme="light"] .data-table tbody tr.stripe-odd, [data-theme="light"] .data-table tbody tr.sc-total-row td {
-    background: #f0f6fe;
-  }
-
-  [data-theme="light"] .custom-last-row td {
-    background: #f0f6fe !important;
   }
 
   [data-theme="light"] .data-table tbody tr.stripe-even {
@@ -649,58 +773,6 @@
     padding: 0;
   }
 
-  /* ===== Hedef raporları sayfası: İlk 3 sütun sticky ===== */
-  .page-home .data-table th.col-index,
-  .page-home .data-table td.col-index {
-    position: sticky;
-    left: 0;
-    z-index: 2;
-  }
-
-  .page-home .data-table th.col-expand,
-  .page-home .data-table td.col-expand {
-    position: sticky;
-    left: 57px;
-    z-index: 2;
-  }
-
-  .page-home .data-table th.col-left,
-  .page-home .data-table td.col-left {
-    position: sticky;
-    left: 93px;
-    z-index: 2;
-    max-width: 140px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-right: 1px solid var(--border-row);
-  }
-  
-  .page-home .data-table th.col-left:first-child,
-  .page-home .data-table td.col-left:first-child {
-    left: 0;
-    max-width: none;
-  }
-
-  /* Header sticky → z-index thead'den yüksek olmalı (thead th zaten z-index:3) */
-  .page-home .data-table thead th.col-index,
-  .page-home .data-table thead th.col-expand,
-  .page-home .data-table thead th.col-left {
-    z-index: 5;
-  }
-
-  /* Satır arkaplanları – sticky hücreler şeffaf kalırsa alttan içerik görünür */
-  .page-home .data-table tr.stripe-odd td.col-index,
-  .page-home .data-table tr.stripe-odd td.col-expand,
-  .page-home .data-table tr.stripe-odd td.col-left {
-    background: var(--bg-stripe);
-  }
-
-  .page-home .data-table tr.stripe-even td.col-index,
-  .page-home .data-table tr.stripe-even td.col-expand,
-  .page-home .data-table tr.stripe-even td.col-left {
-    background: rgb(21, 32, 88);
-  }
   .data-table tbody tr:first-child td:last-child,
   .data-table tbody tr.last-visible-row td:last-child,
   .data-table tbody tr:first-child td:first-child,
@@ -731,10 +803,6 @@
     font-size: 14px !important;
   }
 
-  [data-theme="light"] .custom-last-row td {
-    background: #ffffff !important;
-  }
-
   [data-theme="light"] .table-legend {
     background: #e9f3fe;
   }
@@ -759,11 +827,6 @@
     color: #262A33;
   }
 
-  [data-theme="light"] .data-table tbody tr.stripe-odd,
-  [data-theme="light"] .data-table tbody tr.sc-total-row td {
-    background: #ffffff;
-  }
-
   [data-theme="light"] .data-table tbody tr.stripe-even,
   [data-theme="light"] #dynamicTableContainer2 .data-table tbody tr.stripe-odd {
     background: #E9F3FE;
@@ -771,18 +834,6 @@
 
   [data-theme="light"] #dynamicTableContainer2 .data-table tbody tr.stripe-even {
     background: #ffffff;
-  }
-
-  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-index,
-  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-expand,
-  [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-left {
-    background: #ffffff;
-  }
-
-  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-index,
-  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-expand,
-  [data-theme="light"] .page-home .data-table tr.stripe-even td.col-left {
-    background: #E9F3FE;
   }
 
   [data-theme="light"] .table-row td {
@@ -795,14 +846,6 @@
 
   [data-theme="light"] .expand-icon img {
     filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
-  }
-
-  /* Light modda yalnız sticky col-left kenarlık rengini override et. position/left/max-width
-     (ve modaldaki first-child reset'i) base kurallardan gelir → tek yerden hem dark hem light
-     doğru: modalda col-left first-child olunca sol boşluk oluşmaz. */
-  [data-theme="light"] .page-home .data-table th.col-left,
-  [data-theme="light"] .page-home .data-table td.col-left {
-    border-right-color: #B6D6F8;
   }
 }
 
