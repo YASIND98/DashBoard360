@@ -3,19 +3,16 @@ $(function () {
 
     var NPL = window.NplReport = window.NplReport || {};
 
-    var _rawData = [];      // servis cevabı (Bakiye + Oran birlikte)
-    var _chartData = [];    // aktif metriğe göre türetilmiş
+    var _rawData = [];      // servis cevabı
+    var _chartData = [];    // grafik/tablo için türetilmiş
     var H = 520;
     var ML = 78, MR = 24, MT = 44, MB = 52;
     var BAR_W = 56;                                 // sabit sütun genişliği
     var BAND = 78;                                  // sütun + boşluk (etiketler sığsın diye geniş)
     var PLOT_H = H - MT - MB;
     var MIN_LABEL_H = 16;                            // etiket parçaya sığan en küçük yükseklik
-    var RATIO_TICKS = [0, 25, 50, 75, 100];          // Oran ekseni sabit %
     var TL_PER_BN = 1e9;                             // eksen etiketi bn'ye
     var TL_PER_MN = 1e6;                             // değer etiketi Mn'ye
-
-    function isRatio() { return _metric === 'ratio'; }
 
     function num(v) { return Number(v) || 0; }
 
@@ -48,9 +45,8 @@ $(function () {
         return fmtDot(mn, 1) + 'Mn';
     }
 
-    // Tablo hücresi + bar etiketi: Bakiye'de Mn TL, Oran'da yüzde
     function fmtValue(v) {
-        return isRatio() ? v ? formatPercent(v) : 0 : fmtMn(v);
+        return fmtMn(v);
     }
 
     // Adımı tam gösteren en az ondalık (40 -> 0; 2,5 -> 1; 0,025 -> 3), etiket yanıltmasın.
@@ -61,10 +57,10 @@ $(function () {
         }
         return 3;
     }
-    // Y ekseni etiketi: Bakiye'de birim (Mn/bn) tavana göre, Oran'da "%25".
+    // Y ekseni etiketi: birim (Mn/bn) tavana göre seçilir.
     // Bar etiketleriyle aynı biçim: ondalık ayırıcı nokta ("97.5Mn").
     function fmtTick(v, unit, suffix, decimals) {
-        return isRatio() ? ('%' + fmtNum(v)) : (fmtDot(Number(v) / unit, decimals) + suffix);
+        return fmtDot(Number(v) / unit, decimals) + suffix;
     }
 
     // ISO tarih -> "Aralık 2025" (tablo dönem kolonu)
@@ -80,8 +76,8 @@ $(function () {
         return Math.ceil(x / unit - 1e-9) * unit;
     }
 
-    // Bakiye ekseni: en yüksek toplamı yuvarla, 4 eşit parçaya böl -> 0 dahil 5 çizgi (123M -> tavan 130M).
-    function balanceTicks() {
+    // Y ekseni: en yüksek toplamı yuvarla, 4 eşit parçaya böl -> 0 dahil 5 çizgi (123M -> tavan 130M).
+    function yTicks() {
         var max = 0;
         _chartData.forEach(function (d) {
             var t = num(d.totalRaw);
@@ -93,17 +89,11 @@ $(function () {
         return [0, step, 2 * step, 3 * step, top];
     }
 
-    // Oran ekseni sabit (%0-%100); Bakiye ekseni dinamik.
-    function yTicks() {
-        return isRatio() ? RATIO_TICKS : balanceTicks();
-    }
     function buildChartData(raw) {
         return (raw || []).map(function (d) {
-            var ratio = isRatio();
-
-            var principal = ratio ? num(d.RatioAnapara) * 100 : num(d.BalanceAnapara);
-            var kof = ratio ? num(d.RatioKof) * 100 : num(d.BalanceKof);
-            var total = ratio ? (principal + kof) : num(d.BalanceToplam);
+            var principal = num(d.BalanceAnapara);
+            var kof = num(d.BalanceKof);
+            var total = num(d.BalanceToplam);
 
             return {
                 date: d.ReportDate,
@@ -118,7 +108,11 @@ $(function () {
                 // Ham sayılar (bar yüksekliği + tooltip)
                 principalRaw: principal,
                 kofRaw: kof,
-                totalRaw: total
+                totalRaw: total,
+
+                // Parçaların oranı (tooltip); servisten gelir
+                principalRatio: num(d.RatioAnapara) * 100,
+                kofRatio: num(d.RatioKof) * 100
             };
         });
     }
@@ -183,7 +177,7 @@ $(function () {
         var useMn = yMax < TL_PER_BN;                // tavan <1bn -> Mn, değilse bn
         var tickUnit = useMn ? TL_PER_MN : TL_PER_BN;
         var tickSuffix = useMn ? 'Mn' : 'bn';
-        var tickDec = stepDecimals(step / tickUnit); // eksen ondalığı (Bakiye)
+        var tickDec = stepDecimals(step / tickUnit); // eksen ondalığı
 
         function yAt(v) { return baseY - (v / yMax) * PLOT_H; }
 
@@ -206,29 +200,24 @@ $(function () {
             var yPrincipal = baseY - hPrincipal;
             var yInterest = yPrincipal - hInterest;
 
-            // Tooltip: BalanceToplam'ın ham hâli, fmtNum ile
-            bars += '<g class="npl-chart-bar" data-total="' + fmtNum(d.totalRaw) + '">';
+            // Tooltip içeriği hover'da _chartData[i]'den kurulur
+            bars += '<g class="npl-chart-bar" data-index="' + i + '">';
 
             // Alt parça: NPL Anapara, üst parça: NPL Kat Öncesi Faiz
             bars += '<rect x="' + x + '" y="' + yPrincipal + '" width="' + barW + '" height="' + hPrincipal + '" class="npl-bar-principal" />';
             bars += '<rect x="' + x + '" y="' + yInterest + '" width="' + barW + '" height="' + hInterest + '" class="npl-bar-interest" />';
 
-            // Toplam bar üstünde (Oran'da %100 olduğu için yazılmaz).
-            // Parça değeri, yeterince yüksekse parça içinde gösterilir.
-            if (!isRatio()) {
-                bars += '<text x="' + cx + '" y="' + (yInterest - 8) + '" text-anchor="middle" class="npl-chart-total">' + fmtValue(d.total) + '</text>';
-            }
+            // Toplam bar üstünde; parça değeri yeterince yüksekse parça içinde gösterilir.
+            bars += '<text x="' + cx + '" y="' + (yInterest - 8) + '" text-anchor="middle" class="npl-chart-total">' + fmtValue(d.total) + '</text>';
             if (hInterest >= MIN_LABEL_H) {
-                bars += '<text x="' + cx + '" y="' + (yInterest + hInterest / 2 + 4) + '" text-anchor="middle" class="npl-chart-value">' + fmtValue(d.kof) + '</text>';
+                bars += '<text x="' + cx + '" y="' + (yInterest + hInterest / 2 + 4) + '" text-anchor="middle" class="npl-chart-value npl-chart-value-interest">' + fmtValue(d.kof) + '</text>';
             }
             if (hPrincipal >= MIN_LABEL_H) {
                 bars += '<text x="' + cx + '" y="' + (yPrincipal + hPrincipal / 2 + 4) + '" text-anchor="middle" class="npl-chart-value">' + fmtValue(d.principal) + '</text>';
             }
 
-            // Şeffaf hedef: tooltip kolonun her yerinde açılsın (Bakiye)
-            if (!isRatio()) {
-                bars += '<rect x="' + x + '" y="' + MT + '" width="' + barW + '" height="' + PLOT_H + '" class="npl-bar-hover" />';
-            }
+            // Şeffaf hedef: tooltip kolonun her yerinde açılsın
+            bars += '<rect x="' + x + '" y="' + MT + '" width="' + barW + '" height="' + PLOT_H + '" class="npl-bar-hover" />';
             bars += '</g>';
 
             bars += '<text x="' + cx + '" y="' + (baseY + 24) + '" text-anchor="middle" class="npl-chart-axis">' + d.period + '</text>';
@@ -240,17 +229,26 @@ $(function () {
                 yAxis + bars +
             '</svg>';
 
-        // Oran görünümünde tooltip yok (toplam sabit %100)
-        if (isRatio()) {
-            $('#nplChart').html(svg);
-            return;
-        }
-
         $('#nplChart').html(svg + '<div class="npl-chart-tooltip" id="nplChartTooltip"></div>');
         bindChartTooltip();
     }
 
-    // Bar hover'da tam (küsüratlı) toplamı gösteren tooltip
+    // Tooltip gövdesi: parçalar (tutar + toplam içindeki pay) ve toplam
+    function tooltipHtml(d) {
+        function row(label, value, ratio, cls) {
+            var ratioHtml = (ratio == null) ? '' :
+                ' <span class="npl-tt-ratio">(%' + fmtTr(ratio, 1) + ')</span>';
+            return '<div class="npl-tt-row' + (cls ? ' ' + cls : '') + '">' +
+                       '<span class="npl-tt-label">' + label + '</span>' +
+                       '<span class="npl-tt-value">' + value + ratioHtml + '</span>' +
+                   '</div>';
+        }
+        return row('NPL Anapara', fmtNum(d.principalRaw), d.principalRatio) +
+               row('NPL Kat Öncesi Faiz', fmtNum(d.kofRaw), d.kofRatio) +
+               row('Toplam', fmtNum(d.totalRaw), null, 'npl-tt-total');
+    }
+
+    // Bar hover'da parça kırılımını ve tam (küsüratlı) toplamı gösteren tooltip
     function bindChartTooltip() {
         var $chart = $('#nplChart');
         var $tip = $('#nplChartTooltip');
@@ -258,7 +256,9 @@ $(function () {
         $chart.find('.npl-chart-bar')
             .on('mouseenter', function () {
                 var $g = $(this);
-                $tip.text($g.attr('data-total'));
+                var d = _chartData[parseInt($g.attr('data-index'), 10)];
+                if (!d) return;
+                $tip.html(tooltipHtml(d));
 
                 // Tooltip'i bar'a hizala (sağı, dikey ortası); konum scrollLeft dahil içerik koordinatı.
                 var chartRect = $chart[0].getBoundingClientRect();
@@ -295,16 +295,6 @@ $(function () {
     // ===== Tablo görünümü =====
     // Grafikle aynı cevap; kolonlar key ile eşleşir.
     function tableColumns() {
-        // Oran'da birim başlıkta (%), alt başlık yok
-        if (isRatio()) {
-            return [
-                { key: 'periodLong', header: 'Dönem',                    align: 'left', sortKey: 'date' },
-                { key: 'principal',  header: 'NPL Anapara (%)',          format: fmtValue },
-                { key: 'kof',        header: 'NPL Kat Öncesi Faiz (%)',  format: fmtValue },
-                { key: 'total',      header: 'Toplam NPL Oranı (%)',     format: fmtValue }
-            ];
-        }
-
         // Servis değerleri birebir: Anapara, KOF, Toplam
         return [
             { key: 'periodLong', header: 'Dönem',               align: 'left',  sortKey: 'date' },
@@ -315,9 +305,7 @@ $(function () {
     }
 
     function legendNote() {
-        return isRatio()
-            ? 'Değerler yüzde olarak gösterilmektedir.'
-            : 'Değerler milyon TL olarak gösterilmektedir.';
+        return 'Değerler milyon TL olarak gösterilmektedir.';
     }
 
     // Varsayılan sıralama yok; başlığa tıklanınca o kolona göre sıralanır.
@@ -437,19 +425,6 @@ $(function () {
 
     // filter.js her filtre değişiminde çağırır
     NPL.reload = loadChart;
-
-    // ===== Bakiye / Oran (metrik) =====
-    // İkisi de aynı cevapta; metrik değişince servis çağrılmaz, sadece yeniden çizilir.
-    // Toggle masaüstü+mobil kopyalı, [data-metric] ile senkron.
-    var _metric = 'balance';
-    $(document).on('click', '.npl-metric-toggle [data-metric]', function () {
-        var metric = $(this).data('metric');
-        if (metric === _metric) return;
-        _metric = metric;
-        $('.npl-metric-toggle [data-metric]').removeClass('active');
-        $('.npl-metric-toggle [data-metric="' + metric + '"]').addClass('active');
-        applyData();
-    });
 
     // PDF motoru (download-pdf.js) data-pdf="nplReport" ile bu config'i çeker.
     window.PdfSources = window.PdfSources || {};

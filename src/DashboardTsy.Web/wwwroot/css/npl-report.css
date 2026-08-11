@@ -98,15 +98,41 @@
   display: none;
   position: absolute;
   z-index: 10;
-  padding: 12px 20px;
-  background: var(--white);
+  padding: 10px 16px;
+  background: #E9F3FE;
   border-radius: 8px;
   box-shadow: var(--shadow-dropdown);
   pointer-events: none;
   white-space: nowrap;
-  color: #052560;
-  font-size: 15px;
+  color: #104570;
+  font-size: 14px;
   font-weight: 600;
+}
+
+.npl-chart-tooltip .npl-tt-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.npl-chart-tooltip .npl-tt-row + .npl-tt-row {
+  margin-top: 6px;
+}
+
+.npl-chart-tooltip .npl-tt-label {
+  font-weight: 500;
+}
+
+.npl-chart-tooltip .npl-tt-ratio {
+  color: #104570;
+  font-weight: 400;
+}
+
+.npl-chart-tooltip .npl-tt-total {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(127, 127, 127, 0.35);
 }
 
 /* Ok bar'ın dikey ortasını gösterir (--npl-tt-arrow JS'te hesaplanır) */
@@ -118,7 +144,7 @@
   transform: translateY(-50%);
   border-style: solid;
   border-width: 8px 8px 8px 0;
-  border-color: transparent var(--white) transparent transparent;
+  border-color: transparent #E9F3FE transparent transparent;
 }
 
 /* Bar'ın soluna geçtiyse ok sağa bakar */
@@ -126,7 +152,7 @@
   left: auto;
   right: -7px;
   border-width: 8px 0 8px 8px;
-  border-color: transparent transparent transparent var(--white);
+  border-color: transparent transparent transparent #E9F3FE;
 }
 
 /* ===== Grafik açıklaması =====
@@ -195,6 +221,11 @@
   color: var(--white);
 }
 
+/* Ters çevrilen balonda yüzde de beyaza döner (temel kuraldaki #104570 okunmazdı) */
+[data-theme="light"] .npl-chart-tooltip .npl-tt-ratio {
+  color: var(--white);
+}
+
 [data-theme="light"] .npl-chart-tooltip::before {
   border-color: transparent #052560 transparent transparent;
 }
@@ -214,6 +245,48 @@
     border-radius: 0;
     overflow-x: auto;
     margin: 0;
+  }
+
+  /* Tooltip tablet/mobilde küçük yazı; etiket sarar, tutar tek satırda kalır */
+  .npl-chart-tooltip {
+    font-size: 12px;
+    white-space: normal;
+    max-width: min(78vw, 340px);
+  }
+
+  .npl-chart-tooltip .npl-tt-row {
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .npl-chart-tooltip .npl-tt-row + .npl-tt-row {
+    margin-top: 10px;
+  }
+
+  /* Etiket sütunu dar tutulur: uzun adlar iki satıra sarar, tutarlar tek satırda kalır */
+  .npl-chart-tooltip .npl-tt-label {
+    flex: 0 1 68px;
+    line-height: 1.25;
+  }
+
+  .npl-chart-tooltip .npl-tt-value {
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .npl-chart-tooltip .npl-tt-total {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+
+  .npl-chart-tooltip::before {
+    border-width: 10px 10px 10px 0;
+    left: -9px;
+  }
+
+  .npl-chart-tooltip.npl-tt-left::before {
+    border-width: 10px 0 10px 10px;
+    right: -9px;
   }
 }
 

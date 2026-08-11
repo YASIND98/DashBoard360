@@ -119,27 +119,8 @@
     </div>
 </div>
 
-@{
-    Func<object, Microsoft.AspNetCore.Html.IHtmlContent> nplMetricToggle = @<div class="period-toggle npl-metric-toggle">
-        <button class="period-btn active" data-metric="balance">
-            <img src="~/images/balance.svg" alt="" class="period-icon" /> Bakiye
-        </button>
-        <button class="period-btn" data-metric="ratio">
-            <img src="~/images/percentage.svg" alt="" class="period-icon" /> Oran
-        </button>
-    </div>;
-}
-
 <div class="tab-bar">
     <div class="tab-list" id="nplTabList"></div>
-    <div class="desktop">
-        @nplMetricToggle("")
-    </div>
-</div>
-
-<!-- Bakiye / Oran (mobil) -->
-<div class="mobile period-toggle-row">
-    @nplMetricToggle("")
 </div>
 
 <!-- NPL Report Chart / Table -->

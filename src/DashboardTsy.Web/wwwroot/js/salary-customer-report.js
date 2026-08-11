@@ -105,20 +105,19 @@ $(document).ready(function () {
 
   // ===== Row Builders =====
   function formatDiffNumber(value) {
-      var formatted = formatNumber(value, false);
+      var formatted = formatNumber(value);
       return value > 0 ? '+' + formatted : formatted;
   }
 
   function buildMetricCell(row, prefix, salaryLabel, retiredLabel, withDiff, extraClass) {
-      var name = row.ProductName;
       var html = '<td class="col-metric' + (extraClass ? ' ' + extraClass : '') + '">';
       html += '<div class="sc-metric-flex">';
       html += '<div class="sc-metric-main">';
-      html += '<div class="sc-total">' + formatNumber(row[prefix + 'TotalAmount'], true, name) + '</div>';
+      html += '<div class="sc-total">' + formatNumber(row[prefix + 'TotalAmount']) + '</div>';
       html += '<div class="sc-divider"></div>';
       html += '<div class="sc-sub-group">';
-      html += '<div class="sc-sub"><span class="sc-sub-amount">' + formatNumber(row[prefix + 'SalaryAmount'], true, name) + '</span><span class="sc-sub-rate">%' + formatPercent(row[prefix + 'SalaryRate']) + '</span></div>';
-      html += '<div class="sc-sub"><span class="sc-sub-amount">' + formatNumber(row[prefix + 'RetiredAmount'], true, name) + '</span><span class="sc-sub-rate">%' + formatPercent(row[prefix + 'RetiredRate']) + '</span></div>';
+      html += '<div class="sc-sub"><span class="sc-sub-amount">' + formatNumber(row[prefix + 'SalaryAmount']) + '</span><span class="sc-sub-rate">%' + formatPercent(row[prefix + 'SalaryRate']) + '</span></div>';
+      html += '<div class="sc-sub"><span class="sc-sub-amount">' + formatNumber(row[prefix + 'RetiredAmount']) + '</span><span class="sc-sub-rate">%' + formatPercent(row[prefix + 'RetiredRate']) + '</span></div>';
       html += '</div>';
       html += '</div>';
 
@@ -181,20 +180,16 @@ $(document).ready(function () {
       return html;
   }
 
-  function formatBankShareValue(v, valueType, name) {
-      return valueType === 2 ? formatNumber(v, true, name) : formatNumber(v, false);
-  }
-
   function buildBankShareRowsHtml(products) {
       var html = '';
       products.forEach(function (p) {
           var statusClass = p.WalletShareSecondMonthRateStatus === 2 ? 'negative' : 'positive';
           html += '<tr class="table-row">';
           html += '<td class="col-left">' + p.ProductName + '</td>';
-          html += '<td>' + formatBankShareValue(p.DenizbankFirstMonthValue, p.ValueType, p.ProductName) + '</td>';
-          html += '<td>' + formatBankShareValue(p.DenizbankSecondMonthValue, p.ValueType, p.ProductName) + '</td>';
-          html += '<td>' + formatBankShareValue(p.OtherBanksFirstMonthValue, p.ValueType, p.ProductName) + '</td>';
-          html += '<td>' + formatBankShareValue(p.OtherBanksSecondMonthValue, p.ValueType, p.ProductName) + '</td>';
+          html += '<td>' + formatNumber(p.DenizbankFirstMonthValue) + '</td>';
+          html += '<td>' + formatNumber(p.DenizbankSecondMonthValue) + '</td>';
+          html += '<td>' + formatNumber(p.OtherBanksFirstMonthValue) + '</td>';
+          html += '<td>' + formatNumber(p.OtherBanksSecondMonthValue) + '</td>';
           html += '<td>%' + formatPercent(p.WalletShareFirstMonthRate) + '</td>';
           html += '<td class="' + statusClass + '">%' + formatPercent(p.WalletShareSecondMonthRate) + '</td>';
           html += '</tr>';
@@ -204,13 +199,12 @@ $(document).ready(function () {
 
   // ===== PDF verisi (window.PdfReport) — ekranda görünenle aynı veriden kurulur =====
   function pdfMetricCellHtml(row, prefix) {
-      var name = row.ProductName;
-      return '<div style="font-weight:600;">' + formatNumber(row[prefix + 'TotalAmount'], true, name) + '</div>' +
+      return '<div style="font-weight:600;">' + formatNumber(row[prefix + 'TotalAmount']) + '</div>' +
           '<div style="margin-top:4px; font-size:11px; color:#5a6275; white-space:nowrap;">' +
-              formatNumber(row[prefix + 'SalaryAmount'], true, name) + ' <span style="color:#9aa3b2;">(%' + formatPercent(row[prefix + 'SalaryRate']) + ')</span>' +
+              formatNumber(row[prefix + 'SalaryAmount']) + ' <span style="color:#9aa3b2;">(%' + formatPercent(row[prefix + 'SalaryRate']) + ')</span>' +
           '</div>' +
           '<div style="font-size:11px; color:#5a6275; white-space:nowrap;">' +
-              formatNumber(row[prefix + 'RetiredAmount'], true, name) + ' <span style="color:#9aa3b2;">(%' + formatPercent(row[prefix + 'RetiredRate']) + ')</span>' +
+              formatNumber(row[prefix + 'RetiredAmount']) + ' <span style="color:#9aa3b2;">(%' + formatPercent(row[prefix + 'RetiredRate']) + ')</span>' +
           '</div>';
   }
 
@@ -260,7 +254,7 @@ $(document).ready(function () {
       if (kind === 'bankshare') {
           var bh = window._bsHeaders;
           var valCol = function (key) {
-              return { header: '', key: key, format: function (v, row) { return formatBankShareValue(v, row.ValueType, row.ProductName); } };
+              return { header: '', key: key, format: function (v) { return formatNumber(v); } };
           };
           cols = [
               { header: bh.ProductColumnName, key: 'ProductName', align: 'left' },

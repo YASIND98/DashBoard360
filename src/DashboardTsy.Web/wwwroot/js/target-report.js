@@ -215,12 +215,12 @@ $(document).ready(function () {
           html += '<td class="col-diff">';
           html += '<div>' + formatNumber(p.YesterdayAmount) + '</div>';
           html += '<div class="diff-details">';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0, false) + '</span></span>';
-          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastWeekTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByLastWeekAmount < 0 ? 'negative' : (p.DiffByLastWeekAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastWeekAmount || 0, false) + '</span></span>';
           html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByPrevDayTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0, false) + '</span></span>';
+          html += '<span class="diff-value ' + (p.DiffByPrevDayAmount < 0 ? 'negative' : (p.DiffByPrevDayAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByPrevDayAmount || 0) + '</span></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastWeekTitle"></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastWeekAmount < 0 ? 'negative' : (p.DiffByLastWeekAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastWeekAmount || 0) + '</span></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-daily-header="DiffByLastYearTitle"></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + formatNumber(p.DiffByLastYearAmount || 0) + '</span></span>';
           html += '</div>';
           html += '</td>';
           html += '<td>' + formatNumber(p.PrevDayAmount) + '</td>';
@@ -239,7 +239,7 @@ $(document).ready(function () {
   function buildQuantityRows(products, depth, isSub, parentIndex) {
       var html = '';
       // "%" yalnızca gerçek sayılarda eklenir ("-" değerinde eklenmez)
-      function qVal(v, pct) { return formatNumber(v, false) + (v ? pct : ''); }
+      function qVal(v, pct) { return formatNumber(v) + (v ? pct : ''); }
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           // Ürün adı "oran" içeriyorsa bu satırın değerleri % ile gösterilir
@@ -248,10 +248,10 @@ $(document).ready(function () {
           html += '<td class="col-diff">';
           html += '<div>' + qVal(p.LastMonthAmount, pct) + '</div>';
           html += '<div class="diff-details">';
-          html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastYearTitle"></span>';
-          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + qVal(p.DiffByLastYearAmount || 0, pct) + '</span></span>';
           html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastTwoMonthEarlierTitle"></span>';
           html += '<span class="diff-value ' + (p.DiffByLastTwoMonthEarlierAmount < 0 ? 'negative' : (p.DiffByLastTwoMonthEarlierAmount > 0 ? 'positive' : '')) + '">' + qVal(p.DiffByLastTwoMonthEarlierAmount || 0, pct) + '</span></span>';
+          html += '<span class="diff-detail"><span class="diff-label" data-quantity-header="DiffByLastYearTitle"></span>';
+          html += '<span class="diff-value ' + (p.DiffByLastYearAmount < 0 ? 'negative' : (p.DiffByLastYearAmount > 0 ? 'positive' : '')) + '">' + qVal(p.DiffByLastYearAmount || 0, pct) + '</span></span>';
           html += '</div>';
           html += '</td>';
           html += '<td>' + qVal(p.LastTwoMonthEarlierAmount, pct) + '</td>';
@@ -316,7 +316,7 @@ $(document).ready(function () {
     // Başlık altı tarih (varsa) -> "(gg.aa.yyyy)" — paylaşımlı fmtIsoDate kullanılır
     var _fmtDateHeader = function (v) { return v ? '(' + fmtIsoDate(v) + ')' : ''; };                                 // düz tutar (para birimsiz)
     var _amount = function (v) { return formatNumber(v); };
-    var _qty = function (v, p) { return formatNumber(v, false) + (isRatioProduct(p.ProductName) && v ? '%' : ''); };
+    var _qty = function (v, p) { return formatNumber(v) + (isRatioProduct(p.ProductName) && v ? '%' : ''); };
 
     // Fark detayları (ekrandaki .diff-details karşılığı): değerin altına label + value (renksiz, siyah).
     // Toggle ("Farkları Göster") kapalıyken boş döner -> PDF ekranla aynı kalır.
@@ -352,9 +352,9 @@ $(document).ready(function () {
         if ($('#quantityDiffToggle').attr('data-active') !== 'true') return '';
         var pct = isRatioProduct(p.ProductName) ? '%' : '';
         return _diffBlock([
-          { label: h.DiffByLastYearTitle, value: p.DiffByLastYearAmount },
-          { label: h.DiffByLastTwoMonthEarlierTitle, value: p.DiffByLastTwoMonthEarlierAmount }
-        ], function (v) { return formatNumber(v || 0, false) + ((v || 0) ? pct : ''); });
+          { label: h.DiffByLastTwoMonthEarlierTitle, value: p.DiffByLastTwoMonthEarlierAmount },
+          { label: h.DiffByLastYearTitle, value: p.DiffByLastYearAmount }
+        ], function (v) { return formatNumber(v || 0) + ((v || 0) ? pct : ''); });
       };
       cols = [
         { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
@@ -367,10 +367,10 @@ $(document).ready(function () {
       var _dailyDiff = function (p) {
         if ($('#diffToggle').attr('data-active') !== 'true') return '';
         return _diffBlock([
-          { label: h.DiffByLastYearTitle, value: p.DiffByLastYearAmount },
+          { label: h.DiffByPrevDayTitle, value: p.DiffByPrevDayAmount },
           { label: h.DiffByLastWeekTitle, value: p.DiffByLastWeekAmount },
-          { label: h.DiffByPrevDayTitle, value: p.DiffByPrevDayAmount }
-        ], function (v) { return formatNumber(v || 0, false); });
+          { label: h.DiffByLastYearTitle, value: p.DiffByLastYearAmount }
+        ], function (v) { return formatNumber(v || 0); });
       };
       cols = [
         { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
