@@ -56,7 +56,7 @@ $(function () {
       var v = val || 0;
       var cls = v < 0 ? 'negative' : (v > 0 ? 'positive' : '');
       return '<span class="diff-detail"><span class="diff-label">' + (label || '') + '</span>' +
-             '<span class="diff-value ' + cls + '">' + formatNumber(v, false) + '</span></span>';
+             '<span class="diff-value ' + cls + '">' + formatNumber(v) + '</span></span>';
   }
 
   function diffDetails(items) {
@@ -70,7 +70,7 @@ $(function () {
           var sep = i ? 'border-left:1px solid #e6eaf0;' : '';
           return '<div style="display:inline-block;text-align:center;padding:0 8px;vertical-align:top;' + sep + '">' +
                      '<div style="font-size:11px;color:#9aa3b2;margin-bottom:3px;white-space:nowrap;">' + (it.label || '') + '</div>' +
-                     '<div style="font-size:12px;font-weight:600;color:#1a1a1a;">' + formatNumber(it.value || 0, false) + '</div>' +
+                     '<div style="font-size:12px;font-weight:600;color:#1a1a1a;">' + formatNumber(it.value || 0) + '</div>' +
                  '</div>';
       }).join('');
       return '<div style="margin-top:8px;white-space:nowrap;">' + inner + '</div>';
@@ -80,15 +80,15 @@ $(function () {
       if (_currentTable === 'quantity') {
           var q = window._quantityHeaders || {};
           return [
-              { label: q.DiffByLastYearTitle, value: node.DiffByLastYearAmount },
-              { label: q.DiffByLastTwoMonthEarlierTitle, value: node.DiffByLastTwoMonthEarlierAmount }
+              { label: q.DiffByLastTwoMonthEarlierTitle, value: node.DiffByLastTwoMonthEarlierAmount },
+              { label: q.DiffByLastYearTitle, value: node.DiffByLastYearAmount }
           ];
       }
       var d = window._dailyHeaders || {};
       return [
-          { label: d.DiffByLastYearTitle, value: node.DiffByLastYearAmount },
+          { label: d.DiffByPrevDayTitle, value: node.DiffByPrevDayAmount },
           { label: d.DiffByLastWeekTitle, value: node.DiffByLastWeekAmount },
-          { label: d.DiffByPrevDayTitle, value: node.DiffByPrevDayAmount }
+          { label: d.DiffByLastYearTitle, value: node.DiffByLastYearAmount }
       ];
   }
 
@@ -110,7 +110,7 @@ $(function () {
           ];
       }
       if (tableKey === 'quantity') {
-          var qv = function (v, n) { return formatNumber(v, false) + (v && isRatioProduct(n.ProductName) ? '%' : ''); };
+          var qv = function (v, n) { return formatNumber(v) + (v && isRatioProduct(n.ProductName) ? '%' : ''); };
           return [
               { key: 'LastMonthAmount', fmt: function (n) { return qv(n.LastMonthAmount, n); }, tdClass: 'col-diff', extra: nodeDiffHtml },
               { key: 'LastTwoMonthEarlierAmount', fmt: function (n) { return qv(n.LastTwoMonthEarlierAmount, n); } },

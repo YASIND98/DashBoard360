@@ -14,12 +14,9 @@ function percentColor(ratio) {
     return 'ratio-blue';
 }
 
-function formatNumber(value, isPrice, productName) {
+function formatNumber(value) {
     if (!value) return "-";
-    var num = new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(value);
-    if (!isPrice) return num;
-    var currency = (productName && productName.indexOf('YP') !== -1) ? '$' : '₺';
-    return currency + ' ' + num;
+    return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(value);
 }
 
 // Türkçe ay adları (formatReportDateTr için)
