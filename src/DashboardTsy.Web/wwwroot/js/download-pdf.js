@@ -208,6 +208,10 @@ $(function () {
 
   // Buton tıklanınca: data-pdf="<kaynak>" varsa PdfSources[<kaynak>](), yoksa window.PdfReport.
   $(document).on('click', '.download-pdf-btn', function () {
+    if (document.documentElement.getAttribute('data-pdf-allowed') !== 'true') {
+      alert('PDF indirme özelliği yalnızca Chrome ve Edge tarayıcılarında kullanılabilir.');
+      return;
+    }
     var $btn = $(this);
     var pdfSource = $btn.data('pdf');
     var hasProvider = pdfSource && window.PdfSources && typeof window.PdfSources[pdfSource] === 'function';

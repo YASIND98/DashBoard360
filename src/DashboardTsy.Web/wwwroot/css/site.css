@@ -218,6 +218,12 @@ body {
   height: 24px;
 }
 
+/* PDF butonu sadece Chrome ve Edge'de gösterilir (bkz. _Layout.cshtml data-pdf-allowed) */
+html[data-pdf-allowed="false"] .download-pdf-btn,
+html[data-pdf-allowed="false"] #mobilePdfBtn {
+  display: none !important;
+}
+
 .usd-kur-btn {
   display: flex;
   align-items: center;
