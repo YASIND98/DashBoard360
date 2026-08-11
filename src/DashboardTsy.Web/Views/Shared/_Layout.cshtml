@@ -12,6 +12,23 @@
 <head>
     <!-- Tema: localStorage'dan oku, FOUC'u önle -->
     <script>(function(){var t=localStorage.getItem('app-theme')||'dark';document.documentElement.setAttribute('data-theme',t);}());</script>
+    <!-- PDF butonu sadece Chrome ve Edge'de gösterilir -->
+    <script>
+        (function () {
+            var ua = navigator.userAgent;
+            // Edge: Windows/Mac/Android "Edg/", Android "EdgA/", iOS "EdgiOS/"
+            var isEdge = /Edg(A|iOS)?\//.test(ua);
+            // Brave, UA'da kendini belirtmez ve Chrome gibi görünür; navigator.brave ile ayırt edilir.
+            var isBrave = !!navigator.brave;
+            // Chrome UA token'ı taşıyan ama Chrome olmayan tarayıcılar (Opera, UC Browser, vb.) ve botlar (Googlebot, vb.)
+            var isOtherChromiumBrowser = /OPR\/|Opera|UCBrowser|SamsungBrowser|YaBrowser|Vivaldi|DuckDuckGo/i.test(ua);
+            var isBot = /bot|spider|crawl/i.test(ua);
+            // Chrome: desktop/Android "Chrome/", iOS "CriOS/"
+            var isChrome = /Chrome\/|CriOS\//.test(ua) && !isEdge && !isBrave && !isOtherChromiumBrowser && !isBot;
+            var isAllowedBrowser = isChrome || isEdge;
+            document.documentElement.setAttribute('data-pdf-allowed', isAllowedBrowser ? 'true' : 'false');
+        }());
+    </script>
     <meta charset="utf-8" />
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
