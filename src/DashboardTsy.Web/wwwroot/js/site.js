@@ -79,13 +79,13 @@ function renderMobileMenu(items) {
     for (var i = 0; i < items.length; i++) {
         var item = items[i];
         if (!item.IsVisible) continue;
-        var isFinancialMap = item.Code === 'FinancialMap';
+        // Finansal Harita sadece desktop sidebar'da gösterilir
+        if (item.Code === 'FinancialMap') continue;
         var itemPath = (item.Url || '/').replace(/\/$/, '') || '/';
-        var isActive = (!isFinancialMap && currentPath === itemPath) ? ' active' : '';
+        var isActive = currentPath === itemPath ? ' active' : '';
         var icon = _sidebarIcons[item.Code] || '/images/homepage.svg';
-        var targetAttr = isFinancialMap ? ' target="_blank" rel="noopener noreferrer"' : '';
         var mobileCode = String(item.Code || '').replace(/"/g, '');
-        html += '<a href="' + (isFinancialMap ? withUsername(item.Url) : item.Url) + '" class="mobile-menu-item' + isActive + '" data-sidebar-code="' + mobileCode + '"' + targetAttr + '>';
+        html += '<a href="' + item.Url + '" class="mobile-menu-item' + isActive + '" data-sidebar-code="' + mobileCode + '">';
         html += '<img src="' + icon + '" alt="" />';
         html += '<span>' + item.Name + '</span>';
         html += '</a>';
