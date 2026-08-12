@@ -157,6 +157,18 @@
   background: rgba(246, 247, 249, 0.2);
 }
 
+[data-theme="dark"] #dynamicTableContainer2 .data-table tbody tr.stripe-odd td.col-index,
+[data-theme="dark"] #dynamicTableContainer2 .data-table tbody tr.stripe-odd td.col-expand,
+[data-theme="dark"] #dynamicTableContainer2 .data-table tbody tr.stripe-odd td.col-left {
+  background: rgb(62, 78, 144);
+}
+
+[data-theme="dark"] #dynamicTableContainer2 .data-table tbody tr.stripe-even td.col-index,
+[data-theme="dark"] #dynamicTableContainer2 .data-table tbody tr.stripe-even td.col-expand,
+[data-theme="dark"] #dynamicTableContainer2 .data-table tbody tr.stripe-even td.col-left {
+  background: rgb(16, 36, 118);
+}
+
 .data-table tbody tr:first-child td:first-child {
   border-radius: 30px 0 0 0;
 }
