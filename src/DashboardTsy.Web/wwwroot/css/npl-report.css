@@ -215,25 +215,6 @@
   fill: #536076;
 }
 
-/* Beyaz kart üzerinde beyaz balon kaybolmasın diye tooltip ters çevrilir */
-[data-theme="light"] .npl-chart-tooltip {
-  background: #052560;
-  color: var(--white);
-}
-
-/* Ters çevrilen balonda yüzde de beyaza döner (temel kuraldaki #104570 okunmazdı) */
-[data-theme="light"] .npl-chart-tooltip .npl-tt-ratio {
-  color: var(--white);
-}
-
-[data-theme="light"] .npl-chart-tooltip::before {
-  border-color: transparent #052560 transparent transparent;
-}
-
-[data-theme="light"] .npl-chart-tooltip.npl-tt-left::before {
-  border-color: transparent transparent transparent #052560;
-}
-
 [data-theme="light"] .npl-legend-item {
   color: var(--navy);
 }
