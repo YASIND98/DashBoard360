@@ -197,7 +197,7 @@ $(document).ready(function () {
   // Bölge/Şube/Portföy Kırılımı sekmesi şimdilik gizli olduğu için (report-detail.js), gösterilecek
   // sekmesi olmayan satırlarda ikon basılmaz; aksi hâlde modal boş açılırdı.
   function buildDetailCell(p, tableKey) {
-      var isTop10 = tableKey === 'daily' && TOP10_PRODUCT_NAMES.includes(p.ProductName);
+      var isTop10 = tableKey === 'daily' && TOP10_PRODUCT_NAMES.includes((p.ProductName || '').replace(/\s*\(.*/, ''));
       var hasTrend = tableKey === 'quantity' || tableKey === 'monthly';
       if (!isTop10 && !hasTrend) return '<td class="col-detail"></td>';
       return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +

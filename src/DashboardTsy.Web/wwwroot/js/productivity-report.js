@@ -355,30 +355,51 @@ function loadGeneralRegionReport(tabId) {
         }),
         success: function (response) {
             var data = extractResponseData(response);
-            renderDynamicHeaders(_cachedHeaders, false);
-
-            var html = '';
-            (data || []).forEach(function (row, i) {
-                var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-
-                html += '<tr class="table-row ' + cls + '">';
-                html += '<td class="col-index">' + (i + 1) + '</td>';
-                html += '<td class="col-left">' + row.Urun + '</td>';
-                html += '<td>' + formatNumber(row.BankaGecenYil) + '</td>';
-                html += '<td>' + formatNumber(row.BankaGerceklesen) + '</td>';
-                html += '<td>' + formatNumber(row.BankaOrt) + '</td>';
-                html += '<td>' + formatNumber(row.BankaHedef) + '</td>';
-                html += '<td class="' + percentColor(row.HgYuzde) + '">' + formatPercent(row.HgYuzde) + '</td>';
-                html += '<td>' + formatNumber(row.NetBuyumeBanka) + '</td>';
-                html += '<td>' + formatNumber(row.NetBuyumeBankaOrt) + '</td>';
-                html += '<td>' + formatPercent(row.YtdBanka) + '</td>';
-                html += '<td>' + formatPercent(row.QtdBanka) + '</td>';
-                html += '</tr>';
-            });
-            $('#dynamicTableBody').html(html);
-            updateProductivityStripes();
+            var items = flattenRows(data, 0);
+            var hasExpandable = items.some(function (item) { return item._hasChildren; });
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
+            renderGeneralRegionTable(items);
         }
     });
+}
+
+function renderGeneralRegionTable(items) {
+    var html = '';
+    var hasExpandable = items.some(function (item) { return item._hasChildren; });
+
+    items.forEach(function (item, i) {
+        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
+
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+        html += '<td class="col-index">' + (i + 1) + '</td>';
+
+        if (hasExpandable) {
+            if (item._hasChildren) {
+                html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
+            } else {
+                html += '<td class="col-expand"></td>';
+            }
+        }
+
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.Urun + '</span>' : item.Urun;
+        html += '<td class="col-left">' + indent + '</td>';
+
+        html += '<td>' + formatNumber(item.BankaGecenYil) + '</td>';
+        html += '<td>' + formatNumber(item.BankaGerceklesen) + '</td>';
+        html += '<td>' + formatNumber(item.BankaOrt) + '</td>';
+        html += '<td>' + formatNumber(item.BankaHedef) + '</td>';
+        html += '<td class="' + percentColor(item.HgYuzde) + '">' + formatPercent(item.HgYuzde) + '</td>';
+        html += '<td>' + formatNumber(item.NetBuyumeBanka) + '</td>';
+        html += '<td>' + formatNumber(item.NetBuyumeBankaOrt) + '</td>';
+        html += '<td>' + formatPercent(item.YtdBanka) + '</td>';
+        html += '<td>' + formatPercent(item.QtdBanka) + '</td>';
+        html += '</tr>';
+    });
+
+    $('#dynamicTableBody').html(html);
+    updateProductivityStripes();
 }
 
 // ===== Load Table Headers =====
