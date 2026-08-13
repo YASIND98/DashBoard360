@@ -116,50 +116,129 @@ public static class MockProductivityReportData
 
     public static GetProductivityGeneralRegionReportResponse GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request)
     {
+        var nakdiKrediler = new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+        {
+            Id = 1,
+            ParentProductId = null,
+            Urun = "Nakdi Krediler",
+            BankaGecenYil = 523_876_414m,
+            BankaGerceklesen = 656_745_894m,
+            BankaOrt = 12_400_054m,
+            BankaHedef = 678_991_577m,
+            HgYuzde = 96.43m,
+            NetBuyumeBanka = 130_872_230m,
+            NetBuyumeBankaOrt = 247_664m,
+            YtdBanka = 24.98m,
+            QtdBanka = 10.39m
+        };
+        nakdiKrediler.SubProducts.AddRange(new[]
+        {
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 2, ParentProductId = 1, Urun = "Nakdi Krediler TL (Solo KK Dahil)",
+                BankaGecenYil = 404_254_633m, BankaGerceklesen = 505_075_855m, BankaOrt = 958_287m,
+                BankaHedef = 504_741_081m, HgYuzde = 100.24m, NetBuyumeBanka = 101_720_722m,
+                NetBuyumeBankaOrt = 182_653m, YtdBanka = 25.16m, QtdBanka = 10.37m
+            },
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 3, ParentProductId = 1, Urun = "Leasing TL",
+                BankaGecenYil = 2_944_930m, BankaGerceklesen = 3_887_903m, BankaOrt = 7_363m,
+                BankaHedef = 3_920_995m, HgYuzde = 99.16m, NetBuyumeBanka = 942_973m,
+                NetBuyumeBankaOrt = 1_786m, YtdBanka = 32.02m, QtdBanka = 21.64m
+            },
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 4, ParentProductId = 1, Urun = "Faktoring TL",
+                BankaGecenYil = 7_564_612m, BankaGerceklesen = 13_684_908m, BankaOrt = 25_918m,
+                BankaHedef = 15_982_215m, HgYuzde = 85.63m, NetBuyumeBanka = 6_120_295m,
+                NetBuyumeBankaOrt = 11_591m, YtdBanka = 80.91m, QtdBanka = 25.22m
+            },
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 5, ParentProductId = 1, Urun = "Nakdi Krediler YP ($) (Solo KK Dahil)",
+                BankaGecenYil = 2_262_328m, BankaGerceklesen = 2_365_822m, BankaOrt = 4_481m,
+                BankaHedef = 2_880_607m, HgYuzde = 82.12m, NetBuyumeBanka = 103_494m,
+                NetBuyumeBankaOrt = 196m, YtdBanka = 4.57m, QtdBanka = 3.11m
+            }
+        });
+
+        var gayriNakdiKrediler = new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+        {
+            Id = 7,
+            ParentProductId = null,
+            Urun = "Gayri Nakdi Krediler",
+            BankaGecenYil = 147_339_709m,
+            BankaGerceklesen = 236_361_663m,
+            BankaOrt = 451_443m,
+            BankaHedef = 231_097_027m,
+            HgYuzde = 103.14m,
+            NetBuyumeBanka = 91_021_955m,
+            NetBuyumeBankaOrt = 172_390m,
+            YtdBanka = 61.78m,
+            QtdBanka = 16.65m
+        };
+        gayriNakdiKrediler.SubProducts.AddRange(new[]
+        {
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 8, ParentProductId = 7, Urun = "Gayri Nakdi Krediler TL (Solo)",
+                BankaGecenYil = 9_551_497m, BankaGerceklesen = 14_145_352m, BankaOrt = 26_790m,
+                BankaHedef = 15_128_291m, HgYuzde = 93.50m, NetBuyumeBanka = 4_594_206m,
+                NetBuyumeBankaOrt = 8_701m, YtdBanka = 48.10m, QtdBanka = 17.16m
+            },
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 9, ParentProductId = 7, Urun = "Gayri Nakdi Krediler YP ($) (Solo)",
+                BankaGecenYil = 982_220m, BankaGerceklesen = 1_575_053m, BankaOrt = 2_983m,
+                BankaHedef = 1_271_092m, HgYuzde = 123.91m, NetBuyumeBanka = 592_833m,
+                NetBuyumeBankaOrt = 1_123m, YtdBanka = 60.36m, QtdBanka = 24.03m
+            }
+        });
+
+        var mevduatlar = new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+        {
+            Id = 11,
+            ParentProductId = null,
+            Urun = "Mevduatlar",
+            BankaGecenYil = 636_375_340m,
+            BankaGerceklesen = 767_006_791m,
+            BankaOrt = 1_452_816m,
+            BankaHedef = 905_793_844m,
+            HgYuzde = 84.68m,
+            NetBuyumeBanka = 130_711_451m,
+            NetBuyumeBankaOrt = 247_560m,
+            YtdBanka = 20.54m,
+            QtdBanka = 3.22m
+        };
+        mevduatlar.SubProducts.AddRange(new[]
+        {
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 12, ParentProductId = 11, Urun = "Vadesiz Mevduatlar (Solo)",
+                BankaGecenYil = 215_297_413m, BankaGerceklesen = 260_959_745m, BankaOrt = 494_242m,
+                BankaHedef = 271_058_611m, HgYuzde = 299.32m, NetBuyumeBanka = 45_662_332m,
+                NetBuyumeBankaOrt = 86_452m, YtdBanka = 21.21m, QtdBanka = 1.62m
+            },
+            new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            {
+                Id = 13, ParentProductId = 11, Urun = "Vadesiz YP ($) (Solo)",
+                BankaGecenYil = 60_494_133m, BankaGerceklesen = 70_107_160m, BankaOrt = 132_779m,
+                BankaHedef = 82_576_297m, HgYuzde = 84.90m, NetBuyumeBanka = 9_643_022m,
+                NetBuyumeBankaOrt = 18_263m, YtdBanka = 15.95m, QtdBanka = -3.22m
+            }
+        });
+
+        var roots = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>
+        {
+            nakdiKrediler,
+            gayriNakdiKrediler,
+            mevduatlar
+        };
+
         return new GetProductivityGeneralRegionReportResponse
         {
-            GetProductivityGeneralRegionReports = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>
-            {
-                new()
-                {
-                    Urun = "Vadesiz TL Mevduat",
-                    BankaGecenYil = 111_600_000m,
-                    BankaGerceklesen = 125_430_000m,
-                    BankaOrt = 118_200_000m,
-                    BankaHedef = 130_000_000m,
-                    HgYuzde = 96.48m,
-                    NetBuyumeBanka = 7_230_000m,
-                    NetBuyumeBankaOrt = 5_400_000m,
-                    YtdBanka = 12.35m,
-                    QtdBanka = 3.12m
-                },
-                new()
-                {
-                    Urun = "Vadeli TL Mevduat",
-                    BankaGecenYil = 315_700_000m,
-                    BankaGerceklesen = 342_180_000m,
-                    BankaOrt = 335_900_000m,
-                    BankaHedef = 350_000_000m,
-                    HgYuzde = 97.77m,
-                    NetBuyumeBanka = 6_280_000m,
-                    NetBuyumeBankaOrt = 4_950_000m,
-                    YtdBanka = 8.42m,
-                    QtdBanka = 1.87m
-                },
-                new()
-                {
-                    Urun = "Ticari Krediler",
-                    BankaGecenYil = 444_800_000m,
-                    BankaGerceklesen = 512_600_000m,
-                    BankaOrt = 495_100_000m,
-                    BankaHedef = 520_000_000m,
-                    HgYuzde = 98.58m,
-                    NetBuyumeBanka = 17_500_000m,
-                    NetBuyumeBankaOrt = 12_300_000m,
-                    YtdBanka = 15.21m,
-                    QtdBanka = 4.65m
-                }
-            }
+            GetProductivityGeneralRegionReports = roots
         };
     }
 

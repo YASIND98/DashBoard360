@@ -393,6 +393,24 @@ public class ReportDataProvider : IReportDataProvider
         return long.TryParse(raw.ToString(), out var parsed) ? parsed : 0L;
     }
 
+    private static int ReadInt(DataRow row, string column)
+    {
+        if (!row.Table.Columns.Contains(column)) return 0;
+        var raw = row[column];
+        if (raw is DBNull or null) return 0;
+        if (raw is int i) return i;
+        return int.TryParse(raw.ToString(), out var parsed) ? parsed : 0;
+    }
+
+    private static int? ReadNullableInt(DataRow row, string column)
+    {
+        if (!row.Table.Columns.Contains(column)) return null;
+        var raw = row[column];
+        if (raw is DBNull or null) return null;
+        if (raw is int i) return i;
+        return int.TryParse(raw.ToString(), out var parsed) ? parsed : (int?)null;
+    }
+
     public IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
     {
         request ??= new GetProductivityReportTabsRequest();
@@ -583,17 +601,38 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
-        response.GetProductivityGeneralRegionReports = MapProductivityGeneralRegionReportItems(ds.Tables[0]);
+        response.GetProductivityGeneralRegionReports = BuildProductivityGeneralRegionReportTree(ds.Tables[0]);
         return response;
     }
 
-    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> MapProductivityGeneralRegionReportItems(DataTable table)
+    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem> BuildProductivityGeneralRegionReportTree(DataTable table)
     {
-        var items = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>(table.Rows.Count);
+        var rows = ReadProductivityGeneralRegionReportRows(table);
+
+        // Eski davranış: SP Id/ParentProductId dönmüyorsa tüm satırları düz liste olarak döndür.
+        var hasHierarchy = table.Columns.Contains("Id") && table.Columns.Contains("ParentProductId");
+        if (!hasHierarchy)
+            return rows.Select(MapProductivityGeneralRegionReportItem).ToList();
+
+        return ProductivityGeneralRegionReportTreeFromRows(rows);
+    }
+
+    private static List<ProductivityGeneralRegionRow> ReadProductivityGeneralRegionReportRows(DataTable table)
+    {
+        var hasId = table.Columns.Contains("Id");
+        var hasParent = table.Columns.Contains("ParentProductId");
+        var hasSortOrder = table.Columns.Contains("SortOrder");
+
+        var rows = new List<ProductivityGeneralRegionRow>(table.Rows.Count);
+        var fallbackId = 0;
+
         foreach (DataRow row in table.Rows)
         {
-            items.Add(new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+            rows.Add(new ProductivityGeneralRegionRow
             {
+                Id = hasId ? ReadInt(row, "Id") : ++fallbackId,
+                ParentProductId = hasParent ? ReadNullableInt(row, "ParentProductId") : null,
+                SortOrder = hasSortOrder ? ReadNullableInt(row, "SortOrder") : null,
                 Urun = ReadString(row, "URUN"),
                 BankaGecenYil = ReadDecimal(row, "BANKA_GECEN_YIL"),
                 BankaGerceklesen = ReadDecimal(row, "BANKA_GERCEKLESEN"),
@@ -606,7 +645,74 @@ public class ReportDataProvider : IReportDataProvider
                 QtdBanka = ReadDecimal(row, "QTD_BANKA")
             });
         }
-        return items;
+        return rows;
+    }
+
+    private static List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>
+        ProductivityGeneralRegionReportTreeFromRows(List<ProductivityGeneralRegionRow> rows)
+    {
+        var byId = new Dictionary<int, GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>(rows.Count);
+
+        // Önce tüm nodeları oluştur (SortOrder ile stabil sıralamak için sıralı gez).
+        var orderedRows = rows.OrderBy(r => r.SortOrder ?? int.MaxValue).ToList();
+
+        foreach (var r in orderedRows)
+        {
+            if (!byId.ContainsKey(r.Id))
+                byId[r.Id] = MapProductivityGeneralRegionReportItem(r);
+        }
+
+        foreach (var r in orderedRows)
+        {
+            if (!r.ParentProductId.HasValue || r.ParentProductId.Value == 0)
+                continue;
+
+            if (byId.TryGetValue(r.ParentProductId.Value, out var parent) && byId.TryGetValue(r.Id, out var node))
+                parent.SubProducts.Add(node);
+        }
+
+        return orderedRows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => byId[r.Id])
+            .ToList();
+    }
+
+    private static GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+        MapProductivityGeneralRegionReportItem(ProductivityGeneralRegionRow r)
+    {
+        return new GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem
+        {
+            Id = r.Id,
+            ParentProductId = r.ParentProductId,
+            Urun = r.Urun ?? string.Empty,
+            BankaGecenYil = r.BankaGecenYil,
+            BankaGerceklesen = r.BankaGerceklesen,
+            BankaOrt = r.BankaOrt,
+            BankaHedef = r.BankaHedef,
+            HgYuzde = r.HgYuzde,
+            NetBuyumeBanka = r.NetBuyumeBanka,
+            NetBuyumeBankaOrt = r.NetBuyumeBankaOrt,
+            YtdBanka = r.YtdBanka,
+            QtdBanka = r.QtdBanka,
+            SubProducts = new List<GetProductivityGeneralRegionReportResponse.GetProductivityGeneralRegionReportItem>()
+        };
+    }
+
+    private sealed class ProductivityGeneralRegionRow
+    {
+        public int Id { get; set; }
+        public int? ParentProductId { get; set; }
+        public int? SortOrder { get; set; }
+        public string Urun { get; set; } = string.Empty;
+        public decimal BankaGecenYil { get; set; }
+        public decimal BankaGerceklesen { get; set; }
+        public decimal BankaOrt { get; set; }
+        public decimal BankaHedef { get; set; }
+        public decimal HgYuzde { get; set; }
+        public decimal NetBuyumeBanka { get; set; }
+        public decimal NetBuyumeBankaOrt { get; set; }
+        public decimal YtdBanka { get; set; }
+        public decimal QtdBanka { get; set; }
     }
 
     public GetProductivityCountCardPosRegionReportResponse? GetProductivityCountCardPosRegionReport(GetProductivityCountCardPosRegionReportRequest request)
