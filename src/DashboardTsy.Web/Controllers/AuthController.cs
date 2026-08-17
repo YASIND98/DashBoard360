@@ -3,6 +3,8 @@ using System.Text.Json;
 using DashboardTsy.Web.Models;
 using DashboardTsy.Web.Models.Activity;
 using DashboardTsy.Web.Services;
+using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DashboardTsy.Web.Controllers;
@@ -69,15 +71,22 @@ public class AuthController : Controller
     [HttpGet]
     public async Task<IActionResult> Login(CancellationToken cancellationToken)
     {
-        var userName = User?.Identity?.Name;
-        if (string.IsNullOrEmpty(userName))
-            return View();
-
+        // Mock modu: form gösterilmeden mock kullanıcı ile oturum açılır.
         if (AuthMockEnabled)
         {
-            // In mock mode, do NOT auto-login. Keep showing the login screen so UI can be tested.
-            return View();
+            var mock = MockOkUser("mock-user");
+            if (mock.Result != null)
+            {
+                SetSession(mock.Result, mock.Result.DomainName);
+                await LogLoginSuccessAsync("Windows(Mock)", mock.Result, cancellationToken).ConfigureAwait(false);
+            }
+            return RedirectToAction("Index", "Home");
         }
+
+        // Windows Auth zorunlu: kimlik yoksa Negotiate challenge tetiklenir (tarayıcı popup'ı).
+        var userName = User?.Identity?.Name;
+        if (string.IsNullOrEmpty(userName))
+            return Challenge(NegotiateDefaults.AuthenticationScheme);
 
         var baseUrl = _configuration["DashboardApi:BaseUrl"]?.TrimEnd('/') + "/";
         var url = $"{baseUrl}Public/WindowsLogin?username={WebUtility.UrlEncode(userName)}";
@@ -106,12 +115,28 @@ public class AuthController : Controller
             return RedirectToAction("Index", "Home");
         }
 
-        return View();
+        // Windows kimliği geldi ama SsoUserView'da tanımlı değil (ya da bloklu).
+        // Local login formuna DÜŞMÜYORUZ; kullanıcıya "yetkiniz yok" ekranı gösteriyoruz.
+        ViewData["DomainUser"] = userName;
+        ViewData["Message"] = result?.Message?.message2;
+        Response.StatusCode = StatusCodes.Status403Forbidden;
+        return View("AccessDenied");
     }
 
+    // NOT: LoginDomain / LoginUser action'ları eski local-login (SsoUserView'da yoksa form)
+    // akışının parçasıydı. Artık Windows Auth her koşulda zorunlu ve fallback UI kaldırıldı.
+    // Kod ileride geri açılabilsin diye duruyor; runtime'da erişilemez (Gone/NotFound).
     [HttpGet]
     public async Task<JsonResult> LoginDomain(CancellationToken cancellationToken)
     {
+        Response.StatusCode = StatusCodes.Status410Gone;
+        return Json(new ApiResponse<UsersDto>
+        {
+            Result = new UsersDto { UserId = 0 },
+            Message = new MessageResult { message = "Devre Dışı", message2 = "Local login kaldırıldı. Windows Auth kullanılıyor." }
+        });
+
+#pragma warning disable CS0162 // Unreachable code detected — legacy path retained for future re-enable
         var userName = User?.Identity?.Name ?? string.Empty;
 
         if (AuthMockEnabled)
@@ -148,11 +173,20 @@ public class AuthController : Controller
         }
 
         return Json(result);
+#pragma warning restore CS0162
     }
 
     [HttpPost]
     public async Task<JsonResult> LoginUser([FromForm] LoginModel model, CancellationToken cancellationToken)
     {
+        Response.StatusCode = StatusCodes.Status410Gone;
+        return Json(new ApiResponse<UsersDto>
+        {
+            Result = new UsersDto { UserId = 0 },
+            Message = new MessageResult { message = "Devre Dışı", message2 = "Local login kaldırıldı. Windows Auth kullanılıyor." }
+        });
+
+#pragma warning disable CS0162 // Unreachable code detected — legacy path retained for future re-enable
         if (AuthMockEnabled)
         {
             var mock = MockOkUser(model.Email);
@@ -193,6 +227,7 @@ public class AuthController : Controller
         }
 
         return Json(result);
+#pragma warning restore CS0162
     }
 
     [HttpGet]

@@ -1,0 +1,50 @@
+@{
+    ViewData["Title"] = "Erişim Reddedildi";
+    Layout = null;
+    var domainUser = ViewData["DomainUser"] as string;
+    var apiMessage = ViewData["Message"] as string;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Yönetici Raporu — Erişim Reddedildi</title>
+    <link href="~/assets/lib/bootstrap/bootstrap-grid.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/login.css" rel="stylesheet" asp-append-version="true" />
+</head>
+
+<body>
+    <div class="login-wrapper">
+        <div class="login-container">
+            <div class="login-header">
+                <img src="~/images/denizbank-logo.svg" alt="DenizBank" />
+                <h2>Yönetici Rapor Platformu</h2>
+            </div>
+
+            <div class="login-card" style="display:flex; align-items:center; justify-content:center; min-height:320px;">
+                <div class="login-form" style="text-align:center; width:100%;">
+                    <h3>Erişim Reddedildi</h3>
+                    <p style="margin-top:12px;">
+                        Windows kimliğiniz doğrulandı ancak sistemde bu kullanıcı için tanımlı yetki bulunmuyor.
+                    </p>
+                    @if (!string.IsNullOrEmpty(domainUser))
+                    {
+                        <p style="opacity:.75;">Domain kullanıcısı: <strong>@domainUser</strong></p>
+                    }
+                    @if (!string.IsNullOrEmpty(apiMessage))
+                    {
+                        <p style="opacity:.65; font-size:.9rem;">@apiMessage</p>
+                    }
+                    <p style="margin-top:16px;">
+                        Erişim için lütfen yöneticinize başvurun.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
