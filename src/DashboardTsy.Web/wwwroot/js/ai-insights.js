@@ -182,7 +182,7 @@ $(document).ready(function () {
             }
             $('#aiNotice').empty();
             // Servis cevabını doğrudan "AI yazıyormuş" gibi kademeli olarak ekrana yaz
-            aiTypeMarkdown($result, captured.summary);
+            aiTypeMarkdown($result, captured.summary, captured.openSections);
         }
 
         $.ajax({
@@ -192,7 +192,11 @@ $(document).ready(function () {
             data: JSON.stringify(payload),
             success: function (data) {
                 var items = (data && data.Items) || (data && data.items) || [];
-                var captured = { summary: items.length ? (items[0].Summary || items[0].summary || '') : '' };
+                var item = items.length ? items[0] : null;
+                var captured = {
+                    summary: item ? (item.Summary || item.summary || '') : '',
+                    openSections: (item && (item.OpenSections || item.openSections)) || []
+                };
                 aiAfterThinking(thinkStart, function () { finish(captured); });
             },
             error: function () {
@@ -219,7 +223,7 @@ $(document).ready(function () {
     // Zaman güdümlüdür: tüm cevap en fazla ~5 saniyede tamamlanır.
     var AI_TYPE_BUDGET = 8500; // ms — tüm metnin yazılacağı azami süre (gerçekten yazıyor hissi)
 
-    function aiTypeMarkdown($container, md, onDone) {
+    function aiTypeMarkdown($container, md, openSections, onDone) {
         var full = md || '';
         var $content = $('<div class="ai-result-content ai-typing"></div>');
         $container.empty().append($content);
@@ -235,12 +239,24 @@ $(document).ready(function () {
         if (!full) { complete(); return; }
 
         // 1) Nihai HTML'i tek seferde oluştur — kalın/renk/tablo ilk karakterden itibaren doğru
-        $content.html(renderMarkdown(full));
+        $content.html(renderMarkdown(full, openSections));
         var root = $content[0];
 
-        // 2) Kademeli belirecek blokları başta gizle (yazıya ulaşınca açılırlar)
-        var blocks = root.querySelectorAll('p, h1, h2, h3, h4, h5, h6, hr, table, li, tr');
-        for (var b = 0; b < blocks.length; b++) blocks[b].classList.add('ai-pending');
+        // Kapalı bölümün gövdesi animasyona girmez; görünmeyen metne yazılırken takılmış gibi görünürdü
+        function isSkipped(el) {
+            return el.classList && el.classList.contains('ai-collapse-body') &&
+                   el.parentNode && el.parentNode.classList.contains('is-closed');
+        }
+
+        // 2) Kademeli belirecek blokları başta gizle (yazıya ulaşınca açılırlar).
+        //    Collapse kutusu da dahil; yoksa çerçevesi baştan görünüp içi boş kalıyor.
+        var blocks = root.querySelectorAll('section.ai-collapse, p, h1, h2, h3, h4, h5, h6, hr, table, li, tr');
+        for (var b = 0; b < blocks.length; b++) {
+            var el = blocks[b];
+            if (el.closest('.ai-collapse.is-closed > .ai-collapse-body')) continue;
+            if (el.classList.contains('ai-collapse-head')) continue;   // kutuyla birlikte belirir
+            el.classList.add('ai-pending');
+        }
 
         // 3) Belge sırasına göre işlem listesi kur; metin düğümlerini boşalt
         var ops = [];
@@ -249,6 +265,7 @@ $(document).ready(function () {
             for (var i = 0; i < node.childNodes.length; i++) {
                 var child = node.childNodes[i];
                 if (child.nodeType === 1) {
+                    if (isSkipped(child)) continue;
                     if (child.classList && child.classList.contains('ai-pending')) {
                         ops.push({ kind: 'show', el: child });
                     }
@@ -347,6 +364,23 @@ $(document).ready(function () {
         $('#aiNotice').empty();
     }
 
+    // ===== Katlanabilir bölümler =====
+    // Summary'deki her "## " başlığı bir bölüm; belge sırasına göre 1'den numaralanır.
+    // Hangilerinin açık geleceğini servis söyler: { Summary: "...", OpenSections: [1, 5] }
+    var COLLAPSE_HEADING_LEVEL = 2;   // "## " — bölüm başlangıcı sayılan başlık seviyesi
+
+    $(document).on('click', '.ai-collapse-head', function () {
+        var isClosed = $(this).closest('.ai-collapse').toggleClass('is-closed').hasClass('is-closed');
+        $(this).attr('aria-expanded', isClosed ? 'false' : 'true');
+    });
+
+    $(document).on('keydown', '.ai-collapse-head', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            $(this).trigger('click');
+        }
+    });
+
     // ===== Markdown -> HTML (başlık, kalın, tablo, liste, hr; inline HTML korunur) =====
     function mdInline(text) {
         // **kalın** -> <strong> (mevcut <span> gibi inline HTML olduğu gibi korunur)
@@ -358,15 +392,29 @@ $(document).ready(function () {
         return raw.split('|').map(function (c) { return c.trim(); });
     }
 
-    function renderMarkdown(md) {
+    function renderMarkdown(md, openSections) {
         if (!md) return '';
+        var open = openSections || [];
         var lines = md.replace(/\r\n/g, '\n').split('\n');
         var html = [];
         var i = 0;
         var listOpen = false;
+        var collapseStack = [];   // açık collapse bölümlerinin başlık seviyeleri
+        var sectionNo = 0;        // "## " başlıklarının belge sırası (1'den)
 
         function closeList() {
             if (listOpen) { html.push('</ul>'); listOpen = false; }
+        }
+
+        // Bölüm, aynı/daha üst seviyeli başlıkta (veya <hr>/metin sonunda) kapanır; kaç tane kapattığını döner
+        function closeCollapses(level) {
+            var closed = 0;
+            while (collapseStack.length && collapseStack[collapseStack.length - 1] >= level) {
+                html.push('</div></section>');
+                collapseStack.pop();
+                closed++;
+            }
+            return closed;
         }
 
         while (i < lines.length) {
@@ -376,15 +424,38 @@ $(document).ready(function () {
             // Boş satır
             if (trimmed === '') { closeList(); i++; continue; }
 
-            // Yatay çizgi
-            if (/^-{3,}$/.test(trimmed)) { closeList(); html.push('<hr />'); i++; continue; }
+            // Yatay çizgi — bölüm ayracı olduğu için açık collapse'leri kapatır. Bölüm kapattıysa
+            // çizgi basılmaz (kutu kenarlıkları zaten ayırıyor); açık bölüm yokken çizilir.
+            if (/^-{3,}$/.test(trimmed)) {
+                closeList();
+                if (!closeCollapses(1)) html.push('<hr />');
+                i++; continue;
+            }
 
             // Başlıklar
             var h = /^(#{1,6})\s+(.*)$/.exec(trimmed);
             if (h) {
                 closeList();
                 var level = h[1].length;
-                html.push('<h' + level + '>' + mdInline(h[2]) + '</h' + level + '>');
+                var headText = h[2];
+                closeCollapses(level);
+
+                if (level === COLLAPSE_HEADING_LEVEL) {
+                    sectionNo++;
+                    var isOpen = open.indexOf(sectionNo) > -1;
+                    // Baştan kapalı basılır; animasyon atladığı için "açılıp sonra kapanma" olmaz
+                    html.push('<section class="ai-collapse' + (isOpen ? '' : ' is-closed') + '">');
+                    html.push(
+                        '<h' + level + ' class="ai-collapse-head" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '">' +
+                            '<span class="ai-collapse-title">' + mdInline(headText) + '</span>' +
+                            '<span class="ai-collapse-icon" aria-hidden="true"></span>' +
+                        '</h' + level + '>'
+                    );
+                    html.push('<div class="ai-collapse-body">');
+                    collapseStack.push(level);
+                } else {
+                    html.push('<h' + level + '>' + mdInline(headText) + '</h' + level + '>');
+                }
                 i++; continue;
             }
 
@@ -422,6 +493,7 @@ $(document).ready(function () {
         }
 
         closeList();
+        closeCollapses(1);
         return html.join('');
     }
 });
