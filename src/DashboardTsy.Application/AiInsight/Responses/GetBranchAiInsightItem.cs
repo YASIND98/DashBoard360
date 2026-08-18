@@ -8,7 +8,7 @@ public class GetBranchAiInsightItem
     public string BranchCode { get; set; } = string.Empty;
     public DateTime SummaryDate { get; set; }
     public string Summary { get; set; } = string.Empty;
-    public List<int> OpenSections { get; set; } = new();
+    public List<string> OpenSections { get; set; } = new();
     public string ModelName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
 }

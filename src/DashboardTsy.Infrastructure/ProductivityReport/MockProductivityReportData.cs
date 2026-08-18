@@ -1458,14 +1458,36 @@ public static class MockProductivityReportData
 
         return new List<GetProductivityReportTableHeaderItem>
         {
-            new() { Id = 1, HeaderName = "Genel Bilgiler", ParentId = 0, OrderNo = 1, Sortable = false },
-            new() { Id = 2, HeaderName = "Müşteri Adı", ParentId = 1, OrderNo = 1, Sortable = true },
-            new() { Id = 3, HeaderName = "Şube Adı", ParentId = 1, OrderNo = 2, Sortable = true },
+            new() { Id = 1, HeaderName = "#", ParentId = 0, OrderNo = 1, Sortable = false },
+            new() { Id = 2, HeaderName = "Ürün Adı", ParentId = 0, OrderNo = 2, Sortable = true },
 
-            new() { Id = 4, HeaderName = "Performans", ParentId = 0, OrderNo = 2, Sortable = false },
-            new() { Id = 5, HeaderName = "Adet", ParentId = 4, OrderNo = 1, Sortable = true },
-            new() { Id = 6, HeaderName = "Hacim", ParentId = 4, OrderNo = 2, Sortable = true },
-            new() { Id = 7, HeaderName = "Karlılık", ParentId = 4, OrderNo = 3, Sortable = true }
+            new() { Id = 10, HeaderName = "Gerçekleşen", ParentId = 0, OrderNo = 3, Sortable = false },
+            new() { Id = 11, HeaderName = "Geçen Yıl", ParentId = 10, OrderNo = 1, Sortable = true },
+            new() { Id = 12, HeaderName = "Şube", ParentId = 10, OrderNo = 2, Sortable = true },
+            new() { Id = 13, HeaderName = "Bölge", ParentId = 10, OrderNo = 3, Sortable = true },
+            new() { Id = 14, HeaderName = "Bölge Ort.", ParentId = 10, OrderNo = 4, Sortable = true },
+            new() { Id = 15, HeaderName = "Banka", ParentId = 10, OrderNo = 5, Sortable = true },
+            new() { Id = 16, HeaderName = "Banka Ort.", ParentId = 10, OrderNo = 6, Sortable = true },
+
+            new() { Id = 20, HeaderName = "Hedef", ParentId = 0, OrderNo = 4, Sortable = true },
+            new() { Id = 21, HeaderName = "H/G %", ParentId = 0, OrderNo = 5, Sortable = true },
+
+            new() { Id = 30, HeaderName = "Net Büyüme", ParentId = 0, OrderNo = 6, Sortable = false },
+            new() { Id = 31, HeaderName = "Şube", ParentId = 30, OrderNo = 1, Sortable = true },
+            new() { Id = 32, HeaderName = "Bölge", ParentId = 30, OrderNo = 2, Sortable = true },
+            new() { Id = 33, HeaderName = "Bölge Ort.", ParentId = 30, OrderNo = 3, Sortable = true },
+            new() { Id = 34, HeaderName = "Banka", ParentId = 30, OrderNo = 4, Sortable = true },
+            new() { Id = 35, HeaderName = "Banka Ort.", ParentId = 30, OrderNo = 5, Sortable = true },
+
+            new() { Id = 40, HeaderName = "YTD", ParentId = 0, OrderNo = 7, Sortable = false },
+            new() { Id = 41, HeaderName = "Şube", ParentId = 40, OrderNo = 1, Sortable = true },
+            new() { Id = 42, HeaderName = "Bölge", ParentId = 40, OrderNo = 2, Sortable = true },
+            new() { Id = 43, HeaderName = "Banka", ParentId = 40, OrderNo = 3, Sortable = true },
+
+            new() { Id = 50, HeaderName = "QTD", ParentId = 0, OrderNo = 8, Sortable = false },
+            new() { Id = 51, HeaderName = "Şube", ParentId = 50, OrderNo = 1, Sortable = true },
+            new() { Id = 52, HeaderName = "Bölge", ParentId = 50, OrderNo = 2, Sortable = true },
+            new() { Id = 53, HeaderName = "Banka", ParentId = 50, OrderNo = 3, Sortable = true }
         };
     }
 

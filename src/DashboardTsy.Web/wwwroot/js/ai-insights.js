@@ -89,7 +89,6 @@ $(document).ready(function () {
 
     $('#aiDrawerClose').on('click', closeAiDrawer);
     $('#aiDrawerOverlay').on('click', closeAiDrawer);
-
     // ===== Region Selection (filtreleme ile aynı) =====
     $(document).on('click', '#aiBolgeList .dropdown-item', function () {
         var code = $(this).attr('data-code');
@@ -365,9 +364,16 @@ $(document).ready(function () {
     }
 
     // ===== Katlanabilir bölümler =====
-    // Summary'deki her "## " başlığı bir bölüm; belge sırasına göre 1'den numaralanır.
-    // Hangilerinin açık geleceğini servis söyler: { Summary: "...", OpenSections: [1, 5] }
-    var COLLAPSE_HEADING_LEVEL = 2;   // "## " — bölüm başlangıcı sayılan başlık seviyesi
+    // "## " ve "### " başlıkları katlanır bölüm olur. Anahtar belge yapısından üretilir:
+    // 2. "## " -> "2", onun 3. "### "i -> "2.3". Hangilerinin açık geleceğini servis söyler:
+    // { Summary: "...", OpenSections: ["1", "2.3"] }
+    // Alt bölüm listedeyse üstü de açılır; kapalı bir kutunun içindeki açık bölüm görünmezdi.
+    var COLLAPSE_MIN_LEVEL = 2;   // "## "
+    var COLLAPSE_MAX_LEVEL = 3;   // "### "
+
+    // Servis şimdilik OpenSections göndermiyor; boş geldiğinde bu liste kullanılır.
+    // Belgede karşılığı olmayan anahtarlar sessizce yok sayılır.
+    var DEFAULT_OPEN_SECTIONS = ['1', '2.1', '3.1', '4.1', '5', '6.1', '7', '8'];
 
     $(document).on('click', '.ai-collapse-head', function () {
         var isClosed = $(this).closest('.ai-collapse').toggleClass('is-closed').hasClass('is-closed');
@@ -394,13 +400,13 @@ $(document).ready(function () {
 
     function renderMarkdown(md, openSections) {
         if (!md) return '';
-        var open = openSections || [];
+        var open = (openSections && openSections.length ? openSections : DEFAULT_OPEN_SECTIONS).map(String);
         var lines = md.replace(/\r\n/g, '\n').split('\n');
         var html = [];
         var i = 0;
         var listOpen = false;
         var collapseStack = [];   // açık collapse bölümlerinin başlık seviyeleri
-        var sectionNo = 0;        // "## " başlıklarının belge sırası (1'den)
+        var counters = [];        // seviye başına sıra sayacı; anahtar bunlardan kurulur
 
         function closeList() {
             if (listOpen) { html.push('</ul>'); listOpen = false; }
@@ -415,6 +421,20 @@ $(document).ready(function () {
                 closed++;
             }
             return closed;
+        }
+
+        // Anahtar listede varsa ya da listedeki bir anahtarın atasıysa ("2.3" -> "2") açık gelir
+        function isSectionOpen(key) {
+            return open.some(function (k) { return k === key || k.indexOf(key + '.') === 0; });
+        }
+
+        // Bu seviyedeki sırayı bir artırır, altındaki sayaçları sıfırlar; "2" / "2.3" anahtarını döner
+        function sectionKey(level) {
+            counters[level] = (counters[level] || 0) + 1;
+            for (var deeper = level + 1; deeper <= COLLAPSE_MAX_LEVEL; deeper++) counters[deeper] = 0;
+            var parts = [];
+            for (var l = COLLAPSE_MIN_LEVEL; l <= level; l++) parts.push(counters[l] || 0);
+            return parts.join('.');
         }
 
         while (i < lines.length) {
@@ -440,9 +460,8 @@ $(document).ready(function () {
                 var headText = h[2];
                 closeCollapses(level);
 
-                if (level === COLLAPSE_HEADING_LEVEL) {
-                    sectionNo++;
-                    var isOpen = open.indexOf(sectionNo) > -1;
+                if (level >= COLLAPSE_MIN_LEVEL && level <= COLLAPSE_MAX_LEVEL) {
+                    var isOpen = isSectionOpen(sectionKey(level));
                     // Baştan kapalı basılır; animasyon atladığı için "açılıp sonra kapanma" olmaz
                     html.push('<section class="ai-collapse' + (isOpen ? '' : ' is-closed') + '">');
                     html.push(
