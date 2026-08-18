@@ -448,6 +448,25 @@
     display: none;
 }
 
+/* İç içe bölüm (### içinde): daha sade, dıştaki kutudan ayrışsın */
+.ai-result-content .ai-collapse .ai-collapse {
+    margin: 8px 0;
+    border-radius: 8px;
+}
+
+.ai-result-content .ai-collapse .ai-collapse-head {
+    padding: 8px 10px;
+    background: #fbfcfe;
+}
+
+.ai-result-content .ai-collapse .ai-collapse-head:hover {
+    background: #f2f6fc;
+}
+
+.ai-result-content .ai-collapse .ai-collapse-body {
+    padding: 10px 10px 2px;
+}
+
 .ai-result-content .ai-collapse-body > :first-child {
     margin-top: 0;
 }
