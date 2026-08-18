@@ -3,6 +3,121 @@ var _selectedDate =  _todayDate;
 // ===== Yield Table Skeleton + Loading =====
 var _yieldLoadingActive = false;
 var _yieldHasSecondTable = false;
+// ===== Yield Table Skeleton + Loading =====
+
+// --- Genel (loadGeneralReport / renderGeneralTable) ---
+var GENERAL_REGION_PDF_FIELDS = [
+    'Urun', 'BankaGecenYil', 'BankaGerceklesen', 'BankaOrt', 'BankaHedef',
+    'HgYuzde', 'NetBuyumeBanka', 'NetBuyumeBankaOrt', 'YtdBanka', 'QtdBanka'
+];
+ 
+// --- Hacim — Bölge (loadVolumeRegionReport / renderVolumeRegionTable) ---
+var VOLUME_REGION_PDF_FIELDS = [
+    'ProductName',
+    'RealizationRegionLastYearValue', 'RealizationRegionValue', 'RealizationRegionAverageValue',
+    'RealizationBankValue', 'RealizationBankAverageValue',
+    'TargetValue', 'HgRate',
+    'NetGrowthRegionValue', 'NetGrowthRegionAverageValue', 'NetGrowthBankValue', 'NetGrowthBankAverageValue',
+    'YtdRegionValue', 'YtdBankAverageValue',
+    'QtdRegionValue', 'QtdBankAverageValue'
+];
+ 
+// --- Hacim — Şube (loadVolumeBranchReport / renderVolumeBranchTable) ---
+var VOLUME_BRANCH_PDF_FIELDS = [
+    'ProductName',
+    'RealizationBranchLastYearValue', 'RealizationBranchValue', 'RealizationRegionValue',
+    'RealizationRegionAverageValue', 'RealizationBankValue', 'RealizationBankAverageValue',
+    'TargetValue', 'HgRate',
+    'NetGrowthBranchValue', 'NetGrowthRegionValue', 'NetGrowthRegionAverageValue',
+    'NetGrowthBankValue', 'NetGrowthBankAverageValue',
+    'YtdBranchValue', 'YtdRegionValue', 'YtdBankValue',
+    'QtdBranchValue', 'QtdRegionValue', 'QtdBankValue'
+];
+ 
+// --- Adet — Müşteri — Bölge (loadCountCustomerRegionReport / renderCountCustomerRegionTable) ---
+var COUNT_CUSTOMER_REGION_PDF_FIELDS = [
+    'ProductName',
+    'RealizationRegion', 'RealizationBankAverage',
+    'YtdChangeRegion', 'YtdChangeBankAverage',
+    'QtdChangeRegion', 'QtdChangeBankAverage'
+];
+ 
+// --- Adet — Müşteri — Şube (loadCountCustomerBranchReport / renderCountCustomerBranchTable) ---
+var COUNT_CUSTOMER_BRANCH_PDF_FIELDS = [
+    'ProductName',
+    'RealizationBranchValue', 'RealizationRegionAverageValue', 'RealizationBankAverageValue',
+    'YtdNominalChangeBranchValue', 'YtdNominalChangeRegionAverageValue', 'YtdNominalChangeBankAverageValue',
+    'QtdNominalChangeBranchValue', 'QtdNominalChangeRegionAverageValue', 'QtdNominalChangeBankAverageValue'
+];
+ 
+// --- Adet — Nakit Yönetimi — Bölge (loadCountCashManagementRegionReport / renderCountCashManagementRegionTable) ---
+var COUNT_CASH_MGMT_REGION_PDF_FIELDS = [
+    'ProductName',
+    'RealizationRegionValue', 'RealizationRegionAverageValue', 'RealizationBankAverageValue',
+    'YtdNominalChangeRegionValue', 'YtdNominalChangeRegionAverageValue', 'YtdNominalChangeBankAverageValue',
+    'QtdNominalChangeRegionValue', 'QtdNominalChangeRegionAverageValue', 'QtdNominalChangeBankAverageValue'
+];
+ 
+// --- Adet — Nakit Yönetimi — Şube (loadCountCashManagementBranchReport / renderCountCashManagementBranchTable) ---
+var COUNT_CASH_MGMT_BRANCH_PDF_FIELDS = [
+    'ProductName',
+    'RealizationBranchValue', 'RealizationRegionAverageValue', 'RealizationBankAverageValue',
+    'YtdNominalChangeBranchValue', 'YtdNominalChangeRegionAverageValue', 'YtdNominalChangeBankAverageValue',
+    'QtdNominalChangeBranchValue', 'QtdNominalChangeRegionAverageValue', 'QtdNominalChangeBankAverageValue'
+];
+ 
+// --- Adet — Kredi Kartı/POS — Şube (loadCountCardPosBranchReport / renderCountCardPosBranchTable) ---
+var COUNT_CARD_POS_BRANCH_PDF_FIELDS = [
+    'ProductName',
+    'CurrentPeriodBranchValue', 'CurrentPeriodRegionAverageValue', 'CurrentPeriodBankAverageValue',
+    'ThreeMonthHgBranchValue', 'ThreeMonthHgRegionAverageValue', 'ThreeMonthHgBankAverageValue'
+];
+ 
+// --- Adet — Kredi Kartı/POS — Bölge (loadCountCardPosRegionReport / renderCountCardPosRegionTable) ---
+var COUNT_CARD_POS_REGION_PDF_FIELDS = [
+    'ProductName',
+    'CurrentMonthRegionValue', 'CurrentMonthBankAverage',
+    'ThreeMonthHgRegion', 'ThreeMonthHgBankAverage'
+];
+ 
+// --- Adet — Oran Tablosu — Bölge (loadCountCardPosRatioRegionReport / renderCountCardPosRatioRegionTable) ---
+var COUNT_CARD_POS_RATIO_REGION_PDF_FIELDS = [
+    'RatioName', 'PreviousQuarterRegionValue', 'CurrentRegionValue', 'CurrentBankAverageValue'
+];
+ 
+// --- Adet — Oran Tablosu — Şube (loadCountCardPosRatioBranchReport / renderCountCardPosRatioBranchTable) ---
+var COUNT_CARD_POS_RATIO_BRANCH_PDF_FIELDS = [
+    'RatioName', 'PreviousQuarterBranchValue', 'CurrentBranchValue',
+    'CurrentRegionAverageValue', 'CurrentBankAverageValue'
+];
+ 
+// --- Karlılık — Üst Tablo — Bölge (loadProfitTotalRegionReport / renderProfitTotalRegionTable) ---
+var PROFIT_TOTAL_REGION_PDF_FIELDS = [
+    'Description', 'TargetValue', 'RealizationRegionValue', 'RegionAverageValue', 'BankAverageValue',
+    'RealizationBankAverageValue', 'BankBudgetValue', 'HgRegionValue', 'HgBankAverageValue',
+    'RetailValue', 'KobiValue', 'AgricultureValue', 'CommercialValue'
+];
+ 
+// --- Karlılık — Üst Tablo — Şube (loadProfitTotalBranchReport / renderProfitTotalBranchTable) ---
+var PROFIT_TOTAL_BRANCH_PDF_FIELDS = [
+    'Description', 'TargetValue', 'RealizationBranchValue', 'RegionAverageValue', 'RealizationRegionAverageValue',
+    'BankAverageValue', 'RealizationBankAverageValue', 'BranchBudgetValue', 'RegionBudgetValue', 'BankBudgetValue',
+    'HgBranchValue', 'HgRegionAverageValue', 'HgBankAverageValue',
+    'RetailValue', 'KobiValue', 'AgricultureValue', 'CommercialValue'
+];
+ 
+// --- Karlılık — Spread Yönetimi — Bölge (loadProfitSpreadManagementRegionReport) ---
+var PROFIT_SPREAD_MGMT_REGION_PDF_FIELDS = [
+    'Description', 'SpreadValue', 'RatioRegionValue', 'RatioBankAverageValue',
+    'NetReturnRegionValue', 'NetReturnBankAverageValue', 'NetReturnHgRegionValue', 'NetReturnHgBankAverageValue'
+];
+ 
+// --- Karlılık — Spread Yönetimi — Şube (loadProfitSpreadManagementBranchReport) ---
+var PROFIT_SPREAD_MGMT_BRANCH_PDF_FIELDS = [
+    'Description', 'SpreadValue', 'RatioBranchValue', 'RatioRegionAverageValue', 'RatioBankAverageValue',
+    'NetReturnBranchValue', 'NetReturnRegionAverageValue', 'NetReturnBankAverageValue',
+    'NetReturnHgBranchValue', 'NetReturnHgRegionAverageValue', 'NetReturnHgBankAverageValue'
+];
 
 function showYieldTableLoading() {
     _yieldLoadingActive = true;
@@ -354,7 +469,7 @@ function loadGeneralRegionReport(tabId) {
             segment: tab
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, GENERAL_REGION_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable);
@@ -557,7 +672,7 @@ function loadVolumeRegionReport(regionCode, subTabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, VOLUME_REGION_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -631,7 +746,7 @@ function loadVolumeBranchReport(branchCode, subTabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, VOLUME_BRANCH_PDF_FIELDS)
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -709,7 +824,7 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, COUNT_CUSTOMER_REGION_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -772,7 +887,7 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, COUNT_CUSTOMER_BRANCH_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -836,7 +951,7 @@ function loadCountCashManagementRegionReport(regionCode, subTabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, COUNT_CASH_MGMT_REGION_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -900,7 +1015,7 @@ function loadCountCashManagementBranchReport(branchCode, subTabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, COUNT_CASH_MGMT_BRANCH_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -964,7 +1079,7 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, COUNT_CARD_POS_BRANCH_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -1025,7 +1140,7 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, COUNT_CARD_POS_REGION_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -1096,7 +1211,7 @@ function loadCountCardPosRatioRegionReport(regionCode, tabId) {
                     reportDate: _selectedDate
                 }),
                 success: function (response) {
-                    var data = extractResponseData(response);
+                    var data = extractResponseData(response, COUNT_CARD_POS_RATIO_REGION_PDF_FIELDS);
                     renderCountCardPosRatioRegionTable(data);
                 }
             });
@@ -1184,7 +1299,7 @@ function loadCountCardPosRatioBranchReport(branchCode, tabId) {
                     reportDate: _selectedDate
                 }),
                 success: function (response) {
-                    var data = extractResponseData(response);
+                    var data = extractResponseData(response, COUNT_CARD_POS_RATIO_BRANCH_PDF_FIELDS);
                     renderCountCardPosRatioBranchTable(data);
                 }
             });
@@ -1257,7 +1372,7 @@ function loadProfitTotalRegionReport(regionCode) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, PROFIT_TOTAL_REGION_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -1476,7 +1591,7 @@ function loadProfitTotalBranchReport(branchCode) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, PROFIT_TOTAL_BRANCH_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -1550,7 +1665,7 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, PROFIT_SPREAD_MGMT_REGION_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
@@ -1611,7 +1726,7 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
             isAscending: _yieldSortBy !== null ? _yieldSortAsc : true
         }),
         success: function (response) {
-            var data = extractResponseData(response);
+            var data = extractResponseData(response, PROFIT_SPREAD_MGMT_BRANCH_PDF_FIELDS);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
             renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
