@@ -79,7 +79,7 @@ function _yieldFields(sample) {
     var skip = { _depth: 1, _hasChildren: 1, SubProducts: 1 };
     return Object.keys(sample).filter(function (k) {
         if (skip[k]) return false;
-        if (/Code$|Id$/.test(k)) return false;          // gösterilmeyen anahtarlar
+        if (/Code$|Id$|Diff$/.test(k)) return false;   // gösterilmeyen anahtarlar
         var v = sample[k];
         if (v && typeof v === 'object') return false;   // nested / dizi
         return true;
@@ -120,9 +120,9 @@ function _yieldInfoLines() {
     return lines;
 }
 
-function setYieldPdfReport(data) {
+function setYieldPdfReport(data, explicitFields) {
     var leaves = _yieldLeafHeaderNames();
-    var fields = _yieldFields((data && data[0]) || null);
+    var fields = (explicitFields && explicitFields.length) ? explicitFields : _yieldFields((data && data[0]) || null);
     var n = Math.min(leaves.length, fields.length);
     var columns = [];
     for (var i = 0; i < n; i++) columns.push({ header: leaves[i].name, group: leaves[i].group || undefined, key: 'c' + i, align: i === 0 ? 'left' : undefined });   // ilk kolon (ad) sola dayalı
@@ -139,14 +139,14 @@ function setYieldPdfReport(data) {
 }
 
 // Response'tan asıl data array'ini çıkar (ilk array property veya direkt array)
-function extractResponseData(response) {
+function extractResponseData(response, explicitFields) {
     var data = response;
     if (!Array.isArray(response)) {
         for (var key in response) {
             if (response.hasOwnProperty(key) && Array.isArray(response[key])) { data = response[key]; break; }
         }
     }
-    try { setYieldPdfReport(Array.isArray(data) ? data : []); } catch (e) { /* PDF verisi opsiyonel */ }
+    try { setYieldPdfReport(Array.isArray(data) ? data : [], explicitFields); } catch (e) { /* PDF verisi opsiyonel */ }
     return data;
 }
 
