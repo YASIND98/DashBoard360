@@ -395,6 +395,63 @@
     background: #fbfbfd;
 }
 
+/* ===== Katlanabilir bölümler ===== */
+.ai-result-content .ai-collapse {
+    margin: 12px 0;
+    border: 1px solid #e5e8ef;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* Başlık artık kutunun tıklanabilir şeridi; h2/h3 margin'ini ezer */
+.ai-result-content .ai-collapse-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 0;
+    padding: 10px 12px;
+    background: #f5f8fc;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ai-result-content .ai-collapse-head:hover {
+    background: #eaf1fa;
+}
+
+.ai-result-content .ai-collapse-head:focus-visible {
+    outline: 2px solid #008CEB;
+    outline-offset: -2px;
+}
+
+.ai-result-content .ai-collapse-icon {
+    flex: 0 0 auto;
+    width: 7px;
+    height: 7px;
+    margin-right: 3px;
+    border-right: 2px solid #104570;
+    border-bottom: 2px solid #104570;
+    transform: rotate(45deg);
+    transition: transform 0.2s ease;
+}
+
+.ai-result-content .ai-collapse.is-closed .ai-collapse-icon {
+    transform: rotate(-135deg);
+}
+
+.ai-result-content .ai-collapse-body {
+    padding: 12px 12px 2px;
+}
+
+.ai-result-content .ai-collapse.is-closed > .ai-collapse-body {
+    display: none;
+}
+
+.ai-result-content .ai-collapse-body > :first-child {
+    margin-top: 0;
+}
+
 /* "AI yazıyor" imleci — metni takip eden ince, hafif parlayan kalem ucu */
 .ai-caret {
     display: inline-block;
