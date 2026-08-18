@@ -79,7 +79,7 @@ function _yieldFields(sample) {
     var skip = { _depth: 1, _hasChildren: 1, SubProducts: 1 };
     return Object.keys(sample).filter(function (k) {
         if (skip[k]) return false;
-        if (/Code$|Id$/.test(k)) return false;          // gösterilmeyen anahtarlar
+        if (/Code$|Id$|Diff$/.test(k)) return false;   // gösterilmeyen anahtarlar
         var v = sample[k];
         if (v && typeof v === 'object') return false;   // nested / dizi
         return true;
