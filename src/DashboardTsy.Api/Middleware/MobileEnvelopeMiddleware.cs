@@ -1,14 +1,18 @@
 using System.Text.Json;
 using DashboardTsy.Api.Models.Mobile;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace DashboardTsy.Api.Middleware;
 
 /// <summary>
 /// /mobile/* path'i altındaki tüm istekleri işler:
-///   1. Path'ten "/mobile" prefix'ini kaldırır — böylece mevcut controller route'ları aynen match olur.
-///   2. Controller'ın döndüğü JSON body'yi yakalar, MobileEnvelope&lt;T&gt; içine sararak client'a yazar.
-///   3. Beklenmedik exception yakalarsa HTTP 500 + Failure envelope döner.
-///   4. HTTP status code (200/400/404/500) korunur, sadece body sarılır.
+///   1. JWT authentication check — login endpoint'leri (Token/Login2/SendSmsCode) hariç, /mobile/* altındaki
+///      her istek için geçerli Bearer token zorunludur. Yoksa 401 + Failure envelope döner.
+///   2. Path'ten "/mobile" prefix'ini kaldırır — böylece mevcut controller route'ları aynen match olur.
+///   3. Controller'ın döndüğü JSON body'yi yakalar, MobileEnvelope&lt;T&gt; içine sararak client'a yazar.
+///   4. Beklenmedik exception yakalarsa HTTP 500 + Failure envelope döner.
+///   5. HTTP status code (200/400/404/500) korunur, sadece body sarılır.
 ///
 /// Web (/mobile prefix'i olmayan) istekler bu middleware'i şeffaf olarak geçer — mevcut davranış değişmez.
 /// </summary>
@@ -16,6 +20,17 @@ public sealed class MobileEnvelopeMiddleware
 {
     private const string MobileSegment = "/mobile";
     private const string SuccessMessage = "OK";
+
+    /// <summary>
+    /// JWT check'ten muaf tutulan login endpoint'leri. /mobile prefix'i kaldırıldıktan SONRAKİ path'lerle karşılaştırılır.
+    /// Bunlar KutupYıldızı'na proxy'lenen login akışının kendisi — token almadan çağrılmaları zorunlu.
+    /// </summary>
+    private static readonly string[] AnonymousPaths =
+    {
+        "/api/Token",
+        "/api/Login2",
+        "/api/SendSmsCode"
+    };
 
     private static readonly JsonSerializerOptions SerializerOptions = new()
     {
@@ -45,7 +60,9 @@ public sealed class MobileEnvelopeMiddleware
         // Bu middleware UseRouting'den ÖNCE çalışmalıdır; aksi halde endpoint çoktan bind edilmiş olur ve
         // rewrite yeni route match'i tetiklemez.
         var originalPath = context.Request.Path;
-        context.Request.Path = remainingPath.HasValue ? remainingPath : "/";
+        // remainingPath boşsa "/" (root); PathString ternary'de tip belirsizliği olmasın diye explicit.
+        var rewrittenPath = remainingPath.HasValue ? remainingPath : new PathString("/");
+        context.Request.Path = rewrittenPath;
 
         // Response body'yi geçici bir buffer'a yönlendir; sarma sonrası gerçek stream'e yazacağız.
         var originalBody = context.Response.Body;
@@ -54,6 +71,21 @@ public sealed class MobileEnvelopeMiddleware
 
         try
         {
+            // JWT authentication check — login endpoint'leri hariç her /mobile/* isteği için token zorunlu.
+            // UseAuthentication middleware'i pipeline'da bu noktadan SONRA çalışıyor (path rewrite UseRouting'den
+            // önce olmak zorunda), bu yüzden token'ı manuel olarak IAuthenticationService üzerinden doğruluyoruz.
+            // Başarılı ise context.User set edilir — downstream controller'lar claim'leri kullanabilir.
+            if (!IsAnonymousPath(rewrittenPath))
+            {
+                var authResult = await context.AuthenticateAsync(JwtBearerDefaults.AuthenticationScheme);
+                if (!authResult.Succeeded)
+                {
+                    await WriteFailureAsync(context, originalBody, StatusCodes.Status401Unauthorized, "Yetkisiz");
+                    return;
+                }
+                context.User = authResult.Principal;
+            }
+
             await _next(context);
             await WriteEnvelopeAsync(context, buffer, originalBody);
         }
@@ -68,6 +100,20 @@ public sealed class MobileEnvelopeMiddleware
             context.Response.Body = originalBody;
             context.Request.Path = originalPath;
         }
+    }
+
+    /// <summary>
+    /// /mobile prefix'i kaldırıldıktan sonraki path'i AnonymousPaths listesiyle karşılaştırır.
+    /// Case-insensitive — client büyük/küçük harf farkıyla göndermiş olabilir.
+    /// </summary>
+    private static bool IsAnonymousPath(PathString rewrittenPath)
+    {
+        foreach (var anonymous in AnonymousPaths)
+        {
+            if (rewrittenPath.Equals(anonymous, StringComparison.OrdinalIgnoreCase))
+                return true;
+        }
+        return false;
     }
 
     private static async Task WriteEnvelopeAsync(HttpContext context, MemoryStream buffer, Stream originalBody)
