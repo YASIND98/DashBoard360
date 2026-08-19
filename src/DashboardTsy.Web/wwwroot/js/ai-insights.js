@@ -364,16 +364,15 @@ $(document).ready(function () {
     }
 
     // ===== Katlanabilir bölümler =====
-    // "## " ve "### " başlıkları katlanır bölüm olur. Anahtar belge yapısından üretilir:
-    // 2. "## " -> "2", onun 3. "### "i -> "2.3". Hangilerinin açık geleceğini servis söyler:
-    // { Summary: "...", OpenSections: ["1", "2.3"] }
-    // Alt bölüm listedeyse üstü de açılır; kapalı bir kutunun içindeki açık bölüm görünmezdi.
-    var COLLAPSE_MIN_LEVEL = 2;   // "## "
-    var COLLAPSE_MAX_LEVEL = 3;   // "### "
+    // Bölümü başlığın numarası belirler: "2.1. Özet" -> "2.1", derinlik de "2"nin içinde olduğunu söyler.
+    // Satırın "## ", "### " ya da tamamı kalın "**...**" yazılmış olması fark etmez; servis üçünü de
+    // kullanıyor. Açık gelecekleri servis söyler: { Summary: "...", OpenSections: ["1", "2.1"] }
+    var HEADING_RE = /^(#{1,6})\s+(.*)$/;
+    var BOLD_LINE_RE = /^\*\*(.+)\*\*$/;
+    var SECTION_NO_RE = /^(\d+(?:\.\d+)*)\.\s+/;
 
     // Servis şimdilik OpenSections göndermiyor; boş geldiğinde bu liste kullanılır.
-    // Belgede karşılığı olmayan anahtarlar sessizce yok sayılır.
-    var DEFAULT_OPEN_SECTIONS = ['1', '2.1', '3.1', '4.1', '5', '6.1', '7', '8'];
+    var DEFAULT_OPEN_SECTIONS = ['1', '2.1', '3.1', '4.1', '5', '6.1', '7', '8', '8.1', '8.2'];
 
     $(document).on('click', '.ai-collapse-head', function () {
         var isClosed = $(this).closest('.ai-collapse').toggleClass('is-closed').hasClass('is-closed');
@@ -389,7 +388,7 @@ $(document).ready(function () {
 
     // ===== Markdown -> HTML (başlık, kalın, tablo, liste, hr; inline HTML korunur) =====
     function mdInline(text) {
-        // **kalın** -> <strong> (mevcut <span> gibi inline HTML olduğu gibi korunur)
+        // Metindeki <span> gibi inline HTML olduğu gibi korunur
         return text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
     }
 
@@ -405,17 +404,16 @@ $(document).ready(function () {
         var html = [];
         var i = 0;
         var listOpen = false;
-        var collapseStack = [];   // açık collapse bölümlerinin başlık seviyeleri
-        var counters = [];        // seviye başına sıra sayacı; anahtar bunlardan kurulur
+        var collapseStack = [];
 
         function closeList() {
             if (listOpen) { html.push('</ul>'); listOpen = false; }
         }
 
-        // Bölüm, aynı/daha üst seviyeli başlıkta (veya <hr>/metin sonunda) kapanır; kaç tane kapattığını döner
-        function closeCollapses(level) {
+        // Kapatılan bölüm sayısını döner; <hr> bu sayıya bakıp çizgi basıp basmayacağına karar veriyor
+        function closeCollapses(depth) {
             var closed = 0;
-            while (collapseStack.length && collapseStack[collapseStack.length - 1] >= level) {
+            while (collapseStack.length && collapseStack[collapseStack.length - 1] >= depth) {
                 html.push('</div></section>');
                 collapseStack.pop();
                 closed++;
@@ -428,52 +426,47 @@ $(document).ready(function () {
             return open.some(function (k) { return k === key || k.indexOf(key + '.') === 0; });
         }
 
-        // Bu seviyedeki sırayı bir artırır, altındaki sayaçları sıfırlar; "2" / "2.3" anahtarını döner
-        function sectionKey(level) {
-            counters[level] = (counters[level] || 0) + 1;
-            for (var deeper = level + 1; deeper <= COLLAPSE_MAX_LEVEL; deeper++) counters[deeper] = 0;
-            var parts = [];
-            for (var l = COLLAPSE_MIN_LEVEL; l <= level; l++) parts.push(counters[l] || 0);
-            return parts.join('.');
-        }
-
         while (i < lines.length) {
             var line = lines[i];
             var trimmed = line.trim();
 
-            // Boş satır
             if (trimmed === '') { closeList(); i++; continue; }
 
-            // Yatay çizgi — bölüm ayracı olduğu için açık collapse'leri kapatır. Bölüm kapattıysa
-            // çizgi basılmaz (kutu kenarlıkları zaten ayırıyor); açık bölüm yokken çizilir.
+            // Bölüm ayracı: açık bölümleri kapatır, çizgiyi yalnız kutu dışında kaldıysa basar
             if (/^-{3,}$/.test(trimmed)) {
                 closeList();
                 if (!closeCollapses(1)) html.push('<hr />');
                 i++; continue;
             }
 
-            // Başlıklar
-            var h = /^(#{1,6})\s+(.*)$/.exec(trimmed);
-            if (h) {
+            var h = HEADING_RE.exec(trimmed);
+            var bold = h ? null : BOLD_LINE_RE.exec(trimmed);
+            if (h || bold) {
+                var headText = h ? h[2] : bold[1];
+                var no = SECTION_NO_RE.exec(headText);
                 closeList();
-                var level = h[1].length;
-                var headText = h[2];
-                closeCollapses(level);
 
-                if (level >= COLLAPSE_MIN_LEVEL && level <= COLLAPSE_MAX_LEVEL) {
-                    var isOpen = isSectionOpen(sectionKey(level));
+                if (no) {
+                    var key = no[1];
+                    var depth = key.split('.').length;
+                    closeCollapses(depth);
+                    var isOpen = isSectionOpen(key);
+                    var tag = 'h' + Math.min(depth + 1, 6);
                     // Baştan kapalı basılır; animasyon atladığı için "açılıp sonra kapanma" olmaz
                     html.push('<section class="ai-collapse' + (isOpen ? '' : ' is-closed') + '">');
                     html.push(
-                        '<h' + level + ' class="ai-collapse-head" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '">' +
+                        '<' + tag + ' class="ai-collapse-head" role="button" tabindex="0" aria-expanded="' + (isOpen ? 'true' : 'false') + '">' +
                             '<span class="ai-collapse-title">' + mdInline(headText) + '</span>' +
                             '<span class="ai-collapse-icon" aria-hidden="true"></span>' +
-                        '</h' + level + '>'
+                        '</' + tag + '>'
                     );
                     html.push('<div class="ai-collapse-body">');
-                    collapseStack.push(level);
+                    collapseStack.push(depth);
+                } else if (h) {
+                    // Numarasız başlık içinde bulunduğu bölümü kapatmaz
+                    html.push('<h' + h[1].length + '>' + mdInline(headText) + '</h' + h[1].length + '>');
                 } else {
-                    html.push('<h' + level + '>' + mdInline(headText) + '</h' + level + '>');
+                    html.push('<p>' + mdInline(trimmed) + '</p>');
                 }
                 i++; continue;
             }
@@ -498,14 +491,12 @@ $(document).ready(function () {
                 continue;
             }
 
-            // Liste öğesi
             if (/^[-*]\s+/.test(trimmed)) {
                 if (!listOpen) { html.push('<ul>'); listOpen = true; }
                 html.push('<li>' + mdInline(trimmed.replace(/^[-*]\s+/, '')) + '</li>');
                 i++; continue;
             }
 
-            // Paragraf
             closeList();
             html.push('<p>' + mdInline(trimmed) + '</p>');
             i++;
