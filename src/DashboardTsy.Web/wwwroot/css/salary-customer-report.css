@@ -66,8 +66,8 @@
 .sc-sub {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 40px;
+  justify-content: flex-start;
+  gap: 140px;
   font-size: 12px;
   font-weight: 400;
   color: var(--text-muted);
@@ -116,6 +116,10 @@
   margin-top: 0;
 }
 
+.sc-metric-diff.diff-details .sc-sub{
+  justify-content: center;
+}
+
 .sc-tag {
   color: var(--text-muted);
   line-height: 12px !important;
@@ -124,10 +128,21 @@
 .sc-sub-amount {
   color: var(--text-light);
   font-weight: 500;
+  min-width: 110px;
+  text-align: left;
+  margin-left: 0px;
+}
+
+#crossSellTableBody .sc-sub {
+  gap: 225px;
 }
 
 .sc-sub-rate {
   color: var(--bg-subtab);
+}
+
+#volumeDataTable thead th {
+  white-space: normal;
 }
 
 #volumeDataTable thead th.col-cmp,
@@ -262,6 +277,10 @@
   border-bottom: 1px solid var(--text-gray);
 }
 
+#bankShareDataTable tbody tr {
+  height: 68px;
+}
+
 #bankShareDataTable tbody tr:first-child td {
   border-top: 1px solid var(--text-gray);
 }
@@ -327,6 +346,12 @@
 [data-theme="light"] .sc-tag,
 [data-theme="light"] .sc-sub-rate {
   color: #68778f;
+}
+
+[data-theme="light"] #volumeDataTable thead th .sc-th-diff,
+[data-theme="light"] #crossSellDataTable thead th .sc-th-diff {
+  color: #68778f;
+  font-weight: 500;
 }
 
 @media (max-width: 767px) {

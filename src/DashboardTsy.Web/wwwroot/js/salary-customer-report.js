@@ -151,10 +151,10 @@ $(document).ready(function () {
               '<div class="sc-sub"><span class="sc-tag">' + (headers.RetiredLabel || 'Emekli') + '</span></div>' +
               '</div>' +
               '</td>';
-          html += buildMetricCell(p, 'LastYear', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp col-cmp-first');
-          html += buildMetricCell(p, 'LastWeek', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp');
+          html += buildMetricCell(p, 'Yesterday', headers.SalaryLabel, headers.RetiredLabel, false, 'col-cmp col-cmp-first');
           html += buildMetricCell(p, 'PreviousDay', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp');
-          html += buildMetricCell(p, 'Yesterday', headers.SalaryLabel, headers.RetiredLabel, false, 'col-cmp col-cmp-last');
+          html += buildMetricCell(p, 'LastWeek', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp');
+          html += buildMetricCell(p, 'LastYear', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp col-cmp-last');
           html += '</tr>';
       });
       return html;
@@ -172,9 +172,9 @@ $(document).ready(function () {
               '<div class="sc-sub"><span class="sc-tag">' + (headers.RetiredLabel || 'Emekli') + '</span></div>' +
               '</div>' +
               '</td>';
-          html += buildMetricCell(p, 'LastYear', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp col-cmp-first');
+          html += buildMetricCell(p, 'LastMonth', headers.SalaryLabel, headers.RetiredLabel, false, 'col-cmp col-cmp-first');
           html += buildMetricCell(p, 'TwoMonthsAgo', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp');
-          html += buildMetricCell(p, 'LastMonth', headers.SalaryLabel, headers.RetiredLabel, false, 'col-cmp col-cmp-last');
+          html += buildMetricCell(p, 'LastYear', headers.SalaryLabel, headers.RetiredLabel, true, 'col-cmp col-cmp-last');
           html += '</tr>';
       });
       return html;
@@ -190,8 +190,8 @@ $(document).ready(function () {
           html += '<td>' + formatNumber(p.DenizbankSecondMonthValue) + '</td>';
           html += '<td>' + formatNumber(p.OtherBanksFirstMonthValue) + '</td>';
           html += '<td>' + formatNumber(p.OtherBanksSecondMonthValue) + '</td>';
-          html += '<td>%' + formatPercent(p.WalletShareFirstMonthRate) + '</td>';
-          html += '<td class="' + statusClass + '">%' + formatPercent(p.WalletShareSecondMonthRate) + '</td>';
+          html += '<td>%' + formatNumber(p.WalletShareFirstMonthRate) + '</td>';
+          html += '<td class="' + statusClass + '">%' + formatNumber(p.WalletShareSecondMonthRate) + '</td>';
           html += '</tr>';
       });
       return html;
@@ -262,8 +262,8 @@ $(document).ready(function () {
               $.extend(valCol('DenizbankSecondMonthValue'), { group: bh.DenizbankCreditGroupName, header: bh.SecondMonthName }),
               $.extend(valCol('OtherBanksFirstMonthValue'), { group: bh.OtherBanksCreditGroupName, header: bh.FirstMonthName }),
               $.extend(valCol('OtherBanksSecondMonthValue'), { group: bh.OtherBanksCreditGroupName, header: bh.SecondMonthName }),
-              { group: bh.WalletShareGroupName, header: bh.FirstMonthName, key: 'WalletShareFirstMonthRate', format: function (v) { return '%' + formatPercent(v); } },
-              { group: bh.WalletShareGroupName, header: bh.SecondMonthName, key: 'WalletShareSecondMonthRate', format: function (v) { return '%' + formatPercent(v); } }
+              { group: bh.WalletShareGroupName, header: bh.FirstMonthName, key: 'WalletShareFirstMonthRate', format: function (v) { return '%' + formatNumber(v); } },
+              { group: bh.WalletShareGroupName, header: bh.SecondMonthName, key: 'WalletShareSecondMonthRate', format: function (v) { return '%' + formatNumber(v); } }
           ];
           window.PdfReport = {
               title: title, infoLines: salaryPdfInfoLines(kind), columns: cols, rows: rows || [],
@@ -274,9 +274,9 @@ $(document).ready(function () {
           var csDiffOn = $('#crossSellDiffToggle').attr('data-active') === 'true';
           cols = [
               { header: ch.ProductColumnName, key: 'ProductName', align: 'left' },
-              pdfPeriodColumn(ch.LastYearColumnName, ch.LastYearColumnDate, 'LastYear', true, csDiffOn),
+              pdfPeriodColumn(ch.LastMonthColumnName, ch.LastMonthColumnDate, 'LastMonth', false, csDiffOn),
               pdfPeriodColumn(ch.TwoMonthsAgoColumnName, ch.TwoMonthsAgoColumnDate, 'TwoMonthsAgo', true, csDiffOn),
-              pdfPeriodColumn(ch.LastMonthColumnName, ch.LastMonthColumnDate, 'LastMonth', false, csDiffOn)
+              pdfPeriodColumn(ch.LastYearColumnName, ch.LastYearColumnDate, 'LastYear', true, csDiffOn)
           ];
           window.PdfReport = {
               title: title, infoLines: salaryPdfInfoLines(kind), columns: cols, rows: rows || [],
@@ -287,10 +287,10 @@ $(document).ready(function () {
           var volDiffOn = $('#volumeDiffToggle').attr('data-active') === 'true';
           cols = [
               { header: vh.ProductColumnName, key: 'ProductName', align: 'left' },
-              pdfPeriodColumn(vh.LastYearColumnName, vh.LastYearColumnDate, 'LastYear', true, volDiffOn),
-              pdfPeriodColumn(vh.LastWeekColumnName, vh.LastWeekColumnDate, 'LastWeek', true, volDiffOn),
+              pdfPeriodColumn(vh.YesterdayColumnName, vh.YesterdayColumnDate, 'Yesterday', false, volDiffOn),
               pdfPeriodColumn(vh.PreviousDayColumnName, vh.PreviousDayColumnDate, 'PreviousDay', true, volDiffOn),
-              pdfPeriodColumn(vh.YesterdayColumnName, vh.YesterdayColumnDate, 'Yesterday', false, volDiffOn)
+              pdfPeriodColumn(vh.LastWeekColumnName, vh.LastWeekColumnDate, 'LastWeek', true, volDiffOn),
+              pdfPeriodColumn(vh.LastYearColumnName, vh.LastYearColumnDate, 'LastYear', true, volDiffOn)
           ];
           window.PdfReport = {
               title: title, infoLines: salaryPdfInfoLines(kind), columns: cols, rows: rows || [],
@@ -398,7 +398,12 @@ $(document).ready(function () {
           loadVolumeReport(function (data) {
               $('#volumeTableBody').html(buildVolumeRows(data, window._volHeaders));
               var showDiff = $('#volumeDiffToggle').attr('data-active') === 'true';
-              if (!showDiff) $('#volumeTableBody .diff-details').hide();
+              if (!showDiff) {
+                  $('#volumeTableBody .diff-details').hide();
+                  $('#volumeDataTable thead .diff-details').hide();
+              } else {
+                  $('#volumeDataTable thead .diff-details').show();
+              }
               if (showDiff) $('#volumeTableBody .sc-sub-rate').hide();
               setSalaryPdfReport('volume', data);
               updateStripes();

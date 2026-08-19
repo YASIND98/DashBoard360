@@ -83,37 +83,52 @@
                     <th class="col-cmp col-cmp-first">
                         <div class="cs-th-row">
                             <span class="cs-th-text">
-                                <span data-vol-header="LastYearColumnName"></span>
-                                <small data-vol-header="LastYearColumnDate"></small>
-                            </span>
-                            <i class="sort-icon" data-sort-by="2"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
-                        </div>
-                    </th>
-                    <th class="col-cmp">
-                        <div class="cs-th-row">
-                            <span class="cs-th-text">
-                                <span data-vol-header="LastWeekColumnName"></span>
-                                <small data-vol-header="LastWeekColumnDate"></small>
-                            </span>
-                            <i class="sort-icon" data-sort-by="3"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
-                        </div>
-                    </th>
-                    <th class="col-cmp">
-                        <div class="cs-th-row">
-                            <span class="cs-th-text">
-                                <span data-vol-header="PreviousDayColumnName"></span>
-                                <small data-vol-header="PreviousDayColumnDate"></small>
-                            </span>
-                            <i class="sort-icon" data-sort-by="4"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
-                        </div>
-                    </th>
-                    <th class="col-cmp col-cmp-last">
-                        <div class="cs-th-row">
-                            <span class="cs-th-text">
                                 <span data-vol-header="YesterdayColumnName"></span>
                                 <small data-vol-header="YesterdayColumnDate"></small>
                             </span>
                             <i class="sort-icon" data-sort-by="5"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                        </div>
+                    </th>
+                    <th class="col-cmp">
+                        <div class="sc-th-flex">
+                            <div class="sc-th-main">
+                                <div class="cs-th-row">
+                                    <span class="cs-th-text">
+                                        <span data-vol-header="PreviousDayColumnName"></span>
+                                        <small data-vol-header="PreviousDayColumnDate"></small>
+                                    </span>
+                                    <i class="sort-icon" data-sort-by="4"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                                </div>
+                            </div>
+                            <div class="sc-th-diff diff-details" style="display:none;"><span data-vol-header="PreviousDayDifferenceColumnName"></span></div>
+                        </div>
+                    </th>
+                    <th class="col-cmp">
+                        <div class="sc-th-flex">
+                            <div class="sc-th-main">
+                                <div class="cs-th-row">
+                                    <span class="cs-th-text">
+                                        <span data-vol-header="LastWeekColumnName"></span>
+                                        <small data-vol-header="LastWeekColumnDate"></small>
+                                    </span>
+                                    <i class="sort-icon" data-sort-by="3"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                                </div>
+                            </div>
+                            <div class="sc-th-diff diff-details" style="display:none;"><span data-vol-header="LastWeekDifferenceColumnName"></span></div>
+                        </div>
+                    </th>
+                    <th class="col-cmp col-cmp-last">
+                        <div class="sc-th-flex">
+                            <div class="sc-th-main">
+                                <div class="cs-th-row">
+                                    <span class="cs-th-text">
+                                        <span data-vol-header="LastYearColumnName"></span>
+                                        <small data-vol-header="LastYearColumnDate"></small>
+                                    </span>
+                                    <i class="sort-icon" data-sort-by="2"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                                </div>
+                            </div>
+                            <div class="sc-th-diff diff-details" style="display:none;"><span data-vol-header="LastYearDifferenceColumnName"></span></div>
                         </div>
                     </th>
                 </tr>
@@ -146,17 +161,12 @@
                     <th class="col-index"></th>
                     <th class="col-left col-product-header"><span data-cs-header="ProductColumnName"></span></th>
                     <th class="col-cmp col-cmp-first">
-                        <div class="sc-th-flex">
-                            <div class="sc-th-main">
-                                <div class="cs-th-row">
-                                    <span class="cs-th-text">
-                                        <span data-cs-header="LastYearColumnName"></span>
-                                        <small data-cs-header="LastYearColumnDate"></small>
-                                    </span>
-                                    <i class="sort-icon" data-sort-by="2"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
-                                </div>
-                            </div>
-                            <div class="sc-th-diff diff-details" style="display:none;"><span data-cs-header="LastYearDifferenceColumnName"></span></div>
+                        <div class="cs-th-row">
+                            <span class="cs-th-text">
+                                <span data-cs-header="LastMonthColumnName"></span>
+                                <small data-cs-header="LastMonthColumnDate"></small>
+                            </span>
+                            <i class="sort-icon" data-sort-by="4"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
                         </div>
                     </th>
                     <th class="col-cmp">
@@ -174,12 +184,17 @@
                         </div>
                     </th>
                     <th class="col-cmp col-cmp-last">
-                        <div class="cs-th-row">
-                            <span class="cs-th-text">
-                                <span data-cs-header="LastMonthColumnName"></span>
-                                <small data-cs-header="LastMonthColumnDate"></small>
-                            </span>
-                            <i class="sort-icon" data-sort-by="4"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                        <div class="sc-th-flex">
+                            <div class="sc-th-main">
+                                <div class="cs-th-row">
+                                    <span class="cs-th-text">
+                                        <span data-cs-header="LastYearColumnName"></span>
+                                        <small data-cs-header="LastYearColumnDate"></small>
+                                    </span>
+                                    <i class="sort-icon" data-sort-by="2"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>
+                                </div>
+                            </div>
+                            <div class="sc-th-diff diff-details" style="display:none;"><span data-cs-header="LastYearDifferenceColumnName"></span></div>
                         </div>
                     </th>
                 </tr>
