@@ -631,9 +631,15 @@ Response şeması aynıdır (`ApiResponse<UsersDto>`).
 
 ### GET /Public/GetUserBySession?sessionId={sessionId}
 
-`sessionId` ile kullanıcıyı çözer ve `UsersDto` döner. Web login akışında sonuç sunucu-tarafı
-session'a yazılır; mobil taraf oturum tutmadığı için her istekte `sessionId` gönderip aynı
-endpoint'i çağırır. Response şeması aynıdır (`ApiResponse<UsersDto>`).
+Web login akışı için. `sessionId` query parametresi ile kullanıcıyı çözer ve `UsersDto` döner;
+Web tarafı sonucu sunucu-tarafı session'a yazar. Response şeması aynıdır (`ApiResponse<UsersDto>`).
+
+### GET /Public/GetCurrentUser
+
+Mobil için. `Authorization: Bearer <kutup-jwt>` header'ı zorunludur. Sunucu JWT'nin
+`ChannelSessionId` claim'ini okuyup `UserLogin` üzerinden kullanıcıyı çözer — client parametre
+göndermez, sessionId spoof edilemez. Token yoksa/geçersizse `401`; claim yoksa `ApiResponse<UsersDto>`
+zarfında "Geçersiz session bilgisi" mesajı döner.
 
 ---
 
