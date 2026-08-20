@@ -1315,7 +1315,7 @@ function renderProfitTotalRegionTable(items) {
 }
 
 // ===== Profit Ratio Region Report (Karlılık — Alt Tablo — Bölge) =====
-// Header'ları statik renderProfitRatioRegionHeaders ile, body dynamicTableBody2'ye render eder
+// Header'ları statik renderProfitRatioHeaders ile, body dynamicTableBody2'ye render eder
 function loadProfitRatioRegionReport(regionCode) {
     $.ajax({
         url: '/ProductivityReport/GetProductivityProfitRatioRegionReport',
@@ -1332,14 +1332,14 @@ function loadProfitRatioRegionReport(regionCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderProfitRatioRegionHeaders(hasExpandable);
+            renderProfitRatioHeaders(hasExpandable, false);
             renderProfitRatioRegionTable(items);
             _yieldHasSecondTable = true;
         }
     });
 }
 
-function renderProfitRatioRegionHeaders(hasExpandable) {
+function renderProfitRatioHeaders(hasExpandable, isBranch) {
     var $thead = $('#dynamicTableHead2');
     $thead.empty();
 
@@ -1349,6 +1349,7 @@ function renderProfitRatioRegionHeaders(hasExpandable) {
     row += '<th class="col-index">#</th>';
     row += expandTh;
     row += '<th class="col-left">Oran Adı</th>';
+    if (isBranch) row += '<th>Şube</th>';
     row += '<th>Bölge</th>';
     row += '<th>Banka</th>';
     row += '<th>Bireysel</th>';
@@ -1417,7 +1418,7 @@ function loadProfitRatioBranchReport(branchCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderProfitRatioRegionHeaders(hasExpandable);
+            renderProfitRatioHeaders(hasExpandable, true);
             renderProfitRatioBranchTable(items);
             _yieldHasSecondTable = true;
         }
@@ -1448,6 +1449,7 @@ function renderProfitRatioBranchTable(items) {
 
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-left">' + indent + '</td>';
+        html += '<td class="has-diff">' + fmt(item.BranchValue) + formatDiff(item.BranchValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent) + '</td>';
         html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent) + '</td>';
         html += '<td>' + fmt(item.RetailValue) + '</td>';
