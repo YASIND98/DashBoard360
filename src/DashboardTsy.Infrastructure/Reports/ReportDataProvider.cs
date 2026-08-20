@@ -3065,6 +3065,8 @@ public class ReportDataProvider : IReportDataProvider
             TargetValue = r.TargetValue,
             RegionValue = r.RegionValue,
             RegionValueDiff = r.RegionValueDiff,
+            BranchValue = r.BranchValue,
+            BranchValueDiff = r.BranchValueDiff,
             BankValue = r.BankValue,
             BankValueDiff = r.BankValueDiff,
             RetailValue = r.RetailValue,
