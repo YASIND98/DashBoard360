@@ -604,10 +604,10 @@ function renderVolumeRegionTable(items) {
         html += '<td>' + formatNumber(item.NetGrowthRegionAverageValue) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
-        html += '<td>' + item.YtdRegionValue + '</td>';
-        html += '<td class="has-diff">' + item.YtdBankAverageValue + formatDiff(item.YtdBankAverageDiff) + '</td>';
-        html += '<td>' + item.QtdRegionValue + '</td>';
-        html += '<td class="has-diff">' + item.QtdBankAverageValue + formatDiff(item.QtdBankAverageDiff) + '</td>';
+        html += '<td>' + formatRateValue(item.YtdRegionValue) + '</td>';
+        html += '<td class="has-diff">' + formatRateValue(item.YtdBankAverageValue) + formatDiff(item.YtdBankAverageDiff) + '</td>';
+        html += '<td>' + formatRateValue(item.QtdRegionValue) + '</td>';
+        html += '<td class="has-diff">' + formatRateValue(item.QtdBankAverageValue) + formatDiff(item.QtdBankAverageDiff) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -680,12 +680,12 @@ function renderVolumeBranchTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionAverageValue) + formatDiff(item.NetGrowthRegionAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageValueDiff, true) + '</td>';
-        html += '<td>' + item.YtdBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.YtdRegionValue + formatDiff(item.YtdRegionValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.YtdBankValue + formatDiff(item.YtdBankValueDiff) + '</td>';
-        html += '<td>' + item.QtdBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.QtdRegionValue + formatDiff(item.QtdRegionValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.QtdBankValue + formatDiff(item.QtdBankValueDiff) + '</td>';
+        html += '<td>' + formatRateValue(item.YtdBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatRateValue(item.YtdRegionValue) + formatDiff(item.YtdRegionValueDiff) + '</td>';
+        html += '<td class="has-diff">' + formatRateValue(item.YtdBankValue) + formatDiff(item.YtdBankValueDiff) + '</td>';
+        html += '<td>' + formatRateValue(item.QtdBranchValue) + '</td>';
+        html += '<td class="has-diff">' + formatRateValue(item.QtdRegionValue) + formatDiff(item.QtdRegionValueDiff) + '</td>';
+        html += '<td class="has-diff">' + formatRateValue(item.QtdBankValue) + formatDiff(item.QtdBankValueDiff) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -1739,6 +1739,11 @@ function reapplySortVisual($table) {
     if (_yieldSortBy !== null) {
         $table.find('.sort-icon[data-sort-id="' + _yieldSortBy + '"]').addClass(_yieldSortAsc ? 'asc' : 'desc');
     }
+}
+
+function formatRateValue(val) {
+    if (val == null || val === '' || Number(val) === 0) return '-';
+    return val;
 }
 
 function formatDiff(val, useFormatNumber) {

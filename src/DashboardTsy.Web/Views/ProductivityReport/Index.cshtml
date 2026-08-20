@@ -322,6 +322,24 @@
             $('.sc-lightbox-overlay').fadeIn(180);
         });
 
+        // Yönetici fotoğrafı: hover'da büyüteç ikonu, tıklayınca aynı lightbox
+        $(document).on('click', '.sc-avatar-zoom', function () {
+            var $wrap = $(this);
+            if ($wrap.hasClass('no-zoom')) return;
+
+            var src = $wrap.find('.sc-manager-avatar').attr('src');
+            if (!src) return;
+
+            var $meta = $wrap.siblings('.sc-manager-meta');
+            var name  = $.trim($meta.find('.sc-manager-name').text());
+            var role  = $.trim($meta.find('.sc-manager-role').text());
+            var title = (name && name !== '-') ? name : role;
+
+            $('.sc-lightbox-img').attr('src', src);
+            $('.sc-lightbox-title').text(title);
+            $('.sc-lightbox-overlay').fadeIn(180);
+        });
+
         $(document).on('click', '.sc-lightbox-close, .sc-lightbox-overlay', function (e) {
             e.stopPropagation(); 
             if ($(e.target).is('.sc-lightbox-overlay') || $(e.target).is('.sc-lightbox-close')) {
@@ -525,12 +543,14 @@
             if (branchPhoto) {
                 setImgWithFallback($photo.find('.sc-branch-photo'), branchPhoto);
                 setImgWithFallback($photo.find('.sc-manager-avatar'), branchManagerPhoto);
+                $photo.find('.sc-avatar-zoom').toggleClass('no-zoom', !branchManagerPhoto);
                 $photo.show().addClass('with-bg');
                 $card.removeClass('area');
                 $info.hide();
             } else {
                 var avatarPhoto = isBranch ? branchManagerPhoto : regionManagerPhoto;
                 setImgWithFallback($info.find('.sc-manager-avatar'), avatarPhoto);
+                $info.find('.sc-avatar-zoom').toggleClass('no-zoom', !avatarPhoto);
                 $photo.hide().removeClass('with-bg');
                 $card.addClass('area');
                 $info.show();

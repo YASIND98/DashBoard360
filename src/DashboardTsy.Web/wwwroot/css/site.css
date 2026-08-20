@@ -445,15 +445,56 @@ body:has(.scorecard-panel.open)::before {
   position: relative;
   top: 0;
   flex-shrink: 0;
-  width: 46px;
-  height: 46px;
+  width: 56px;
+  height: 56px;
   object-fit: cover;
   background: #1a3a6b;
   border: 2px solid rgba(255, 255, 255, 0.4);
   border-radius: 50%;
 }
 
-.sc-branch-photo-block.with-bg .sc-manager-avatar {
+/* Avatar Zoom (büyütme ikonu her zaman görünür) */
+.sc-avatar-zoom {
+  position: relative;
+  top: 0;
+  display: inline-flex;
+  flex-shrink: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.sc-avatar-zoom-icon {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: #fff;
+  font-size: 11px;
+  line-height: 1;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  transition: background 0.2s;
+}
+
+.sc-avatar-zoom:hover .sc-avatar-zoom-icon {
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.sc-avatar-zoom.no-zoom {
+  cursor: default;
+}
+
+.sc-avatar-zoom.no-zoom .sc-avatar-zoom-icon {
+  display: none;
+}
+
+.sc-branch-photo-block.with-bg .sc-avatar-zoom {
   top: -11px;
 }
 
