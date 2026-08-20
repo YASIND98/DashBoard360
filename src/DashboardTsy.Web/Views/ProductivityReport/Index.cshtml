@@ -215,8 +215,13 @@
         }
 
         // ===== State =====
+        var PAGE_FILTER_KEY = 'productivity';
         var selectedRegion = null;
         var selectedBranch = null;
+
+        function persistSelection() {
+            saveFilterSelection(PAGE_FILTER_KEY, selectedRegion, selectedBranch);
+        }
 
         // ===== Filter Lists =====
         function renderRegionDropdown() {
@@ -243,16 +248,27 @@
             }
             // Sekmeler yalnızca sayfa ilk açılışında çekilir; bölge/şube seçimi tekrar tetiklemez
             loadProductivityTabs(1, function () {
+                var savedSelection = initFilterSelection(PAGE_FILTER_KEY);
+
                 loadRegionFilters(function () {
+                    if (savedSelection.region && findRegion(savedSelection.region.code)) {
+                        selectedRegion = savedSelection.region;
+                        $('#yieldBolgeLabel').text(selectedRegion.name);
+                    }
                     var single = renderRegionDropdown();
                     if (single) {
                         selectedRegion = { code: single.Code, name: single.Name };
                     }
                     loadBranchFilters(function () {
+                        if (savedSelection.branch && findBranch(savedSelection.branch.code, selectedRegion ? selectedRegion.code : null)) {
+                            selectedBranch = savedSelection.branch;
+                            $('#yieldSubeLabel').text(selectedBranch.name);
+                        }
                         var singleBranch = renderBranchDropdown();
                         if (singleBranch) {
                             selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
                         }
+                        persistSelection();
                         if (selectedRegion || selectedBranch) {
                             updateUI();
                         } else {
@@ -281,6 +297,7 @@
 
             renderBranchDropdown();
 
+            persistSelection();
             updateUI();
         });
 
@@ -311,6 +328,7 @@
             $('#yieldSubePanel').removeClass('open');
             $('#yieldSubeSearch').val('');
 
+            persistSelection();
             updateUI();
         });
 
@@ -319,6 +337,16 @@
             var name = $(this).closest('.sc-branch-photo-block').find('.sc-manager-role').text();
             $('.sc-lightbox-img').attr('src', src);
             $('.sc-lightbox-title').text(name);
+            $('.sc-lightbox-overlay').fadeIn(180);
+        });
+
+        $(document).on('click', '.sc-avatar-zoom:not(.no-zoom)', function () {
+            var $meta = $(this).siblings('.sc-manager-meta');
+            var name  = $.trim($meta.find('.sc-manager-name').text());
+            var title = (name && name !== '-') ? name : $.trim($meta.find('.sc-manager-role').text());
+
+            $('.sc-lightbox-img').attr('src', $(this).find('.sc-manager-avatar').attr('src'));
+            $('.sc-lightbox-title').text(title);
             $('.sc-lightbox-overlay').fadeIn(180);
         });
 
@@ -381,6 +409,7 @@
             $('#yieldBolgeList .dropdown-item').removeClass('selected');
             $('#yieldSubeLabel').text('Şube');
             renderBranchDropdown();
+            persistSelection();
             updateUI();
         });
 
@@ -388,6 +417,7 @@
             selectedBranch = null;
             $('#yieldSubeLabel').text('Şube');
             renderBranchDropdown();
+            persistSelection();
             updateUI();
         });
 
@@ -396,8 +426,8 @@
             var isBranch = selectedBranch !== null;
             var filterType = isBranch ? 2 : 1;
             var label = isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
-            $('#scorecardBtnLabel').text(label);
-            $('#scorecardTitle').text(label);
+            $('.scorecard-btn-label').text(label);
+            $('.scorecard-title').text(label);
 
             if (!selectedRegion && !selectedBranch) {
                 $('.scorecard-content').html('');
@@ -525,12 +555,14 @@
             if (branchPhoto) {
                 setImgWithFallback($photo.find('.sc-branch-photo'), branchPhoto);
                 setImgWithFallback($photo.find('.sc-manager-avatar'), branchManagerPhoto);
+                $photo.find('.sc-avatar-zoom').toggleClass('no-zoom', !branchManagerPhoto);
                 $photo.show().addClass('with-bg');
                 $card.removeClass('area');
                 $info.hide();
             } else {
                 var avatarPhoto = isBranch ? branchManagerPhoto : regionManagerPhoto;
                 setImgWithFallback($info.find('.sc-manager-avatar'), avatarPhoto);
+                $info.find('.sc-avatar-zoom').toggleClass('no-zoom', !avatarPhoto);
                 $photo.hide().removeClass('with-bg');
                 $card.addClass('area');
                 $info.show();

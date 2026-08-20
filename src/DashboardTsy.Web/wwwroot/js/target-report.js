@@ -4,8 +4,13 @@ $(document).ready(function () {
   showLoadingOverlay();
 
   // ===== State =====
+  var PAGE_FILTER_KEY = 'target';
   var selectedRegion = null;
   var selectedBranch = null;
+
+  function persistSelection() {
+      saveFilterSelection(PAGE_FILTER_KEY, selectedRegion, selectedBranch);
+  }
   var currentSortBy = 0;
   var currentSortState = null;
   var monthlyHeadersLoaded = false;
@@ -742,6 +747,7 @@ $(document).ready(function () {
       $('#indexRegionSearch').val('');
 
       renderBranchDropdown();
+      persistSelection();
       showLoadingOverlay();
       loadActiveReport();
   });
@@ -773,6 +779,7 @@ $(document).ready(function () {
       $('#indexBranchPanel').removeClass('open');
       $('#indexBranchSearch').val('');
 
+      persistSelection();
       showLoadingOverlay();
       loadActiveReport();
   });
@@ -793,16 +800,27 @@ $(document).ready(function () {
               }
           });
       }
+      var savedSelection = initFilterSelection(PAGE_FILTER_KEY);
+
       loadRegionFilters(function () {
+          if (savedSelection.region && findRegion(savedSelection.region.code)) {
+              selectedRegion = savedSelection.region;
+              $('#indexRegionLabel').text(selectedRegion.name);
+          }
           var single = renderRegionDropdown();
           if (single) {
               selectedRegion = { code: single.Code, name: single.Name };
           }
           loadBranchFilters(function () {
+              if (savedSelection.branch && findBranch(savedSelection.branch.code, selectedRegion ? selectedRegion.code : null)) {
+                  selectedBranch = savedSelection.branch;
+                  $('#indexBranchLabel').text(selectedBranch.name);
+              }
               var singleBranch = renderBranchDropdown();
               if (singleBranch) {
                   selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
               }
+              persistSelection();
               loadDailyReport();
           });
       });

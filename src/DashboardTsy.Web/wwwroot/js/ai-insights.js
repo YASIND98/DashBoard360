@@ -8,6 +8,23 @@ $(document).ready(function () {
     var aiSelectedRegion = null;
     var aiSelectedBranch = null;
 
+    var aiResultKey = null;
+    var aiRequestPending = false;
+
+    var aiPageKey = null;
+
+    function aiSelectionKey() {
+        if (!(aiSelectedRegion && aiSelectedBranch)) return null;
+        return aiSelectedRegion.code + '|' + aiSelectedBranch.code;
+    }
+
+    function aiClearResult() {
+        aiResultKey = null;
+        $('#aiDrawer').removeClass('has-result');
+        $('#aiResult').empty();
+        $('#aiNotice').empty();
+    }
+
     // ===== Filter Lists (filtreleme ile aynı logic) =====
     function aiRenderRegionDropdown() {
         return renderRegionList('#aiBolgeList', aiSelectedRegion ? aiSelectedRegion.code : null);
@@ -37,13 +54,16 @@ $(document).ready(function () {
     // ===== Open / Close =====
     function openAiDrawer() {
         var pre = getPageSelection();
+        var pageKey = (pre.region ? pre.region.code : '') + '|' + (pre.branch ? pre.branch.code : '');
+        var followPage = pageKey !== aiPageKey;
+        aiPageKey = pageKey;
 
         loadRegionFilters(function () {
             var single = aiRenderRegionDropdown();
             // Öncelik: sayfada seçili bölge; yoksa tek seçenek varsa o
-            if (pre.region) {
+            if (pre.region && (followPage || !aiSelectedRegion)) {
                 aiSelectedRegion = pre.region;
-            } else if (single) {
+            } else if (!aiSelectedRegion && single) {
                 aiSelectedRegion = { code: single.Code, name: single.Name };
             }
             if (aiSelectedRegion) {
@@ -53,9 +73,9 @@ $(document).ready(function () {
             }
 
             loadBranchFilters(function () {
-                if (pre.branch) {
+                if (pre.branch && (followPage || !aiSelectedBranch)) {
                     aiSelectedBranch = pre.branch;
-                } else {
+                } else if (!aiSelectedBranch) {
                     var singleBranch = aiRenderBranchDropdown();
                     if (singleBranch) {
                         aiSelectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
@@ -67,6 +87,8 @@ $(document).ready(function () {
                 }
                 aiRenderBranchDropdown();
                 aiUpdateSubmitState();
+
+                if (!aiRequestPending && (!aiResultKey || aiResultKey !== aiSelectionKey())) aiClearResult();
             });
         });
 
@@ -75,11 +97,9 @@ $(document).ready(function () {
     }
 
     function closeAiDrawer() {
-        $('#aiDrawer').removeClass('open has-result');
+        $('#aiDrawer').removeClass('open');
         $('#aiDrawerOverlay').removeClass('open');
         $('.dropdown-panel').removeClass('open');
-        $('#aiResult').empty();
-        $('#aiNotice').empty();
     }
 
     $(document).on('click', '#aiInsightsBtn', function (e) {
@@ -163,9 +183,13 @@ $(document).ready(function () {
         $('#aiNotice').empty();
         $('#aiDrawer').addClass('has-result');
         $result.html(aiLoaderHtml());
+        aiResultKey = null;
+        aiRequestPending = true;
+        var requestKey = aiSelectionKey();
         var thinkStart = Date.now();
 
         function finish(captured) {
+            aiRequestPending = false;
             $btn.text('AI İçgörüsü Oluştur');
             aiUpdateSubmitState();
 
@@ -180,6 +204,7 @@ $(document).ready(function () {
                 return;
             }
             $('#aiNotice').empty();
+            aiResultKey = requestKey;
             // Servis cevabını doğrudan "AI yazıyormuş" gibi kademeli olarak ekrana yaz
             aiTypeMarkdown($result, captured.summary, captured.openSections);
         }
@@ -219,8 +244,8 @@ $(document).ready(function () {
     // Servis cevabını gerçek bir AI yazıyormuş gibi kademeli olarak ekrana yansıtır.
     // Markdown bir kez nihai HTML'e çevrilir (biçim/sözdizimi asla ekranda görünmez);
     // ardından metin, doğru yapı içine akıtılır: bloklar yazıya ulaşıldıkça belirir.
-    // Zaman güdümlüdür: tüm cevap en fazla ~5 saniyede tamamlanır.
-    var AI_TYPE_BUDGET = 8500; // ms — tüm metnin yazılacağı azami süre (gerçekten yazıyor hissi)
+    // Zaman güdümlüdür: tüm cevap en fazla ~4 saniyede tamamlanır.
+    var AI_TYPE_BUDGET = 4000; // ms — tüm metnin yazılacağı azami süre (gerçekten yazıyor hissi)
 
     function aiTypeMarkdown($container, md, openSections, onDone) {
         var full = md || '';
@@ -290,14 +315,6 @@ $(document).ready(function () {
             if (node.parentNode) node.parentNode.insertBefore(caret, node.nextSibling);
         }
 
-        // Kaydırma kabı drawer gövdesidir (#aiResult'ın overflow'u yok)
-        var scroller = $container.closest('.ai-drawer-body')[0] || $container[0];
-        function autoScroll() {
-            if (scroller.scrollHeight > scroller.clientHeight) {
-                scroller.scrollTop = scroller.scrollHeight;
-            }
-        }
-
         // 4) Zaman güdümlü akış: her karede geçen süreye göre kaç karakter görünmeli hesaplanır.
         //    Böylece metnin uzunluğundan bağımsız olarak toplam süre ~AI_TYPE_BUDGET'tir.
         var start = Date.now();
@@ -329,8 +346,6 @@ $(document).ready(function () {
                 if (show < op.text.length) break;         // bu düğüm henüz bitmedi
                 opIdx++;                                  // tamamlandı, sonrakine geç
             }
-
-            autoScroll();
 
             if (progress >= 1 || opIdx >= ops.length) { complete(); return; }
             requestAnimationFrame(frame);

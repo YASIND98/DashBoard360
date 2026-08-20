@@ -371,6 +371,39 @@ function renderBranchList(listSelector, selectedCode, regionCode) {
   return isSingle ? filtered[0] : null;
 }
 
+function findBranch(code, regionCode) {
+  for (var i = 0; i < _branchFilters.length; i++) {
+      var b = _branchFilters[i];
+      if (b.Code === code) {
+          if (regionCode && b.RegionCode !== regionCode) return null;
+          return b;
+      }
+  }
+  return null;
+}
+
+// ===== Selected Region/Branch (per page, cached in sessionStorage) =====
+function filterSelectionKey(pageKey) {
+  return '_filterSelection_' + pageKey;
+}
+
+function saveFilterSelection(pageKey, region, branch) {
+  sessionStorage.setItem(filterSelectionKey(pageKey), JSON.stringify({
+      region: region ? { code: region.code, name: region.name } : null,
+      branch: branch ? { code: branch.code, name: branch.name } : null
+  }));
+}
+
+// Sayfa yenilenirse o sayfanın seçimi sıfırlanır, sayfalar arası geçişte korunur.
+function initFilterSelection(pageKey) {
+  var key = filterSelectionKey(pageKey);
+  var nav = performance.getEntriesByType('navigation')[0];
+  if (nav && nav.type === 'reload') sessionStorage.removeItem(key);
+
+  var saved = JSON.parse(sessionStorage.getItem(key) || '{}');
+  return { region: saved.region || null, branch: saved.branch || null };
+}
+
 // ===== Scorecard Headers (cached per filterType in sessionStorage) =====
 function loadScoreCardHeaders(filterType, callback) {
   var key = '_scoreCardHeaders_' + filterType;
