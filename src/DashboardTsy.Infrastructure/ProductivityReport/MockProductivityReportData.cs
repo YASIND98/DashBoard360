@@ -1016,6 +1016,8 @@ public static class MockProductivityReportData
             Id = 1,
             RatioName = "Şube Karlılık Oranı - Toplam",
             TargetValue = 0.24m,
+            BranchValue = 0.238m,
+            BranchValueDiff = 0.002m,
             RegionValue = 0.235m,
             RegionValueDiff = 0.005m,
             BankValue = 0.23m,
@@ -1033,6 +1035,8 @@ public static class MockProductivityReportData
             Id = 2,
             RatioName = "Net Faiz Marjı (Şube)",
             TargetValue = 0.11m,
+            BranchValue = 0.109m,
+            BranchValueDiff = 0.001m,
             RegionValue = 0.108m,
             RegionValueDiff = 0.001m,
             BankValue = 0.107m,
@@ -1050,6 +1054,8 @@ public static class MockProductivityReportData
             Id = 3,
             RatioName = "Komisyon Geliri Oranı (Şube)",
             TargetValue = 0.07m,
+            BranchValue = 0.07m,
+            BranchValueDiff = 0.0005m,
             RegionValue = 0.069m,
             RegionValueDiff = 0.001m,
             BankValue = 0.068m,
@@ -1824,6 +1830,7 @@ public static class MockProductivityReportData
             6 => p => p.KobiValue,
             7 => p => p.AgricultureValue,
             8 => p => p.CommercialValue,
+            9 => p => p.BranchValue,
             _ => p => p.Id
         };
 
