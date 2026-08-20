@@ -109,7 +109,7 @@ public class MobileAuthController : Controller
         }
 
         var baseUrl = _configuration["DashboardApi:BaseUrl"]?.TrimEnd('/') + "/";
-        var url = $"{baseUrl}Public/GetUserBySession?sessionId={WebUtility.UrlEncode(sessionId)}";
+        var url = $"{baseUrl}Public/SessionLogin?sessionId={WebUtility.UrlEncode(sessionId)}";
 
         ApiResponse<UsersDto>? result = null;
         try

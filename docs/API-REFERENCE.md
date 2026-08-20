@@ -629,11 +629,9 @@ Response şeması `WindowsLogin` ile aynıdır (`ApiResponse<UsersDto>`).
 
 Response şeması aynıdır (`ApiResponse<UsersDto>`).
 
-### GET /Public/GetUserBySession?sessionId={sessionId}
+### GET /Public/SessionLogin?sessionId={sessionId}
 
-`sessionId` ile kullanıcıyı çözer ve `UsersDto` döner. Web login akışında sonuç sunucu-tarafı
-session'a yazılır; mobil taraf oturum tutmadığı için her istekte `sessionId` gönderip aynı
-endpoint'i çağırır. Response şeması aynıdır (`ApiResponse<UsersDto>`).
+Var olan bir oturumu `sessionId` ile devam ettirir. Response şeması aynıdır (`ApiResponse<UsersDto>`).
 
 ---
 
