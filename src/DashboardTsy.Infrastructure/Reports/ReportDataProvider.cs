@@ -2983,7 +2983,8 @@ public class ReportDataProvider : IReportDataProvider
         public string RatioName { get; set; } = string.Empty;
 
         public decimal TargetValue { get; set; }
-
+        public decimal BranchValue { get; set; }
+        public decimal? BranchValueDiff { get; set; }
         public decimal RegionValue { get; set; }
         public decimal? RegionValueDiff { get; set; }
 
