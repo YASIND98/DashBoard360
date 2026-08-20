@@ -1,7 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Json;
-using DashboardTsy.Api.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace DashboardTsy.Api.Services;
@@ -153,38 +152,6 @@ public sealed class MockMobileAuthScenario
             AccessToken = accessToken
         });
     }
-
-    /// <summary>
-    /// /Public/GetCurrentUser mock cevabı. AuthMock:Enabled=true iken controller DB'ye hiç gitmez;
-    /// bu UsersDto'yu ApiResponse zarfına sarıp döner. Değerler Web/MobileAuthController.BuildMockUser
-    /// ile aynı — mobil ve web mock akışları aynı kimliği görür.
-    /// </summary>
-    public ApiResponse<UsersDto> BuildCurrentUserResponse() =>
-        new()
-        {
-            Result = new UsersDto
-            {
-                UserId = 999,
-                NameSurname = "Mock Kullanici",
-                Email = "mock-session-user",
-                DomainName = "mock-session-user",
-                Department = "Mock Departman",
-                BranchCode = 1001,
-                BranchName = "Mock Sube",
-                RegionCode = 1,
-                Authority = "Admin",
-                Password = "mock-token",
-                IsBlock = false,
-                UpdateSeen = true,
-                CreatedDate = DateTime.UtcNow,
-                ProfilePhoto = "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png"
-            },
-            Message = new MessageResult
-            {
-                message = "Başarılı",
-                message2 = "Giriş başarılı."
-            }
-        };
 
     /// <summary>
     /// JWT üretici — Kutup'un JwtManager'ıyla aynı algoritma (HS256) ve aynı symmetric key kullanır.
