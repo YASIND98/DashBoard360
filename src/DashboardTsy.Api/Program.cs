@@ -1,16 +1,13 @@
 using System.Globalization;
 using System.IO.Compression;
-using DashboardTsy.Api.Controllers;
 using DashboardTsy.Api.Data;
 using DashboardTsy.Api.Middleware;
 using DashboardTsy.Api.Services;
 using DashboardTsy.Infrastructure.Data;
 using DashboardTsy.Infrastructure.Reports;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -90,50 +87,6 @@ builder.Services.AddHttpClient("PupaApi", client =>
     client.BaseAddress = new Uri(pupaBaseUrl + "/");
 });
 
-// --- Mobile Auth (iOS) — KutupYıldızı pass-through proxy + AuthMock ---
-// iOS client'ın Login/OTP akışı iki modda çalışır:
-//   AuthMock:Enabled=false → KutupYıldızı'nın mevcut endpoint'lerine forward edilir (default).
-//   AuthMock:Enabled=true  → MockMobileAuthScenario devreye girer; Kutup'a gidilmez.
-// Detay: MobileAuthController + MockMobileAuthScenario.
-var kutupBaseUrl = builder.Configuration["KutupYildizi:BaseUrl"];
-var authMockEnabled = builder.Configuration.GetValue<bool>("AuthMock:Enabled");
-if (string.IsNullOrEmpty(kutupBaseUrl) && !authMockEnabled)
-{
-    throw new InvalidOperationException(
-        "Missing configuration: KutupYildizi:BaseUrl (or set AuthMock:Enabled=true for mock mode).");
-}
-builder.Services.AddHttpClient(MobileAuthController.HttpClientName, client =>
-{
-    // Mock modunda BaseAddress kullanılmıyor; boşsa placeholder verip HttpClient factory'nin patlamasını önlüyoruz.
-    var effectiveUrl = string.IsNullOrEmpty(kutupBaseUrl) ? "http://localhost/" : kutupBaseUrl.TrimEnd('/') + "/";
-    client.BaseAddress = new Uri(effectiveUrl);
-});
-
-// Mock senaryo sınıfı — Singleton çünkü state'siz (config bir kere okunuyor, JWT key process ömrü boyunca sabit).
-builder.Services.AddSingleton<DashboardTsy.Api.Services.MockMobileAuthScenario>();
-
-// Kutup'un ürettiği JWT'yi DashboardTsy'nin de doğrulayabilmesi için — mobile client login sonrası
-// aynı token ile rapor endpoint'lerine de erişebilsin. SymmetricKey Kutup'takiyle birebir aynı
-// olmak zorunda (base64). Web tarafı Windows/Domain auth ile korunduğu ve mevcut controller'larda
-// [Authorize] YOK — bu blok mevcut davranışı bozmaz; yalnızca ileride [Authorize] konursa devreye girer.
-var mobileJwtKey = builder.Configuration["MobileJwt:SymmetricKey"];
-if (!string.IsNullOrEmpty(mobileJwtKey))
-{
-    builder.Services
-        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddJwtBearer(options =>
-        {
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = false,
-                ValidateAudience = false,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Convert.FromBase64String(mobileJwtKey))
-            };
-        });
-}
-
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -183,9 +136,6 @@ app.UseMiddleware<MobileEnvelopeMiddleware>();
 // path rewrite'ı işe yaramaz.
 app.UseRouting();
 
-// UseAuthentication + UseAuthorization sırası: authentication ÖNCE — token okunmadan yetki kontrolü yapılamaz.
-// Mevcut controller'larda [Authorize] YOK; bu satırlar davranışı değiştirmez, sadece ileri [Authorize] için hazırlar.
-app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
