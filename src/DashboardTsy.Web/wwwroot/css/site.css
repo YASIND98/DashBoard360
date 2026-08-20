@@ -453,7 +453,7 @@ body:has(.scorecard-panel.open)::before {
   border-radius: 50%;
 }
 
-/* Avatar Zoom (büyütme ikonu her zaman görünür) */
+/* Avatar Zoom */
 .sc-avatar-zoom {
   position: relative;
   top: 0;
@@ -937,7 +937,7 @@ body:has(.scorecard-panel.open)::before {
 }
 
 @media (max-width: 767px) {
-  #scorecardBtnLabel {
+  .scorecard-btn-label {
     display: none;
   }
   .scorecard-nps-wrapper.mobile .scorecard-btn {
