@@ -7,10 +7,7 @@ namespace DashboardTsy.Api.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-public class PublicController(
-    IWindowsAuthService authService,
-    MockMobileAuthScenario mockScenario,
-    IConfiguration configuration) : ControllerBase
+public class PublicController(IWindowsAuthService authService) : ControllerBase
 {
     /// <summary>
     /// Kutup JWT'sinin business session tanımlayıcısını taşıdığı claim adı.
@@ -63,10 +60,6 @@ public class PublicController(
     [HttpGet("GetCurrentUser")]
     public async Task<ActionResult<ApiResponse<UsersDto>>> GetCurrentUser(CancellationToken cancellationToken)
     {
-        // AuthMock:Enabled=true → DB'ye gitmeden mock UsersDto döner (Kutup mock akışıyla tutarlı).
-        if (configuration.GetValue<bool>("AuthMock:Enabled"))
-            return Ok(mockScenario.BuildCurrentUserResponse());
-
         var sessionId = User.FindFirst(ChannelSessionClaim)?.Value;
         var result = await authService.GetUserBySessionAsync(sessionId ?? string.Empty, cancellationToken).ConfigureAwait(false);
         return Ok(result);
