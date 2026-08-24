@@ -502,6 +502,10 @@ $(document).ready(function () {
   handleTableSearch('#salarySearchInput');
 
   // ===== Region/Branch Filters =====
+  function persistSelection() {
+      saveFilterSelection(selectedRegion, selectedBranch);
+  }
+
   function renderRegionDropdown() {
       return renderRegionList('#salaryRegionList', selectedRegion ? selectedRegion.code : null);
   }
@@ -527,6 +531,7 @@ $(document).ready(function () {
       $('#salaryRegionSearch').val('');
 
       renderBranchDropdown();
+      persistSelection();
       loadActiveTable();
   });
 
@@ -557,6 +562,7 @@ $(document).ready(function () {
       $('#salaryBranchPanel').removeClass('open');
       $('#salaryBranchSearch').val('');
 
+      persistSelection();
       loadActiveTable();
   });
 
@@ -572,12 +578,23 @@ $(document).ready(function () {
   }
 
   loadTodayDate(function () {
+      var savedSelection = initFilterSelection();
+
       loadRegionFilters(function () {
+          if (savedSelection.region && findRegion(savedSelection.region.code)) {
+              selectedRegion = savedSelection.region;
+              $('#salaryRegionLabel').text(selectedRegion.name);
+          }
           var single = renderRegionDropdown();
           if (single) selectedRegion = { code: single.Code, name: single.Name };
           loadBranchFilters(function () {
+              if (savedSelection.branch && findBranch(savedSelection.branch.code, selectedRegion ? selectedRegion.code : null)) {
+                  selectedBranch = savedSelection.branch;
+                  $('#salaryBranchLabel').text(selectedBranch.name);
+              }
               var singleBranch = renderBranchDropdown();
               if (singleBranch) selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+              persistSelection();
 
               loadSalaryTabs(function (tabs) {
                   window._salaryTabs = tabs;

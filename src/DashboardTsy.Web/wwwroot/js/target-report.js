@@ -4,12 +4,11 @@ $(document).ready(function () {
   showLoadingOverlay();
 
   // ===== State =====
-  var PAGE_FILTER_KEY = 'target';
   var selectedRegion = null;
   var selectedBranch = null;
 
   function persistSelection() {
-      saveFilterSelection(PAGE_FILTER_KEY, selectedRegion, selectedBranch);
+      saveFilterSelection(selectedRegion, selectedBranch);
   }
   var currentSortBy = 0;
   var currentSortState = null;
@@ -800,7 +799,7 @@ $(document).ready(function () {
               }
           });
       }
-      var savedSelection = initFilterSelection(PAGE_FILTER_KEY);
+      var savedSelection = initFilterSelection();
 
       loadRegionFilters(function () {
           if (savedSelection.region && findRegion(savedSelection.region.code)) {

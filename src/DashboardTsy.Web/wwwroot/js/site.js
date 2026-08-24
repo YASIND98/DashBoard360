@@ -382,26 +382,27 @@ function findBranch(code, regionCode) {
   return null;
 }
 
-// ===== Selected Region/Branch (per page, cached in sessionStorage) =====
-function filterSelectionKey(pageKey) {
-  return '_filterSelection_' + pageKey;
-}
+// ===== Selected Region/Branch (tüm raporlarda ortak, sessionStorage'da) =====
+var FILTER_SELECTION_KEY = '_filterSelection';
 
-function saveFilterSelection(pageKey, region, branch) {
-  sessionStorage.setItem(filterSelectionKey(pageKey), JSON.stringify({
-      region: region ? { code: region.code, name: region.name } : null,
-      branch: branch ? { code: branch.code, name: branch.name } : null
+// Kod string saklanır: skor kart number, diğer raporlar string kullanıyor.
+function saveFilterSelection(region, branch) {
+  sessionStorage.setItem(FILTER_SELECTION_KEY, JSON.stringify({
+      region: region ? { code: String(region.code), name: region.name } : null,
+      branch: branch ? { code: String(branch.code), name: branch.name } : null
   }));
 }
 
-// Sayfa yenilenirse o sayfanın seçimi sıfırlanır, sayfalar arası geçişte korunur.
-function initFilterSelection(pageKey) {
-  var key = filterSelectionKey(pageKey);
-  var nav = performance.getEntriesByType('navigation')[0];
-  if (nav && nav.type === 'reload') sessionStorage.removeItem(key);
-
-  var saved = JSON.parse(sessionStorage.getItem(key) || '{}');
+function getFilterSelection() {
+  var saved = JSON.parse(sessionStorage.getItem(FILTER_SELECTION_KEY) || '{}');
   return { region: saved.region || null, branch: saved.branch || null };
+}
+
+// Sayfa yenilenirse seçim sıfırlanır; sessionStorage olduğu için oturum bitince kendiliğinden gider.
+function initFilterSelection() {
+  var nav = performance.getEntriesByType('navigation')[0];
+  if (nav && nav.type === 'reload') sessionStorage.removeItem(FILTER_SELECTION_KEY);
+  return getFilterSelection();
 }
 
 // ===== Scorecard Headers (cached per filterType in sessionStorage) =====

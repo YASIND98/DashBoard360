@@ -9,6 +9,38 @@ $(function () {
     var _scRegions = [];
     var _scBranches = [];
 
+    // Raporlarla ortak bölge/şube seçimi; sayfa yenilendiyse kayıt burada silinir.
+    initFilterSelection();
+
+    function persistSelection() {
+        var region = _scRegions.filter(function (r) { return r.regionCode === R().regionCode; })[0];
+        var branch = _scBranches.filter(function (b) { return b.branchCode === R().branchCode; })[0];
+        saveFilterSelection(
+            region ? { code: region.regionCode, name: region.regionName } : null,
+            branch ? { code: branch.branchCode, name: branch.branchName } : null
+        );
+    }
+
+    // Kayıtta kod string, bu ekranda number; eşleşme String() ile yapılır.
+    // Kayıt her liste yüklemesinde okunur, yetkiyle sabitlenmiş filtre değiştirilmez.
+    function restoreSavedRegion() {
+        var saved = getFilterSelection().region;
+        if (R().regionDisabled || !saved) return;
+        var region = _scRegions.filter(function (r) { return String(r.regionCode) === String(saved.code); })[0];
+        if (!region) return;
+        R().regionCode = region.regionCode;
+        $('#scRegionLabel').text(region.regionName);
+    }
+
+    function restoreSavedBranch() {
+        var saved = getFilterSelection().branch;
+        if (R().branchDisabled || !saved) return;
+        var branch = _scBranches.filter(function (b) { return String(b.branchCode) === String(saved.code); })[0];
+        if (!branch) return;
+        R().branchCode = branch.branchCode;
+        $('#scBranchLabel').text(branch.branchName);
+    }
+
     // scorecard/regions: kullanıcının görebildiği bölgelerin listesi.
     function fetchRegions(callback) {
         $.ajax({
@@ -84,6 +116,7 @@ $(function () {
     function loadRegions(done) {
         fetchRegions(function (regions) {
             _scRegions = regions || [];
+            restoreSavedRegion();
             var single = _scRegions.length === 1;
             if (single) {
                 R().regionCode = _scRegions[0].regionCode;
@@ -99,6 +132,7 @@ $(function () {
     function loadBranches(done) {
         fetchBranches(function (branches) {
             _scBranches = branches || [];
+            restoreSavedBranch();
             var single = _scBranches.length === 1;
             if (single) {
                 R().branchCode = _scBranches[0].branchCode;
@@ -112,6 +146,7 @@ $(function () {
             }
             $('#scBranchSelect').toggleClass('disabled', R().branchDisabled);
             renderScBranchList();
+            persistSelection();
             if (done) done();
         });
     }
@@ -198,6 +233,7 @@ $(function () {
         R().branchCode = -1;
         $('#scBranchLabel').text('Şube');
         resetRegisterFilter();
+        persistSelection();
         loadBranches(function () {
             loadRegisters(R().loadTable);
         });
@@ -219,6 +255,7 @@ $(function () {
         }
 
         resetRegisterFilter();                       // şube değişti -> seçili sicil geçersiz
+        persistSelection();
         loadRegisters(R().loadTable);           // o şubenin sicilleri + tablo
     });
     $(document).on('click', '#scRegisterList .dropdown-item', function () {
@@ -244,6 +281,7 @@ $(function () {
             }
         }
 
+        persistSelection();
         R().loadTable();
     });
 

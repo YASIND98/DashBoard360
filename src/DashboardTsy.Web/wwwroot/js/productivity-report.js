@@ -1387,12 +1387,12 @@ function renderProfitRatioRegionTable(items) {
 
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-left">' + indent + '</td>';
-        html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent, true) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent, true) + '</td>';
         html += '<td>' + fmt(item.RetailValue) + '</td>';
         html += '<td>' + fmt(item.KobiValue) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent, true) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent, true) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -1449,13 +1449,13 @@ function renderProfitRatioBranchTable(items) {
 
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.RatioName + '</span>' : item.RatioName;
         html += '<td class="col-left">' + indent + '</td>';
-        html += '<td class="has-diff">' + fmt(item.BranchValue) + formatDiff(item.BranchValueDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.BranchValue) + formatDiff(item.BranchValueDiff, !isPercent, true) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.RegionValue) + formatDiff(item.RegionValueDiff, !isPercent, true) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.BankValue) + formatDiff(item.BankValueDiff, !isPercent, true) + '</td>';
         html += '<td>' + fmt(item.RetailValue) + '</td>';
         html += '<td>' + fmt(item.KobiValue) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent, true) + '</td>';
+        html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent, true) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -1748,9 +1748,11 @@ function formatRateValue(val) {
     return val;
 }
 
-function formatDiff(val, useFormatNumber) {
+// invertColors: oran tablosunda artı fark kırmızı, eksi fark yeşil gösterilir
+function formatDiff(val, useFormatNumber, invertColors) {
     if (!val) return '<div class="diff-value-for-productivity">&nbsp;</div>';
-    var cls = val < 0 ? 'negative' : (val > 0 ? 'positive' : '');
+    var isGood = invertColors ? val < 0 : val > 0;
+    var cls = isGood ? 'positive' : 'negative';
     var prefix = val > 0 ? '+' : '';
     var display = useFormatNumber ? formatNumber(val) : val;
     return '<div class="diff-value-for-productivity ' + cls + '">' + prefix + display + '</div>';
