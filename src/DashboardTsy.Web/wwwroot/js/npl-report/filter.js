@@ -184,6 +184,10 @@
     $(function () {
         if (!document.getElementById('nplChart')) return;
 
+        function persistSelection() {
+            saveFilterSelection(_selectedRegion, _selectedBranch);
+        }
+
         function renderRegionDropdown() {
             return renderRegionList('#nplRegionList', _selectedRegion ? _selectedRegion.code : null);
         }
@@ -224,6 +228,7 @@
             $('#nplBranchLabel').text('Şube');
             renderRegionDropdown();
             renderBranchDropdown();
+            persistSelection();
             updateBreadcrumb();
             reload();
         });
@@ -231,19 +236,31 @@
             _selectedBranch = null;
             $('#nplBranchLabel').text('Şube');
             renderBranchDropdown();
+            persistSelection();
             updateBreadcrumb();
             reload();
         });
 
         if (typeof loadRegionFilters === 'function') {
+            var savedSelection = initFilterSelection();
+
             loadRegionFilters(function () {
+                if (savedSelection.region && findRegion(savedSelection.region.code)) {
+                    _selectedRegion = savedSelection.region;
+                    $('#nplRegionLabel').text(_selectedRegion.name);
+                }
                 var single = renderRegionDropdown();
                 if (single) _selectedRegion = { code: single.Code, name: single.Name };
 
                 if (typeof loadBranchFilters !== 'function') { updateBreadcrumb(); return; }
                 loadBranchFilters(function () {
+                    if (savedSelection.branch && findBranch(savedSelection.branch.code, _selectedRegion ? _selectedRegion.code : null)) {
+                        _selectedBranch = savedSelection.branch;
+                        $('#nplBranchLabel').text(_selectedBranch.name);
+                    }
                     var singleBranch = renderBranchDropdown();
                     if (singleBranch) _selectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
+                    persistSelection();
                     updateBreadcrumb();
                     if (_selectedRegion || _selectedBranch) reload();
                 });
@@ -266,6 +283,7 @@
             $('#nplRegionPanel').removeClass('open');
             $('#nplRegionSearch').val('');
 
+            persistSelection();
             updateBreadcrumb();
             reload();
         });
@@ -295,6 +313,7 @@
             $('#nplBranchPanel').removeClass('open');
             $('#nplBranchSearch').val('');
 
+            persistSelection();
             updateBreadcrumb();
             reload();
         });

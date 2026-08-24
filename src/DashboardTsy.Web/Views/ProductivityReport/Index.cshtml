@@ -215,12 +215,11 @@
         }
 
         // ===== State =====
-        var PAGE_FILTER_KEY = 'productivity';
         var selectedRegion = null;
         var selectedBranch = null;
 
         function persistSelection() {
-            saveFilterSelection(PAGE_FILTER_KEY, selectedRegion, selectedBranch);
+            saveFilterSelection(selectedRegion, selectedBranch);
         }
 
         // ===== Filter Lists =====
@@ -248,7 +247,7 @@
             }
             // Sekmeler yalnızca sayfa ilk açılışında çekilir; bölge/şube seçimi tekrar tetiklemez
             loadProductivityTabs(1, function () {
-                var savedSelection = initFilterSelection(PAGE_FILTER_KEY);
+                var savedSelection = initFilterSelection();
 
                 loadRegionFilters(function () {
                     if (savedSelection.region && findRegion(savedSelection.region.code)) {
