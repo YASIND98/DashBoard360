@@ -7,5 +7,5 @@ public interface IWindowsAuthService
     Task<ApiResponse<UsersDto>> WindowsLoginAsync(string username, CancellationToken cancellationToken = default);
     Task<ApiResponse<UsersDto>> DomainLoginAsync(string domainName, CancellationToken cancellationToken = default);
     Task<ApiResponse<UsersDto>> LoginAsync(string username, string password, CancellationToken cancellationToken = default);
-    Task<ApiResponse<UsersDto>> SessionLoginAsync(string sessionId, CancellationToken cancellationToken = default);
+    Task<ApiResponse<UsersDto>> GetUserBySessionAsync(string sessionId, CancellationToken cancellationToken = default);
 }

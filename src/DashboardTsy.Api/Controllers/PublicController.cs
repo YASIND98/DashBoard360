@@ -29,10 +29,14 @@ public class PublicController(IWindowsAuthService authService) : ControllerBase
         return Ok(result);
     }
 
-    [HttpGet("SessionLogin")]
-    public async Task<ActionResult<ApiResponse<UsersDto>>> SessionLogin([FromQuery] string sessionId, CancellationToken cancellationToken)
+    /// <summary>
+    /// SessionId ile kullanıcıyı çözüp UsersDto döner. Hem web login akışı (sonra session'a yazar)
+    /// hem de mobil (oturum tutmaz, her istekte sessionId gönderir) tarafından kullanılır.
+    /// </summary>
+    [HttpGet("GetUserBySession")]
+    public async Task<ActionResult<ApiResponse<UsersDto>>> GetUserBySession([FromQuery] string sessionId, CancellationToken cancellationToken)
     {
-        var result = await authService.SessionLoginAsync(sessionId, cancellationToken).ConfigureAwait(false);
+        var result = await authService.GetUserBySessionAsync(sessionId, cancellationToken).ConfigureAwait(false);
         return Ok(result);
     }
 }
