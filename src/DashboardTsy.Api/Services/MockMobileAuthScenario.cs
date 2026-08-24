@@ -155,45 +155,6 @@ public sealed class MockMobileAuthScenario
     }
 
     /// <summary>
-    /// /api/GetAuth — SendSmsCode'da alınan AccessToken ile çağrılan personel-yetki sorgusu.
-    /// Kutup'ta [Authorize] korumalı olduğu için gerçek doğrulama JWT middleware'de yapılır; mock burada
-    /// sadece HashCustomerNumber doluysa "yetkili personel" senaryosunu simüle eder — Kutup'un GetAuthModel
-    /// şemasıyla (Result, PersonelName, BranchName, SessionId, NetmerExternalId, HashUserName, IsAdmin,
-    /// IsPerformanceAdmin, EmergencyToken) birebir aynı alan adlarını döner.
-    /// </summary>
-    public MockResult HandleGetAuth(JsonElement? body)
-    {
-        if (body is null || body.Value.ValueKind != JsonValueKind.Object)
-            return MockResult.Ok(new { IsError = 1, Error = "Uygulama için yetkiniz yoktur." });
-
-        var root = body.Value;
-        var hashCustomerNumber = TryGetString(root, "hashCustomerNumber") ?? TryGetString(root, "HashCustomerNumber");
-        var userName = TryGetString(root, "userName") ?? TryGetString(root, "UserName");
-
-        // Kutup davranışı: HashCustomerNumber boşsa 200 OK + IsError=1 döner (400 değil).
-        if (string.IsNullOrEmpty(hashCustomerNumber))
-            return MockResult.Ok(new { IsError = 1, Error = "Uygulama için yetkiniz yoktur." });
-
-        return MockResult.Ok(new
-        {
-            Result = "1",
-            PersonelName = userName ?? "Mock Personel",
-            BranchName = "Mock Sube",
-            SessionId = MockChannelSessionId,
-            NetmerExternalId = MockCustomerIdentity,
-            HashUserName = userName is null ? null : Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(userName)),
-            IsAdmin = 0,
-            IsPerformanceAdmin = 0,
-            EmergencyToken = IssueJwt(new[]
-            {
-                new Claim("CustomerNo", MockCustomerNo),
-                new Claim("SessionId", MockChannelSessionId),
-                new Claim("NetmerExternalId", MockCustomerIdentity)
-            })
-        });
-    }
-
-    /// <summary>
     /// /Public/GetCurrentUser mock cevabı. AuthMock:Enabled=true iken controller DB'ye hiç gitmez;
     /// bu UsersDto'yu ApiResponse zarfına sarıp döner. Değerler Web/MobileAuthController.BuildMockUser
     /// ile aynı — mobil ve web mock akışları aynı kimliği görür.
