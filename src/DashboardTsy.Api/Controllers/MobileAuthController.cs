@@ -6,7 +6,7 @@ namespace DashboardTsy.Api.Controllers;
 
 /// <summary>
 /// Mobil (iOS) client için login akışı. İki modda çalışır:
-///   1) AuthMock:Enabled=false (default) → KutupYıldızı /api/Token, /api/Login2, /api/SendSmsCode
+///   1) AuthMock:Enabled=false (default) → KutupYıldızı /api/Token, /api/Login2, /api/SendSmsCode, /api/GetAuth
 ///      endpoint'lerine PASS-THROUGH proxy. Body/authorization byte-identical forward edilir; Kutup'ta
 ///      hiçbir değişiklik yapılmadan iOS'a Kutup'un mevcut login akışı servis edilir.
 ///   2) AuthMock:Enabled=true → MockMobileAuthScenario devreye girer, Kutup'a hiç gidilmez.
@@ -14,6 +14,12 @@ namespace DashboardTsy.Api.Controllers;
 ///
 /// Akış (her iki modda):
 ///   iOS → /mobile/api/Login2  → MobileEnvelopeMiddleware (/mobile prefix'i kaldırır) → /api/Login2 (bu controller)
+///
+/// GetAuth farkı: Kutup'ta [Authorize(Roles = "User", AuthenticationSchemes = "ApplicationSchema")] ile korunur —
+/// yani SendSmsCode'dan alınan access token ile (Authorization header) çağrılması zorunludur. Bu yüzden
+/// MobileEnvelopeMiddleware.AnonymousPaths listesine EKLENMEMİŞTİR: /mobile/api/GetAuth çağrısı önce
+/// DashboardTsy'nin kendi JWT kontrolünden geçer, sonra ForwardToKutupAsync ile Authorization header'ı
+/// Kutup'a da forward edilir (Kutup kendi JWT'sini ayrıca doğrular).
 /// </summary>
 [ApiController]
 [Route("api")]
@@ -55,6 +61,10 @@ public sealed class MobileAuthController : ControllerBase
     [HttpPost("SendSmsCode")]
     public Task<IActionResult> SendSmsCode(CancellationToken cancellationToken)
         => HandleAsync("/api/SendSmsCode", body => _mockScenario.HandleSendSmsCode(body), cancellationToken);
+
+    [HttpPost("GetAuth")]
+    public Task<IActionResult> GetAuth(CancellationToken cancellationToken)
+        => HandleAsync("/api/GetAuth", body => _mockScenario.HandleGetAuth(body), cancellationToken);
 
     /// <summary>
     /// Ortak handler — mock enabled ise mock'a, değilse Kutup'a yönlendirir. Body iki modda da
