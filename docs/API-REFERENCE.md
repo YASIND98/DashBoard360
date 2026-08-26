@@ -641,6 +641,13 @@ Mobil için. `Authorization: Bearer <kutup-jwt>` header'ı zorunludur. Sunucu JW
 göndermez, sessionId spoof edilemez. Token yoksa/geçersizse `401`; claim yoksa `ApiResponse<UsersDto>`
 zarfında "Geçersiz session bilgisi" mesajı döner.
 
+**Mock modu.** `AuthMock:Enabled=true` iken bu endpoint DB'ye hiç gitmez;
+`MockMobileAuthScenario.BuildCurrentUserResponse` üzerinden sabit bir kullanıcı döner
+(`UserId=999`, `NameSurname="Mock Kullanici"`, `Authority="Admin"`, …). Değerler
+Web tarafındaki `BuildMockUser` ile birebir aynıdır — mobil ve web mock akışları aynı kimliği
+görür. Kutup JWT'si hâlâ geçerli olmalıdır (`[Authorize]` middleware'i mock modunda da devrede);
+iOS ekibi mock akışını uçtan uca kurup token'ı `/api/SendSmsCode` mock'undan alır.
+
 ---
 
 ## 7. SalaryCustomerReport
