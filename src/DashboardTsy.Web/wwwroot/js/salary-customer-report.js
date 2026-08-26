@@ -474,6 +474,32 @@ $(document).ready(function () {
   });
   $('#crossSellDiffToggle').attr('data-active', 'false');
 
+  // Tablet/mobilde legend gizli; fark toggle'ı 3-nokta menüsünden yönetilir (aktif tabloya göre).
+  function activeDiffToggle() {
+      var kind = getActiveMainTabKind();
+      if (kind === 'volume') return '#volumeDiffToggle';
+      if (kind === 'crosssell') return '#crossSellDiffToggle';
+      return null;   // Banka Payı'nda fark toggle'ı yok
+  }
+
+  function syncMobileDiffBtn() {
+      var toggle = activeDiffToggle();
+      $('#mobileDiffBtn').toggle(!!toggle);
+      if (!toggle) return;
+      var active = $(toggle).attr('data-active') === 'true';
+      $('#mobileDiffBtnText').text(active ? 'Farkları Gizle' : 'Farkları Göster');
+  }
+
+  $(document).on('click', '#mobileDiffBtn', function () {
+      var toggle = activeDiffToggle();
+      if (toggle) $(toggle).trigger('click');
+      syncMobileDiffBtn();
+      $(this).closest('details').removeAttr('open');
+  });
+
+  $(document).on('click', '.salary-main-tabs .segment', function () { setTimeout(syncMobileDiffBtn, 0); });
+  syncMobileDiffBtn();
+
   // ===== Banka Payı - Maaş / Emekli Müşteri Toggle =====
   $(document).on('click', '#bankShareCustomerToggle', function () {
       var showRetired = $(this).attr('data-active') !== 'true';
