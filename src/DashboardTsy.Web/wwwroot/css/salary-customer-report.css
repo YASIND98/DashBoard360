@@ -67,7 +67,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 140px;
+  gap: 24px;
   font-size: 12px;
   font-weight: 400;
   color: var(--text-muted);
@@ -76,8 +76,9 @@
 }
 
 .sc-sub-group {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 8px;
   margin-top: 8px;
 }
@@ -116,8 +117,8 @@
   margin-top: 0;
 }
 
-.sc-metric-diff.diff-details .sc-sub{
-  justify-content: center;
+.sc-metric-diff.diff-details .sc-sub {
+  justify-content: flex-start;
 }
 
 .sc-tag {
@@ -126,18 +127,15 @@
 }
 
 .sc-sub-amount {
+  flex: 1;
   color: var(--text-light);
   font-weight: 500;
-  min-width: 110px;
   text-align: left;
-  margin-left: 0px;
-}
-
-#crossSellTableBody .sc-sub {
-  gap: 225px;
 }
 
 .sc-sub-rate {
+  min-width: 40px;
+  text-align: left;
   color: var(--bg-subtab);
 }
 
