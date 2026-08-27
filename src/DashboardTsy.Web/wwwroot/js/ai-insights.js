@@ -11,11 +11,9 @@ $(document).ready(function () {
     var aiResultKey = null;
     var aiRequestPending = false;
 
-    var aiPageKey = null;
-
     function aiSelectionKey() {
-        if (!(aiSelectedRegion && aiSelectedBranch)) return null;
-        return aiSelectedRegion.code + '|' + aiSelectedBranch.code;
+        if (!aiSelectedRegion && !aiSelectedBranch) return null;
+        return (aiSelectedRegion ? aiSelectedRegion.code : '') + '|' + (aiSelectedBranch ? aiSelectedBranch.code : '');
     }
 
     function aiClearResult() {
@@ -35,8 +33,7 @@ $(document).ready(function () {
     }
 
     function aiUpdateSubmitState() {
-        // Hem bölge hem şube seçilmeden içgörü oluşturulamaz
-        $('#aiDrawerSubmit').prop('disabled', !(aiSelectedRegion && aiSelectedBranch));
+        $('#aiDrawerSubmit').prop('disabled', !(aiSelectedRegion || aiSelectedBranch));
     }
 
     // Sayfadaki (Verim Raporları) filtrelerde seçili bölge/şubeyi oku
@@ -51,40 +48,40 @@ $(document).ready(function () {
         };
     }
 
+    function aiSyncRegionLabel() {
+        $('#aiBolgeLabel').text(aiSelectedRegion ? aiSelectedRegion.name : 'Bölge Seçiniz');
+        $('#aiBolgeSelect').toggleClass('ai-has-value', !!aiSelectedRegion);
+    }
+
+    function aiSyncBranchLabel() {
+        $('#aiSubeLabel').text(aiSelectedBranch ? aiSelectedBranch.name : 'Şube Seçiniz');
+        $('#aiSubeSelect').toggleClass('ai-has-value', !!aiSelectedBranch);
+    }
+
     // ===== Open / Close =====
     function openAiDrawer() {
         var pre = getPageSelection();
-        var pageKey = (pre.region ? pre.region.code : '') + '|' + (pre.branch ? pre.branch.code : '');
-        var followPage = pageKey !== aiPageKey;
-        aiPageKey = pageKey;
+        // İçgörü üretilmiş (ya da üretiliyor) bir seçim korunur; yoksa sayfa filtresi izlenir
+        var keepSelection = !!aiResultKey || aiRequestPending;
 
         loadRegionFilters(function () {
             var single = aiRenderRegionDropdown();
-            // Öncelik: sayfada seçili bölge; yoksa tek seçenek varsa o
-            if (pre.region && (followPage || !aiSelectedRegion)) {
-                aiSelectedRegion = pre.region;
-            } else if (!aiSelectedRegion && single) {
+            if (!keepSelection) aiSelectedRegion = pre.region;
+            if (!aiSelectedRegion && single) {
                 aiSelectedRegion = { code: single.Code, name: single.Name };
             }
-            if (aiSelectedRegion) {
-                $('#aiBolgeLabel').text(aiSelectedRegion.name);
-                $('#aiBolgeSelect').addClass('ai-has-value');
-                aiRenderRegionDropdown();
-            }
+            aiSyncRegionLabel();
+            aiRenderRegionDropdown();
 
             loadBranchFilters(function () {
-                if (pre.branch && (followPage || !aiSelectedBranch)) {
-                    aiSelectedBranch = pre.branch;
-                } else if (!aiSelectedBranch) {
+                if (!keepSelection) aiSelectedBranch = pre.branch;
+                if (!aiSelectedBranch) {
                     var singleBranch = aiRenderBranchDropdown();
                     if (singleBranch) {
                         aiSelectedBranch = { code: singleBranch.Code, name: singleBranch.Name };
                     }
                 }
-                if (aiSelectedBranch) {
-                    $('#aiSubeLabel').text(aiSelectedBranch.name);
-                    $('#aiSubeSelect').addClass('ai-has-value');
-                }
+                aiSyncBranchLabel();
                 aiRenderBranchDropdown();
                 aiUpdateSubmitState();
 
@@ -172,8 +169,8 @@ $(document).ready(function () {
         var $result = $('#aiResult');
 
         var payload = {
-            regionCode: aiSelectedRegion ? aiSelectedRegion.code : null,
-            branchCode: aiSelectedBranch ? aiSelectedBranch.code : null
+            regionCode: aiSelectedRegion ? aiSelectedRegion.code : '',
+            branchCode: aiSelectedBranch ? aiSelectedBranch.code : ''
         };
 
         $btn.prop('disabled', true);
@@ -200,7 +197,7 @@ $(document).ready(function () {
             }
             if (!captured.summary) {
                 $('#aiDrawer').removeClass('has-result');
-                aiShowNotice('Bu bölge ve şubeye ait AI içgörüsü bulunmamaktadır.');
+                aiShowNotice(aiEmptyResultMessage());
                 return;
             }
             $('#aiNotice').empty();
@@ -228,6 +225,12 @@ $(document).ready(function () {
             }
         });
     });
+
+    function aiEmptyResultMessage() {
+        if (aiSelectedRegion && aiSelectedBranch) return 'Bu bölge ve şubeye ait AI içgörüsü bulunmamaktadır.';
+        if (aiSelectedBranch) return 'Bu şubeye ait AI içgörüsü bulunmamaktadır.';
+        return 'Bu bölgeye ait AI içgörüsü bulunmamaktadır.';
+    }
 
     // "Düşünüyor" orb'u en az bu kadar görünür (hızlı cevap gelse bile efekt fark edilir)
     function aiAfterThinking(startedAt, cb) {

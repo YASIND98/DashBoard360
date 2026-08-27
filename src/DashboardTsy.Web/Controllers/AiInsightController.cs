@@ -25,8 +25,8 @@ public class AiInsightController : ControllerBase
     {
         if (request == null) return BadRequest();
         if (!HasSession()) return Unauthorized();
-        if (string.IsNullOrWhiteSpace(request.RegionCode) || string.IsNullOrWhiteSpace(request.BranchCode))
-            return BadRequest("RegionCode and BranchCode are required.");
+        if (string.IsNullOrWhiteSpace(request.RegionCode) && string.IsNullOrWhiteSpace(request.BranchCode))
+            return BadRequest("RegionCode or BranchCode is required.");
 
         var result = await _apiClient.GetBranchAiInsightsAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
