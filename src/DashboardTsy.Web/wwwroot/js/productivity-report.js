@@ -7,6 +7,7 @@ var _yieldHasSecondTable = false;
 function showYieldTableLoading() {
     _yieldLoadingActive = true;
     _yieldHasSecondTable = false;
+    window.scrollTo(0, 0);
     // Tablo container'ları gizle, skeleton göster
     $('#dynamicTableContainer').hide();
     $('#dynamicTableContainer2').hide();
@@ -31,6 +32,8 @@ function hideYieldTableLoading() {
     $('#pageSkeleton').hide();
     $('#dynamicTableContainer').show();
     $('#dynamicTableContainer2').toggle(_yieldHasSecondTable);
+    // Tablo kendi kabında kayar; container gizlenip gösterilince tarayıcı eski konumu koruyor
+    $('#dynamicTableContainer .table-wrapper').scrollTop(0);
     $('body').loading('stop');
 }
 
