@@ -449,6 +449,7 @@ window.MOCK.scoreCards = {
   ]
 }
 
+
 window.getScoreCardsMock = function () {
     return window.MOCK.scoreCards;
 };
@@ -693,3 +694,95 @@ window.getScoreCardMainViewBranchesMock = function () {
     return window.MOCK.scoreCardMainViewBranches;
 };
 
+// ============================================================================
+// Skor Kart - Mock API yönlendiricisi
+// Skor kart ekranı gerçek servisleri ("/scorecard/...") $.ajax ile çağırır.
+// Bu router $.ajax'ı sarmalar; bu isteklere yukarıdaki mock cevaplarını döndürür,
+// böylece backend olmadan ekranda mock veriler görünür. Scorecard dışı istekler
+// değiştirilmeden gerçek $.ajax'a iletilir.
+// Kapatmak için mock.js'ten ÖNCE: window.MOCK = { useMockApi: false };
+// ============================================================================
+(function () {
+    if (!window.jQuery) return;                       // jQuery yoksa sarmalama yapma
+    if (window.MOCK.useMockApi === false) return;     // açıkça kapatıldıysa dokunma
+
+    var $ = window.jQuery;
+
+    // Endpoint (yol sonu) -> mock cevabı üreten fonksiyon. o: $.ajax ayarları.
+    var ROUTES = {
+        '/scorecard/authorities':                  function () { return getUserAuthoritiesMock(); },
+        '/scorecard/periods':                      function (o) { return getPrimMonitoringPeriodsMock(readData(o).periodTypes); },
+        '/scorecard/pupa-types':                   function () { return getPupaTypesMock(); },
+        '/scorecard/score-cards':                  function () { return getScoreCardsMock(); },
+        '/scorecard/types':                        function () { return getScoreCardTypesMock(); },
+        '/scorecard/regions':                      function () { return getRegionsMock(); },
+        '/scorecard/branches':                     function () { return getBranchesMock(); },
+        '/scorecard/registers':                    function () { return getRegistersMock(); },
+        '/scorecard/cumulatives':                  function () { return getScoreCardReportMock(); },
+        '/scorecard/main-view-regions':            function () { return getScoreCardMainViewRegionsMock(); },
+        '/scorecard/main-view-branches':           function () { return getScoreCardMainViewBranchesMock(); },
+        '/scorecard/employee-order-summaries':     function () { return getEmployeeOrderSummariesMock(); },
+        '/scorecard/details':                      function (o) { return getScoreCardDetailMock(detailStatusKey(o)); },
+        '/scorecard/trends/product-sale-realized': function () { return getScoreCardTrendMock(); }
+    };
+
+    // İstek verisini nesneye çevir: POST -> JSON string, GET -> nesne ya da query string.
+    function readData(options) {
+        var d = options && options.data;
+        if (d == null) return {};
+        if (typeof d !== 'string') return d;
+        try { return JSON.parse(d); } catch (e) { /* JSON değil -> query string dene */ }
+        var out = {};
+        d.split('&').forEach(function (kv) {
+            var p = kv.split('=');
+            out[decodeURIComponent(p[0])] = decodeURIComponent(p[1] || '');
+        });
+        return out;
+    }
+
+    // details isteğindeki sayısal status kodunu (1/0/-1) mock anahtarına çevir.
+    function detailStatusKey(options) {
+        var code = readData(options).status;
+        var map = (typeof SCORE_CARD_DETAIL_STATUS !== 'undefined')
+            ? SCORE_CARD_DETAIL_STATUS : { realized: 1, pending: 0, unrealized: -1 };
+        for (var key in map) { if (String(map[key]) === String(code)) return key; }
+        return 'realized';
+    }
+
+    // İstek yolunu (query'siz) route tablosuyla eşleştir (yol sonuna göre).
+    function matchRoute(url) {
+        var path = String(url || '').split('?')[0];
+        var keys = Object.keys(ROUTES);
+        for (var i = 0; i < keys.length; i++) {
+            if (path.slice(-keys[i].length) === keys[i]) return ROUTES[keys[i]];
+        }
+        return null;
+    }
+
+    var _origAjax = $.ajax;
+    $.ajax = function (url, options) {
+        // $.ajax(url, options) ve $.ajax(options) imzalarının ikisini de destekle
+        var settings = (typeof url === 'string') ? $.extend({}, options, { url: url }) : (url || {});
+
+        var handler = matchRoute(settings.url);
+        if (!handler) return _origAjax.apply($, arguments);   // scorecard dışı -> gerçek istek
+
+        // Önce GERÇEK isteği at (Network sekmesinde görünür). Servis cevap verirse onu kullan;
+        // istek başarısız olursa (cevap gelmezse) mock'a düş. Böylece requestler izlenebilir,
+        // backend yokken de ekran boş kalmaz.
+        var dfd = $.Deferred();
+        _origAjax.apply($, arguments)
+            .done(function (res, textStatus, jqXHR) {
+                dfd.resolve(res, textStatus, jqXHR);
+            })
+            .fail(function () {
+                var data;
+                try { data = handler(settings); } catch (e) { data = null; }
+                if (window.console && console.warn) {
+                    console.warn('[Skor Kart MOCK] ' + settings.url + ' cevap vermedi → mock kullanıldı');
+                }
+                dfd.resolve(data, 'success', null);
+            });
+        return dfd.promise();
+    };
+})();

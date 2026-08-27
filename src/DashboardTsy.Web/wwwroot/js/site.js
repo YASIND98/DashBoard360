@@ -435,6 +435,10 @@ function normalizeTurkish(str) {
         .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u');
 }
 
+function resetTableScroll(bodySelector) {
+    $(bodySelector).closest('.table-wrapper').scrollTop(0);
+}
+
 function reStripeTable($tbody) {
     var stripeIndex = 0;
     var $lastVisible = null;

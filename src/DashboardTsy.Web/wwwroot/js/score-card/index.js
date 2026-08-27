@@ -583,6 +583,7 @@ $(function () {
                 fetchScoreCardMainViewRegions(buildMainViewRequest(4), function (res) {
                     _overview = buildRegionOverviewModel(res);
                     renderReportBody();
+                    resetTableScroll('#scReportBody');
                 });
                 return;
             }
@@ -592,6 +593,7 @@ $(function () {
                 fetchScoreCardMainViewBranches(buildMainViewRequest(3), function (branchRes) {
                     _overview = buildBranchOverviewModel(branchRes);
                     renderReportBody();
+                    resetTableScroll('#scReportBody');
                 });
                 return;
             }
@@ -603,6 +605,7 @@ $(function () {
             ROWS = (res && res.mainTableData) ? res.mainTableData : [];
             renderTotalScore();                         // Toplam Skor = weightedPercentage toplamı
             renderReportBody();
+            resetTableScroll('#scReportBody');
         });
     }
 
