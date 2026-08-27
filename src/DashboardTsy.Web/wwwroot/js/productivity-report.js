@@ -680,11 +680,11 @@ function renderVolumeBranchTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionAverageValue) + formatDiff(item.NetGrowthRegionAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageValueDiff, true) + '</td>';
-        html += '<td>' + formatRateValue(item.YtdBranchValue) + '</td>';
-        html += '<td class="has-diff">' + formatRateValue(item.YtdRegionValue) + formatDiff(item.YtdRegionValueDiff) + '</td>';
+        html += '<td class="' + compareColor(item.YtdBranchValue, item.YtdRegionValue) + '">' + formatRateValue(item.YtdBranchValue) + '</td>';
+        html += '<td class="has-diff ' + compareColor(item.YtdRegionValue, item.YtdBankValue) + '">' + formatRateValue(item.YtdRegionValue) + formatDiff(item.YtdRegionValueDiff) + '</td>';
         html += '<td class="has-diff">' + formatRateValue(item.YtdBankValue) + formatDiff(item.YtdBankValueDiff) + '</td>';
-        html += '<td>' + formatRateValue(item.QtdBranchValue) + '</td>';
-        html += '<td class="has-diff">' + formatRateValue(item.QtdRegionValue) + formatDiff(item.QtdRegionValueDiff) + '</td>';
+        html += '<td class="' + compareColor(item.QtdBranchValue, item.QtdRegionValue) + '">' + formatRateValue(item.QtdBranchValue) + '</td>';
+        html += '<td class="has-diff ' + compareColor(item.QtdRegionValue, item.QtdBankValue) + '">' + formatRateValue(item.QtdRegionValue) + formatDiff(item.QtdRegionValueDiff) + '</td>';
         html += '<td class="has-diff">' + formatRateValue(item.QtdBankValue) + formatDiff(item.QtdBankValueDiff) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
@@ -1743,6 +1743,13 @@ function reapplySortVisual($table) {
     if (_yieldSortBy !== null) {
         $table.find('.sort-icon[data-sort-id="' + _yieldSortBy + '"]').addClass(_yieldSortAsc ? 'asc' : 'desc');
     }
+}
+
+// YTD/QTD kolonları: şube bölgeye, bölge bankaya göre kıyaslanır.
+// Değerlerden biri yoksa (formatRateValue "-" basıyor) renk verilmez.
+function compareColor(value, benchmark) {
+    if (value == null || value === '' || benchmark == null || benchmark === '') return '';
+    return Number(value) >= Number(benchmark) ? 'positive' : 'negative';
 }
 
 function formatRateValue(val) {
