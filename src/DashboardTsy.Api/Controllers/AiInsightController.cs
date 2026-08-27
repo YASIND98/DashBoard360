@@ -19,8 +19,8 @@ public class AiInsightController : ControllerBase
     [HttpPost("GetBranchAiInsights")]
     public ActionResult<GetBranchAiInsightResponse> GetBranchAiInsights([FromBody] GetBranchAiInsightRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.RegionCode) || string.IsNullOrWhiteSpace(request.BranchCode))
-            return BadRequest("RegionCode and BranchCode are required.");
+        if (string.IsNullOrWhiteSpace(request.RegionCode) && string.IsNullOrWhiteSpace(request.BranchCode))
+            return BadRequest("RegionCode or BranchCode is required.");
 
         var result = _reportDataProvider.GetBranchAiInsights(request);
         return Ok(result);
