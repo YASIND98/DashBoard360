@@ -366,7 +366,7 @@ function renderBranchList(listSelector, selectedCode, regionCode) {
   }
   filtered.forEach(function (b) {
       var cls = (isSingle || (selectedCode && selectedCode === b.Code)) ? ' selected' : '';
-      $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.Code + '" data-region="' + b.RegionCode + '">' + b.Name + '</div>');
+      $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.Code + '" data-region="' + b.RegionCode + '">' + b.Code + ' - ' + b.Name + '</div>');
   });
   return isSingle ? filtered[0] : null;
 }
