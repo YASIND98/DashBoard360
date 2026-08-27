@@ -1301,8 +1301,8 @@ function renderProfitTotalRegionTable(items) {
         html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.BankBudgetValue) + '</td>';
-        html += '<td class="has-diff">' + item.HgRegionValue + formatDiff(item.HgRegionValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
+        html += '<td class="has-diff ' + percentColor(item.HgRegionValue) + '">' + item.HgRegionValue + formatDiff(item.HgRegionValueDiff) + '</td>';
+        html += '<td class="has-diff ' + percentColor(item.HgBankAverageValue) + '">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
         html += '<td>' + formatNumber(item.RetailValue) + '</td>';
         html += '<td>' + formatNumber(item.KobiValue) + '</td>';
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
@@ -1526,8 +1526,8 @@ function renderProfitTotalBranchTable(items) {
         html += '<td>' + formatNumber(item.RegionBudgetValue) + '</td>';
         html += '<td>' + formatNumber(item.BankBudgetValue) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBranchValue) + '">' + formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
+        html += '<td class="has-diff ' + percentColor(item.HgRegionAverageValue) + '">' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
+        html += '<td class="has-diff ' + percentColor(item.HgBankAverageValue) + '">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
         html += '<td>' + formatNumber(item.RetailValue) + '</td>';
         html += '<td>' + formatNumber(item.KobiValue) + '</td>';
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
