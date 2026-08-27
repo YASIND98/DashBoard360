@@ -449,6 +449,7 @@ window.MOCK.scoreCards = {
   ]
 }
 
+
 window.getScoreCardsMock = function () {
     return window.MOCK.scoreCards;
 };
@@ -692,4 +693,3 @@ window.MOCK.scoreCardMainViewBranches = {
 window.getScoreCardMainViewBranchesMock = function () {
     return window.MOCK.scoreCardMainViewBranches;
 };
-

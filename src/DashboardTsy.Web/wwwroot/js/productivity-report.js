@@ -31,6 +31,8 @@ function hideYieldTableLoading() {
     $('#pageSkeleton').hide();
     $('#dynamicTableContainer').show();
     $('#dynamicTableContainer2').toggle(_yieldHasSecondTable);
+    // Tablo kendi kabında kayar; container gizlenip gösterilince tarayıcı eski konumu koruyor
+    resetTableScroll('#dynamicTableBody');
     $('body').loading('stop');
 }
 

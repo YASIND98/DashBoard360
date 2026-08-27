@@ -415,6 +415,7 @@ $(document).ready(function () {
           data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#dailyTableBody').html(buildDailyRows(data.Products, 0, false));
+              resetTableScroll('#dailyTableBody');
               setHomePdfReport('daily', data.Products);
 
               $('#dailyTableBody [data-daily-header]').each(function () {
@@ -450,6 +451,7 @@ $(document).ready(function () {
           data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#monthlyTableBody').html(buildMonthlyRows(data.Products, 0, false));
+              resetTableScroll('#monthlyTableBody');
               setHomePdfReport('monthly', data.Products);
               if (monthlyFirstLoad) {
                   monthlyFirstLoad = false;
@@ -489,6 +491,7 @@ $(document).ready(function () {
           data: JSON.stringify(buildRequest()),
           success: function (data) {
               $('#quantityTableBody').html(buildQuantityRows(data.Products, 0, false));
+              resetTableScroll('#quantityTableBody');
               setHomePdfReport('quantity', data.Products);
 
               $('#quantityTableBody [data-quantity-header]').each(function () {

@@ -413,6 +413,7 @@ $(function () {
     function applyData() {
         _chartData = buildChartData(_rawData);
         applyView();
+        resetTableScroll('#nplTableBody');
     }
 
     // Filtre/sekme değişince servisi çağır -> çiz

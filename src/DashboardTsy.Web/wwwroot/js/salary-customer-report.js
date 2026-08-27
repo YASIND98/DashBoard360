@@ -600,6 +600,7 @@ $(document).ready(function () {
   }
 
   function hideLoadingOverlay() {
+      resetTableScroll('#bankShareTableBody, #crossSellTableBody, #volumeTableBody');
       $('body').loading('stop');
   }
 
