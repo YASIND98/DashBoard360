@@ -12,12 +12,16 @@ $(function () {
     // Raporlarla ortak bölge/şube seçimi; sayfa yenilendiyse kayıt burada silinir.
     initFilterSelection();
 
+    function branchLabel(b) {
+        return b.branchCode + ' - ' + b.branchName;
+    }
+
     function persistSelection() {
         var region = _scRegions.filter(function (r) { return r.regionCode === R().regionCode; })[0];
         var branch = _scBranches.filter(function (b) { return b.branchCode === R().branchCode; })[0];
         saveFilterSelection(
             region ? { code: region.regionCode, name: region.regionName } : null,
-            branch ? { code: branch.branchCode, name: branch.branchName } : null
+            branch ? { code: branch.branchCode, name: branchLabel(branch) } : null
         );
     }
 
@@ -38,7 +42,7 @@ $(function () {
         var branch = _scBranches.filter(function (b) { return String(b.branchCode) === String(saved.code); })[0];
         if (!branch) return;
         R().branchCode = branch.branchCode;
-        $('#scBranchLabel').text(branch.branchName);
+        $('#scBranchLabel').text(branchLabel(branch));
     }
 
     // scorecard/regions: kullanıcının görebildiği bölgelerin listesi.
@@ -108,7 +112,7 @@ $(function () {
         }
         _scBranches.forEach(function (b) {
             var cls = (single || b.branchCode === R().branchCode) ? ' selected' : '';
-            $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.branchCode + '" data-region="' + b.regionCode + '">' + b.branchName + '</div>');
+            $list.append('<div class="dropdown-item' + cls + '" data-code="' + b.branchCode + '" data-region="' + b.regionCode + '">' + branchLabel(b) + '</div>');
         });
     }
 
@@ -136,7 +140,7 @@ $(function () {
             var single = _scBranches.length === 1;
             if (single) {
                 R().branchCode = _scBranches[0].branchCode;
-                $('#scBranchLabel').text(_scBranches[0].branchName);
+                $('#scBranchLabel').text(branchLabel(_scBranches[0]));
             } else {
                 var stillExists = _scBranches.some(function (b) { return b.branchCode === R().branchCode; });
                 if (!stillExists) {
@@ -272,7 +276,7 @@ $(function () {
             var branch = _scBranches.filter(function (b) { return b.branchCode == branchCode; })[0];
             if (branch) {
                 R().branchCode = branch.branchCode;
-                $('#scBranchLabel').text(branch.branchName);
+                $('#scBranchLabel').text(branchLabel(branch));
                 renderScBranchList();
                 R().regionCode = branch.regionCode;
                 var region = _scRegions.filter(function (r) { return r.regionCode === branch.regionCode; })[0];
