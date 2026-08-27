@@ -1279,8 +1279,9 @@ function renderProfitTotalRegionTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
+        var summaryClass = (!lastRowClass && item.Description === 'Net İşletme Geliri') ? ' row-summary' : '';
 
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + summaryClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
@@ -1499,8 +1500,9 @@ function renderProfitTotalBranchTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
+        var summaryClass = (!lastRowClass && item.Description === 'Net İşletme Geliri') ? ' row-summary' : '';
 
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + summaryClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
