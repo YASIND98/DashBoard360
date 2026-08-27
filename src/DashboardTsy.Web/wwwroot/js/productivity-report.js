@@ -1279,8 +1279,9 @@ function renderProfitTotalRegionTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
+        var summaryClass = (!lastRowClass && item.Description === 'Net İşletme Geliri') ? ' row-summary' : '';
 
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + summaryClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
@@ -1299,7 +1300,7 @@ function renderProfitTotalRegionTable(items) {
         html += '<td>' + formatNumber(item.RegionAverageValue) + '</td>';
         html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
-        html += '<td>' + formatPercent(item.BankBudgetValue) + '</td>';
+        html += '<td>' + formatNumber(item.BankBudgetValue) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgRegionValue) + '">' + item.HgRegionValue + formatDiff(item.HgRegionValueDiff) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBankAverageValue) + '">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
         html += '<td>' + formatNumber(item.RetailValue) + '</td>';
@@ -1499,8 +1500,9 @@ function renderProfitTotalBranchTable(items) {
         var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
         var expandClass = item._hasChildren ? ' expandable' : '';
         var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
+        var summaryClass = (!lastRowClass && item.Description === 'Net İşletme Geliri') ? ' row-summary' : '';
 
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + '">';
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + summaryClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
 
         if (hasExpandable) {
@@ -1521,8 +1523,8 @@ function renderProfitTotalBranchTable(items) {
         html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
         html += '<td class="' + percentColor(item.BranchBudgetValue) + '">' + formatPercent(item.BranchBudgetValue) + '</td>';
-        html += '<td>' + formatPercent(item.RegionBudgetValue) + '</td>';
-        html += '<td>' + formatPercent(item.BankBudgetValue) + '</td>';
+        html += '<td>' + formatNumber(item.RegionBudgetValue) + '</td>';
+        html += '<td>' + formatNumber(item.BankBudgetValue) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBranchValue) + '">' + formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgRegionAverageValue) + '">' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBankAverageValue) + '">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';

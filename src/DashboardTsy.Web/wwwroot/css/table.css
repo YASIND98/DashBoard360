@@ -481,6 +481,11 @@
   font-size: 20px !important;
 }
 
+.row-summary td {
+  font-weight: bold;
+  background: linear-gradient(180deg, #0070CB 30%, #0062B2 60%, #00467F 100%) !important;
+}
+
 .expandable {
   cursor: pointer;
 }
@@ -702,7 +707,8 @@
     background: #F0F6FE;
   }
 
-  [data-theme="light"] .custom-last-row td {
+  [data-theme="light"] .custom-last-row td,
+  [data-theme="light"] .row-summary td {
     background: #F0F6FE !important;
   }
 
