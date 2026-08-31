@@ -1297,11 +1297,11 @@ function renderProfitTotalRegionTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-left">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionValue) + formatDiff(item.RealizationRegionValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.RegionAverageValue) + '</td>';
         html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
+        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td>' + formatNumber(item.BankBudgetValue) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgRegionValue) + '">' + item.HgRegionValue + formatDiff(item.HgRegionValueDiff) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBankAverageValue) + '">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
@@ -1518,13 +1518,12 @@ function renderProfitTotalBranchTable(items) {
         var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + item.Description + '</span>' : item.Description;
         html += '<td class="col-left">' + indent + '</td>';
 
-        html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBranchValue) + formatDiff(item.RealizationBranchValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.RegionAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
-        html += '<td class="' + percentColor(item.BranchBudgetValue) + '">' + formatPercent(item.BranchBudgetValue) + '</td>';
+        html += '<td>' + formatNumber(item.BranchBudgetValue) + '</td>';
         html += '<td>' + formatNumber(item.RegionBudgetValue) + '</td>';
         html += '<td>' + formatNumber(item.BankBudgetValue) + '</td>';
         html += '<td class="has-diff ' + percentColor(item.HgBranchValue) + '">' + formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff) + '</td>';
