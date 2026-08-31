@@ -1308,7 +1308,7 @@ function renderProfitTotalRegionTable(items) {
         html += '<td>' + formatNumber(item.RetailValue) + '</td>';
         html += '<td>' + formatNumber(item.KobiValue) + '</td>';
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
+        html += '<td class="has-diff">' + (item.CommercialValue == 0 ? '-' : formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true)) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -1395,7 +1395,7 @@ function renderProfitRatioRegionTable(items) {
         html += '<td>' + fmt(item.RetailValue) + '</td>';
         html += '<td>' + fmt(item.KobiValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent, true) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent, true) + '</td>';
+        html += '<td class="has-diff">' + (item.CommercialValue == 0 ? '-' : fmt(item.CommercialValue) + formatDiff(item.CommercialValueDiff, !isPercent, true)) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
