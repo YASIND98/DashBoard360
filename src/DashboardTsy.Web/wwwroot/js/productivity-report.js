@@ -1503,6 +1503,7 @@ function renderProfitTotalBranchTable(items) {
         var expandClass = item._hasChildren ? ' expandable' : '';
         var lastRowClass = (item.Id === lastTopLevelId) ? ' custom-last-row' : '';
         var summaryClass = (!lastRowClass && item.Description === 'Net İşletme Geliri') ? ' row-summary' : '';
+        var isProfitBeforeTaxes = (item.Description === 'VERGİ ÖNCESİ KAR') ? true : false;
 
         html += '<tr class="table-row ' + cls + depthClass + expandClass + lastRowClass + summaryClass + '">';
         html += '<td class="col-index">' + (i + 1) + '</td>';
@@ -1523,16 +1524,16 @@ function renderProfitTotalBranchTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.BankAverageValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.BranchBudgetValue) + '</td>';
-        html += '<td>' + formatNumber(item.RegionBudgetValue) + '</td>';
-        html += '<td>' + formatNumber(item.BankBudgetValue) + '</td>';
-        html += '<td class="has-diff ' + percentColor(item.HgBranchValue) + '">' + formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff) + '</td>';
-        html += '<td class="has-diff ' + percentColor(item.HgRegionAverageValue) + '">' + item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff ' + percentColor(item.HgBankAverageValue) + '">' + item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff) + '</td>';
-        html += '<td>' + formatNumber(item.RetailValue) + '</td>';
-        html += '<td>' + formatNumber(item.KobiValue) + '</td>';
-        html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true) + '</td>';
+        html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.BranchBudgetValue)) + '</td>';
+        html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.RegionBudgetValue)) + '</td>';
+        html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.BankBudgetValue)) + '</td>';
+        html += '<td class="' + (isProfitBeforeTaxes ? '' : 'has-diff ' + percentColor(item.HgBranchValue)) + '">' + (isProfitBeforeTaxes ? '-' : (formatPercent(item.HgBranchValue) + formatDiff(item.HgBranchValueDiff))) + '</td>';
+        html += '<td class="' + (isProfitBeforeTaxes ? '' : 'has-diff ' + percentColor(item.HgRegionAverageValue)) + '">' + (isProfitBeforeTaxes ? '-' : (item.HgRegionAverageValue + formatDiff(item.HgRegionAverageValueDiff))) + '</td>';
+        html += '<td class="' + (isProfitBeforeTaxes ? '' : 'has-diff ' + percentColor(item.HgBankAverageValue)) + '">' + (isProfitBeforeTaxes ? '-' : (item.HgBankAverageValue + formatDiff(item.HgBankAverageValueDiff))) + '</td>';
+        html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.RetailValue)) + '</td>';
+        html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.KobiValue)) + '</td>';
+        html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.AgricultureValue)) + '</td>';
+        html += '<td class="' + (isProfitBeforeTaxes ? '' : 'has-diff') + '">' + (isProfitBeforeTaxes ? '-' : (formatNumber(item.CommercialValue) + formatDiff(item.CommercialValueDiff, true))) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
