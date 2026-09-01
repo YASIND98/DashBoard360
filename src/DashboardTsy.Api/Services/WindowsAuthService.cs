@@ -105,7 +105,7 @@ public class WindowsAuthService : IWindowsAuthService
         return response;
     }
 
-    public async Task<ApiResponse<UsersDto>> SessionLoginAsync(string sessionId, CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<UsersDto>> GetUserBySessionAsync(string sessionId, CancellationToken cancellationToken = default)
     {
         var response = NewResponse();
 

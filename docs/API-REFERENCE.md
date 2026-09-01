@@ -1,65 +1,128 @@
 # DashboardTsy API — Endpoint Referans Dökümanı
 
-> Mobil ekip için hazırlanmıştır. Kaynak: `src/DashboardTsy.Api/Controllers/*` (2026-08-06 itibarıyla).
+> Mobil ekip için hazırlanmıştır. Kaynak: `src/DashboardTsy.Api/Controllers/*` (2026-08-12 itibarıyla).
 > Örnek request/response gövdeleri, DTO tanımlarından üretilen **şema-doğru statik örneklerdir** (gerçek prod verisi değildir).
+
+> **⚠️ 2026-08-12 güncellemesi — Mobile Auth eklendi:** iOS uygulaması için Kutup Yıldızı login akışına proxy'lenen yeni endpoint'ler ve JWT tabanlı erişim koruması geldi. Detay: [`0. Mobile Auth`](#0-mobile-auth-ios-login-akışı) ve güncellenmiş [Genel Bilgiler](#genel-bilgiler).
 
 ## İçindekiler
 
 1. [Genel Bilgiler](#genel-bilgiler)
-2. [AiInsight](#1-aiinsight)
-3. [AppSettings](#2-appsettings)
-4. [CacheAdmin](#3-cacheadmin)
-5. [ExchangeRate](#4-exchangerate)
-6. [NplReport](#5-nplreport)
-7. [Public (Auth/Login)](#6-public-authlogin)
-8. [SalaryCustomerReport](#7-salarycustomerreport)
-9. [ScoreCard](#8-scorecard)
-10. [TargetReport](#9-targetreport)
-11. [ProductivityReport](#10-productivityreport)
-12. [Bilinen Kısıtlar ve Uyarılar](#bilinen-kısıtlar-ve-uyarılar)
+2. [Mobile Auth (iOS Login Akışı)](#0-mobile-auth-ios-login-akışı)
+3. [AiInsight](#1-aiinsight)
+4. [AppSettings](#2-appsettings)
+5. [CacheAdmin](#3-cacheadmin)
+6. [ExchangeRate](#4-exchangerate)
+7. [NplReport](#5-nplreport)
+8. [Public (Auth/Login) — web-only, mobilde kullanılmaz](#6-public-authlogin)
+9. [SalaryCustomerReport](#7-salarycustomerreport)
+10. [ScoreCard](#8-scorecard)
+11. [TargetReport](#9-targetreport)
+12. [ProductivityReport](#10-productivityreport)
+13. [Bilinen Kısıtlar ve Uyarılar](#bilinen-kısıtlar-ve-uyarılar)
 
 ---
 
 ## Genel Bilgiler
 
-### Base URL
+### Base URL ve `/mobile` Prefix'i (mobil ekip için kritik)
 
-Route'larda **`/api` prefix'i yoktur.** Controller'lardaki bazı XML yorumlarda `/api/...` geçse de gerçek route budur:
+DashboardTsy API iki paralel erişim yolu sunar:
 
+| İstemci | Path şablonu | Envelope | Auth |
+|---|---|---|---|
+| **iOS uygulaması (mobil)** | `https://<host>/mobile/<Controller>/<Action>` | Var — [`MobileEnvelope<T>`](#mobileenveloped) sarmalayıcısı otomatik | JWT Bearer zorunlu (login endpoint'leri hariç) |
+| Web (tarayıcı) | `https://<host>/<Controller>/<Action>` | Yok — çıplak DTO/liste | Windows/Negotiate (ağ seviyesi) |
+
+**Aynı controller iki taraftan da erişilebilir** — arada bir middleware var (`MobileEnvelopeMiddleware`) ve şunu yapar:
+1. `/mobile` prefix'ini kaldırıp path'i controller route'una çevirir (`/mobile/TargetReport/... → /TargetReport/...`)
+2. Login endpoint'leri (`/mobile/api/Token`, `/mobile/api/Login2`, `/mobile/api/SendSmsCode`) hariç, **JWT Bearer token'ı zorunlu olarak doğrular** — yoksa `401 { status:false, message:"Yetkisiz", data:null }` döner.
+3. Controller'ın döndürdüğü JSON'u `MobileEnvelope<T>` içine sarar.
+
+Mobil ekip **her zaman `/mobile/*` prefix'ini kullanmalıdır.** Prefix'siz path'ler web akışıdır ve iOS'tan gelen istek Windows auth'a girip çalışmaz.
+
+Örnek:
 ```
-https://<host>/<Controller>/<Action>
+POST https://<host>/mobile/TargetReport/GetDailyTargetReport
+Authorization: Bearer eyJhbGciOi...   ← Login akışından alınan JWT
+Content-Type: application/json
 ```
 
-Örnek: `POST https://<host>/TargetReport/GetDailyTargetReport`
+> Not: Controller XML-doc yorumlarında bazen `/api/...` prefix'i geçer; **gerçek route bu değil.** Route attribute'una ve yukarıdaki tabloya güvenin.
 
 ### Kimlik Doğrulama (Auth)
 
-- **ASP.NET seviyesinde `[Authorize]` YOK.** Hiçbir controller/action'da auth attribute'u bulunmuyor — API katmanı kendi başına tüm endpoint'leri anonim kabul ediyor.
-- Oturum yönetimi uygulama (business) seviyesinde **`sessionId`** üzerinden yürüyor:
-  1. Mobil/istemci önce [`/Public`](#6-public-authlogin) altındaki login endpoint'lerinden birine istek atar (`WindowsLogin`, `DomainLogin`, `Login`, `SessionLogin`).
-  2. Dönen `UsersDto` içinden alınan oturum bilgisi, sonraki tüm rapor çağrılarının **request body'sindeki `SessionId` alanına** konur.
-  3. Sunucu tarafında bu `SessionId` her rapor endpoint'inde zorunlu bir parametre olarak geçiyor (SP çağrılarına parametre olarak veriliyor).
-- Gerçek erişim kontrolü (network/gateway seviyesi, Windows Auth vs.) API'nin dışında bir yerde yapılıyor olabilir — **bunu backend ekibiyle teyit edin.**
-- **Header bazlı auth yok** — `Authorization: Bearer ...` gibi bir header hiçbir endpoint'te (`ScoreCard` hariç, o da farklı bir amaçla) okunmuyor.
+**Mobil için iki katmanlı auth vardır:**
+
+**Katman 1 — JWT Bearer (transport-level, zorunlu).**
+- iOS ilk olarak [`0. Mobile Auth`](#0-mobile-auth-ios-login-akışı) altındaki üç endpoint'e sırasıyla istek atar:
+  1. `POST /mobile/api/Token` — ClientId/ClientSecret ile anonim JWT alır.
+  2. `POST /mobile/api/Login2` — anonim JWT ile kullanıcı adı/şifre + SMS OTP challenge alır.
+  3. `POST /mobile/api/SendSmsCode` — OTP kodu doğrulanır, **kullanıcıya özel JWT** döner.
+- Bu son JWT, `/mobile/*` altındaki **tüm** endpoint'lerde `Authorization: Bearer <token>` header'ıyla gönderilir. Yoksa 401.
+- Token süresi Kutup Yıldızı config'ine bağlıdır (prod'da 30 dk, dev'de 480 dk). Süresi dolduğunda tekrar login gerekir; şu an refresh token akışı yoktur.
+
+**Katman 2 — Business-level `SessionId` (rapor endpoint'leri).**
+- JWT geçerli olsa dahi, rapor endpoint'lerinin çoğu request body'sinde `sessionId` alanı bekler ve bu SP çağrılarına parametre olarak geçer.
+- `SessionId`'nin nasıl elde edildiği/hangi alandan türetildiği DTO'da açık değil — **backend ekibine sorun.** JWT içindeki `ChannelSessionId` claim'i olabilir, ya da ayrı bir endpoint'ten döner.
+
+**Web tarafı (referans, mobil için değil):** ASP.NET seviyesinde `[Authorize]` yok, erişim ağ/Windows Auth ile korunuyor. Web mobil değildir, mobil ekip bu bölümü göz ardı edebilir.
 
 ### Ortak Header'lar
 
 | Header | Zorunlu mu | Nerede | Açıklama |
 |---|---|---|---|
+| `Authorization: Bearer <jwt>` | **Evet**, login endpoint'leri hariç | `/mobile/*` altındaki tüm istekler | [`/mobile/api/SendSmsCode`](#post-mobileapisendsmscode) çağrısından dönen `accessToken` alanının değeri. Yoksa 401. |
 | `Content-Type: application/json` | POST body olan tüm endpoint'lerde evet | Tümü | Standart JSON body |
 | `ExternalContext` | Opsiyonel | Sadece `ScoreCard/*` (14 endpoint) | Değer varsa, ScoreCard controller'ı bunu upstream Pupa API'sine olduğu gibi forward ediyor. Mobil taraf bir context/correlation id göndermek isterse burayı kullanabilir — semantiği için backend'e sorun. |
 
 ### Genel Hata Davranışı
 
-- `null`/boş body gönderilirse çoğu endpoint **`400 Bad Request`** döner.
-- Bazı endpoint'ler (`TargetReport` içinde işaretliler) veri bulunamazsa **`404 Not Found`** döner.
-- `ScoreCard` proxy endpoint'leri, upstream Pupa API token alamazsa **`502 Bad Gateway`** döner; diğer durumlarda upstream'in status code'unu olduğu gibi forward eder.
-- Genel response sarmalayıcısı **yok** — bazı endpoint'ler çıplak DTO/list döner, `Public` controller'ı ise `ApiResponse<UsersDto>` ile sarmalıyor (bkz. [ApiResponse<T>](#apiresponset)).
+Mobil (`/mobile/*`) tarafında **tüm yanıtlar `MobileEnvelope<T>` içinde döner** — hata mı başarı mı ayrımı envelope'un `status` alanından yapılır, HTTP status code ise ek bilgi verir.
+
+| HTTP status | `status` | Ne zaman |
+|---|---|---|
+| `200 OK` | `true` | Başarılı |
+| `400 Bad Request` | `false` | Eksik/geçersiz body, validation hatası. `message` alanı hatayı açıklar. |
+| `401 Unauthorized` | `false` | JWT yok, süresi dolmuş, ya da geçersiz. `message: "Yetkisiz"` |
+| `404 Not Found` | `false` | Veri bulunamadı (bazı `TargetReport` endpoint'leri) |
+| `500 Internal Server Error` | `false` | Beklenmedik sunucu hatası. `message: "Sunucu hatası"` |
+| `502 Bad Gateway` | `false` | Sadece `ScoreCard/*` — upstream Pupa API'sine ulaşılamıyor |
 
 ### Ortak Response Sarmalayıcı Tipleri
 
+#### MobileEnvelope&lt;T&gt;
+
+Mobil tarafta (`/mobile/*` altında) **her yanıt** bu zarfa sarılır. Middleware otomatik yapar; controller'lar farkında değildir.
+
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": { "...": "T tipine göre değişir" }
+}
+```
+
+Başarısız örnek:
+```json
+{
+  "status": false,
+  "message": "Yetkisiz",
+  "data": null
+}
+```
+
+| Alan | Tip | Not |
+|---|---|---|
+| `status` | `boolean` | `true` = HTTP 2xx başarılı, `false` = 4xx/5xx |
+| `message` | `string` | Başarıda `"OK"`, hatada okunabilir mesaj (varsa upstream'den, yoksa default: "Yetkisiz", "Sunucu hatası", "Bulunamadı", vs.) |
+| `data` | `T \| null` | Asıl payload — controller'ın döndürdüğü DTO. Hatada `null`. |
+
+> Controller'lar hâlâ ham DTO/liste döndürür (kodda değişmedi). Envelope sadece `/mobile/*` altında middleware tarafından eklenir. Web tarafı çıplak DTO görmeye devam eder.
+
 #### ApiResponse&lt;T&gt;
-Sadece `Public` (login) endpoint'lerinde kullanılıyor.
+
+Sadece `/Public/*` (web tarafı login) endpoint'lerinde kullanılıyor. **Mobil ekip bu tipe direkt hiç dokunmaz** — mobil auth için [`0. Mobile Auth`](#0-mobile-auth-ios-login-akışı) bölümüne bakın.
 
 ```json
 {
@@ -82,7 +145,233 @@ API `tr-TR` culture ile çalışıyor: ondalık ayraç `.`, binlik ayraç `,`, t
 
 ### CORS
 
-Tanımlı **değil**. Mobil native istemciler için sorun olmaz; bir web istemci bu API'ye tarayıcıdan çağrı yapacaksa backend'e CORS eklenmesi gerekir.
+Tanımlı **değil**. Native mobil (iOS) için sorun olmaz. Web istemci bu API'ye tarayıcıdan çağrı yapacaksa backend'e CORS eklenmesi gerekir.
+
+---
+
+## 0. Mobile Auth (iOS Login Akışı)
+
+iOS uygulamasının login akışı KutupYıldızı'na (mevcut mobil bankacılık backend'i) pass-through proxy ile bağlanır. DashboardTsy Api sadece isteği/response'u aynen forward eder — kimlik doğrulama, şifre decrypt, OTP mantığı Kutup tarafında yapılır. iOS'un görmesi gereken sözleşme aşağıda.
+
+> **Akış özeti (sıralı):**
+> `1) POST /mobile/api/Token` (anonim JWT) → `2) POST /mobile/api/Login2` (kullanıcı adı/şifre, OTP challenge alır) → `3) POST /mobile/api/SendSmsCode` (OTP doğrular, **user JWT** döner) → `4) Bearer <userJWT>` ile diğer endpoint'ler çağrılır.
+
+> **Şifreleme:** `UserName`, `EPassword` ve `CustomerNo` alanları RSA-OAEP ile şifrelenmiş base64 string gelir. Şifreleme anahtarı Kutup'un yayınladığı public.key ile yapılır; mobil taraf bu anahtarı ayrıca alır. Backend ekibine sorup public key'i temin edin.
+
+### 🧪 Mock Mode (`AuthMock:Enabled=true`)
+
+DashboardTsy Api iki modda çalışır — hangisinin aktif olduğu `appsettings.json:AuthMock:Enabled` değerine bağlıdır. **Response şeması iki modda birebir aynıdır.** iOS kodu değişmez; sadece backend flag değişir.
+
+| Davranış | `false` (prod/UAT — default) | `true` (mock — geliştirme) |
+|---|---|---|
+| Nereye gider | KutupYıldızı `/api/*` | Kutup'a gitmez, in-memory yanıt |
+| RSA şifreleme | Kutup decrypt eder — public.key gerekir | Kontrol edilmez, alanlar opaque geçer |
+| SMS gönderilir mi | Evet — Kutup gerçek SMS OTP gönderir | Hayır — sabit değer döner |
+| Geçerli OTP kodu | Gerçek SMS'e gelen kod | **`"111111"`** (sabit) |
+| Access token | Kutup üretir | DashboardTsy üretir (Kutup ile aynı symmetric key, geçerli JWT) |
+| Yanıt HTTP status | Kutup ne döndürürse | Kutup davranışıyla eşleşen değer |
+
+**Mock modda sabit değerler:**
+
+| Alan | Mock değeri |
+|---|---|
+| `EncryptData` (Login2'den dönen CustomerNo) | `"1000000001"` (düz string, RSA-şifreli değil) |
+| `SmsGuid` | `"mock-sms-guid-11111111-1111-1111-1111-111111111111"` |
+| `Key` | `"mock-verify-key"` |
+| `CustomerIdentity` (SendSmsCode'dan) | `"9000000001"` |
+| `ChannelSessionId` (JWT claim) | `"mock-channel-session-1234567890abcdef"` |
+| Geçerli OTP | `"111111"` — başka her kod `"Sms kodu doğru değil."` hatası |
+
+**Mock modda validation:**
+
+- `Token` → `deviceId` boş ise 400. ClientId/ClientSecret **kontrol edilmez** (mock).
+- `Login2` → `parameters[0]` var ise başarılı sayılır. UserName/EPassword içeriği **kontrol edilmez** — her şey OK dönebilir. (Kutup mode'da kimlik doğrulama gerçek yapılır.)
+- `SendSmsCode` → 6 zorunlu alan (`smsGuid`, `password`, `key`, `customerNo`, `userName`, `deviceId`) boş ise 400. Doluysa ve `password="111111"` ise başarılı; başka kod → `"Sms kodu doğru değil."`.
+
+**Mock modda üretilen JWT gerçek geçerli bir token'dır.** `MobileJwt:SymmetricKey` ile imzalanır, DashboardTsy'nin JWT Bearer middleware'i tarafından kabul edilir; mock login sonrası iOS diğer `/mobile/*` korumalı endpoint'lerine bu token ile normal şekilde erişebilir.
+
+> **Prod'a çıkarken:** `AuthMock:Enabled` **kesinlikle `false`** olmalı. `KutupYildizi:BaseUrl` de gerçek adres olmak zorunda; mock kapalıyken bu config boş ise uygulama startup'ta fail-fast bir exception atar.
+
+### POST /mobile/api/Token
+
+Login akışına başlamadan önce alınması gereken **anonim JWT**. `Login2` ve `SendSmsCode` çağrılarında bu token `Authorization` header'ında gitmez zaten (login endpoint'leri auth-muaf), ama Kutup'un iç kontrolü için de bilgi vermesi gerekir; şu an sadece Kutup üretiyor, iOS opsiyonel olarak header'a ekleyebilir.
+
+- **Auth:** yok (anonim)
+- **Envelope:** var
+
+**Request** (`AnonymousTokenHttpRequest`):
+```json
+{
+  "parameters": [
+    {
+      "clientId": "<Kutup'tan gelen ClientId>",
+      "clientSecret": "<Kutup'tan gelen ClientSecret>",
+      "deviceId": "<cihazın benzersiz ID'si (UUID önerilir)>"
+    }
+  ]
+}
+```
+
+**Response** (`200 OK`):
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "Token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+**Hata (`400`)** — ClientId/ClientSecret eşleşmezse veya `deviceId` boş ise:
+```json
+{ "status": false, "message": "Geçersiz istek", "data": null }
+```
+
+### POST /mobile/api/Login2
+
+Kullanıcı adı ve şifreyi Kutup'a gönderir; başarılıysa Kutup **kullanıcının kayıtlı telefonuna SMS OTP kodu** yollar ve doğrulama için gerekli `smsGuid` + `key` ikilisini döner. `encryptData` alanında müşteri numarası şifreli olarak geri döner — bir sonraki adımda bu değer aynen kullanılır.
+
+- **Auth:** yok (anonim). Opsiyonel olarak `Authorization: Bearer <anonimJWT>` gönderilebilir; Kutup'un iç doğrulaması için.
+- **Envelope:** var
+
+**Request** (`MobileLoginHttpRequest`):
+```json
+{
+  "header": {
+    "channelRequestId": "<opsiyonel; boş bırakılabilir>",
+    "appKey": "<Kutup config>",
+    "channel": "<Kutup config>",
+    "channelSessionId": "<opsiyonel; anonim JWT'den de çekilir>"
+  },
+  "parameters": [
+    {
+      "applicationVersion": "1.0.0",
+      "userAgentString": "iOS/17.5 iPhone15,3",
+      "clientId": "<Kutup ClientId>",
+      "softwareVersion": "17.5",
+      "deviceType": "iPhone",
+      "operatingSystem": "iOS",
+      "userName": "<RSA-şifreli TC no veya müşteri no>",
+      "ePassword": "<RSA-şifreli şifre>",
+      "clientSecret": "<Kutup ClientSecret>",
+      "deviceId": "<cihaz UUID>"
+    }
+  ]
+}
+```
+
+**Response — başarılı** (`200 OK`):
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "IsError": false,
+    "ErrorMessage": null,
+    "SmsLength": 6,
+    "IsAlphaNumericCode": false,
+    "EncryptData": "<RSA-şifreli CustomerNo — SendSmsCode'a geri gidecek>",
+    "SmsGuid": "b3a1c8e2-4f5d-4a6b-9c1e-1f2a3b4c5d6e",
+    "Key": "verify-key-string"
+  }
+}
+```
+
+**Response — kimlik doğrulanamadı / şifre yanlış** (`200 OK`, `IsError=true`):
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "IsError": true,
+    "ErrorMessage": "Girmiş olduğunuz bilgiler doğrulanamadı. Lütfen tüm bilgileri kontrol ederek tekrar deneyiniz."
+  }
+}
+```
+
+> **Dikkat:** HTTP status kodu başarılı olsa bile Kutup response body'sinde `IsError=true` gelebilir (Kutup davranışı). Mobil taraf **hem `envelope.status`'ü hem `data.IsError`'u kontrol etmelidir.**
+
+### POST /mobile/api/SendSmsCode
+
+OTP kodu doğrulama. Başarılıysa **kullanıcıya özel JWT** (`accessToken`) döner — sonraki tüm çağrılarda `Authorization: Bearer <accessToken>` olarak kullanılır.
+
+- **Auth:** yok (anonim). Opsiyonel `Authorization: Bearer <anonimJWT>` gönderilebilir.
+- **Envelope:** var
+
+**Request** (`SmsVerifyHttpRequest`) — tüm alanlar zorunlu:
+```json
+{
+  "smsGuid": "<Login2 response'undan>",
+  "password": "<kullanıcının SMS'e gelen OTP kodu (plaintext, 6 hane)>",
+  "key": "<Login2 response'undan>",
+  "customerNo": "<Login2 response'undaki EncryptData — aynen gönder>",
+  "userName": "<kullanıcı adı — plaintext, JWT claim'ine gidecek>",
+  "deviceId": "<cihaz UUID>",
+  "deviceToken": "<opsiyonel: push notification token>"
+}
+```
+
+**Response — başarılı** (`200 OK`):
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "State": "Success",
+    "CustomerNo": "<RSA-şifreli — Login2'de dönenle aynı>",
+    "CustomerIdentity": "1234567890",
+    "AccessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
+}
+```
+
+**Response — eksik alan** (`400`):
+```json
+{
+  "status": false,
+  "message": "DeviceId, UserName, SmsGuid, Password, Key ve CustomerNo zorunludur.",
+  "data": null
+}
+```
+
+**Response — OTP kodu yanlış / süresi doldu / max deneme** (`200 OK`, `IsError=1`):
+```json
+{
+  "status": true,
+  "message": "OK",
+  "data": {
+    "IsError": 1,
+    "ErrorMessage": "Sms kodu doğru değil.",
+    "CustomerNo": "<Login2'deki EncryptData>"
+  }
+}
+```
+
+Bilinen `ErrorMessage` değerleri:
+- `"Sms kodu doğru değil."` — yanlış kod
+- `"Maksimum doğrulama denemesine ulaşıldı."` — üst üste hatalı giriş
+- `"Doğrulama süresi doldu."` — OTP süresi geçti, `Login2`'den başlanmalı
+- `"Sms datası bulunamadı."` — session cache expired (10 dk üzeri gecikme)
+
+### `accessToken`'in kullanımı
+
+Bu bölümdeki 3 endpoint (Token/Login2/SendSmsCode) dışında **her `/mobile/*` çağrısında** aşağıdaki header eklenmeli:
+
+```
+Authorization: Bearer <SendSmsCode.data.AccessToken>
+```
+
+Yoksa middleware `401 { status:false, message:"Yetkisiz", data:null }` döndürür.
+
+Token içeriği (informational — mobil parse etmesine gerek yok):
+- `CustomerNo` — müşteri numarası (plaintext)
+- `UserId` — müşteri identity ID
+- `DeviceId`, `DeviceToken`, `ChannelSessionId` — Kutup için context claim'leri
+- `role: "User"`
+- `exp` — token bitiş zamanı
+
+Token süresi dolunca (`exp` geçtiğinde) her istek 401 dönmeye başlar; mobil taraf tekrar login akışına yönlendirmelidir. Şu an refresh-token akışı **yoktur**.
 
 ---
 
@@ -298,9 +587,11 @@ NPL raporlarında kullanılan ürün lookup listesi (İhtiyaç, KMH, KK, ÜK, Tr
 
 ## 6. Public (Auth/Login)
 
-Oturum akışının başlangıç noktası. Bu endpoint'lerden dönen `UsersDto.userId`/oturum bilgisini sonraki tüm rapor çağrılarında `SessionId` olarak kullanacaksınız — **backend ekibiyle `SessionId`'nin tam olarak hangi alandan üretildiğini teyit edin**, DTO'da ayrı bir `SessionId` alanı yok, muhtemelen ayrı bir mekanizma (cookie/token) var.
+> ⚠️ **Bu bölüm web tarafı içindir; iOS uygulaması bu endpoint'leri ÇAĞIRMAZ.** Mobil login için [`0. Mobile Auth`](#0-mobile-auth-ios-login-akışı) bölümünü kullanın. Aşağıdaki notlar sadece bağlam/referans amaçlıdır.
 
-> ⚠️ **Güvenlik notu:** `/Public/Login` şifreyi **query string** üzerinden GET ile alıyor (`?username=...&password=...`). Bu, şifrenin proxy/access loglarına düşmesi riski taşır. Mobil tarafta mümkünse `WindowsLogin`/`DomainLogin`/`SessionLogin` akışlarının kullanılması, `Login`'in son çare olması önerilir — bunu backend ile netleştirin.
+Web'in oturum başlangıç noktası. Bu endpoint'lerden dönen `UsersDto.userId`/oturum bilgisi web akışındaki sonraki rapor çağrılarında `SessionId` olarak kullanılır — DTO'da ayrı bir `SessionId` alanı yok, muhtemelen ayrı bir mekanizma (cookie/token) var; backend ile teyit edilmeli.
+
+> ⚠️ **Güvenlik notu:** `/Public/Login` şifreyi **query string** üzerinden GET ile alıyor (`?username=...&password=...`). Bu, şifrenin proxy/access loglarına düşmesi riski taşır — mobil ekipte de olsa web ekibinde de olsa `Login`'in son çare olması önerilir.
 
 ### GET /Public/WindowsLogin?username={username}
 
@@ -338,9 +629,24 @@ Response şeması `WindowsLogin` ile aynıdır (`ApiResponse<UsersDto>`).
 
 Response şeması aynıdır (`ApiResponse<UsersDto>`).
 
-### GET /Public/SessionLogin?sessionId={sessionId}
+### GET /Public/GetUserBySession?sessionId={sessionId}
 
-Var olan bir oturumu `sessionId` ile devam ettirir. Response şeması aynıdır (`ApiResponse<UsersDto>`).
+Web login akışı için. `sessionId` query parametresi ile kullanıcıyı çözer ve `UsersDto` döner;
+Web tarafı sonucu sunucu-tarafı session'a yazar. Response şeması aynıdır (`ApiResponse<UsersDto>`).
+
+### GET /Public/GetCurrentUser
+
+Mobil için. `Authorization: Bearer <kutup-jwt>` header'ı zorunludur. Sunucu JWT'nin
+`ChannelSessionId` claim'ini okuyup `UserLogin` üzerinden kullanıcıyı çözer — client parametre
+göndermez, sessionId spoof edilemez. Token yoksa/geçersizse `401`; claim yoksa `ApiResponse<UsersDto>`
+zarfında "Geçersiz session bilgisi" mesajı döner.
+
+**Mock modu.** `AuthMock:Enabled=true` iken bu endpoint DB'ye hiç gitmez;
+`MockMobileAuthScenario.BuildCurrentUserResponse` üzerinden sabit bir kullanıcı döner
+(`UserId=999`, `NameSurname="Mock Kullanici"`, `Authority="Admin"`, …). Değerler
+Web tarafındaki `BuildMockUser` ile birebir aynıdır — mobil ve web mock akışları aynı kimliği
+görür. Kutup JWT'si hâlâ geçerli olmalıdır (`[Authorize]` middleware'i mock modunda da devrede);
+iOS ekibi mock akışını uçtan uca kurup token'ı `/api/SendSmsCode` mock'undan alır.
 
 ---
 
@@ -1805,16 +2111,22 @@ Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i
 
 Mobil ekiple entegrasyona başlamadan önce backend ekibiyle netleştirilmesi önerilen noktalar:
 
-1. **Auth akışı netleşmeli.** ASP.NET seviyesinde `[Authorize]` yok; erişim kontrolü ağ/gateway seviyesinde olabilir. `SessionId`'nin login response'undan (`UsersDto`) tam olarak nasıl türetildiği DTO'da açık değil — backend'e sorulmalı.
-2. **`/Public/Login` şifreyi query string'de taşıyor** (GET). Mümkünse bu endpoint mobil tarafta kullanılmamalı; `WindowsLogin` / `DomainLogin` / `SessionLogin` tercih edilmeli.
-3. **XML-doc yorumlarında `/api/...` prefix'i geçiyor ama gerçek route'larda yok.** Route attribute'larına güvenin, yorumlara değil.
-4. **`ScoreCard/*` (14 endpoint) tamamen farklı bir model** — sabit DTO yok, request/response Pupa API'nin ham JSON'u. Gerçek şema için Pupa API dokümantasyonuna bakılmalı.
-5. **`ExternalContext` header'ı** sadece `ScoreCard/*` tarafından okunuyor/forward ediliyor; diğer endpoint'lerde etkisi yok.
-6. **ProductivityReport grubunun büyük çoğunluğu mock data dönüyor** — şema kesin, veri henüz gerçek değil. Gerçek veri entegrasyonu tamamlanınca bu döküman güncellenmeli.
-7. **`GetReportDates` bir POST ama body almıyor** — muhtemelen ileride GET'e çevrilebilir, mobil tarafın body göndermemesi yeterli.
-8. **CORS tanımlı değil** — sadece native mobil için sorun değil, ama backend tarafı bir web istemciye açılırsa eklenmesi gerekir.
-9. **Genel bir response sarmalayıcı (envelope) yok** — sadece `Public/*` `ApiResponse<T>` kullanıyor, diğerleri çıplak DTO/array dönüyor. Hata durumunda status code'a bakmak gerekiyor, response body'de standart bir `success`/`error` alanı yok.
-10. **404 davranışı endpoint'e göre değişken** — bazı `TargetReport` endpoint'leri veri bulunamazsa 404 dönerken, çoğu endpoint boş liste/obje dönüyor. Her endpoint için yukarıdaki tablo/notlar dikkatle takip edilmeli.
+1. **Refresh token yok.** JWT süresi dolunca (prod 30 dk, dev 480 dk, mock 480 dk) tüm istekler 401 döner. Mobil uygulama 401 aldığında **kullanıcıyı tekrar login ekranına yönlendirmeli**. Refresh akışı ilerideki bir sürüme bırakıldı.
+
+   > **Mock mode:** `AuthMock:Enabled=true` iken login akışı KutupYıldızı'na gitmeden mock yanıt döner. Detay: [`Mock Mode`](#-mock-mode-authmockenabledtrue). iOS geliştirici SMS OTP olarak sabit **`111111`** kullanır. Prod'a çıkışta flag `false` olmalıdır.
+2. **JWT symmetric key iki projede paylaşılıyor.** DashboardTsy'nin token doğrulaması Kutup'un `JwtManager.SymmetricKey` değeriyle birebir aynı base64 key'i kullanır (`appsettings.MobileJwt.SymmetricKey`). Kutup tarafı key'i değiştirirse DashboardTsy config'i de güncellenmelidir; aksi halde tüm mobil istekler 401 alır.
+3. **Business-level `SessionId` hâlâ belirsiz.** JWT ile transport güvenliği çözüldü, ama rapor endpoint'lerinin body'sinde beklenen `sessionId` alanının **hangi kaynaktan üretileceği DTO'da açık değil**. Backend ekibiyle netleştirin — JWT'deki `ChannelSessionId` claim'i mi, yoksa ayrı bir endpoint çıktısı mı olduğu iOS istemcinin bilmesi gereken şey.
+4. **`Login2` ve `SendSmsCode` — HTTP 200 hata çelişkisi.** Şifre yanlış veya OTP hatalı olduğunda HTTP status 200 dönebilir ama `data.IsError` alanı `true` ya da `1` olur. Mobil taraf **envelope.status + data.IsError'u birlikte kontrol etmelidir.**
+5. **`/mobile/api/Token` gerekli mi?** Şu an DashboardTsy'nin JWT middleware'i `Login2`/`SendSmsCode`'u anonim kabul ediyor — pratikte `Token` çağrılmadan da bu ikisi çalışır. Kutup iç doğrulaması için header'a eklemek isteniyorsa akış budur; yoksa iOS bu adımı atlayabilir. Backend ile teyit edin.
+6. **RSA public key mobil tarafta gerekli.** `UserName`, `EPassword` ve `CustomerNo` alanları RSA-OAEP ile şifrelenmiş halde gönderilir. Public key **repoda yok**; backend'den ayrıca alınmalıdır. iOS'ta `Security.framework` üzerinden encryption yapılabilir.
+7. **Session cache TTL 10 dk.** `Login2` ile `SendSmsCode` arasında 10 dakikadan uzun süre geçerse `"Sms datası bulunamadı."` hatası alınır — akış baştan başlatılmalıdır. Kullanıcı OTP ekranında 10 dk beklerse bu durum tetiklenir.
+8. **XML-doc yorumlarında `/api/...` prefix'i geçiyor.** Bunlar Kutup'tan gelen yorumlardır; gerçek DashboardTsy route'ları farklı. Bu döküman ve controller `[Route(...)]` attribute'larına güvenin, XML yorumlara değil.
+9. **`ScoreCard/*` (14 endpoint) tamamen farklı bir model** — sabit DTO yok, request/response Pupa API'nin ham JSON'u. Gerçek şema için Pupa API dokümantasyonuna bakılmalı.
+10. **`ExternalContext` header'ı** sadece `ScoreCard/*` tarafından okunuyor/forward ediliyor; diğer endpoint'lerde etkisi yok.
+11. **ProductivityReport grubunun büyük çoğunluğu mock data dönüyor** — şema kesin, veri henüz gerçek değil. Gerçek veri entegrasyonu tamamlanınca bu döküman güncellenmeli.
+12. **`GetReportDates` bir POST ama body almıyor** — muhtemelen ileride GET'e çevrilebilir, mobil tarafın body göndermemesi yeterli.
+13. **CORS tanımlı değil** — native iOS için sorun değil, ama backend web istemciye açılırsa eklenmesi gerekir.
+14. **404 davranışı endpoint'e göre değişken** — bazı `TargetReport` endpoint'leri veri bulunamazsa 404 dönerken, çoğu endpoint boş liste/obje dönüyor. Envelope'lu yanıtta bu `{ status:false, message:"Bulunamadı", data:null }` şeklinde gelir.
 
 ---
 
