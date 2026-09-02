@@ -198,16 +198,19 @@
         });
 
         // Data field mapping per section (by section index in OrderNo)
-        // Region returns 2 sections (manager+roles, NPS); Branch returns 3 sections (manager+months, roles, NPS).
+        // Her iki tip de 4 bölüm döner: manager+aylar, roller, NPS, Telefonla Karşılama Oranı.
         var _sectionFieldsRegion = [
-            ['ManagerName', 'CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
-            null // NPS via getNpsFields
+            ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
+            ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
+            null, // NPS via getNpsFields
+            ['PhoneGreetingScore']
         ];
 
         var _sectionFieldsBranch = [
             ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
             ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
-            null // NPS via getNpsFields
+            null, // NPS via getNpsFields
+            ['PhoneGreetingScore']
         ];
 
         function getNpsFields(isBranch) {
