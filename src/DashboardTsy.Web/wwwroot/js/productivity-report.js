@@ -169,10 +169,6 @@ var _yieldHeadersXhr = null;
 var _yieldTableXhr = null;
 var _yieldTable2Xhr = null;
 
-function _yieldAbort(xhr) {
-    if (xhr && xhr.readyState !== 4) xhr.abort();
-}
-
 // ===== Load Tabs =====
 function loadProductivityTabs(filterType, callback) {
     $.ajax({
@@ -358,7 +354,7 @@ $(document).on('click', '#dynamicTable thead th, #dynamicTable2 thead th', funct
 function loadGeneralRegionReport(tabId) {
     var tab = (tabId != null) ? String(tabId) : null;
 
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityGeneralRegionReport',
         type: 'POST',
@@ -428,7 +424,7 @@ function loadTableHeaders(toggleId, tabId, subTabId, filterType, callback) {
         return;
     }
 
-    _yieldAbort(_yieldHeadersXhr);
+    abortXhr(_yieldHeadersXhr);
     _yieldHeadersXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityReportTableHeaders',
         type: 'POST',
@@ -559,7 +555,7 @@ function renderDynamicHeaders(headers, hasExpandable, withDetail) {
 
 // ===== Volume Region Report (Hacim — Bölge) =====
 function loadVolumeRegionReport(regionCode, subTabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityVolumeRegionReport',
         type: 'POST',
@@ -634,7 +630,7 @@ function renderVolumeRegionTable(items) {
 
 // ===== Volume Branch Report (Hacim — Şube) =====
 function loadVolumeBranchReport(branchCode, subTabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityVolumeBranchReport',
         type: 'POST',
@@ -713,7 +709,7 @@ function renderVolumeBranchTable(items) {
 
 // ===== Count Customer Region Report (Adet — Bölge) =====
 function loadCountCustomerRegionReport(regionCode, subTabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCustomerRegionReport',
         type: 'POST',
@@ -777,7 +773,7 @@ function renderCountCustomerRegionTable(items) {
 
 // ===== Count Customer Branch Report (Adet — Müşteri — Şube) =====
 function loadCountCustomerBranchReport(branchCode, subTabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCustomerBranchReport',
         type: 'POST',
@@ -842,7 +838,7 @@ function renderCountCustomerBranchTable(items) {
 
 // ===== Count Cash Management Region Report (Adet — Nakit Yönetimi — Bölge) =====
 function loadCountCashManagementRegionReport(regionCode, subTabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCashManagementRegionReport',
         type: 'POST',
@@ -907,7 +903,7 @@ function renderCountCashManagementRegionTable(items) {
 
 // ===== Count Cash Management Branch Report (Adet — Nakit Yönetimi — Şube) =====
 function loadCountCashManagementBranchReport(branchCode, subTabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCashManagementBranchReport',
         type: 'POST',
@@ -972,7 +968,7 @@ function renderCountCashManagementBranchTable(items) {
 
 // ===== Count Card/POS Branch Report (Adet — Kredi Kartı / POS — Şube) =====
 function loadCountCardPosBranchReport(branchCode, tabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCardPosBranchReport',
         type: 'POST',
@@ -1034,7 +1030,7 @@ function renderCountCardPosBranchTable(items) {
 
 // ===== Count Card/POS Region Report (Adet — Kredi Kartı / POS — Bölge) =====
 function loadCountCardPosRegionReport(regionCode, tabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCardPosRegionReport',
         type: 'POST',
@@ -1096,7 +1092,7 @@ function renderCountCardPosRegionTable(items) {
 // Ödeme Sistemleri tek tablo gösterir; oran tablosu ana konteynere (#dynamicTable) render edilir.
 function loadCountCardPosRatioRegionReport(regionCode, tabId) {
     // Load headers first, then data
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCardPosRatioRegionReportTableHeaders',
         type: 'POST',
@@ -1185,7 +1181,7 @@ function renderCountCardPosRatioRegionTable(items) {
 
 // ===== Count Card/POS Ratio Branch Report (Adet — Oran Tablosu — Şube) =====
 function loadCountCardPosRatioBranchReport(branchCode, tabId) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityCountCardPosRatioBranchReportTableHeaders',
         type: 'POST',
@@ -1270,7 +1266,7 @@ function renderCountCardPosRatioBranchTable(items) {
 // ===== Profit Total Region Report (Karlılık — Üst Tablo — Bölge) =====
 // Header'ları loadTableHeaders'dan alır, body dynamicTableBody'ye render eder
 function loadProfitTotalRegionReport(regionCode) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityProfitTotalRegionReport',
         type: 'POST',
@@ -1344,7 +1340,7 @@ function renderProfitTotalRegionTable(items) {
 // ===== Profit Ratio Region Report (Karlılık — Alt Tablo — Bölge) =====
 // Header'ları statik renderProfitRatioHeaders ile, body dynamicTableBody2'ye render eder
 function loadProfitRatioRegionReport(regionCode) {
-    _yieldAbort(_yieldTable2Xhr);
+    abortXhr(_yieldTable2Xhr);
     _yieldTable2Xhr = $.ajax({
         url: '/ProductivityReport/GetProductivityProfitRatioRegionReport',
         type: 'POST',
@@ -1431,7 +1427,7 @@ function renderProfitRatioRegionTable(items) {
 
 // ===== Profit Ratio Branch Report (Karlılık — Alt Tablo — Şube) =====
 function loadProfitRatioBranchReport(branchCode) {
-    _yieldAbort(_yieldTable2Xhr);
+    abortXhr(_yieldTable2Xhr);
     _yieldTable2Xhr = $.ajax({
         url: '/ProductivityReport/GetProductivityProfitRatioBranchReport',
         type: 'POST',
@@ -1495,7 +1491,7 @@ function renderProfitRatioBranchTable(items) {
 
 // ===== Profit Total Branch Report (Karlılık — Üst Tablo — Şube) =====
 function loadProfitTotalBranchReport(branchCode) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityProfitTotalBranchReport',
         type: 'POST',
@@ -1571,7 +1567,7 @@ function renderProfitTotalBranchTable(items) {
 
 // ===== Profit Spread Management Region Report (Karlılık — Spread Yönetimi — Bölge) =====
 function loadProfitSpreadManagementRegionReport(regionCode) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityProfitSpreadManagementRegionReport',
         type: 'POST',
@@ -1633,7 +1629,7 @@ function renderProfitSpreadManagementRegionTable(items) {
 
 // ===== Profit Spread Management Branch Report (Karlılık — Spread Yönetimi — Şube) =====
 function loadProfitSpreadManagementBranchReport(branchCode) {
-    _yieldAbort(_yieldTableXhr);
+    abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
         url: '/ProductivityReport/GetProductivityProfitSpreadManagementBranchReport',
         type: 'POST',

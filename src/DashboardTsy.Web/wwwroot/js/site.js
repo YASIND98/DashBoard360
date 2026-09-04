@@ -141,6 +141,13 @@ function renderTableLegend(containerId, options) {
 }
 
 
+// ===== Shared XHR Abort Helper =====
+// Hızlı tab/şube/bölge değişiminde önceki isteğin geç gelen cevabı ekranı ezmesin diye
+// her yeni tablo isteğinden önce bir öncekini iptal ederiz.
+function abortXhr(xhr) {
+    if (xhr && xhr.readyState !== 4) xhr.abort();
+}
+
 // ===== Shared Today Date (4 saatte bir tazelenir) =====
 var _todayDateTtlMs = 4 * 60 * 60 * 1000; // 4 saat
 var _todayDate = sessionStorage.getItem('todayDate') || new Date().toISOString();

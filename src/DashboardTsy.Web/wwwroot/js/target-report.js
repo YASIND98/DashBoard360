@@ -23,10 +23,6 @@ $(document).ready(function () {
   var _targetTop10Xhr = null;
   var _targetBreakdownXhr = null;
 
-  function _targetAbort(xhr) {
-      if (xhr && xhr.readyState !== 4) xhr.abort();
-  }
-
   // ===== Load Menu Texts =====
   var cachedMenu = sessionStorage.getItem('_menuTexts');
   if (cachedMenu) {
@@ -57,7 +53,7 @@ $(document).ready(function () {
           callback(JSON.parse(cached));
           return;
       }
-      _targetAbort(_targetHeadersXhr);
+      abortXhr(_targetHeadersXhr);
       _targetHeadersXhr = $.ajax({
           url: url,
           type: 'POST',
@@ -421,7 +417,7 @@ $(document).ready(function () {
 
   // ===== Report Loaders =====
   function loadDailyReport() {
-      _targetAbort(_targetTableXhr);
+      abortXhr(_targetTableXhr);
       _targetTableXhr = $.ajax({
           url: '/TargetReport/GetDailyTargetReport',
           type: 'POST',
@@ -458,7 +454,7 @@ $(document).ready(function () {
           showLoadingOverlay();
       }
 
-      _targetAbort(_targetTableXhr);
+      abortXhr(_targetTableXhr);
       _targetTableXhr = $.ajax({
           url: '/TargetReport/GetMonthlyTargetReport',
           type: 'POST',
@@ -499,7 +495,7 @@ $(document).ready(function () {
           });
       }
 
-      _targetAbort(_targetTableXhr);
+      abortXhr(_targetTableXhr);
       _targetTableXhr = $.ajax({
           url: '/TargetReport/GetDailyQuantityTargetReport',
           type: 'POST',
@@ -870,7 +866,7 @@ $(document).ready(function () {
     $('#top10First').html('');
     $('#top10Last').html('');
     showLoadingOverlay();
-    _targetAbort(_targetTop10Xhr);
+    abortXhr(_targetTop10Xhr);
     _targetTop10Xhr = $.ajax({
       url: '/TargetReport/GetProductTop10DailyAndWeeklyDifferences',
       type: 'POST',
@@ -922,7 +918,7 @@ $(document).ready(function () {
           productId: productId,
           userCode: window.USER_CODE   // session User.DomainName (Index.cshtml -> window.USER_CODE)
       });
-      _targetAbort(_targetBreakdownXhr);
+      abortXhr(_targetBreakdownXhr);
       _targetBreakdownXhr = $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(body) })
           .done(function (data) { window.ReportBreakdownData = (data && data.Products) || []; })
           .fail(function () { window.ReportBreakdownData = []; })
