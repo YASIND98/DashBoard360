@@ -71,6 +71,9 @@ builder.Services.AddSingleton<DashboardTsy.Application.SalaryCustomerReport.ISal
 // NplReport — ReportDataProvider ile aynı gerekçe: stateless + Singleton bağımlılıklar.
 builder.Services.AddSingleton<DashboardTsy.Application.NplReport.INplReportProvider, DashboardTsy.Infrastructure.NplReport.NplReportProvider>();
 
+// PosReport — ReportDataProvider ile aynı gerekçe: stateless + Singleton bağımlılıklar.
+builder.Services.AddSingleton<DashboardTsy.Application.PosReport.IPosReportProvider, DashboardTsy.Infrastructure.PosReport.PosReportProvider>();
+
 // ScoreCard proxy: ServiceBus OAuth token (singleton cache) + Pupa API HttpClient
 builder.Services.Configure<PupaApiOptions>(builder.Configuration.GetSection(PupaApiOptions.SectionName));
 builder.Services.Configure<ServiceBusOptions>(builder.Configuration.GetSection(ServiceBusOptions.SectionName));

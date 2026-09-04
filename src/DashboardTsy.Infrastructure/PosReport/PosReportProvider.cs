@@ -1,0 +1,59 @@
+using System.Data;
+using DashboardTsy.Application.PosReport;
+using DashboardTsy.Application.PosReport.Requests;
+using DashboardTsy.Application.PosReport.Responses;
+using DashboardTsy.Infrastructure.Data;
+using Microsoft.Extensions.Configuration;
+
+namespace DashboardTsy.Infrastructure.PosReport;
+
+/// <summary>
+/// IPosReportProvider implementasyonu: SP_RP_POS_Report çağrısını yapar ve satırları GetPosReportItem'a map eder.
+/// ReportMock:Enabled true iken MockPosReportData'ya delege eder.
+///
+/// SP imzası:
+///   @RegionCode   VARCHAR(100)
+///   @BranchCode   VARCHAR(...)
+///   @BusinessLine VARCHAR(...)
+///
+/// SP çıktı kolonları: Metrics (VARCHAR), Date (DATE), Value (BIGINT), DiffValue (BIGINT).
+/// Kolon adları DTO property adlarıyla birebir olduğu için DataTableHelper.ToList<T>() yeterlidir.
+/// </summary>
+public class PosReportProvider : IPosReportProvider
+{
+    private const string ConnectionKey = "YoneticiRaporu";
+    private const string ProcedureName = "SP_RP_POS_Report";
+
+    private readonly IStoredProcedureExecutor _spExecutor;
+    private readonly IConfiguration _configuration;
+
+    public PosReportProvider(IStoredProcedureExecutor spExecutor, IConfiguration configuration)
+    {
+        _spExecutor = spExecutor;
+        _configuration = configuration;
+    }
+
+    private bool MockEnabled =>
+        _configuration["ReportMock:Enabled"] is string v && bool.TryParse(v, out var b) && b;
+
+    public IReadOnlyList<GetPosReportItem> GetPosReport(GetPosReportRequest request)
+    {
+        request ??= new GetPosReportRequest();
+
+        if (MockEnabled)
+            return MockPosReportData.GetPosReport(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@RegionCode"]   = string.IsNullOrWhiteSpace(request.RegionCode) ? (object?)DBNull.Value : request.RegionCode,
+            ["@BranchCode"]   = string.IsNullOrWhiteSpace(request.BranchCode) ? (object?)DBNull.Value : request.BranchCode,
+            ["@BusinessLine"] = string.IsNullOrWhiteSpace(request.BusinessLine) ? (object?)DBNull.Value : request.BusinessLine
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(ConnectionKey, ProcedureName, parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetPosReportItem>();
+
+        return DataTableHelper.ToList<GetPosReportItem>(ds.Tables[0]);
+    }
+}

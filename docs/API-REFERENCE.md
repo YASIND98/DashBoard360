@@ -19,7 +19,8 @@
 10. [ScoreCard](#8-scorecard)
 11. [TargetReport](#9-targetreport)
 12. [ProductivityReport](#10-productivityreport)
-13. [Bilinen Kısıtlar ve Uyarılar](#bilinen-kısıtlar-ve-uyarılar)
+13. [PosReport](#11-posreport)
+14. [Bilinen Kısıtlar ve Uyarılar](#bilinen-kısıtlar-ve-uyarılar)
 
 ---
 
@@ -2104,6 +2105,98 @@ Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i
   "regionManagerPhoto": "https://cdn.denizbank.com/photos/managers/17.jpg"
 }
 ```
+
+---
+
+## 11. PosReport
+
+POS (satış noktası) müşteri metrikleri raporu. Ekranda 5 metrik (Sahip / Aktif / Ciro / Yeni Kazanım / İptal Müşteri Adedi) × N ay şeklinde bir tablo olarak render edilir; API bunu **flat liste** olarak döner ve gruplama client tarafında yapılır (NPL/SalaryCustomer ile tutarlı).
+
+### POST /PosReport/GetPosReport
+
+SP_RP_POS_Report çıktısını satır bazlı döner. Her satır: bir metrik adı, o metriğin belirli bir ay için değeri (`value`) ve bir önceki aya göre farkı (`diffValue`).
+
+- **Auth:** JWT Bearer (mobil için `/mobile/*` altında zorunlu). Business-level `SessionId` **kullanılmıyor** — bu endpoint request body'sinde `sessionId` beklemez.
+- **400 durumu:** body `null` ise
+- **Mock:** `appsettings.ReportMock:Enabled=true` iken 5 metrik × 7 ay = 35 satırlık deterministik mock döner (Kaynak: `MockPosReportData`). SP hiç çağrılmaz.
+
+**Request** (`GetPosReportRequest`):
+```json
+{
+  "regionCode": "35",
+  "branchCode": "1234",
+  "businessLine": "BIREYSEL"
+}
+```
+> Üç alan da nullable — filtre uygulanmayacaksa `null` gönderilebilir ya da alan hiç eklenmeyebilir; SP tarafına `NULL` geçer.
+
+| Alan | Tip | Zorunlu | SP parametresi | Not |
+|---|---|---|---|---|
+| `regionCode` | `string?` | Hayır | `@RegionCode VARCHAR(100)` | Bölge kodu filtresi. |
+| `branchCode` | `string?` | Hayır | `@BranchCode VARCHAR` | Şube kodu filtresi. |
+| `businessLine` | `string?` | Hayır | `@BusinessLine VARCHAR` | İş kolu (örn. `"BIREYSEL"`, `"ISLETME"`). |
+
+**Response** (`200 OK` → `GetPosReportItem[]`):
+```json
+[
+  {
+    "metrics": "Sahip Müşteri Adedi",
+    "date": "2026-07-30T00:00:00",
+    "value": 123456,
+    "diffValue": null
+  },
+  {
+    "metrics": "Sahip Müşteri Adedi",
+    "date": "2026-08-31T00:00:00",
+    "value": 124956,
+    "diffValue": 1500
+  },
+  {
+    "metrics": "Sahip Müşteri Adedi",
+    "date": "2026-09-30T00:00:00",
+    "value": 126456,
+    "diffValue": 1500
+  },
+  {
+    "metrics": "Aktif Müşteri Adedi",
+    "date": "2026-07-30T00:00:00",
+    "value": 133456,
+    "diffValue": null
+  },
+  {
+    "metrics": "Aktif Müşteri Adedi",
+    "date": "2026-08-31T00:00:00",
+    "value": 134956,
+    "diffValue": 1500
+  }
+]
+```
+
+| Alan | Tip | Not |
+|---|---|---|
+| `metrics` | `string` | Metrik adı — ekrandaki satır başlığı. Örn. `"Sahip Müşteri Adedi"`, `"Aktif Müşteri Adedi"`, `"Ciro Müşteri Adedi"`, `"Yeni Kazanım Müşteri Adedi"`, `"İptal Müşteri Adedi"`. SP kolon adı: `Metrics`. |
+| `date` | `DateTime` | Değerin ait olduğu tarih (genelde ay sonu). ISO-8601 formatında. |
+| `value` | `long?` (BIGINT) | O tarihteki değer. `null` olabilir. |
+| `diffValue` | `long?` (BIGINT) | Bir önceki aya göre fark. **Serinin ilk ayında `null`** (önceki ay yok). Pozitif = artış, negatif = düşüş. Client tarafında yeşil/kırmızı renklendirme buna göre yapılır. |
+
+**Client tarafında gruplama (öneri).** API flat döner; ekrandaki tablo için metrik bazında gruplayın:
+
+```js
+// Örn. web/mobil client'ta:
+const byMetric = items.reduce((acc, item) => {
+  (acc[item.metrics] ??= []).push({ date: item.date, value: item.value, diffValue: item.diffValue });
+  return acc;
+}, {});
+// → { "Sahip Müşteri Adedi": [{...}, {...}], "Aktif Müşteri Adedi": [...] }
+```
+
+**Boş sonuç.** Filtre kombinasyonu eşleşmezse SP boş tablo döndürebilir — bu durumda endpoint boş dizi (`[]`) döner, 404 değil.
+
+**Hata (`400`)** — body `null` gelirse:
+```json
+{ "status": false, "message": "Geçersiz istek", "data": null }
+```
+> Envelope alanları sadece `/mobile/*` altında görünür; web tarafında sadece HTTP 400 döner, body boştur.
 
 ---
 
