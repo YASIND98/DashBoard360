@@ -293,8 +293,8 @@ $(document).ready(function () {
 
   // ===== PDF verisi (window.PdfReport) — servis cevabından kurulur, DOM'dan okunmaz =====
   function _pdfInfoLines() {
-    // Tarih artık date-picker'dan (#dpLabel) okunur; .date-text fallback (başka bağlamlar için).
-    var date = ($('#dpLabel').text() || $('.date-text').text() || '').trim();
+    // Tarih: seçilen ayın rapor günü (#dpLabel yalnızca ayı gösterir); .date-text fallback.
+    var date = formatReportDateTr(_selectedReportDate) || ($('#dpLabel').text() || $('.date-text').text() || '').trim();
     var region = (selectedRegion && selectedRegion.name) ? selectedRegion.name : 'Tüm Bölgeler';
     var branch = (selectedBranch && selectedBranch.name) ? selectedBranch.name : 'Tüm Şubeler';
     var type = ($('.segment[data-type].active').text() || '').trim();                                       // Hacim / Adet
@@ -788,13 +788,15 @@ $(document).ready(function () {
 
   // ===== Init =====
   loadTodayDate(function () {
-      // İstekte kullanılacak rapor tarihi başlangıçta _todayDate (session); tarih seçilince güncellenir.
+      // İstekte kullanılacak rapor tarihi başlangıçta _todayDate (session); ay seçilince güncellenir.
       _selectedReportDate = _todayDate;
-      // Date picker: geçerli rapor tarihiyle başlat; gün değişince o günün raporu yüklenir.
+      // Date picker ay modunda (Skor Kart'taki gibi): kapanan aylarda ayın son takvim günü,
+      // içinde bulunulan ayda son veri günü (_todayDate) rapor tarihi olarak gider.
       if (window.DatePicker) {
           DatePicker.init({
-              initial: new Date(_todayDate),
-              max: new Date(_todayDate),
+              mode: 'month',
+              initial: _todayDate,
+              max: _todayDate,
               onChange: function (iso) {
                   _selectedReportDate = iso;
                   showLoadingOverlay();

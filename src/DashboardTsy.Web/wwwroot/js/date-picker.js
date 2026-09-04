@@ -18,8 +18,8 @@ $(function () {
     var minDate = null, maxDate = null;
     var onChange = null;
     var readOnly = false, staticLabel = null;
+    var monthMode = false;
 
-    // ── Tarih yardımcıları ──
     function startOfDay(d) { return new Date(d.getFullYear(), d.getMonth(), d.getDate()); }
     function today() { return startOfDay(new Date()); }
     function addDays(d, n) { return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
@@ -35,11 +35,41 @@ $(function () {
     function fmtLong(d) { return d.getDate() + ' ' + _trMonths[d.getMonth()] + ' ' + d.getFullYear(); }
     function outOfRange(d) { return (minDate && d < minDate) || (maxDate && d > maxDate); }
 
-    // ── Header (etiket + rozet + ok durumları) ──
+    // ── Ay modu yardımcıları ──
+    function endOfMonth(y, m) { return new Date(y, m + 1, 0); }
+    // Seçilen ayın rapor tarihi: ayın son günü; içinde bulunulan ayda son veri günü (max).
+    function monthReportDate(y, m) {
+        var last = endOfMonth(y, m);
+        return (maxDate && last > maxDate) ? new Date(maxDate) : last;
+    }
+    // Ayın tamamı aralık dışındaysa seçilemez.
+    function monthOutOfRange(y, m) {
+        return (maxDate && new Date(y, m, 1) > maxDate) || (minDate && endOfMonth(y, m) < minDate);
+    }
+    // Rozetin ("Bu Ay") referans ayı: max varsa o, yoksa bugün.
+    function isCurrentMonth(d) {
+        var ref = maxDate || today();
+        return d.getFullYear() === ref.getFullYear() && d.getMonth() === ref.getMonth();
+    }
+    // dir yönündeki bir sonraki ay ({year, month}); aralık dışıysa null.
+    function shiftMonth(dir) {
+        var y = selected.getFullYear(), m = selected.getMonth() + dir;
+        if (m < 0) { m = 11; y--; } else if (m > 11) { m = 0; y++; }
+        return monthOutOfRange(y, m) ? null : { year: y, month: m };
+    }
+
     function refreshHeader() {
         if (readOnly) {
             $label.text(staticLabel || fmtLong(selected));
             $badge.hide();
+            return;
+        }
+        if (monthMode) {
+            var isCurrent = isCurrentMonth(selected);
+            $label.text(_trMonths[selected.getMonth()] + ' ' + selected.getFullYear());
+            $badge.text(isCurrent ? 'Bu Ay' : '').toggle(isCurrent);
+            $prev.prop('disabled', !shiftMonth(-1));
+            $next.prop('disabled', !shiftMonth(1));
             return;
         }
         var isToday = sameDay(selected, today());
@@ -49,7 +79,6 @@ $(function () {
         $next.prop('disabled', outOfRange(addDays(selected, 1)));
     }
 
-    // ── Panel render (ay gezinme + hafta günleri + 6 haftalık gün ızgarası) ──
     function monthNav() {
         var prevOff = minDate && new Date(panel.year, panel.month, 0) < minDate;      // önceki ayın son günü < min
         var nextOff = maxDate && new Date(panel.year, panel.month + 1, 1) > maxDate;   // sonraki ayın ilk günü > max
@@ -60,7 +89,31 @@ $(function () {
             '</div>';
     }
 
+    // Ay modundaki yıl gezinme satırı (‹ 2026 ›).
+    function yearNav() {
+        var prevOff = minDate && new Date(panel.year - 1, 11, 31) < minDate;   // önceki yılın son günü < min
+        var nextOff = maxDate && new Date(panel.year + 1, 0, 1) > maxDate;     // sonraki yılın ilk günü > max
+        return '<div class="dp-month-nav">' +
+            '<button type="button" class="dp-month-btn" data-dp="prev-year"' + (prevOff ? ' disabled' : '') + '>&#8249;</button>' +
+            '<span class="dp-month-label">' + panel.year + '</span>' +
+            '<button type="button" class="dp-month-btn" data-dp="next-year"' + (nextOff ? ' disabled' : '') + '>&#8250;</button>' +
+            '</div>';
+    }
+
+    function renderMonthPanel() {
+        var html = yearNav() + '<div class="dp-months">';
+        for (var m = 0; m < 12; m++) {                                   // data-dp-month: 0-11
+            var off = monthOutOfRange(panel.year, m);
+            var active = panel.year === selected.getFullYear() && m === selected.getMonth();
+            var cls = 'dp-month' + (active ? ' dp-active' : '') + (off ? ' dp-disabled' : '');
+            html += '<div class="' + cls + '"' + (off ? '' : ' data-dp-month="' + m + '"') + '>' + _trMonths[m] + '</div>';
+        }
+        $panel.html(html + '</div>');
+    }
+
     function renderPanel() {
+        if (monthMode) { renderMonthPanel(); return; }
+
         var first = new Date(panel.year, panel.month, 1);
         var gridStart = addDays(first, -((first.getDay() + 6) % 7));   // ızgara Pazartesi'den başlar (önceki aya taşabilir)
 
@@ -79,7 +132,6 @@ $(function () {
         $panel.html(html + '</div>');
     }
 
-    // ── Panel aç/kapat ──
     function openPanel() {
         panel.year = selected.getFullYear();
         panel.month = selected.getMonth();
@@ -94,21 +146,23 @@ $(function () {
         $root.removeClass('dp-panel-open');
     }
 
-    // ── Seçimi uygula + yayımla ──
+    // Ay modunda gelen tarih, ait olduğu ayın rapor tarihine normalize edilir.
     function setSelected(d, notify) {
-        selected = startOfDay(d);
+        d = startOfDay(d);
+        selected = monthMode ? monthReportDate(d.getFullYear(), d.getMonth()) : d;
         refreshHeader();
-        if (notify) {
-            var iso = toISO(selected);
-            if (typeof onChange === 'function') onChange(iso, selected);
-            $(document).trigger('datepicker:change', { date: selected, iso: iso });
-        }
+        if (notify && onChange) onChange(toISO(selected), selected);
     }
 
-    // Header okları: günü ±1 kaydır (aralık dışıysa durur).
+    // Header okları: gün modunda günü, ay modunda ayı ±1 kaydırır (aralık dışıysa durur).
     function navigate(dir) {
-        var t = addDays(selected, dir);
-        if (!outOfRange(t)) setSelected(t, true);
+        if (monthMode) {
+            var t = shiftMonth(dir);
+            if (t) setSelected(monthReportDate(t.year, t.month), true);
+            return;
+        }
+        var d = addDays(selected, dir);
+        if (!outOfRange(d)) setSelected(d, true);
     }
 
     // Panel içi ay gezintisi (seçimi değiştirmez).
@@ -119,7 +173,12 @@ $(function () {
         renderPanel();
     }
 
-    // ── Eventler ──
+    // Ay modunda panel içi yıl gezintisi (seçimi değiştirmez).
+    function shiftPanelYear(dir) {
+        panel.year += dir;
+        renderPanel();
+    }
+
     $trigger.on('click', function (e) {
         e.stopPropagation();
         if (readOnly) return;
@@ -132,16 +191,24 @@ $(function () {
     $next.on('click', function () { if (!readOnly) navigate(1); });
     $(document).on('click', '[data-dp="prev-month"]', function (e) { e.stopPropagation(); shiftPanelMonth(-1); });
     $(document).on('click', '[data-dp="next-month"]', function (e) { e.stopPropagation(); shiftPanelMonth(1); });
+    $(document).on('click', '[data-dp="prev-year"]', function (e) { e.stopPropagation(); shiftPanelYear(-1); });
+    $(document).on('click', '[data-dp="next-year"]', function (e) { e.stopPropagation(); shiftPanelYear(1); });
     $(document).on('click', '[data-dp-date]', function (e) {
         e.stopPropagation();
         setSelected(toDate($(this).data('dp-date')), true);
         closePanel();
     });
+    $(document).on('click', '[data-dp-month]', function (e) {
+        e.stopPropagation();
+        setSelected(monthReportDate(panel.year, +$(this).data('dp-month')), true);
+        closePanel();
+    });
 
-    // ── Dış API — opts: { initial, min, max, onChange } ──
+    // ── Dış API — opts: { mode, initial, min, max, onChange } ──
     window.DatePicker = {
         init: function (opts) {
             opts = opts || {};
+            monthMode = opts.mode === 'month';
             minDate = toDate(opts.min);
             maxDate = toDate(opts.max);
             onChange = typeof opts.onChange === 'function' ? opts.onChange : null;
@@ -149,10 +216,7 @@ $(function () {
             staticLabel = opts.label || null;    // sabit etiket (ör. "Haziran 2026")
             $root.toggleClass('dp-readonly', readOnly);
             setSelected(toDate(opts.initial) || today(), false);
-        },
-        setDate: function (d, notify) { setSelected(toDate(d) || today(), !!notify); },
-        getDate: function () { return selected ? new Date(selected) : null; },
-        getISO: function () { return selected ? toISO(selected) : null; }
+        }
     };
 
     // Varsayılan: bugün (ekran init ile değiştirir).
