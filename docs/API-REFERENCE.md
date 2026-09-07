@@ -2125,7 +2125,7 @@ SP_RP_POS_Report çıktısını satır bazlı döner. Her satır: bir metrik ad�
 {
   "regionCode": "35",
   "branchCode": "1234",
-  "businessLine": "BIREYSEL"
+  "tabId": 1
 }
 ```
 > Üç alan da nullable — filtre uygulanmayacaksa `null` gönderilebilir ya da alan hiç eklenmeyebilir; SP tarafına `NULL` geçer.
@@ -2134,7 +2134,7 @@ SP_RP_POS_Report çıktısını satır bazlı döner. Her satır: bir metrik ad�
 |---|---|---|---|---|
 | `regionCode` | `string?` | Hayır | `@RegionCode VARCHAR(100)` | Bölge kodu filtresi. |
 | `branchCode` | `string?` | Hayır | `@BranchCode VARCHAR` | Şube kodu filtresi. |
-| `businessLine` | `string?` | Hayır | `@BusinessLine VARCHAR` | İş kolu (örn. `"BIREYSEL"`, `"ISLETME"`). |
+| `tabId` | `int?` | Hayır | `@TabId INT` | Ekrandaki tab seçimi. |
 
 **Response** (`200 OK` → `GetPosReportItem[]`):
 ```json

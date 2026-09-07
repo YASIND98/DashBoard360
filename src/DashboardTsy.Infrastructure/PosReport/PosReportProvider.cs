@@ -14,7 +14,7 @@ namespace DashboardTsy.Infrastructure.PosReport;
 /// SP imzası:
 ///   @RegionCode   VARCHAR(100)
 ///   @BranchCode   VARCHAR(...)
-///   @BusinessLine VARCHAR(...)
+///   @TabId        INT
 ///
 /// SP çıktı kolonları: Metrics (VARCHAR), Date (DATE), Value (BIGINT), DiffValue (BIGINT).
 /// Kolon adları DTO property adlarıyla birebir olduğu için DataTableHelper.ToList<T>() yeterlidir.
@@ -47,7 +47,7 @@ public class PosReportProvider : IPosReportProvider
         {
             ["@RegionCode"]   = string.IsNullOrWhiteSpace(request.RegionCode) ? (object?)DBNull.Value : request.RegionCode,
             ["@BranchCode"]   = string.IsNullOrWhiteSpace(request.BranchCode) ? (object?)DBNull.Value : request.BranchCode,
-            ["@BusinessLine"] = string.IsNullOrWhiteSpace(request.BusinessLine) ? (object?)DBNull.Value : request.BusinessLine
+            ["@TabId"]      = request.TabId.HasValue ? (object?)request.TabId.Value : DBNull.Value
         };
 
         var ds = _spExecutor.ExecuteDataSet(ConnectionKey, ProcedureName, parameters);
