@@ -7,8 +7,6 @@ $(function () {
   var DIFF_LEGEND = '<span class="legend-value">-</span><span class="legend-bar ratio-red-bg"></span><span class="legend-value">0</span><span class="legend-bar ratio-green-bg"></span><span class="legend-value">+</span>';
   var RATIO_LEGEND = '<span class="legend-value">0</span><span class="legend-bar ratio-red-bg"></span><span class="legend-value">75</span><span class="legend-bar ratio-orange-bg"></span><span class="legend-value">100</span><span class="legend-bar ratio-green-bg"></span><span class="legend-value">120</span><span class="legend-bar ratio-blue-bg"></span>';
 
-  var BREAKDOWN_TAB_ENABLED = false;
-
   var _open = {};
   var _currentTable = 'daily';
   var _providers = {};
@@ -180,7 +178,6 @@ $(function () {
   }
 
   function renderBreakdown(tableKey) {
-      if (!BREAKDOWN_TAB_ENABLED) return;   // sekme gizliyken kırılım çizilmez
       var prov = activeProvider();
       var head = prov.buildHead(tableKey, _ctx);
       var visible = buildVisible(activeProducts(tableKey));
@@ -202,8 +199,6 @@ $(function () {
   }
 
   function showTab(tab) {
-      // Kırılım kapalıyken açılış/geri dönüş sekmesi Top-10, o da yoksa Trend olur
-      if (tab === 'breakdown' && !BREAKDOWN_TAB_ENABLED) tab = _showTop10Tab ? 'top10' : 'trend';
       $('#reportDetailTabs .report-detail-tab').removeClass('active');
       $('#reportDetailTabs .report-detail-tab[data-report-detail-tab="' + tab + '"]').addClass('active');
       $('#reportDetailBreakdownTab').toggleClass('report-detail-hidden', tab !== 'breakdown');
@@ -297,14 +292,6 @@ $(function () {
   });
 
   $('#reportDetailTabs').on('click', '.report-detail-tab', function () { showTab($(this).data('report-detail-tab')); });
-
-  // Kırılım kapalı: sekme butonu, içeriği ve yalnız kırılıma ait "Farkları Göster" aksiyonları gizlenir
-  if (!BREAKDOWN_TAB_ENABLED) {
-      $('#reportDetailTabs .report-detail-tab[data-report-detail-tab="breakdown"]').hide();
-      $('#reportDetailBreakdownTab').addClass('report-detail-hidden');
-      $('#reportDetailDiffToggle').hide();
-      $('#reportDetailDiffBtn').hide();
-  }
 
   $('#reportDetailClose').on('click', function () {
       $('#reportDetailOverlay').removeClass('active');

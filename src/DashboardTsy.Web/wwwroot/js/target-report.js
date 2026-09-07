@@ -207,12 +207,9 @@ $(document).ready(function () {
   // Tüm tablolardaki "Detay" hücresi: detay modalını açan ikon. tableKey = daily|quantity|monthly.
   // Top-10 sekmesi yalnızca hacim/bakiye (daily) + TOP10 ürününde açılır (data-top10).
   // Trend Analizi sekmesi yalnızca Adet (quantity) ve Aylık H/G (monthly) tablolarında vardır.
-  // Bölge/Şube/Portföy Kırılımı sekmesi şimdilik gizli olduğu için (report-detail.js), gösterilecek
-  // sekmesi olmayan satırlarda ikon basılmaz; aksi hâlde modal boş açılırdı.
+  // Bölge/Şube/Portföy Kırılımı her satırda açıldığı için detay ikonu her satıra basılır.
   function buildDetailCell(p, tableKey) {
       var isTop10 = tableKey === 'daily' && TOP10_PRODUCT_NAMES.includes((p.ProductName || '').replace(/\s*\(.*/, ''));
-      var hasTrend = tableKey === 'quantity' || tableKey === 'monthly';
-      if (!isTop10 && !hasTrend) return '<td class="col-detail"></td>';
       return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +
           ' data-table="' + tableKey + '"' +
           ' data-product-id="' + p.ProductId + '"' +
@@ -935,9 +932,8 @@ $(document).ready(function () {
     var isTop10 = String($(this).data('top10')) === '1';
     $('.report-detail-title').text(productName);
 
-    // Kırılım sekmesi şimdilik gizli (report-detail.js); gösterilmeyen veri için servise gidilmez.
-    // Geri açılırken alttaki satır yorumdan çıkarılmalı.
-    // loadBreakdown($(this).data('table') || 'daily', $(this).data('product-id'));
+    // Bölge/Şube/Portföy kırılımı: modal her satırda bu sekmeyle açılır, veriyi burada yükleriz.
+    loadBreakdown($(this).data('table') || 'daily', $(this).data('product-id'));
 
     if (isTop10) {
       currentTop10ProductId = $(this).data('product-id');
