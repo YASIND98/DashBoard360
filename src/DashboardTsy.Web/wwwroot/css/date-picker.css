@@ -205,6 +205,38 @@
   pointer-events: none;
 }
 
+.dp-months {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.dp-month {
+  padding: 10px 6px;
+  color: white;
+  font-size: 14px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.dp-month:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.dp-month.dp-active {
+  background: #7db5f3;
+  color: #0f4570;
+  font-weight: 600;
+}
+
+.dp-month.dp-disabled {
+  opacity: 0.28;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 @media (min-width: 1200px) {
   [data-theme="light"] .dp-nav {
     border-color: rgba(18, 55, 92, 0.3);
@@ -278,6 +310,20 @@
 
 [data-theme="light"] .dp-day.dp-muted {
   color: rgba(18, 55, 92, 0.3);
+}
+
+[data-theme="light"] .dp-month {
+  color: #3B4351;
+}
+
+[data-theme="light"] .dp-month:hover {
+  background: rgba(18, 55, 92, 0.07);
+  color: #12375C;
+}
+
+[data-theme="light"] .dp-month.dp-active {
+  background: #7db5f3;
+  color: #0f4570;
 }
 
 @media (max-width: 1199px) {
