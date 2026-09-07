@@ -15,6 +15,14 @@ $(document).ready(function () {
   var monthlyHeadersLoaded = false;
   var _selectedReportDate = _todayDate;
 
+  // ===== In-flight Request Tracking =====
+  // Hızlı tab/şube/bölge değişiminde önceki isteğin geç gelen cevabı ekranı ezmesin diye
+  // her yeni tablo isteğinden önce bir öncekini iptal ederiz.
+  var _targetHeadersXhr = null;
+  var _targetTableXhr = null;
+  var _targetTop10Xhr = null;
+  var _targetBreakdownXhr = null;
+
   // ===== Load Menu Texts =====
   var cachedMenu = sessionStorage.getItem('_menuTexts');
   if (cachedMenu) {
@@ -45,7 +53,8 @@ $(document).ready(function () {
           callback(JSON.parse(cached));
           return;
       }
-      $.ajax({
+      abortXhr(_targetHeadersXhr);
+      _targetHeadersXhr = $.ajax({
           url: url,
           type: 'POST',
           contentType: 'application/json',
@@ -408,7 +417,8 @@ $(document).ready(function () {
 
   // ===== Report Loaders =====
   function loadDailyReport() {
-      $.ajax({
+      abortXhr(_targetTableXhr);
+      _targetTableXhr = $.ajax({
           url: '/TargetReport/GetDailyTargetReport',
           type: 'POST',
           contentType: 'application/json',
@@ -444,7 +454,8 @@ $(document).ready(function () {
           showLoadingOverlay();
       }
 
-      $.ajax({
+      abortXhr(_targetTableXhr);
+      _targetTableXhr = $.ajax({
           url: '/TargetReport/GetMonthlyTargetReport',
           type: 'POST',
           contentType: 'application/json',
@@ -484,7 +495,8 @@ $(document).ready(function () {
           });
       }
 
-      $.ajax({
+      abortXhr(_targetTableXhr);
+      _targetTableXhr = $.ajax({
           url: '/TargetReport/GetDailyQuantityTargetReport',
           type: 'POST',
           contentType: 'application/json',
@@ -856,7 +868,8 @@ $(document).ready(function () {
     $('#top10First').html('');
     $('#top10Last').html('');
     showLoadingOverlay();
-    $.ajax({
+    abortXhr(_targetTop10Xhr);
+    _targetTop10Xhr = $.ajax({
       url: '/TargetReport/GetProductTop10DailyAndWeeklyDifferences',
       type: 'POST',
       contentType: 'application/json',
@@ -907,7 +920,8 @@ $(document).ready(function () {
           productId: productId,
           userCode: window.USER_CODE   // session User.DomainName (Index.cshtml -> window.USER_CODE)
       });
-      $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(body) })
+      abortXhr(_targetBreakdownXhr);
+      _targetBreakdownXhr = $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(body) })
           .done(function (data) { window.ReportBreakdownData = (data && data.Products) || []; })
           .fail(function () { window.ReportBreakdownData = []; })
           .always(function () { $(document).trigger('reportBreakdown:loaded', { table: tableKey }); });
