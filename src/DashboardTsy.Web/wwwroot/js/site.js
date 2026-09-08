@@ -29,6 +29,7 @@ var _sidebarIcons = {
     'NplReport': '/images/npl.svg',
     'FinancialMap': '/images/financial-map.svg',
     'MMReport': '/images/salary-customers.svg',
+    'PosReport': '/images/pos-report.svg',
 };
 
 function withUsername(url) {
