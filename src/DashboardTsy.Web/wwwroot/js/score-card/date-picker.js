@@ -14,20 +14,18 @@ $(function () {
 
     // Aktif dönemin parse edilmiş verisi. (Her tip değişiminde yeniden yüklenir.)
     //   { type, byYear: { yıl: { alt: key } }, years: [azalan benzersiz], first: { year, sub } }
-    //   alt = aylık:ay(1-12), çeyreklik:çeyrek(1-4), yıllık:0
+    //   alt = aylık/yıllık:ay(1-12), çeyreklik:çeyrek(1-4)
     var D = null;
-    // sub = aktif tipe göre ay / çeyrek / 0 (yıllık).
     var state = { year: 0, sub: 0, panelYear: 0 };
 
     // ── Servis dönemini parse et ─────────────────────────────────────────────────
-    // value formatı: "YIL - AYn" / "YIL - CEYREKn"; yıllıkta yıl bazında İLK key alınır.
+    // value formatı: "YIL - AYn" / "YIL - CEYREKn" (yıllık da ay taşır).
     function parsePeriods(type, kvs) {
-        var isYear = (type === PERIOD.yillik);
         var byYear = {}, years = [], first = null;
         (kvs || []).forEach(function (it) {
             var p = String(it.value).split(' - ');
             var year = parseInt(p[0], 10);
-            var sub = isYear ? 0 : parseInt((p[1] || '').replace(/[^0-9]/g, ''), 10);
+            var sub = parseInt((p[1] || '').replace(/[^0-9]/g, ''), 10);
             if (!byYear[year]) { byYear[year] = {}; years.push(year); }
             if (byYear[year][sub] == null) byYear[year][sub] = it.key;   // aynı alt için ilk key
             if (!first) first = { year: year, sub: sub };
@@ -55,12 +53,12 @@ $(function () {
     function isFirstSelected() { return state.year === D.first.year && state.sub === D.first.sub; }
 
     function getLabel() {
-        if (D.type === PERIOD.aylik) return _trMonths[state.sub - 1] + ' ' + state.year;
         if (D.type === PERIOD.ceyreklik) {
             var months = quarterMonths(state.sub).map(shortMonth).join(' - ') + ' ' + state.year;
             return isFirstSelected() ? months : months + '  ' + state.sub + '. Çeyrek';
         }
-        return '' + state.year;
+        // Aylık ve yıllık: seçili ay + yıl (yıllıkta ay = kümülatifin bitiş ayı).
+        return _trMonths[state.sub - 1] + ' ' + state.year;
     }
 
     function getBadge() {
@@ -68,7 +66,6 @@ $(function () {
         return D.type === PERIOD.aylik ? 'Bu Ay' : (D.type === PERIOD.ceyreklik ? 'Bu Çeyrek' : 'Bu Yıl');
     }
 
-    // Seçili dönemin servis dateNumber'ı (key).
     function getDateNumber() {
         return (D.byYear[state.year] && D.byYear[state.year][state.sub]) || -1;
     }
@@ -101,16 +98,7 @@ $(function () {
 
     function renderPanel() {
         var html = '';
-        if (D.type === PERIOD.aylik) {
-            var availM = D.byYear[state.panelYear] || {};
-            html += yearNav() + '<div class="sc-dp-grid">';
-            for (var m = 1; m <= 12; m++) {
-                html += gridCell(_trMonths[m - 1], 'data-dp-month="' + m + '"',
-                                 state.panelYear === state.year && m === state.sub, availM[m] == null);
-            }
-            html += '</div>';
-
-        } else if (D.type === PERIOD.ceyreklik) {
+        if (D.type === PERIOD.ceyreklik) {
             var availQ = D.byYear[state.panelYear] || {};
             html += yearNav() + '<div class="sc-dp-grid sc-dp-grid-2">';
             for (var q = 1; q <= 4; q++) {
@@ -120,19 +108,21 @@ $(function () {
             html += '</div>';
 
         } else {
-            // Yıllık: yalnızca servisten dönen benzersiz yıllar.
-            html += '<div class="sc-dp-year-list">';
-            D.years.forEach(function (y) {
-                html += '<div class="sc-dp-year-item' + (y === state.year ? ' sc-dp-active' : '') + '" data-dp-year="' + y + '">' + y + '</div>';
-            });
+            // Aylık ve yıllık: yıl gezintisi + ay ızgarası; servisten o yıl için dönmeyen aylar pasif.
+            var availM = D.byYear[state.panelYear] || {};
+            html += yearNav() + '<div class="sc-dp-grid">';
+            for (var m = 1; m <= 12; m++) {
+                html += gridCell(_trMonths[m - 1], 'data-dp-month="' + m + '"',
+                                 state.panelYear === state.year && m === state.sub, availM[m] == null);
+            }
             html += '</div>';
         }
-        $('#scDpPanel').html(html).toggleClass('sc-dp-panel--yearly', D.type === PERIOD.yillik);
+        $('#scDpPanel').html(html);
     }
 
     // ── Panel açma / kapama ─────────────────────────────────────────────────────
     function openPanel() {
-        if (!D) return;   // dönem verisi henüz gelmediyse panel açma
+        if (!D) return;
         state.panelYear = state.year;
         renderPanel();
         $('#scDpPanel').addClass('open');
@@ -146,13 +136,8 @@ $(function () {
     }
 
     // ── İleri / geri (header okları): bir sonraki dönem servis dışıysa durur ──────
-    // dir yönündeki bir sonraki dönem ({year, sub}); servis dışıysa null.
     function nextSelection(dir) {
-        if (D.type === PERIOD.yillik) {
-            var yi = D.years.indexOf(state.year) - dir;   // azalan: önceki(eski)=index+1
-            return (yi >= 0 && yi < D.years.length) ? { year: D.years[yi], sub: 0 } : null;
-        }
-        var max = (D.type === PERIOD.aylik) ? 12 : 4;
+        var max = (D.type === PERIOD.ceyreklik) ? 4 : 12;
         var y = state.year, s = state.sub + dir;
         if (s < 1) { s = max; y--; } else if (s > max) { s = 1; y++; }
         return (D.byYear[y] && D.byYear[y][s] != null) ? { year: y, sub: s } : null;
@@ -203,14 +188,6 @@ $(function () {
         state.year = state.panelYear;
         closePanel(); refreshHeader(); notify();
     });
-
-    $(document).on('click', '[data-dp-year]', function (e) {
-        e.stopPropagation();
-        state.year = +$(this).data('dp-year');
-        closePanel(); refreshHeader(); notify();
-    });
-
-    // Periyot tipi (Aylık/Çeyreklik/Yıllık) değişimini index.js dinler; dönemleri çekip
 
     // ── Dış API: dönem listesini index.js besler (scorecard/periods tek yerden çekilir) ──
     $('#scDatePicker').hide();   // dönem verisi gelene kadar gizli; veri boşsa gizli kalır

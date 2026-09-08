@@ -581,7 +581,6 @@
   z-index: 6;
 }
 
-/* ===== Hedef ve Verim raporları sayfası: sticky ===== */
   .page-home .data-table th.col-index,
   .page-home .data-table td.col-index,
   .page-yieldreports .data-table th.col-index,
@@ -605,7 +604,9 @@
   .page-home .data-table th.col-left,
   .page-home .data-table td.col-left,
   .page-yieldreports .data-table th.col-left,
-  .page-yieldreports .data-table td.col-left {
+  .page-yieldreports .data-table td.col-left,
+  .page-posreport .data-table th.col-left,
+  .page-posreport .data-table td.col-left {
     position: sticky;
     z-index: 2;
     white-space: nowrap;
@@ -643,14 +644,18 @@
   [data-theme="light"] .page-home .data-table th.col-left,
   [data-theme="light"] .page-home .data-table td.col-left,
   [data-theme="light"] .page-yieldreports .data-table th.col-left,
-  [data-theme="light"] .page-yieldreports .data-table td.col-left {
+  [data-theme="light"] .page-yieldreports .data-table td.col-left,
+  [data-theme="light"] .page-posreport .data-table th.col-left,
+  [data-theme="light"] .page-posreport .data-table td.col-left {
     border-right-color: #B6D6F8;
   }
 
   .page-home .data-table th.col-left:first-child,
   .page-home .data-table td.col-left:first-child,
   .page-yieldreports .data-table th.col-left:first-child,
-  .page-yieldreports .data-table td.col-left:first-child{
+  .page-yieldreports .data-table td.col-left:first-child,
+  .page-posreport .data-table th.col-left:first-child,
+  .page-posreport .data-table td.col-left:first-child{
     left: 0;
     max-width: none;
   }
@@ -661,7 +666,8 @@
   .page-home .data-table thead th.col-left,
   .page-yieldreports .data-table thead th.col-index,
   .page-yieldreports .data-table thead th.col-expand,
-  .page-yieldreports .data-table thead th.col-left {
+  .page-yieldreports .data-table thead th.col-left,
+  .page-posreport .data-table thead th.col-left {
     z-index: 5;
   }
 
@@ -671,7 +677,8 @@
   .page-home .data-table tr.stripe-odd td.col-left,
   .page-yieldreports .data-table tr.stripe-odd td.col-index,
   .page-yieldreports .data-table tr.stripe-odd td.col-expand,
-  .page-yieldreports .data-table tr.stripe-odd td.col-left {
+  .page-yieldreports .data-table tr.stripe-odd td.col-left,
+  .page-posreport .data-table tr.stripe-odd td.col-left {
     background: var(--bg-stripe);
   }
 
@@ -680,7 +687,8 @@
   .page-home .data-table tr.stripe-even td.col-left,
   .page-yieldreports .data-table tr.stripe-even td.col-index,
   .page-yieldreports .data-table tr.stripe-even td.col-expand,
-  .page-yieldreports .data-table tr.stripe-even td.col-left {
+  .page-yieldreports .data-table tr.stripe-even td.col-left,
+  .page-posreport .data-table tr.stripe-even td.col-left {
     background: rgb(21, 32, 88);
   }
 
@@ -689,7 +697,8 @@
   [data-theme="light"] .page-home .data-table tr.stripe-odd td.col-left,
   [data-theme="light"] .page-yieldreports .data-table tr.stripe-odd td.col-index,
   [data-theme="light"] .page-yieldreports .data-table tr.stripe-odd td.col-expand,
-  [data-theme="light"] .page-yieldreports .data-table tr.stripe-odd td.col-left {
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-odd td.col-left,
+  [data-theme="light"] .page-posreport .data-table tr.stripe-odd td.col-left {
     background: #F0F6FE;
   }
 
@@ -698,7 +707,8 @@
   [data-theme="light"] .page-home .data-table tr.stripe-even td.col-left,
   [data-theme="light"] .page-yieldreports .data-table tr.stripe-even td.col-index,
   [data-theme="light"] .page-yieldreports .data-table tr.stripe-even td.col-expand,
-  [data-theme="light"] .page-yieldreports .data-table tr.stripe-even td.col-left {
+  [data-theme="light"] .page-yieldreports .data-table tr.stripe-even td.col-left,
+  [data-theme="light"] .page-posreport .data-table tr.stripe-even td.col-left {
     background: #E9F3FE;
   }
 

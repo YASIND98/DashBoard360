@@ -1,0 +1,89 @@
+@model ReportViewModel
+
+<div class="page-header">
+    <h1 class="page-title">POS Raporları</h1>
+    <div class="page-date">
+        <span class="date-text">@Model.Tarih</span>
+        <span class="date-badge">Bugün</span>
+    </div>
+    @await Html.PartialAsync("_AvatarArea")
+</div>
+
+<div class="filters-row">
+    <h1 class="page-title page-title-mobile mobile">POS Raporları</h1>
+    <div class="filters-left">
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="posRegionSelect">
+                <span class="filter-label" id="posRegionLabel">Bölge</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="posRegionPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="posRegionSearch" />
+                </div>
+                <div class="dropdown-list" id="posRegionList"></div>
+            </div>
+        </div>
+
+        <div class="filter-dropdown-wrapper">
+            <div class="filter-dropdown" id="posBranchSelect">
+                <span class="filter-label" id="posBranchLabel">Şube</span>
+                <img src="~/images/down.svg" alt="" />
+            </div>
+            <div class="dropdown-panel" id="posBranchPanel">
+                <div class="dropdown-search">
+                    <img src="~/images/search.svg" alt="" />
+                    <input type="text" placeholder="Ara" class="dropdown-search-input" id="posBranchSearch" />
+                </div>
+                <div class="dropdown-list" id="posBranchList"></div>
+            </div>
+        </div>
+
+        <div class="filter-search">
+            <img src="~/images/search.svg" alt="" />
+            <input type="text" placeholder="Ara" id="posSearchInput" />
+        </div>
+
+        @await Html.PartialAsync("_MobileMoreMenu")
+    </div>
+</div>
+
+<!-- İş kolu sekmeleri: data-tab-id servise tabId olarak gider. Açılışta Genel Bakış (0) seçili. -->
+<div class="tab-bar">
+    <div class="tab-list" id="posTabList">
+        <button class="tab active" data-tab-id="0">Genel Bakış</button>
+        <button class="tab" data-tab-id="1">Kurumsal</button>
+        <button class="tab" data-tab-id="2">Ticari</button>
+        <button class="tab" data-tab-id="3">KOBİ</button>
+        <button class="tab" data-tab-id="4">Tarım</button>
+        <button class="tab" data-tab-id="5">Bireysel</button>
+        <button class="tab" data-tab-id="6">Ortak</button>
+    </div>
+</div>
+
+<!-- POS Table: satırlar metrik, kolonlar ay (yeniden eskiye) -->
+<div class="table-container" id="posTableContainer">
+    <div class="table-wrapper">
+        <table class="data-table" id="posDataTable">
+            <thead id="posTableHead"></thead>
+            <tbody id="posTableBody"></tbody>
+        </table>
+    </div>
+    <div class="table-legend" id="posLegend">
+        <span class="legend-note">Fark değerleri bir önceki aya göre hesaplanmaktadır.</span>
+        <div class="legend-actions">
+            <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
+                <img src="~/images/download.svg" alt="PDF İndir" />
+                <span>PDF İndir</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
+    <script src="~/js/pos-report.js" asp-append-version="true"></script>
+    <script src="~/js/download-pdf.js" asp-append-version="true"></script>
+}

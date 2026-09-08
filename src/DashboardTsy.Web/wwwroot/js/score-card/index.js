@@ -353,7 +353,8 @@ $(function () {
             ? window.ScoreCardDatePicker.getSelection() : null;
         var year = sel ? sel.year : -1;
         var sub = sel ? sel.sub : -1;
-        if (period === 'yillik')    return { year: year, month: -1, quarter: -1, cumulativeFlag: "1" };
+        // Yıllık kümülatiftir ama bitiş ayı date-picker'dan seçilir; seçili ay servise gider.
+        if (period === 'yillik')    return { year: year, month: sub, quarter: -1, cumulativeFlag: "1" };
         if (period === 'ceyreklik') return { year: year, month: -1, quarter: sub, cumulativeFlag: "0" };
         return { year: year, month: sub, quarter: -1, cumulativeFlag: "0" };
     }
@@ -362,7 +363,7 @@ $(function () {
         var p = periodParams();
         return {
             year: p.year,                                   // date-picker'da seçili yıl
-            month: p.month,                                 // aylıkta seçili ay; çeyreklik/yıllıkta -1
+            month: p.month,                                 // aylık ve yıllıkta seçili ay; çeyreklikte -1
             quarter: p.quarter,                             // çeyreklikte seçili çeyrek (1-4); değilse -1
             cumulativeFlag: p.cumulativeFlag,               // yıllıkta 1; değilse 0
             registerId: _registerId,                        // seçili sicil;
