@@ -114,7 +114,18 @@ $(document).ready(function () {
 
       var $body = $('#posTableBody').html(html);
       reStripeTable($body);
+      applyDiffVisibility();
   }
+
+  // Fark satırları client'ta gizlenir; veri her iki durumda da aynı geldiği için servise gidilmez.
+  function applyDiffVisibility() {
+      $('#posTableBody .diff-value').toggle($('#posDiffToggle').attr('data-active') === 'true');
+  }
+
+  $(document).on('click', '#posDiffToggle', function () {
+      $(this).attr('data-active', $(this).attr('data-active') === 'true' ? 'false' : 'true');
+      applyDiffVisibility();
+  });
 
   // ===== PDF (window.PdfReport) — ekranda görünenle aynı veriden kurulur =====
   function pdfInfoLines() {

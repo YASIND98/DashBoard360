@@ -71,8 +71,20 @@
         </table>
     </div>
     <div class="table-legend" id="posLegend">
-        <span class="legend-note">Fark değerleri bir önceki aya göre hesaplanmaktadır.</span>
+        <span class="legend-note">Tablodaki değerler x1000 olarak verilmektedir.</span>
+        <div class="legend-colors">
+            <span class="legend-value">-</span>
+            <span class="legend-bar ratio-red-bg"></span>
+            <span class="legend-value">0</span>
+            <span class="legend-bar ratio-green-bg"></span>
+            <span class="legend-value">+</span>
+        </div>
         <div class="legend-actions">
+            <div class="diff-toggle" id="posDiffToggle" data-active="true">
+                <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+                <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+                <span>Farkları Göster</span>
+            </div>
             <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
                 <img src="~/images/download.svg" alt="PDF İndir" />
                 <span>PDF İndir</span>
