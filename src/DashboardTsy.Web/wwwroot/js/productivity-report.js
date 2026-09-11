@@ -616,9 +616,9 @@ function renderVolumeRegionTable(items) {
         html += '<td>' + formatNumber(item.NetGrowthRegionAverageValue) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
-        html += '<td>' + formatRateValue(item.YtdRegionValue) + '</td>';
+        html += '<td class="' + compareColor(item.YtdRegionValue, item.YtdBankAverageValue) + '">' + formatRateValue(item.YtdRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatRateValue(item.YtdBankAverageValue) + formatDiff(item.YtdBankAverageDiff) + '</td>';
-        html += '<td>' + formatRateValue(item.QtdRegionValue) + '</td>';
+        html += '<td class="' + compareColor(item.QtdRegionValue, item.QtdBankAverageValue) + '">' + formatRateValue(item.QtdRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatRateValue(item.QtdBankAverageValue) + formatDiff(item.QtdBankAverageDiff) + '</td>';
         html += buildProductivityDetailCell(item);
         html += '</tr>';

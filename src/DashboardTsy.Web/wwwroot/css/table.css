@@ -659,6 +659,15 @@
     left: 0;
     max-width: none;
   }
+  
+  .page-posreport .data-table th.col-left,
+  .page-posreport .data-table td.col-left,
+  .page-posreport .data-table th.col-left:first-child,
+  .page-posreport .data-table td.col-left:first-child {
+    white-space: normal;
+    width: 184px;
+    min-width: 140px;
+  }
 
   /* Header sticky → z-index thead'den yüksek olmalı (thead th zaten z-index:3) */
   .page-home .data-table thead th.col-index,
