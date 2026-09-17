@@ -3,6 +3,7 @@ using DashboardTsy.Application.BranchMap;
 using DashboardTsy.Application.BranchMap.Requests;
 using DashboardTsy.Application.BranchMap.Responses;
 using DashboardTsy.Infrastructure.Data;
+using Microsoft.Extensions.Configuration;
 
 namespace DashboardTsy.Infrastructure.BranchMap;
 
@@ -10,6 +11,7 @@ namespace DashboardTsy.Infrastructure.BranchMap;
 /// IBranchMapProvider implementasyonu: SP_RP_BRANCHMAPINFO çağrısını yapar.
 /// SP çıktısındaki kolon adları (BRANCNAME, BRANCHADRESS, LN, LT) DTO adlarıyla
 /// birebir örtüşmediği için DataTableHelper yerine elle eşleme kullanılır.
+/// ReportMock:Enabled true iken MockBranchMapData'ya delege eder.
 /// </summary>
 public class BranchMapProvider : IBranchMapProvider
 {
@@ -17,15 +19,23 @@ public class BranchMapProvider : IBranchMapProvider
     private const string ProcedureName = "SP_RP_BRANCHMAPINFO";
 
     private readonly IStoredProcedureExecutor _spExecutor;
+    private readonly IConfiguration _configuration;
 
-    public BranchMapProvider(IStoredProcedureExecutor spExecutor)
+    public BranchMapProvider(IStoredProcedureExecutor spExecutor, IConfiguration configuration)
     {
         _spExecutor = spExecutor;
+        _configuration = configuration;
     }
+
+    private bool MockEnabled =>
+        _configuration["ReportMock:Enabled"] is string v && bool.TryParse(v, out var b) && b;
 
     public IReadOnlyList<GetBranchMapInfoItem> GetBranchMapInfo(GetBranchMapInfoRequest request)
     {
         request ??= new GetBranchMapInfoRequest();
+
+        if (MockEnabled)
+            return MockBranchMapData.GetBranchMapInfo(request);
 
         var parameters = new Dictionary<string, object?>
         {
