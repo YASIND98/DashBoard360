@@ -376,6 +376,7 @@ $(document).ready(function () {
   function loadActiveTable() {
       showLoadingOverlay();
       var kind = getActiveMainTabKind();
+      showActiveTableContainer(kind);
 
       if (kind === 'bankshare') {
           loadBankShareReport(function (data) {
@@ -423,7 +424,6 @@ $(document).ready(function () {
       $('.data-table .sort-icon').removeClass('asc desc');
       $('#salarySearchInput').val('');
 
-      showActiveTableContainer($(this).data('tab-kind'));
       renderSubTabs(window._salaryTabs, getActiveMainTabId());
       loadActiveTable();
   });
