@@ -121,6 +121,7 @@ builder.Services.AddHttpClient<IExchangeRateApiClient, ExchangeRateApiClient>();
 builder.Services.AddHttpClient<ISalaryCustomerReportApiClient, SalaryCustomerReportApiClient>();
 builder.Services.AddHttpClient<INplReportApiClient, NplReportApiClient>();
 builder.Services.AddHttpClient<IPosReportApiClient, PosReportApiClient>();
+builder.Services.AddHttpClient<IBranchMapApiClient, BranchMapApiClient>();
 
 // ScoreCard proxy: Web -> Api -> Pupa (aynı DashboardApi base URL)
 var dashboardApiBaseUrl = builder.Configuration[$"{DashboardApiOptions.SectionName}:BaseUrl"]?.TrimEnd('/') ?? string.Empty;
