@@ -1263,146 +1263,93 @@ public static class MockProductivityReportData
 
     public static GetProductivityProfitSpreadManagementRegionReportResponse GetProductivityProfitSpreadManagementRegionReport(GetProductivityProfitSpreadManagementRegionReportRequest request)
     {
-        var root = new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
+        var items = new List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>
         {
-            Id = 1,
-            Description = "Spread Yönetimi - Toplam",
-            SpreadValue = 0.035m,
-            RatioRegionValue = 0.034m,
-            RatioRegionValueDiff = 0.002m,
-            RatioBankAverageValue = 0.032m,
-            RatioBankAverageValueDiff = 0m,
-            NetReturnRegionValue = 420m,
-            NetReturnRegionValueDiff = 40m,
-            NetReturnBankAverageValue = 380m,
-            NetReturnBankAverageValueDiff = 0m,
-            NetReturnHgRegionValue = 0.97m,
-            NetReturnHgRegionValueDiff = 0.05m,
-            NetReturnHgBankAverageValue = 0.92m,
-            NetReturnHgBankAverageValueDiff = 0m
+            new()
+            {
+                ProductName = "Mevduat Spread",
+                RegionTargetReturnCumulativeCurrentYear = 250,
+                RegionReturnCumulativeCurrentYear = 210,
+                RegionReturnCumulativeLastYear = 180,
+                RegionTargetAverageVolumeCumulativeCurrentYear = 12000,
+                RegionAverageVolumeCumulativeCurrentYear = 11500,
+                RegionAverageVolumeCumulativeLastYear = 10200,
+                RegionSpreadTargetCurrentYear = 2.10m,
+                RegionSpreadReturnCurrentYear = 1.85m,
+                RegionSpreadReturnLastYear = 1.75m,
+                BankSpreadTargetCurrentYear = 2.00m,
+                BankSpreadReturnCurrentYear = 1.80m
+            },
+            new()
+            {
+                ProductName = "Kredi Spread",
+                RegionTargetReturnCumulativeCurrentYear = 260,
+                RegionReturnCumulativeCurrentYear = 235,
+                RegionReturnCumulativeLastYear = 200,
+                RegionTargetAverageVolumeCumulativeCurrentYear = 15000,
+                RegionAverageVolumeCumulativeCurrentYear = 14400,
+                RegionAverageVolumeCumulativeLastYear = 12800,
+                RegionSpreadTargetCurrentYear = 1.90m,
+                RegionSpreadReturnCurrentYear = 1.70m,
+                RegionSpreadReturnLastYear = 1.65m,
+                BankSpreadTargetCurrentYear = 1.85m,
+                BankSpreadReturnCurrentYear = 1.68m
+            }
         };
 
-        root.SubProducts.Add(new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
-        {
-            Id = 2,
-            Description = "Mevduat Spread",
-            SpreadValue = 0.018m,
-            RatioRegionValue = 0.0175m,
-            RatioRegionValueDiff = 0.001m,
-            RatioBankAverageValue = 0.0165m,
-            RatioBankAverageValueDiff = 0m,
-            NetReturnRegionValue = 210m,
-            NetReturnRegionValueDiff = 15m,
-            NetReturnBankAverageValue = 195m,
-            NetReturnBankAverageValueDiff = 0m,
-            NetReturnHgRegionValue = 0.97m,
-            NetReturnHgRegionValueDiff = 0.05m,
-            NetReturnHgBankAverageValue = 0.92m,
-            NetReturnHgBankAverageValueDiff = 0m
-        });
-
-        root.SubProducts.Add(new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
-        {
-            Id = 3,
-            Description = "Kredi Spread",
-            SpreadValue = 0.017m,
-            RatioRegionValue = 0.0165m,
-            RatioRegionValueDiff = 0.001m,
-            RatioBankAverageValue = 0.0155m,
-            RatioBankAverageValueDiff = 0m,
-            NetReturnRegionValue = 210m,
-            NetReturnRegionValueDiff = 25m,
-            NetReturnBankAverageValue = 185m,
-            NetReturnBankAverageValueDiff = 0m,
-            NetReturnHgRegionValue = 0.97m,
-            NetReturnHgRegionValueDiff = 0.06m,
-            NetReturnHgBankAverageValue = 0.91m,
-            NetReturnHgBankAverageValueDiff = 0m
-        });
-
-        var roots = new List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> { root };
-        roots = SortProfitSpreadManagementRegionTree(roots, request.SortBy, request.IsAscending);
+        items = SortProfitSpreadManagementRegionList(items, request.SortBy, request.IsAscending);
 
         return new GetProductivityProfitSpreadManagementRegionReportResponse
         {
-            GetProductivityProfitSpreadManagementRegionReports = roots
+            GetProductivityProfitSpreadManagementRegionReports = items
         };
     }
 
     public static GetProductivityProfitSpreadManagementBranchReportResponse GetProductivityProfitSpreadManagementBranchReport(GetProductivityProfitSpreadManagementBranchReportRequest request)
     {
-        var root = new GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem
+        var items = new List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem>
         {
-            Id = 1,
-            Description = "Spread Yönetimi - Toplam (Şube)",
-            SpreadValue = 0.036m,
-            RatioBranchValue = 0.035m,
-            RatioRegionAverageValue = 0.034m,
-            RatioRegionAverageValueDiff = 0.002m,
-            RatioBankAverageValue = 0.032m,
-            RatioBankAverageValueDiff = 0m,
-            NetReturnBranchValue = 435m,
-            NetReturnRegionAverageValue = 420m,
-            NetReturnRegionAverageValueDiff = 55m,
-            NetReturnBankAverageValue = 380m,
-            NetReturnBankAverageValueDiff = 0m,
-            NetReturnHgBranchValue = 0.98m,
-            NetReturnHgRegionAverageValue = 0.97m,
-            NetReturnHgRegionAverageValueDiff = 0.06m,
-            NetReturnHgBankAverageValue = 0.92m,
-            NetReturnHgBankAverageValueDiff = 0m
+            new()
+            {
+                ProductName = "Mevduat Spread",
+                BranchTargetReturnCumulativeCurrentYear = 260,
+                BranchReturnCumulativeCurrentYear = 220,
+                BranchReturnCumulativeLastYear = 190,
+                BranchTargetAverageVolumeCumulativeCurrentYear = 12500,
+                BranchAverageVolumeCumulativeCurrentYear = 11900,
+                BranchAverageVolumeCumulativeLastYear = 10500,
+                BranchSpreadTargetCurrentYear = 2.15m,
+                BranchSpreadReturnCurrentYear = 1.90m,
+                BranchSpreadReturnLastYear = 1.78m,
+                RegionSpreadTargetCurrentYear = 2.10m,
+                RegionSpreadReturnCurrentYear = 1.85m,
+                BankSpreadTargetCurrentYear = 2.00m,
+                BankSpreadReturnCurrentYear = 1.80m
+            },
+            new()
+            {
+                ProductName = "Kredi Spread",
+                BranchTargetReturnCumulativeCurrentYear = 270,
+                BranchReturnCumulativeCurrentYear = 245,
+                BranchReturnCumulativeLastYear = 210,
+                BranchTargetAverageVolumeCumulativeCurrentYear = 15500,
+                BranchAverageVolumeCumulativeCurrentYear = 14900,
+                BranchAverageVolumeCumulativeLastYear = 13100,
+                BranchSpreadTargetCurrentYear = 1.95m,
+                BranchSpreadReturnCurrentYear = 1.75m,
+                BranchSpreadReturnLastYear = 1.68m,
+                RegionSpreadTargetCurrentYear = 1.90m,
+                RegionSpreadReturnCurrentYear = 1.70m,
+                BankSpreadTargetCurrentYear = 1.85m,
+                BankSpreadReturnCurrentYear = 1.68m
+            }
         };
 
-        root.SubProducts.Add(new GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem
-        {
-            Id = 2,
-            Description = "Mevduat Spread",
-            SpreadValue = 0.019m,
-            RatioBranchValue = 0.0185m,
-            RatioRegionAverageValue = 0.0175m,
-            RatioRegionAverageValueDiff = 0.001m,
-            RatioBankAverageValue = 0.0165m,
-            RatioBankAverageValueDiff = 0m,
-            NetReturnBranchValue = 220m,
-            NetReturnRegionAverageValue = 210m,
-            NetReturnRegionAverageValueDiff = 25m,
-            NetReturnBankAverageValue = 195m,
-            NetReturnBankAverageValueDiff = 0m,
-            NetReturnHgBranchValue = 0.98m,
-            NetReturnHgRegionAverageValue = 0.97m,
-            NetReturnHgRegionAverageValueDiff = 0.06m,
-            NetReturnHgBankAverageValue = 0.92m,
-            NetReturnHgBankAverageValueDiff = 0m
-        });
-
-        root.SubProducts.Add(new GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem
-        {
-            Id = 3,
-            Description = "Kredi Spread",
-            SpreadValue = 0.017m,
-            RatioBranchValue = 0.0165m,
-            RatioRegionAverageValue = 0.0165m,
-            RatioRegionAverageValueDiff = 0.001m,
-            RatioBankAverageValue = 0.0155m,
-            RatioBankAverageValueDiff = 0m,
-            NetReturnBranchValue = 215m,
-            NetReturnRegionAverageValue = 210m,
-            NetReturnRegionAverageValueDiff = 30m,
-            NetReturnBankAverageValue = 185m,
-            NetReturnBankAverageValueDiff = 0m,
-            NetReturnHgBranchValue = 0.98m,
-            NetReturnHgRegionAverageValue = 0.97m,
-            NetReturnHgRegionAverageValueDiff = 0.06m,
-            NetReturnHgBankAverageValue = 0.91m,
-            NetReturnHgBankAverageValueDiff = 0m
-        });
-
-        var roots = new List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> { root };
-        roots = SortProfitSpreadManagementBranchTree(roots, request.SortBy, request.IsAscending);
+        items = SortProfitSpreadManagementBranchList(items, request.SortBy, request.IsAscending);
 
         return new GetProductivityProfitSpreadManagementBranchReportResponse
         {
-            GetProductivityProfitSpreadManagementBranchReports = roots
+            GetProductivityProfitSpreadManagementBranchReports = items
         };
     }
 
@@ -1901,57 +1848,28 @@ public static class MockProductivityReportData
         return ordered;
     }
 
-    private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> SortProfitSpreadManagementRegionTree(
-        List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> nodes, int? sortBy, bool asc)
+    private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> SortProfitSpreadManagementRegionList(
+        List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> items, int? sortBy, bool asc)
     {
         Func<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem, object> key = sortBy switch
         {
-            1 => p => p.Description ?? string.Empty,
-            2 => p => p.SpreadValue,
-            3 => p => p.RatioRegionValue,
-            4 => p => p.RatioBankAverageValue,
-            5 => p => p.NetReturnRegionValue,
-            6 => p => p.NetReturnBankAverageValue,
-            7 => p => p.NetReturnHgRegionValue,
-            8 => p => p.NetReturnHgBankAverageValue,
-            _ => p => p.Id
+            1 => p => p.ProductName ?? string.Empty,
+            _ => p => p.ProductName ?? string.Empty
         };
 
-        var ordered = asc ? nodes.OrderBy(key).ToList() : nodes.OrderByDescending(key).ToList();
-
-        foreach (var n in ordered)
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortProfitSpreadManagementRegionTree(n.SubProducts, sortBy, asc);
-
-        return ordered;
+        return (asc ? items.OrderBy(key) : items.OrderByDescending(key)).ToList();
     }
 
-    private static List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> SortProfitSpreadManagementBranchTree(
-        List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> nodes, int? sortBy, bool asc)
+    private static List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> SortProfitSpreadManagementBranchList(
+        List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> items, int? sortBy, bool asc)
     {
         Func<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem, object> key = sortBy switch
         {
-            1 => p => p.Description ?? string.Empty,
-            2 => p => p.SpreadValue,
-            3 => p => p.RatioBranchValue,
-            4 => p => p.RatioRegionAverageValue,
-            5 => p => p.RatioBankAverageValue,
-            6 => p => p.NetReturnBranchValue,
-            7 => p => p.NetReturnRegionAverageValue,
-            8 => p => p.NetReturnBankAverageValue,
-            9 => p => p.NetReturnHgBranchValue,
-            10 => p => p.NetReturnHgRegionAverageValue,
-            11 => p => p.NetReturnHgBankAverageValue,
-            _ => p => p.Id
+            1 => p => p.ProductName ?? string.Empty,
+            _ => p => p.ProductName ?? string.Empty
         };
 
-        var ordered = asc ? nodes.OrderBy(key).ToList() : nodes.OrderByDescending(key).ToList();
-
-        foreach (var n in ordered)
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortProfitSpreadManagementBranchTree(n.SubProducts, sortBy, asc);
-
-        return ordered;
+        return (asc ? items.OrderBy(key) : items.OrderByDescending(key)).ToList();
     }
 
     #endregion

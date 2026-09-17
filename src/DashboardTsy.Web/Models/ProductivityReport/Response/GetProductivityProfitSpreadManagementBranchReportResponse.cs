@@ -1,4 +1,4 @@
-﻿namespace DashboardTsy.Web.Models.ProductivityReport.Response;
+namespace DashboardTsy.Web.Models.ProductivityReport.Response;
 
 public class GetProductivityProfitSpreadManagementBranchReportResponse
 {
@@ -6,29 +6,24 @@ public class GetProductivityProfitSpreadManagementBranchReportResponse
 
     public class GetProductivityProfitSpreadManagementBranchReportItem
     {
-        public int Id { get; set; }
-        public string Description { get; set; } = string.Empty;
+        public string ProductName { get; set; } = string.Empty;
 
-        public decimal SpreadValue { get; set; }
+        public int BranchTargetReturnCumulativeCurrentYear { get; set; }
+        public int BranchReturnCumulativeCurrentYear { get; set; }
+        public int BranchReturnCumulativeLastYear { get; set; }
 
-        public decimal RatioBranchValue { get; set; }
-        public decimal RatioRegionAverageValue { get; set; }
-        public decimal? RatioRegionAverageValueDiff { get; set; }
-        public decimal RatioBankAverageValue { get; set; }
-        public decimal? RatioBankAverageValueDiff { get; set; }
+        public int BranchTargetAverageVolumeCumulativeCurrentYear { get; set; }
+        public int BranchAverageVolumeCumulativeCurrentYear { get; set; }
+        public int BranchAverageVolumeCumulativeLastYear { get; set; }
 
-        public decimal NetReturnBranchValue { get; set; }
-        public decimal NetReturnRegionAverageValue { get; set; }
-        public decimal? NetReturnRegionAverageValueDiff { get; set; }
-        public decimal NetReturnBankAverageValue { get; set; }
-        public decimal? NetReturnBankAverageValueDiff { get; set; }
+        public decimal BranchSpreadTargetCurrentYear { get; set; }
+        public decimal BranchSpreadReturnCurrentYear { get; set; }
+        public decimal BranchSpreadReturnLastYear { get; set; }
 
-        public decimal NetReturnHgBranchValue { get; set; }
-        public decimal NetReturnHgRegionAverageValue { get; set; }
-        public decimal? NetReturnHgRegionAverageValueDiff { get; set; }
-        public decimal NetReturnHgBankAverageValue { get; set; }
-        public decimal? NetReturnHgBankAverageValueDiff { get; set; }
+        public decimal RegionSpreadTargetCurrentYear { get; set; }
+        public decimal RegionSpreadReturnCurrentYear { get; set; }
 
-        public List<GetProductivityProfitSpreadManagementBranchReportItem> SubProducts { get; set; } = new();
+        public decimal BankSpreadTargetCurrentYear { get; set; }
+        public decimal BankSpreadReturnCurrentYear { get; set; }
     }
 }

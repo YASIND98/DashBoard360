@@ -985,13 +985,8 @@ public class ReportDataProvider : IReportDataProvider
 
         var parameters = new Dictionary<string, object?>
         {
-            ["@SessionId"] = request.SessionId ?? string.Empty,
             ["@RegionCode"] = request.RegionCode ?? string.Empty,
-            ["@ReportDate"] = request.ReportDate,
-            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@ReportDate"] = request.ReportDate
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -1004,10 +999,10 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
-        var roots = BuildProductivityProfitSpreadManagementRegionReportTree(ds, request.ReportDate);
-        roots = SortProductivityProfitSpreadManagementRegionTree(roots, request.SortBy, request.IsAscending);
+        var items = BuildProductivityProfitSpreadManagementRegionReportList(ds.Tables[0]);
+        items = SortProductivityProfitSpreadManagementRegionList(items, request.SortBy, request.IsAscending);
 
-        response.GetProductivityProfitSpreadManagementRegionReports = roots;
+        response.GetProductivityProfitSpreadManagementRegionReports = items;
         return response;
     }
 
@@ -1020,13 +1015,9 @@ public class ReportDataProvider : IReportDataProvider
 
         var parameters = new Dictionary<string, object?>
         {
-            ["@SessionId"] = request.SessionId ?? string.Empty,
-            ["@BranchCode"] = string.IsNullOrWhiteSpace(request.BranchCode) ? (object)DBNull.Value : request.BranchCode,
-            ["@ReportDate"] = request.ReportDate,
-            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
-            ["@IsAscending"] = request.IsAscending,
-            ["@ProductId"] = request.ProductId ?? (object)DBNull.Value,
-            ["@UserCode"] = string.IsNullOrWhiteSpace(request.UserCode) ? (object)DBNull.Value : request.UserCode.Trim()
+            ["@RegionCode"] = request.RegionCode ?? string.Empty,
+            ["@BranchCode"] = request.BranchCode ?? string.Empty,
+            ["@ReportDate"] = request.ReportDate
         };
 
         var ds = _spExecutor.ExecuteDataSet(
@@ -1039,10 +1030,10 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
-        var roots = BuildProductivityProfitSpreadManagementBranchReportTree(ds, request.ReportDate);
-        roots = SortProductivityProfitSpreadManagementBranchTree(roots, request.SortBy, request.IsAscending);
+        var items = BuildProductivityProfitSpreadManagementBranchReportList(ds.Tables[0]);
+        items = SortProductivityProfitSpreadManagementBranchList(items, request.SortBy, request.IsAscending);
 
-        response.GetProductivityProfitSpreadManagementBranchReports = roots;
+        response.GetProductivityProfitSpreadManagementBranchReports = items;
         return response;
     }
 
@@ -1886,140 +1877,47 @@ public class ReportDataProvider : IReportDataProvider
         return ordered;
     }
 
-    private sealed class ProductivityProfitSpreadManagementRegionRow
-    {
-        public int Id { get; set; }
-        public int? ParentProductId { get; set; }
-
-        public string Description { get; set; } = string.Empty;
-
-        public decimal SpreadValue { get; set; }
-
-        public decimal RatioRegionValue { get; set; }
-        public decimal? RatioRegionValueDiff { get; set; }
-        public decimal RatioBankAverageValue { get; set; }
-        public decimal? RatioBankAverageValueDiff { get; set; }
-
-        public decimal NetReturnRegionValue { get; set; }
-        public decimal? NetReturnRegionValueDiff { get; set; }
-        public decimal NetReturnBankAverageValue { get; set; }
-        public decimal? NetReturnBankAverageValueDiff { get; set; }
-
-        public decimal NetReturnHgRegionValue { get; set; }
-        public decimal? NetReturnHgRegionValueDiff { get; set; }
-        public decimal NetReturnHgBankAverageValue { get; set; }
-        public decimal? NetReturnHgBankAverageValueDiff { get; set; }
-    }
-
     private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>
-        BuildProductivityProfitSpreadManagementRegionReportTree(DataSet ds, DateTime reportDate)
+        BuildProductivityProfitSpreadManagementRegionReportList(DataTable table)
     {
-        var t0 = ds.Tables[0];
-        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
-
-        if (hasParentInT0)
+        var items = new List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>(table.Rows.Count);
+        foreach (DataRow row in table.Rows)
         {
-            var rows = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(t0);
-            return ProductivityProfitSpreadManagementRegionReportTreeFromRows(rows);
-        }
-
-        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
-        {
-            var roots = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(ds.Tables[0]);
-            var children = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(ds.Tables[1]);
-
-            var all = new List<ProductivityProfitSpreadManagementRegionRow>(roots.Count + children.Count);
-            all.AddRange(roots);
-            all.AddRange(children);
-
-            return ProductivityProfitSpreadManagementRegionReportTreeFromRows(all);
-        }
-
-        var flat = DataTableHelper.ToList<ProductivityProfitSpreadManagementRegionRow>(t0);
-        return flat.Select(MapProductivityProfitSpreadManagementRegionReportItem).ToList();
-    }
-
-    private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>
-        ProductivityProfitSpreadManagementRegionReportTreeFromRows(List<ProductivityProfitSpreadManagementRegionRow> rows)
-    {
-        var byId = rows
-            .GroupBy(r => r.Id)
-            .ToDictionary(g => g.Key, g => MapProductivityProfitSpreadManagementRegionReportItem(g.First()));
-
-        foreach (var r in rows)
-        {
-            if (!byId.TryGetValue(r.Id, out var node))
+            items.Add(new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
             {
-                node = MapProductivityProfitSpreadManagementRegionReportItem(r);
-                byId[r.Id] = node;
-            }
+                ProductName = ReadString(row, "URUN_ADI"),
+                RegionTargetReturnCumulativeCurrentYear = ReadInt(row, "BOLGE_HEDEF_GETIRI_KUMULE_BU_YIL"),
+                RegionReturnCumulativeCurrentYear = ReadInt(row, "BOLGE_GETIRI_KUMULE_BU_YIL"),
+                RegionReturnCumulativeLastYear = ReadInt(row, "BOLGE_GETIRI_KUMULE_GECEN_YIL"),
 
-            var parentId = r.ParentProductId;
-            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
-                parent.SubProducts.Add(node);
+                RegionTargetAverageVolumeCumulativeCurrentYear = ReadInt(row, "BOLGE_HEDEF_ORT_HACIM_KUMULE_BU_YIL"),
+                RegionAverageVolumeCumulativeCurrentYear = ReadInt(row, "BOLGE_ORT_HACIM_KUMULE_BU_YIL"),
+                RegionAverageVolumeCumulativeLastYear = ReadInt(row, "BOLGE_ORT_HACIM_KUMULE_GECEN_YIL"),
+
+                RegionSpreadTargetCurrentYear = ReadDecimal(row, "BOLGE_SPREAD_HEDEF_BU_YIL"),
+                RegionSpreadReturnCurrentYear = ReadDecimal(row, "BOLGE_SPREAD_GETIRI_BU_YIL"),
+                RegionSpreadReturnLastYear = ReadDecimal(row, "BOLGE_SPREAD_GETIRI_GECEN_YIL"),
+
+                BankSpreadTargetCurrentYear = ReadDecimal(row, "BANKA_SPREAD_HEDEF_BU_YIL"),
+                BankSpreadReturnCurrentYear = ReadDecimal(row, "BANKA_SPREAD_GETIRI_BU_YIL")
+            });
         }
-
-        var rootIds = rows
-            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
-            .Select(r => r.Id)
-            .Distinct()
-            .ToList();
-
-        return rootIds.Select(id => byId[id]).ToList();
-    }
-
-    private static GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
-        MapProductivityProfitSpreadManagementRegionReportItem(ProductivityProfitSpreadManagementRegionRow r)
-    {
-        return new GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem
-        {
-            Id = r.Id,
-            Description = r.Description ?? string.Empty,
-            SpreadValue = r.SpreadValue,
-            RatioRegionValue = r.RatioRegionValue,
-            RatioRegionValueDiff = r.RatioRegionValueDiff,
-            RatioBankAverageValue = r.RatioBankAverageValue,
-            RatioBankAverageValueDiff = r.RatioBankAverageValueDiff,
-            NetReturnRegionValue = r.NetReturnRegionValue,
-            NetReturnRegionValueDiff = r.NetReturnRegionValueDiff,
-            NetReturnBankAverageValue = r.NetReturnBankAverageValue,
-            NetReturnBankAverageValueDiff = r.NetReturnBankAverageValueDiff,
-            NetReturnHgRegionValue = r.NetReturnHgRegionValue,
-            NetReturnHgRegionValueDiff = r.NetReturnHgRegionValueDiff,
-            NetReturnHgBankAverageValue = r.NetReturnHgBankAverageValue,
-            NetReturnHgBankAverageValueDiff = r.NetReturnHgBankAverageValueDiff,
-            SubProducts = new List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>()
-        };
+        return items;
     }
 
     private static List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem>
-        SortProductivityProfitSpreadManagementRegionTree(
-            List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> nodes,
+        SortProductivityProfitSpreadManagementRegionList(
+            List<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem> items,
             int? sortBy,
             bool isAscending)
     {
         Func<GetProductivityProfitSpreadManagementRegionReportResponse.GetProductivityProfitSpreadManagementRegionReportItem, object> keySelector = sortBy switch
         {
-            1 => p => p.Description ?? string.Empty,
-            2 => p => p.SpreadValue,
-            3 => p => p.RatioRegionValue,
-            4 => p => p.RatioBankAverageValue,
-            5 => p => p.NetReturnRegionValue,
-            6 => p => p.NetReturnBankAverageValue,
-            7 => p => p.NetReturnHgRegionValue,
-            8 => p => p.NetReturnHgBankAverageValue,
-            _ => p => p.Id
+            1 => p => p.ProductName ?? string.Empty,
+            _ => p => p.ProductName ?? string.Empty
         };
 
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
-
-        foreach (var n in ordered)
-        {
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortProductivityProfitSpreadManagementRegionTree(n.SubProducts, sortBy, isAscending);
-        }
-
-        return ordered;
+        return (isAscending ? items.OrderBy(keySelector) : items.OrderByDescending(keySelector)).ToList();
     }
 
     private sealed class ProductivityProfitTotalRegionRow
@@ -3445,146 +3343,51 @@ public class ReportDataProvider : IReportDataProvider
         return ordered;
     }
 
-    private sealed class ProductivityProfitSpreadManagementBranchRow
+    private static List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem>
+        BuildProductivityProfitSpreadManagementBranchReportList(DataTable table)
     {
-        public int Id { get; set; }
-        public int? ParentProductId { get; set; }
-
-        public string Description { get; set; } = string.Empty;
-
-        public decimal SpreadValue { get; set; }
-
-        public decimal RatioBranchValue { get; set; }
-        public decimal RatioRegionAverageValue { get; set; }
-        public decimal? RatioRegionAverageValueDiff { get; set; }
-        public decimal RatioBankAverageValue { get; set; }
-        public decimal? RatioBankAverageValueDiff { get; set; }
-
-        public decimal NetReturnBranchValue { get; set; }
-        public decimal NetReturnRegionAverageValue { get; set; }
-        public decimal? NetReturnRegionAverageValueDiff { get; set; }
-        public decimal NetReturnBankAverageValue { get; set; }
-        public decimal? NetReturnBankAverageValueDiff { get; set; }
-
-        public decimal NetReturnHgBranchValue { get; set; }
-        public decimal NetReturnHgRegionAverageValue { get; set; }
-        public decimal? NetReturnHgRegionAverageValueDiff { get; set; }
-        public decimal NetReturnHgBankAverageValue { get; set; }
-        public decimal? NetReturnHgBankAverageValueDiff { get; set; }
-    }
-
-    private static List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> BuildProductivityProfitSpreadManagementBranchReportTree(DataSet ds, DateTime reportDate)
-    {
-        var t0 = ds.Tables[0];
-        var hasParentInT0 = t0.Columns.Contains("ParentProductId");
-
-        if (hasParentInT0)
+        var items = new List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem>(table.Rows.Count);
+        foreach (DataRow row in table.Rows)
         {
-            var rows = DataTableHelper.ToList<ProductivityProfitSpreadManagementBranchRow>(t0);
-            return ProductivityProfitSpreadManagementBranchReportTreeFromRows(rows);
-        }
-
-        if (ds.Tables.Count > 1 && ds.Tables[1].Columns.Contains("ParentProductId"))
-        {
-            var roots = DataTableHelper.ToList<ProductivityProfitSpreadManagementBranchRow>(ds.Tables[0]);
-            var children = DataTableHelper.ToList<ProductivityProfitSpreadManagementBranchRow>(ds.Tables[1]);
-
-            var all = new List<ProductivityProfitSpreadManagementBranchRow>(roots.Count + children.Count);
-            all.AddRange(roots);
-            all.AddRange(children);
-
-            return ProductivityProfitSpreadManagementBranchReportTreeFromRows(all);
-        }
-
-        var flat = DataTableHelper.ToList<ProductivityProfitSpreadManagementBranchRow>(t0);
-        return flat.Select(MapProductivityProfitSpreadManagementBranchReportItem).ToList();
-    }
-
-    private static List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> ProductivityProfitSpreadManagementBranchReportTreeFromRows(List<ProductivityProfitSpreadManagementBranchRow> rows)
-    {
-        var byId = rows
-            .GroupBy(r => r.Id)
-            .ToDictionary(g => g.Key, g => MapProductivityProfitSpreadManagementBranchReportItem(g.First()));
-
-        foreach (var r in rows)
-        {
-            if (!byId.TryGetValue(r.Id, out var node))
+            items.Add(new GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem
             {
-                node = MapProductivityProfitSpreadManagementBranchReportItem(r);
-                byId[r.Id] = node;
-            }
+                ProductName = ReadString(row, "URUN_ADI"),
 
-            var parentId = r.ParentProductId;
-            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
-                parent.SubProducts.Add(node);
+                BranchTargetReturnCumulativeCurrentYear = ReadInt(row, "SUBE_HEDEF_GETIRI_KUMULE_BU_YIL"),
+                BranchReturnCumulativeCurrentYear = ReadInt(row, "SUBE_GETIRI_KUMULE_BU_YIL"),
+                BranchReturnCumulativeLastYear = ReadInt(row, "SUBE_GETIRI_KUMULE_GECEN_YIL"),
+
+                BranchTargetAverageVolumeCumulativeCurrentYear = ReadInt(row, "SUBE_HEDEF_ORT_HACIM_KUMULE_BU_YIL"),
+                BranchAverageVolumeCumulativeCurrentYear = ReadInt(row, "SUBE_ORT_HACIM_KUMULE_BU_YIL"),
+                BranchAverageVolumeCumulativeLastYear = ReadInt(row, "SUBE_ORT_HACIM_KUMULE_GECEN_YIL"),
+
+                BranchSpreadTargetCurrentYear = ReadDecimal(row, "SUBE_SPREAD_HEDEF_BU_YIL"),
+                BranchSpreadReturnCurrentYear = ReadDecimal(row, "SUBE_SPREAD_GETIRI_BU_YIL"),
+                BranchSpreadReturnLastYear = ReadDecimal(row, "SUBE_SPREAD_GETIRI_GECEN_YIL"),
+
+                RegionSpreadTargetCurrentYear = ReadDecimal(row, "BOLGE_SPREAD_HEDEF_BU_YIL"),
+                RegionSpreadReturnCurrentYear = ReadDecimal(row, "BOLGE_SPREAD_GETIRI_BU_YIL"),
+
+                BankSpreadTargetCurrentYear = ReadDecimal(row, "BANKA_SPREAD_HEDEF_BU_YIL"),
+                BankSpreadReturnCurrentYear = ReadDecimal(row, "BANKA_SPREAD_GETIRI_BU_YIL")
+            });
         }
-
-        var rootIds = rows
-            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
-            .Select(r => r.Id)
-            .Distinct()
-            .ToList();
-
-        return rootIds.Select(id => byId[id]).ToList();
+        return items;
     }
 
-    private static GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem MapProductivityProfitSpreadManagementBranchReportItem(ProductivityProfitSpreadManagementBranchRow r)
-    {
-        return new GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem
-        {
-            Id = r.Id,
-            Description = r.Description ?? string.Empty,
-            SpreadValue = r.SpreadValue,
-
-            RatioBranchValue = r.RatioBranchValue,
-            RatioRegionAverageValue = r.RatioRegionAverageValue,
-            RatioRegionAverageValueDiff = r.RatioRegionAverageValueDiff,
-            RatioBankAverageValue = r.RatioBankAverageValue,
-            RatioBankAverageValueDiff = r.RatioBankAverageValueDiff,
-
-            NetReturnBranchValue = r.NetReturnBranchValue,
-            NetReturnRegionAverageValue = r.NetReturnRegionAverageValue,
-            NetReturnRegionAverageValueDiff = r.NetReturnRegionAverageValueDiff,
-            NetReturnBankAverageValue = r.NetReturnBankAverageValue,
-            NetReturnBankAverageValueDiff = r.NetReturnBankAverageValueDiff,
-
-            NetReturnHgBranchValue = r.NetReturnHgBranchValue,
-            NetReturnHgRegionAverageValue = r.NetReturnHgRegionAverageValue,
-            NetReturnHgRegionAverageValueDiff = r.NetReturnHgRegionAverageValueDiff,
-            NetReturnHgBankAverageValue = r.NetReturnHgBankAverageValue,
-            NetReturnHgBankAverageValueDiff = r.NetReturnHgBankAverageValueDiff,
-
-            SubProducts = new List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem>()
-        };
-    }
-
-    private static List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> SortProductivityProfitSpreadManagementBranchTree( List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> nodes, int? sortBy, bool isAscending)
+    private static List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem>
+        SortProductivityProfitSpreadManagementBranchList(
+            List<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem> items,
+            int? sortBy,
+            bool isAscending)
     {
         Func<GetProductivityProfitSpreadManagementBranchReportResponse.GetProductivityProfitSpreadManagementBranchReportItem, object> keySelector = sortBy switch
         {
-            1 => p => p.Description ?? string.Empty,
-            2 => p => p.SpreadValue,
-            3 => p => p.RatioBranchValue,
-            4 => p => p.RatioRegionAverageValue,
-            5 => p => p.RatioBankAverageValue,
-            6 => p => p.NetReturnBranchValue,
-            7 => p => p.NetReturnRegionAverageValue,
-            8 => p => p.NetReturnBankAverageValue,
-            9 => p => p.NetReturnHgBranchValue,
-            10 => p => p.NetReturnHgRegionAverageValue,
-            11 => p => p.NetReturnHgBankAverageValue,
-            _ => p => p.Id
+            1 => p => p.ProductName ?? string.Empty,
+            _ => p => p.ProductName ?? string.Empty
         };
 
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
-
-        foreach (var n in ordered)
-        {
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortProductivityProfitSpreadManagementBranchTree(n.SubProducts, sortBy, isAscending);
-        }
-
-        return ordered;
+        return (isAscending ? items.OrderBy(keySelector) : items.OrderByDescending(keySelector)).ToList();
     }
 
     #endregion

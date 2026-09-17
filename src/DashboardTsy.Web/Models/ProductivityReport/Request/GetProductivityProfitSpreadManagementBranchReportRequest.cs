@@ -5,6 +5,7 @@ namespace DashboardTsy.Web.Models.ProductivityReport.Request;
 public class GetProductivityProfitSpreadManagementBranchReportRequest : BaseReportRequest
 {
     public string SessionId { get; set; } = string.Empty;
+    public string RegionCode { get; set; } = string.Empty;
     public string BranchCode { get; set; } = string.Empty;
     public DateTime ReportDate { get; set; }
     /// <summary>1=Ürün Adı</summary>
