@@ -452,7 +452,8 @@ function sortIcon(h) {
     return ' <i class="sort-icon" data-sort-id="' + h.Id + '"><img class="sort-up" src="/images/sort-asc.svg" alt="" /><img class="sort-down" src="/images/sort-dec.svg" alt="" /></i>';
 }
 
-function renderDynamicHeaders(headers, hasExpandable, withDetail) {
+function renderDynamicHeaders(headers, hasExpandable, withDetail, selectedGroupCount) {
+    selectedGroupCount = selectedGroupCount || 1;
     var $thead = $('#dynamicTableHead');
     $thead.empty();
 
@@ -507,22 +508,25 @@ function renderDynamicHeaders(headers, hasExpandable, withDetail) {
         var row1 = '<tr>';
         var row2 = '<tr>';
 
-        var firstGroupFound = false;
+        var firstGroupFound = 0;
         topHeaders.forEach(function (h, i) {
             var children = childMap[h.Id];
             if (children && children.length > 0) {
-                var isFirstGroup = !firstGroupFound;
-                if (isFirstGroup) firstGroupFound = true;
+                var isFirstGroup = firstGroupFound < selectedGroupCount;
+                if (isFirstGroup) firstGroupFound++;
                 var groupCls = isFirstGroup ? 'col-group-header selected' : 'col-group-header';
                 row1 += '<th colspan="' + children.length + '" class="' + groupCls + '">' + h.HeaderName + '</th>';
                 children.forEach(function (c, cIdx) {
+                    // "Bu Yıl (30.06.2026)" -> tarih alt satıra iner
+                    var m = /^(.*?)\s*\((.+)\)$/.exec(c.HeaderName);
+                    var leafHtml = m ? m[1] + '<small>(' + m[2] + ')</small>' : c.HeaderName;
                     var childCls = '';
                     if (isFirstGroup) {
                         if (cIdx === 0) childCls = ' class="col-selected-first"';
                         else if (cIdx === children.length - 1) childCls = ' class="col-selected-last"';
                         else childCls = ' class="col-selected-mid"';
                     }
-                    row2 += '<th' + childCls + '>' + c.HeaderName + sortIcon(c) + '</th>';
+                    row2 += '<th' + childCls + '>' + leafHtml + sortIcon(c) + '</th>';
                 });
             } else {
                 row1 += '<th rowspan="2"' + getClasses(h, true) + '>' + headerContent(h, i) + '</th>';
@@ -536,20 +540,25 @@ function renderDynamicHeaders(headers, hasExpandable, withDetail) {
         $thead.append(row1);
         $thead.append(row2);
 
-        // DOM'a eklendikten sonra ilk col-group-header'ı selected yap
         var $groups = $thead.find('.col-group-header');
         $groups.removeClass('selected');
-        $groups.first().addClass('selected');
+        $groups.slice(0, selectedGroupCount).addClass('selected');
 
-        // İlk grubun altındaki child th'lere col-selected-first / col-selected-last ekle
+        // Ofset, önceki grupların colspan toplamı (gruplar row2'de sırayla yer alır).
         var $row2ths = $thead.find('tr:last th');
-        var firstColCount = parseInt($groups.first().attr('colspan')) || 1;
         $row2ths.removeClass('col-selected-first col-selected-mid col-selected-last');
-        $row2ths.eq(0).addClass('col-selected-first');
-        for (var m = 1; m < firstColCount - 1; m++) {
-            $row2ths.eq(m).addClass('col-selected-mid');
-        }
-        $row2ths.eq(firstColCount - 1).addClass('col-selected-last');
+        var leafOffset = 0;
+        $groups.each(function (gIdx) {
+            var span = parseInt($(this).attr('colspan')) || 1;
+            if (gIdx < selectedGroupCount) {
+                $row2ths.eq(leafOffset).addClass('col-selected-first');
+                for (var m = 1; m < span - 1; m++) {
+                    $row2ths.eq(leafOffset + m).addClass('col-selected-mid');
+                }
+                $row2ths.eq(leafOffset + span - 1).addClass('col-selected-last');
+            }
+            leafOffset += span;
+        });
     }
 }
 
@@ -1583,49 +1592,64 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
-            renderProfitSpreadManagementRegionTable(items);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true, 2);
+            renderSpreadTable(items, SPREAD_FIELDS.region);
         }
     });
 }
 
-function renderProfitSpreadManagementRegionTable(items) {
-    var html = '';
+// Kolon sırası başlık servisiyle (GetProductivityReportTableHeaders, MainTabId 4 / MidTabId 41)
+// birebir aynı olmalı; aksi hâlde başlıklar hücrelerden kayar.
+var SPREAD_FIELDS = {
+    region: {
+        amounts: ['RegionTargetAverageVolumeCumulativeCurrentYear', 'RegionAverageVolumeCumulativeCurrentYear', 'RegionAverageVolumeCumulativeLastYear',
+                  'RegionTargetReturnCumulativeCurrentYear', 'RegionReturnCumulativeCurrentYear', 'RegionReturnCumulativeLastYear'],
+        rates:   ['RegionSpreadTargetCurrentYear', 'RegionSpreadReturnCurrentYear', 'RegionSpreadReturnLastYear',
+                  'BankSpreadTargetCurrentYear', 'BankSpreadReturnCurrentYear']
+    },
+    branch: {
+        amounts: ['BranchTargetAverageVolumeCumulativeCurrentYear', 'BranchAverageVolumeCumulativeCurrentYear', 'BranchAverageVolumeCumulativeLastYear',
+                  'BranchTargetReturnCumulativeCurrentYear', 'BranchReturnCumulativeCurrentYear', 'BranchReturnCumulativeLastYear'],
+        rates:   ['BranchSpreadTargetCurrentYear', 'BranchSpreadReturnCurrentYear', 'BranchSpreadReturnLastYear',
+                  'RegionSpreadTargetCurrentYear', 'RegionSpreadReturnCurrentYear',
+                  'BankSpreadTargetCurrentYear', 'BankSpreadReturnCurrentYear']
+    }
+};
+
+function spreadRowStart(item, i, hasExpandable) {
+    var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+    var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+    var expandClass = item._hasChildren ? ' expandable' : '';
+
+    var html = '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+    html += '<td class="col-index">' + (i + 1) + '</td>';
+    if (hasExpandable) {
+        html += item._hasChildren
+            ? '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>'
+            : '<td class="col-expand"></td>';
+    }
+    var name = item.ProductName || '';
+    var indent = item._depth > 0
+        ? '<span style="padding-left:' + (item._depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + name + '</span>'
+        : name;
+    return html + '<td class="col-left">' + indent + '</td>';
+}
+
+// mn TL kolonları düz sayı, spread kolonları yüzde basar.
+function renderSpreadTable(items, fields) {
     var hasExpandable = items.some(function (item) { return item._hasChildren; });
 
-    items.forEach(function (item, i) {
-        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
-        var expandClass = item._hasChildren ? ' expandable' : '';
-
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
-        html += '<td class="col-index">' + (i + 1) + '</td>';
-
-        if (hasExpandable) {
-            if (item._hasChildren) {
-                html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
-            } else {
-                html += '<td class="col-expand"></td>';
-            }
-        }
-
-        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
-        html += '<td class="col-left">' + indent + '</td>';
-
-        html += '<td>' + formatNumber(item.SpreadValue) + '</td>';
-        html += '<td>' + item.RatioRegionValue + '</td>';
-        html += '<td>' + item.RatioBankAverageValue + '</td>';
-        html += '<td>' + item.NetReturnRegionValue + '</td>';
-        html += '<td>' + item.NetReturnBankAverageValue + '</td>';
-        html += '<td>' + item.NetReturnHgRegionValue + '</td>';
-        html += '<td>' + item.NetReturnHgBankAverageValue + '</td>';
-        html += buildProductivityDetailCell(item);
-        html += '</tr>';
-    });
+    var html = items.map(function (item, i) {
+        return spreadRowStart(item, i, hasExpandable) +
+            fields.amounts.map(function (f) { return '<td>' + formatNumber(item[f]) + '</td>'; }).join('') +
+            fields.rates.map(function (f) { return '<td>%' + formatPercent(item[f]) + '</td>'; }).join('') +
+            buildProductivityDetailCell(item) + '</tr>';
+    }).join('');
 
     $('#dynamicTableBody').html(html);
     updateProductivityStripes();
 }
+
 
 // ===== Profit Spread Management Branch Report (Karlılık — Spread Yönetimi — Şube) =====
 function loadProfitSpreadManagementBranchReport(branchCode) {
@@ -1645,52 +1669,12 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
-            renderProfitSpreadManagementBranchTable(items);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, true, 2);
+            renderSpreadTable(items, SPREAD_FIELDS.branch);
         }
     });
 }
 
-function renderProfitSpreadManagementBranchTable(items) {
-    var html = '';
-    var hasExpandable = items.some(function (item) { return item._hasChildren; });
-
-    items.forEach(function (item, i) {
-        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
-        var expandClass = item._hasChildren ? ' expandable' : '';
-
-        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
-        html += '<td class="col-index">' + (i + 1) + '</td>';
-
-        if (hasExpandable) {
-            if (item._hasChildren) {
-                html += '<td class="col-expand"><span class="expand-icon"><img src="/images/expand.svg" alt="expand" /></span></td>';
-            } else {
-                html += '<td class="col-expand"></td>';
-            }
-        }
-
-        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px"><img src="/images/sub-arrow.svg" alt="" class="sub-arrow-icon" /> ' + item.Description + '</span>' : item.Description;
-        html += '<td class="col-left">' + indent + '</td>';
-
-        html += '<td>' + formatNumber(item.SpreadValue) + '</td>';
-        html += '<td>' + item.RatioBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.RatioRegionAverageValue + formatDiff(item.RatioRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.RatioBankAverageValue + formatDiff(item.RatioBankAverageValueDiff) + '</td>';
-        html += '<td>' + item.NetReturnBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.NetReturnRegionAverageValue + formatDiff(item.NetReturnRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.NetReturnBankAverageValue + formatDiff(item.NetReturnBankAverageValueDiff) + '</td>';
-        html += '<td>' + item.NetReturnHgBranchValue + '</td>';
-        html += '<td class="has-diff">' + item.NetReturnHgRegionAverageValue + formatDiff(item.NetReturnHgRegionAverageValueDiff) + '</td>';
-        html += '<td class="has-diff">' + item.NetReturnHgBankAverageValue + formatDiff(item.NetReturnHgBankAverageValueDiff) + '</td>';
-        html += buildProductivityDetailCell(item);
-        html += '</tr>';
-    });
-
-    $('#dynamicTableBody').html(html);
-    updateProductivityStripes();
-}
 
 function applyProductivityStripes($table) {
     var stripeIndex = 0;
@@ -1734,33 +1718,33 @@ function updateProductivityStripes() {
     applyFirstGroupSelected($('#dynamicTable'));
     reapplySortVisual($('#dynamicTable'));
 }
-
 function applyFirstGroupSelected($table) {
-    var $selectedHeader = $table.find('thead .col-group-header.selected');
-    if (!$selectedHeader.length) return;
+    var $selected = $table.find('thead .col-group-header.selected');
+    if (!$selected.length) return;
 
-    // İlk group header'ın thead'deki kolon başlangıç indeksini bul
-    var $row1 = $selectedHeader.closest('tr');
-    var startCol = 0;
-    var colCount = 0;
-    var found = false;
-    $row1.find('th').each(function () {
-        var span = parseInt($(this).attr('colspan')) || 1;
-        if (this === $selectedHeader[0]) {
-            colCount = span;
-            found = true;
-            return false;
-        }
-        startCol += span;
+    var ranges = [];
+    $selected.each(function () {
+        var header = this;
+        var startCol = 0;
+        var found = false;
+        $(header).closest('tr').find('th').each(function () {
+            var span = parseInt($(this).attr('colspan')) || 1;
+            if (this === header) { ranges.push({ start: startCol, count: span }); found = true; return false; }
+            startCol += span;
+        });
+        return found;
     });
-    if (!found) return;
+    if (!ranges.length) return;
 
-    // Body satırlarındaki td'lere col-selected-first / col-selected-mid / col-selected-last ekle
     $table.find('tbody tr').each(function () {
         $(this).find('td').each(function (tdIdx) {
-            if (tdIdx === startCol) $(this).addClass('col-selected-first');
-            else if (tdIdx === startCol + colCount - 1) $(this).addClass('col-selected-last');
-            else if (tdIdx > startCol && tdIdx < startCol + colCount - 1) $(this).addClass('col-selected-mid');
+            var $td = $(this);
+            ranges.forEach(function (r) {
+                var last = r.start + r.count - 1;
+                if (tdIdx === r.start) $td.addClass('col-selected-first');
+                else if (tdIdx === last) $td.addClass('col-selected-last');
+                else if (tdIdx > r.start && tdIdx < last) $td.addClass('col-selected-mid');
+            });
         });
     });
 }
