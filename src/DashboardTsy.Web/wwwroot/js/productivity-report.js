@@ -1642,7 +1642,7 @@ function renderSpreadTable(items, fields) {
     var html = items.map(function (item, i) {
         return spreadRowStart(item, i, hasExpandable) +
             fields.amounts.map(function (f) { return '<td>' + formatNumber(item[f]) + '</td>'; }).join('') +
-            fields.rates.map(function (f) { return '<td>%' + formatPercent(item[f]) + '</td>'; }).join('') +
+            fields.rates.map(function (f) { return '<td>' + formatPercent(item[f]) + '</td>'; }).join('') +
             buildProductivityDetailCell(item) + '</tr>';
     }).join('');
 
