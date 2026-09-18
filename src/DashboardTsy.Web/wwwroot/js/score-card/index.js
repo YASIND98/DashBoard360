@@ -307,10 +307,13 @@ $(function () {
     function reloadByScoreCard() {
         if (SCORE_CARD_TYPE_TAB_IDS.indexOf(_scoreCardId) !== -1) {
             fetchScoreCardTypes(_scoreCardId, function (types) {
-                // Servisten dönse bile gizlenecek tipleri (ör. scoreCardTypeId 9) ön yüzden çıkar.
-                types = (types || []).filter(function (t) {
-                    return SCORE_CARD_HIDDEN_TYPE_IDS.indexOf(t.scoreCardTypeId) === -1;
-                });
+                // Gizlenecek tipleri çıkar, kalanların adını id bazlı eşlemeyle düzelt.
+                types = (types || [])
+                    .filter(function (t) { return SCORE_CARD_HIDDEN_TYPE_IDS.indexOf(t.scoreCardTypeId) === -1; })
+                    .map(function (t) {
+                        var label = SCORE_CARD_TYPE_LABELS[t.scoreCardTypeId];
+                        return label ? $.extend({}, t, { scoreCardType: label }) : t;
+                    });
                 renderTypeSubTabs(types);
                 _scoreCardTypeId = (types && types.length) ? types[0].scoreCardTypeId : null;
                 reloadScoreCardFilters();

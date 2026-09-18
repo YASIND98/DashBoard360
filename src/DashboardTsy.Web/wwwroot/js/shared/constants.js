@@ -114,8 +114,17 @@ var SCORE_CARD_MANAGEMENT_KEYS = [21, 24, 37];
 // Bu skor kartlar seçildiğinde alt sekmeler scorecard/types servisinden gelen skor kart tipleridir
 var SCORE_CARD_TYPE_TAB_IDS = [19, 20, 22, 24, 27];
 
-// scorecard/types servisinden dönse bile ön yüzde gösterilmeyecek skor kart tip id'leri
-var SCORE_CARD_HIDDEN_TYPE_IDS = [9];
+// scorecard/types servisinden dönse bile ön yüzde gösterilmeyecek skor kart tip id'leri.
+var SCORE_CARD_HIDDEN_TYPE_IDS = [9, 20];
+
+// scorecard/types Id -> ön yüzde gösterilecek ad. Servisin döndüğü scoreCardType ezilir.
+var SCORE_CARD_TYPE_LABELS = {
+  17: "Bireysel Bankacılık Bölge Bölüm Müdürü",
+  18: "KOBİ Bankacılığı Bölge Bölüm Müdürü",
+  19: "Tarım Bankacılığı Bölge Bölüm Müdürü",
+  21: "Kurumsal Bankacılık Şube Satış Müdürü",
+  22: "Bölge Operasyon Bölüm Müdürü"
+};
 
 var SCORE_CARD_OVERVIEW_STATIC_COLUMNS = {
   SUBE_ADI: "Şube Adı",
