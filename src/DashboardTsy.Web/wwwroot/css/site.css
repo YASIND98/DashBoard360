@@ -663,13 +663,24 @@ body:has(.scorecard-panel.open)::before {
   color: #F6F7F9;
   border-radius: 8px;
   font-size: 12px;
+  cursor: pointer;
 }
 
 .scorecard-map-btn.popup-btn {
   background: var(--text-gray);
 }
+/* =========================================
+   Lightbox Header Adjustments for Map
+   ========================================= */
+.map-active .sc-lightbox-header{
+  justify-content: initial;
+}
 
-
+.map-active .sc-lightbox-title{
+  order: 2;
+  flex: auto;
+  text-align: center;
+}
 /* =========================================
    GOOGLE MAP MARKER
    ========================================= */

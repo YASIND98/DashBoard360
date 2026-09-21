@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="~/css/ai.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/usd-kur-modal.css" asp-append-version="true" />
-<link rel="stylesheet" href="~/css/leaflet.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/assets/lib/leaflet/leaflet.css" asp-append-version="true" />
 
 <!-- Page Title & Date -->
 <div class="page-header">
@@ -179,7 +179,7 @@
 @await Html.PartialAsync("_UsdKurModal")
 
 @section Scripts {
-    <script src="~/js/score-card/leaflet.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/leaflet/leaflet.js" asp-append-version="true"></script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/report-detail.js" asp-append-version="true"></script>
@@ -462,6 +462,7 @@
         // ===== Lightbox =====
         function getActiveLightbox() {
             var $all = $('.sc-lightbox-overlay');
+            $all.addClass('map-active');
             var $visible = $all.filter(function () { return $(this).parent().is(':visible'); });
             return ($visible.length ? $visible : $all).first();
         }
@@ -469,6 +470,7 @@
         function resetLightbox() {
             if (_popupMap) { disposeMap(_popupMap); _popupMap = null; }
             $('.largeLeafletMap, .largeLeafletMapInfo').remove();
+            $('.sc-lightbox-overlay').removeClass('map-active');
             $('.sc-lightbox-img').show();
         }
 
