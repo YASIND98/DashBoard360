@@ -284,7 +284,7 @@ html[data-pdf-allowed="false"] #mobilePdfBtn {
   position: absolute;
   top: 0;
   right: 0;
-  width: 308px;
+  width: 543px;
   background: var(--bg-scorecard-panel);
   border-radius: 40px;
   z-index: 1000;
@@ -538,6 +538,179 @@ body:has(.scorecard-panel.open)::before {
 
 .sc-zoom-btn:hover {
   background: rgba(0, 0, 0, 0.8);
+}
+
+/* =========================================
+   SCORECARD MAP CONTAINER
+   ========================================= */
+
+.scorecard-maps-container {
+  background: var(--text-gray);
+  border-radius: 20px;
+  overflow: auto;
+  position: relative;
+}
+
+.scorecard-content .scorecard-maps-container {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  min-height: 200px;
+  overflow: visible !important;
+}
+
+/* Lightbox özel görünümü */
+.sc-lightbox-box .scorecard-maps-container {
+  background-color: #12375C;
+  border-radius: 0;
+}
+
+
+/* =========================================
+   MAP INFO
+   ========================================= */
+
+.scorecard-map-info {
+  padding: 16px 11px;
+}
+
+.scorecard-inner-wrapper {
+  display: flex;
+  justify-content: space-between;
+}
+
+.scorecard-map-manager-name {
+  font-size: 16px;
+  color: var(--text-light);
+}
+
+.scorecard-map-address {
+  color: var(--text-light);
+}
+
+/* Light theme */
+[data-theme="light"] .scorecard-map-manager-name,
+[data-theme="light"] .scorecard-map-address {
+  color: #262A33;
+}
+
+/* Lightbox */
+.sc-lightbox-box .scorecard-map-manager-name,
+.sc-lightbox-box .scorecard-map-address {
+  color: #F6F7F9;
+}
+
+
+/* =========================================
+   MAP
+   ========================================= */
+
+.scoreboardMap {
+  position: relative !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  height: 200px !important;
+  min-height: 200px !important;
+  z-index: 0;
+}
+
+/* Leaflet elements */
+.scoreboardMap .leaflet-pane,
+.scoreboardMap .leaflet-tile-pane,
+.scoreboardMap .leaflet-layer {
+  visibility: visible !important;
+  display: block !important;
+}
+
+.scoreboardMap .leaflet-tile {
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: block !important;
+  max-width: none !important;
+  max-height: none !important;
+  width: 256px !important;
+  height: 256px !important;
+}
+
+
+/* =========================================
+   LARGE LIGHTBOX MAP
+   ========================================= */
+
+.sc-lightbox-box .largeLeafletMap {
+  flex: 0 0 auto !important;
+  position: relative !important;
+  width: 100% !important;
+  height: 400px !important;
+  min-height: 400px !important;
+}
+
+.sc-lightbox-box .largeLeafletMapInfo {
+  flex: 0 0 auto !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+
+/* =========================================
+   MAP BUTTON
+   ========================================= */
+
+.scorecard-map-btn {
+  display: flex;
+  gap: 10px;
+  padding: 4px 12px;
+  background-color: #12375C;
+  color: #F6F7F9;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.scorecard-map-btn.popup-btn {
+  background: var(--text-gray);
+}
+
+
+/* =========================================
+   GOOGLE MAP MARKER
+   ========================================= */
+
+.google-map-marker {
+  background: transparent;
+  border: none;
+}
+
+.google-map-pin {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  background: #ea4335;
+  border: 3px solid #fff;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .3);
+}
+
+.google-map-pin-dot {
+  position: absolute;
+  top: 9px;
+  left: 9px;
+  width: 5px;
+  height: 5px;
+  background: #fff;
+  border-radius: 50%;
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media screen and (max-width: 768px) {
+  .scorecard-inner-wrapper {
+    flex-direction: column;
+    gap: 10px;
+    align-items: start;
+  }
 }
 
 /* ────────────────────────────────────────────────
