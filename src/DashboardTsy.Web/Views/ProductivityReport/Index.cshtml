@@ -653,8 +653,8 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    RegionCode: 20,
-                    BranchCode: 2204
+                    RegionCode: Number(regionCode) || 20,
+                    BranchCode: Number(branchCode) || 2204
                 }),
                 success: function (response) {
                     if (reqId !== _mapReqId) return;
