@@ -615,15 +615,11 @@ function renderVolumeRegionTable(items) {
         html += '<td class="col-left">' + indent + '</td>';
 
         html += '<td>' + formatNumber(item.RealizationRegionLastYearValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationRegionValue) +'</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
         html += '<td>' + formatNumber(item.RealizationRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
         html += '<td>' + formatNumber(item.NetGrowthRegionAverageValue) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageDiff, true) + '</td>';
         html += '<td class="' + compareColor(item.YtdRegionValue, item.YtdBankAverageValue) + '">' + formatRateValue(item.YtdRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatRateValue(item.YtdBankAverageValue) + formatDiff(item.YtdBankAverageDiff) + '</td>';
@@ -690,17 +686,11 @@ function renderVolumeBranchTable(items) {
         html += '<td class="col-left">' + indent + '</td>';
 
         html += '<td>' + formatNumber(item.RealizationBranchLastYearValue) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.RealizationBranchValue) + formatDiff(item.RealizationBranchDiff, true) + '</td>';
         html += '<td>' + formatNumber(item.TargetValue) + '</td>';
         html += '<td class="' + percentColor(item.HgRate) + '">' + formatPercent(item.HgRate) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationRegionAverageValue) + formatDiff(item.RealizationRegionAverageValueDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.RealizationBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.RealizationBankAverageValue) + formatDiff(item.RealizationBankAverageValueDiff, true) + '</td>';
-        html += '<td class="has-diff">' + formatNumber(item.NetGrowthBranchValue) + formatDiff(item.NetGrowthBranchDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthRegionAverageValue) + formatDiff(item.NetGrowthRegionAverageValueDiff, true) + '</td>';
-        html += '<td>' + formatNumber(item.NetGrowthBankValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.NetGrowthBankAverageValue) + formatDiff(item.NetGrowthBankAverageValueDiff, true) + '</td>';
         html += '<td class="' + compareColor(item.YtdBranchValue, item.YtdRegionValue) + '">' + formatRateValue(item.YtdBranchValue) + '</td>';
         html += '<td class="has-diff ' + compareColor(item.YtdRegionValue, item.YtdBankValue) + '">' + formatRateValue(item.YtdRegionValue) + formatDiff(item.YtdRegionValueDiff) + '</td>';

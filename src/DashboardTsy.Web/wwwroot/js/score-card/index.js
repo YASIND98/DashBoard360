@@ -37,6 +37,7 @@ $(function () {
     var _regionDisabled = false, _branchDisabled = false, _registerDisabled = false;
     var _tabModel = [];
     var _overview = null;
+    var _lastUpdatedDate = null; 
     var _firstLoad = true;   // ilk veri gelene kadar tam ekran loader göstermek için
 
     //scorecard/authorities: kullanıcı rolü + başlangıç bölge/şube/sicil bağlamı. userCode/applicationCode sabittir
@@ -586,7 +587,9 @@ $(function () {
             if (_regionCode === -1) {
                 fetchScoreCardMainViewRegions(buildMainViewRequest(4), function (res) {
                     _overview = buildRegionOverviewModel(res);
+                    _lastUpdatedDate = null;
                     renderReportBody();
+                    renderLegend();
                     resetTableScroll('#scReportBody');
                 });
                 return;
@@ -596,7 +599,9 @@ $(function () {
             if (_branchCode === -1) {
                 fetchScoreCardMainViewBranches(buildMainViewRequest(3), function (branchRes) {
                     _overview = buildBranchOverviewModel(branchRes);
+                    _lastUpdatedDate = null;
                     renderReportBody();
+                    renderLegend();
                     resetTableScroll('#scReportBody');
                 });
                 return;
@@ -607,8 +612,10 @@ $(function () {
         fetchScoreCardCumulatives(buildCumulativesRequest(), function (res) {
             _overview = null;
             ROWS = (res && res.mainTableData) ? res.mainTableData : [];
+            _lastUpdatedDate = (res && res.lastUpdatedDate) || null;
             renderTotalScore();                         // Toplam Skor = weightedPercentage toplamı
             renderReportBody();
+            renderLegend();
             resetTableScroll('#scReportBody');
         });
     }
@@ -1089,9 +1096,11 @@ $(function () {
     }
 
     function renderLegend() {
-        if (typeof renderTableLegend === 'function') {
-            renderTableLegend('#scReportLegend', {});
-        }
+        if (typeof renderTableLegend !== 'function') return;
+        var note = _lastUpdatedDate
+            ? 'Son Güncelleme Tarihi: ' + formatReportDateTr(_lastUpdatedDate)
+            : '';
+        renderTableLegend('#scReportLegend', { note: note });
     }
 
     // Skor kart tipi sekmeleri
