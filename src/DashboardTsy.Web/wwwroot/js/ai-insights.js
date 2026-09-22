@@ -11,9 +11,8 @@ $(document).ready(function () {
     var aiResultKey = null;
     var aiRequestPending = false;
 
-    function aiSelectionKey() {
-        if (!aiSelectedRegion && !aiSelectedBranch) return null;
-        return (aiSelectedRegion ? aiSelectedRegion.code : '') + '|' + (aiSelectedBranch ? aiSelectedBranch.code : '');
+    function selectionKey(region, branch) {
+        return (region ? region.code : '') + '|' + (branch ? branch.code : '');
     }
 
     function aiClearResult() {
@@ -36,7 +35,6 @@ $(document).ready(function () {
         $('#aiDrawerSubmit').prop('disabled', !(aiSelectedRegion || aiSelectedBranch));
     }
 
-    // Sayfadaki (Verim Raporları) filtrelerde seçili bölge/şubeyi oku
     function getPageSelection() {
         var $r = $('#yieldBolgeList .dropdown-item.selected');
         var rcode = $r.attr('data-code');
@@ -61,8 +59,7 @@ $(document).ready(function () {
     // ===== Open / Close =====
     function openAiDrawer() {
         var pre = getPageSelection();
-        // İçgörü üretilmiş (ya da üretiliyor) bir seçim korunur; yoksa sayfa filtresi izlenir
-        var keepSelection = !!aiResultKey || aiRequestPending;
+        var keepSelection = aiRequestPending || aiResultKey === selectionKey(pre.region, pre.branch);
 
         loadRegionFilters(function () {
             var single = aiRenderRegionDropdown();
@@ -85,7 +82,7 @@ $(document).ready(function () {
                 aiRenderBranchDropdown();
                 aiUpdateSubmitState();
 
-                if (!aiRequestPending && (!aiResultKey || aiResultKey !== aiSelectionKey())) aiClearResult();
+                if (!aiRequestPending && aiResultKey !== selectionKey(aiSelectedRegion, aiSelectedBranch)) aiClearResult();
             });
         });
 
@@ -182,7 +179,7 @@ $(document).ready(function () {
         $result.html(aiLoaderHtml());
         aiResultKey = null;
         aiRequestPending = true;
-        var requestKey = aiSelectionKey();
+        var requestKey = selectionKey(aiSelectedRegion, aiSelectedBranch);
         var thinkStart = Date.now();
 
         function finish(captured) {
