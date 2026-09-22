@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="~/css/ai.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/date-picker.css" asp-append-version="true" />
 <link rel="stylesheet" href="~/css/usd-kur-modal.css" asp-append-version="true" />
+<link rel="stylesheet" href="~/assets/lib/leaflet/leaflet.css" asp-append-version="true" />
 
 <!-- Page Title & Date -->
 <div class="page-header">
@@ -178,6 +179,7 @@
 @await Html.PartialAsync("_UsdKurModal")
 
 @section Scripts {
+    <script src="~/assets/lib/leaflet/leaflet.js" asp-append-version="true"></script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/report-detail.js" asp-append-version="true"></script>
@@ -188,6 +190,24 @@
     <script src="~/js/shared/usd-kur-modal.js" asp-append-version="true"></script>
     <script>
     $(document).ready(function () {
+        // ===== Harita state =====
+        var _currentBranch = null;
+        var _mapReqId = 0;        // /BranchMap isteği için
+        var _scorecardReqId = 0;  // scorecard isteği için
+        var _scorecardMaps = [];  // [{ map, ro }]
+        var _popupMap = null;     // { map, ro }
+
+        var MAP_ZOOM = 15;
+        var GOOGLE_TILES = 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}';
+        var OSM_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+        var PIN_ICON = L.divIcon({
+            className: 'google-map-marker',
+            html: '<div class="google-map-pin"><div class="google-map-pin-dot"></div></div>',
+            iconSize: [20, 20],
+            iconAnchor: [10, 20],
+            popupAnchor: [0, -20]
+        });
 
         // Rapor tarihini paylaşımlı usd-kur-modal.js'e ilet
         window._getUsdKurDate = function () { return _selectedDate; };
@@ -334,29 +354,189 @@
             updateUI();
         });
 
+        // =====  Harita için helperlar =====
+        function escHtml(s) {
+            return $('<div>').text(s == null ? '' : s).html();
+        }
+
+        function getBranchLatLng(branch) {
+            var lat = parseFloat(branch && branch.Latitude);
+            var lng = parseFloat(branch && branch.Longitude);
+            return (isNaN(lat) || isNaN(lng)) ? null : [lat, lng];
+        }
+
+        function addBaseLayer(map) {
+            var errors = 0;
+            var google = L.tileLayer(GOOGLE_TILES, {
+                maxZoom: 20,
+                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                attribution: '&copy; Google Maps'
+            }).addTo(map);
+
+            // Google tile'ları yüklenemezse OSM'e geç
+            google.on('tileerror', function () {
+                if (++errors === 3 && map.hasLayer(google)) {
+                    map.removeLayer(google);
+                    L.tileLayer(OSM_TILES, { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+                }
+            });
+        }
+
+        // Tek fabrika: hem küçük (statik) hem popup (interaktif) harita
+        function createBranchMap(container, latlng, interactive) {
+            var options = interactive ? {} : {
+                zoomControl: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                dragging: false,
+                touchZoom: false,
+                boxZoom: false,
+                keyboard: false
+            };
+
+            var map = L.map(container, options).setView(latlng, MAP_ZOOM);
+            addBaseLayer(map);
+            L.marker(latlng, { icon: PIN_ICON }).addTo(map);
+
+            // Container gizliyken (0 boyut) kurulduysa, görünür olunca / boyutu değişince bir kez düzelt
+            var lastW = 0, lastH = 0;
+            var ro = new ResizeObserver(function () {
+                var w = container.clientWidth, h = container.clientHeight;
+                if (!w || !h || (w === lastW && h === lastH)) return;
+                lastW = w; lastH = h;
+                map.invalidateSize({ animate: false, pan: false });
+                map.setView(latlng, MAP_ZOOM, { animate: false, reset: true });
+            });
+            ro.observe(container);
+
+            return { map: map, ro: ro };
+        }
+
+        function disposeMap(entry) {
+            if (!entry) return;
+            try { entry.ro.disconnect(); } catch (e) {}
+            try { entry.map.remove(); } catch (e) {}
+        }
+
+        function buildMapInfoHtml(branch, actionHtml) {
+            return '<div class="scorecard-map-info">' +
+                       '<div class="scorecard-map-manager-name">' + escHtml(branch.BranchName) + '</div>' +
+                       '<div class="scorecard-inner-wrapper">' +
+                           '<div class="scorecard-map-address">' + escHtml(branch.BranchAddress) + '</div>' +
+                           actionHtml +
+                       '</div>' +
+                   '</div>';
+        }
+
+        // ===== Scorecard içindeki küçük haritalar (desktop + mobile) =====
+        function destroyScorecardMaps() {
+            _scorecardMaps.forEach(disposeMap);
+            _scorecardMaps = [];
+        }
+
+        // Her .scorecard-content'e ayrı harita basar: map-1, map-2
+        function renderMapButton(branch) {
+            _currentBranch = branch;
+
+            destroyScorecardMaps();
+            $('.scorecard-content .scorecard-maps-container').remove();
+
+            var latlng = getBranchLatLng(branch);
+            if (!latlng) return;
+
+            var btnHtml =
+                '<button class="scorecard-map-btn open-map-popup" type="button">' +
+                    '<img class="bd-noexpand" src="/images/score-card-map.svg" alt="" /> Haritada Göster' +
+                '</button>';
+
+            $('.scorecard-content').each(function (i) {
+                var $wrap = $('<div class="scorecard-maps-container"></div>')
+                    .append($('<div class="scoreboardMap"></div>').attr('id', 'map-' + (i + 1)))
+                    .append(buildMapInfoHtml(branch, btnHtml));
+
+                $(this).append($wrap);
+                _scorecardMaps.push(createBranchMap($wrap.find('.scoreboardMap')[0], latlng, false));
+            });
+        }
+
+        // ===== Lightbox =====
+        function getActiveLightbox() {
+            var $all = $('.sc-lightbox-overlay');
+            $all.addClass('map-active');
+            var $visible = $all.filter(function () { return $(this).parent().is(':visible'); });
+            return ($visible.length ? $visible : $all).first();
+        }
+
+        function resetLightbox() {
+            if (_popupMap) { disposeMap(_popupMap); _popupMap = null; }
+            $('.largeLeafletMap, .largeLeafletMapInfo').remove();
+            $('.sc-lightbox-overlay').removeClass('map-active');
+            $('.sc-lightbox-img').show();
+        }
+
+        function openLightbox(title, src) {
+            resetLightbox();
+            var $overlay = getActiveLightbox();
+            $overlay.find('.sc-lightbox-img').attr('src', src);
+            $overlay.find('.sc-lightbox-title').text(title);
+            $overlay.stop(true, true).fadeIn(180);
+        }
+
+        function closeLightbox() {
+            $('.sc-lightbox-overlay:visible').stop(true, true).fadeOut(180).promise().done(resetLightbox);
+        }
+
+        // Büyük harita popup'ı
+        function openMapPopup(branch) {
+            var latlng = getBranchLatLng(branch);
+            if (!latlng) return;
+
+            resetLightbox();
+
+            var $overlay = getActiveLightbox();
+            var $box = $overlay.find('.sc-lightbox-box').first();
+            $overlay.find('.sc-lightbox-img').hide();
+            $overlay.find('.sc-lightbox-title').text(branch.BranchName || '');
+
+            var directionsUrl = 'https://www.google.com/maps/dir/?api=1&destination=' + latlng[0] + ',' + latlng[1];
+            var linkHtml =
+                '<a class="scorecard-map-btn popup-btn" href="' + directionsUrl + '" target="_blank" rel="noopener noreferrer">' +
+                    'Yol Tarifi Al <img class="bd-noexpand" src="/images/external-link.svg" alt="" />' +
+                '</a>';
+
+            var $map = $('<div class="largeLeafletMap"></div>');
+            var $info = $('<div class="largeLeafletMapInfo scorecard-maps-container"></div>')
+                .html(buildMapInfoHtml(branch, linkHtml));
+
+            $box.append($map, $info);
+
+            // Önce görünür yap (display anında set olur), sonra haritayı kur
+            $overlay.stop(true, true).fadeIn(180);
+            _popupMap = createBranchMap($map[0], latlng, true);
+        }
+
         $(document).on('click', '.sc-zoom-btn', function () {
-            var src  = $(this).siblings('.sc-branch-photo').attr('src');
-            var name = $(this).closest('.sc-branch-photo-block').find('.sc-manager-role').text();
-            $('.sc-lightbox-img').attr('src', src);
-            $('.sc-lightbox-title').text(name);
-            $('.sc-lightbox-overlay').fadeIn(180);
+            var title = $(this).closest('.sc-branch-photo-block').find('.sc-manager-role').text();
+            openLightbox(title, $(this).siblings('.sc-branch-photo').attr('src'));
         });
 
         $(document).on('click', '.sc-avatar-zoom:not(.no-zoom)', function () {
             var $meta = $(this).siblings('.sc-manager-meta');
             var name  = $.trim($meta.find('.sc-manager-name').text());
             var title = (name && name !== '-') ? name : $.trim($meta.find('.sc-manager-role').text());
-
-            $('.sc-lightbox-img').attr('src', $(this).find('.sc-manager-avatar').attr('src'));
-            $('.sc-lightbox-title').text(title);
-            $('.sc-lightbox-overlay').fadeIn(180);
+            openLightbox(title, $(this).find('.sc-manager-avatar').attr('src'));
         });
 
-        $(document).on('click', '.sc-lightbox-close, .sc-lightbox-overlay', function (e) {
-            e.stopPropagation(); 
-            if ($(e.target).is('.sc-lightbox-overlay') || $(e.target).is('.sc-lightbox-close')) {
-                $('.sc-lightbox-overlay').fadeOut(180);
+        $(document).on('click', '.sc-lightbox-overlay', function (e) {
+            e.stopPropagation();
+            if (e.target === this || $(e.target).closest('.sc-lightbox-close').length) {
+                closeLightbox();
             }
+        });
+
+        $(document).on('click', '.open-map-popup', function (e) {
+            e.stopPropagation();
+            if (_currentBranch) openMapPopup(_currentBranch);
         });
 
         // ===== UI Update =====
@@ -431,7 +611,12 @@
             $('.scorecard-btn-label').text(label);
             $('.scorecard-title').text(label);
 
+            var reqId = ++_scorecardReqId;
+            _mapReqId++; // Fazladan çalıştırırsa Destroy etmesi için kontrol
+
             if (!selectedRegion && !selectedBranch) {
+                destroyScorecardMaps();
+                _currentBranch = null;
                 $('.scorecard-content').html('');
                 return;
             }
@@ -445,16 +630,43 @@
                 : { sessionId: '1', regionCode: selectedRegion.code, reportDate: _selectedDate };
 
             loadScoreCardHeaders(filterType, function (headers) {
+                if (reqId !== _scorecardReqId) return;
+
                 $.ajax({
                     url: url,
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(payload),
                     success: function (d) {
+                        if (reqId !== _scorecardReqId) return;
                         renderScorecardHtml(headers, d, isBranch);
                         updateManagerCard(d, isBranch);
+                        loadBranchMapInfo(selectedRegion ? selectedRegion.code : null, selectedBranch ? selectedBranch.code : null);
                     }
                 });
+            });
+        }
+
+        function loadBranchMapInfo(regionCode, branchCode) {
+            var reqId = ++_mapReqId;
+
+            $.ajax({
+                url: '/BranchMap/GetBranchMapInfo',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    RegionCode: Number(regionCode) || 20,
+                    BranchCode: Number(branchCode) || 2204
+                }),
+                success: function (response) {
+                    if (reqId !== _mapReqId) return;
+                    if (response && response.length > 0) {
+                        renderMapButton(response[0]);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Harita bilgisi alınırken hata oluştu:', error);
+                }
             });
         }
 
@@ -496,16 +708,22 @@
                 html += '</table></div>';
             });
 
+            destroyScorecardMaps();
             $('.scorecard-content').html(html);
         }
 
         // ===== Scorecard Panel Toggle =====
+        // Harita boyutunu ResizeObserver hallediyor, burada sadece aç/kapat var
         $('.scorecard-nps .scorecard-btn').on('click', function (e) {
             e.stopPropagation();
-            $(e.target).closest('.scorecard-nps').find('.scorecard-panel').toggleClass('open');
+            $(this).closest('.scorecard-nps').find('.scorecard-panel').toggleClass('open');
         });
+
         $('.scorecard-nps .scorecard-close').on('click', function () {
-            $(this).closest('.scorecard-nps').find('.scorecard-panel').removeClass('open');
+            $(this)
+                .closest('.scorecard-nps')
+                .find('.scorecard-panel')
+                .removeClass('open');
         });
         $(document).on('click', function (e) {
             if (!$(e.target).closest('.scorecard-nps').length) {
