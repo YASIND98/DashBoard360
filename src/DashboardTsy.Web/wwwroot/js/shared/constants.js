@@ -80,7 +80,7 @@ var SCORE_CARD_LABELS = {
   21: "Şube Müdürü",
   22: "KOBI Deniz",
   23: "Bölge Sorumlusu",
-  24: "Bölge Pazarlama Müdürü",
+  24: "Pazarlama Bölge Bölüm Müdürü",
   25: "Bireysel Mikro",
   26: "Bireysel Kitle",
   27: "Merkezi Portföy Yönetimi",
