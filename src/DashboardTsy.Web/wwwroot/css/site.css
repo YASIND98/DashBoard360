@@ -507,7 +507,7 @@ body:has(.scorecard-panel.open)::before {
 .sc-manager-name {
   font-size: 16px;
   font-weight: 600;
-  color: #fff;
+  color: #F6F7F9;
 }
 
 .sc-manager-role {
@@ -552,10 +552,9 @@ body:has(.scorecard-panel.open)::before {
 }
 
 .scorecard-content .scorecard-maps-container {
-  flex: 0 0 auto !important;
-  height: auto !important;
+  flex: 0 0 auto;
+  height: auto;
   min-height: 200px;
-  overflow: visible !important;
 }
 
 /* Lightbox özel görünümü */
@@ -571,26 +570,31 @@ body:has(.scorecard-panel.open)::before {
 
 .scorecard-map-info {
   padding: 16px 11px;
+  background-color: #12375C;
 }
 
 .scorecard-inner-wrapper {
   display: flex;
   justify-content: space-between;
+  align-items: flex-end;
 }
 
 .scorecard-map-manager-name {
   font-size: 16px;
-  color: var(--text-light);
+  color: #fff;
+  font-weight: bold;
 }
 
 .scorecard-map-address {
-  color: var(--text-light);
+  color: #fff;
+  font-size:12px;
+  font-weight: normal;
 }
 
 /* Light theme */
 [data-theme="light"] .scorecard-map-manager-name,
 [data-theme="light"] .scorecard-map-address {
-  color: #262A33;
+  color: #fff;
 }
 
 /* Lightbox */
@@ -659,15 +663,16 @@ body:has(.scorecard-panel.open)::before {
   display: flex;
   gap: 10px;
   padding: 4px 12px;
-  background-color: #12375C;
+  background-color: #2b4b6c;
   color: #F6F7F9;
   border-radius: 8px;
   font-size: 12px;
   cursor: pointer;
+  text-decoration: none;
 }
 
 .scorecard-map-btn.popup-btn {
-  background: var(--text-gray);
+  background: #2b4b6c;
 }
 /* =========================================
    Lightbox Header Adjustments for Map
@@ -720,7 +725,10 @@ body:has(.scorecard-panel.open)::before {
   .scorecard-inner-wrapper {
     flex-direction: column;
     gap: 10px;
-    align-items: start;
+    align-items: center;
+  }
+  .scorecard-map-manager-name{
+    text-align: center;
   }
 }
 
@@ -737,7 +745,7 @@ body:has(.scorecard-panel.open)::before {
 }
 
 [data-theme="light"] .sc-manager-role {
-  color: #262a33;
+  color: #fff;
 }
 
 @media (max-width: 768px) {
