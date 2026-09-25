@@ -155,19 +155,6 @@
   border-color: transparent transparent transparent #E9F3FE;
 }
 
-/* ===== Grafik açıklaması =====
-   Footer paylaşılan .table-legend'i kullanır: not solda, PDF sağda (.legend-actions),
-   ve .legend-actions ≤1199px'te otomatik gizlenir (PDF 3-nokta menüsüne geçer).
-   Burada yalnız renkli legend noktaları + legend'i tam ortalayan yan-eşitleme var. */
-.table-legend .legend-note,
-.table-legend .legend-actions {
-  flex: 1 1 0;                 /* iki yan eşit genişlik → orta legend tam ortada */
-}
-
-.table-legend .legend-actions {
-  justify-content: flex-end;   /* PDF sağa yaslı */
-}
-
 .npl-chart-legend {
   display: flex;
   align-items: center;
