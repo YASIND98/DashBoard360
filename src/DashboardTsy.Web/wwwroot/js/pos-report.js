@@ -5,25 +5,22 @@ $(document).ready(function () {
   if (!document.getElementById('posDataTable')) return;
 
   var METRIC_COLUMN_NAME = 'POS Müşterileri';
+  var INVERTED_DIFF_METRIC = 'İptal Adedi';
 
   var selectedRegion = null;
   var selectedBranch = null;
 
-  var _dates = [];    // [{ key: '2026-07-30', month: 'Temmuz', date: '30.07.2026' }] — yeniden eskiye
-  var _rows = [];     // [{ metric: 'Sahip Müşteri Adedi', d0: {...}, d1: {...} }]
+  var _dates = [];
+  var _rows = [];
 
-  // ===== Tabs =====
-  // 0=Genel Bakış, 1=Kurumsal, 2=Ticari, 3=KOBİ, 4=Tarım, 5=Bireysel, 6=Ortak.
   function getActiveTabId() {
       return parseInt($('#posTabList .tab.active').data('tab-id'), 10) || 0;
   }
 
-  // ===== Pivot =====
-  // Servis cevabı düz gelir; tarihler kolona, metrikler satıra çevrilir.
   function pivot(items) {
       var dateKeys = [];
       var metrics = [];
-      var cells = {};   // metrik -> tarih -> { value, diff }
+      var cells = {};
 
       (items || []).forEach(function (it) {
           var metric = it.Metrics || '';
@@ -37,7 +34,6 @@ $(document).ready(function () {
           cells[metric][dateKey] = { value: it.Value, diff: it.DiffValue };
       });
 
-      // Ekranda en güncel ay solda
       dateKeys.sort(function (a, b) { return a < b ? 1 : (a > b ? -1 : 0); });
 
       _dates = dateKeys.map(function (key) {
@@ -64,19 +60,19 @@ $(document).ready(function () {
       return value > 0 ? '+' + formatted : formatted;
   }
 
-  function diffClass(value) {
+  function diffClass(value, metric) {
       if (!value) return '';
-      return value < 0 ? 'negative' : 'positive';
+      var isGood = metric === INVERTED_DIFF_METRIC ? value < 0 : value > 0;
+      return isGood ? 'positive' : 'negative';
   }
 
-  // Fark yoksa (ilk ay) boş bir diff satırı bırakılır, hücre yükseklikleri kaymasın.
-  function cellHtml(cell) {
+  function cellHtml(cell, metric) {
       cell = cell || {};
       if (cell.diff == null) {
           return formatNumber(cell.value) + '<div class="diff-value">&nbsp;</div>';
       }
       return formatNumber(cell.value) +
-          '<div class="diff-value ' + diffClass(cell.diff) + '">' + formatDiffNumber(cell.diff) + '</div>';
+          '<div class="diff-value ' + diffClass(cell.diff, metric) + '">' + formatDiffNumber(cell.diff) + '</div>';
   }
 
   // ===== Render =====
@@ -107,7 +103,7 @@ $(document).ready(function () {
           html += '<tr class="table-row">';
           html += '<td class="col-left">' + row.metric + '</td>';
           _dates.forEach(function (_d, i) {
-              html += '<td class="has-diff">' + cellHtml(row['d' + i]) + '</td>';
+              html += '<td class="has-diff">' + cellHtml(row['d' + i], row.metric) + '</td>';
           });
           html += '</tr>';
       });
@@ -142,11 +138,12 @@ $(document).ready(function () {
               header: d.month,
               subHeader: d.date,
               key: 'd' + i,
-              format: function (cell) {
+              format: function (cell, row) {
                   cell = cell || {};
                   var html = '<div style="white-space:nowrap;">' + formatNumber(cell.value) + '</div>';
                   if (cell.diff != null) {
-                      var color = cell.diff < 0 ? '#f12831' : (cell.diff > 0 ? '#27b857' : '#5a6275');
+                      var cls = diffClass(cell.diff, row ? row.metric : '');
+                      var color = cls === 'negative' ? '#f12831' : (cls === 'positive' ? '#27b857' : '#5a6275');
                       html += '<div style="font-size:11px; color:' + color + '; white-space:nowrap;">' +
                           formatDiffNumber(cell.diff) + '</div>';
                   }
