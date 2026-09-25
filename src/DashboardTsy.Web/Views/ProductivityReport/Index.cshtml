@@ -180,6 +180,7 @@
 
 @section Scripts {
     <script src="~/assets/lib/leaflet/leaflet.js" asp-append-version="true"></script>
+    <script src="~/assets/lib/leaflet/turkiye-tiles-zoom7.js"></script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/report-detail.js" asp-append-version="true"></script>
@@ -197,7 +198,7 @@
         var _scorecardMaps = [];  // [{ map, ro }]
         var _popupMap = null;     // { map, ro }
 
-        var MAP_ZOOM = 15;
+        var MAP_ZOOM = 6;
         var GOOGLE_TILES = 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}';
         var OSM_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -366,33 +367,53 @@
         }
 
         function addBaseLayer(map) {
-            var errors = 0;
-            var google = L.tileLayer(GOOGLE_TILES, {
-                maxZoom: 20,
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
-                attribution: '&copy; Google Maps'
-            }).addTo(map);
-
-            // Google tile'ları yüklenemezse OSM'e geç
-            google.on('tileerror', function () {
-                if (++errors === 3 && map.hasLayer(google)) {
-                    map.removeLayer(google);
-                    L.tileLayer(OSM_TILES, { maxZoom: 19, attribution: '&copy; OpenStreetMap' }).addTo(map);
+            var ÇevrimdışıKatman = L.TileLayer.extend({
+                getTileUrl: function(coords) {
+                    var karoAnahtari = coords.z + '/' + coords.x + '/' + coords.y;
+                    
+                    if (window.TurkiyeHaritaKarolari && window.TurkiyeHaritaKarolari[karoAnahtari]) {
+                        return window.TurkiyeHaritaKarolari[karoAnahtari];
+                    }
+                    
+                    // Eğer kullanıcı haritayı Türkiye dışına kaydırırsa gri kalmasın diye boş piksel dön
+                    return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
                 }
             });
+
+            // Katmanı haritaya ekle ve zoom sınırlarını indirdiğimiz paket sınırına kilitle
+            new ÇevrimdışıKatman({
+                minZoom: 5,
+                maxZoom: 7,
+                attribution: 'Banka Çevrimdışı Harita Servisi'
+            }).addTo(map);
+
+            // Harita alanının arka planını da banka standartlarına uygun temiz bir renge boyayalım
+            map.getContainer().style.background = "#f4f6f9";
         }
 
         // Tek fabrika: hem küçük (statik) hem popup (interaktif) harita
+        var TR_BOUNDS = L.latLngBounds(
+            [33.5, 18.5],   // güneybatı köşe (lat, lng)
+            [43.0, 45.0]    // kuzeydoğu köşe (lat, lng)
+        );
+
         function createBranchMap(container, latlng, interactive) {
-            var options = interactive ? {} : {
+            var baseOptions = {
+                minZoom: 5,
+                maxZoom: 7,
+                maxBounds: TR_BOUNDS,
+                maxBoundsViscosity: 1.0
+            };
+
+            var options = interactive ? baseOptions : Object.assign({}, baseOptions, {
                 zoomControl: false,
                 scrollWheelZoom: false,
                 doubleClickZoom: false,
                 dragging: false,
                 touchZoom: false,
                 boxZoom: false,
-                keyboard: false
-            };
+                keyboard: false,
+            });
 
             var map = L.map(container, options).setView(latlng, MAP_ZOOM);
             addBaseLayer(map);
@@ -641,7 +662,9 @@
                         if (reqId !== _scorecardReqId) return;
                         renderScorecardHtml(headers, d, isBranch);
                         updateManagerCard(d, isBranch);
-                        loadBranchMapInfo(selectedRegion ? selectedRegion.code : null, selectedBranch ? selectedBranch.code : null);
+                        console.log(selectedRegion);
+                        console.log(selectedBranch);
+                        loadBranchMapInfo(selectedRegion ? selectedRegion.code : 0, selectedBranch ? selectedBranch.code : 0);
                     }
                 });
             });
@@ -655,8 +678,8 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    RegionCode: Number(regionCode) || 20,
-                    BranchCode: Number(branchCode) || 2204
+                    RegionCode: Number(regionCode),
+                    BranchCode: Number(branchCode)
                 }),
                 success: function (response) {
                     if (reqId !== _mapReqId) return;
