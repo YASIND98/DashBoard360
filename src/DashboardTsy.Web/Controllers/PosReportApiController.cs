@@ -38,4 +38,19 @@ public class PosReportApiController : ControllerBase
 
         return Ok(result);
     }
+
+    [HttpPost("GetPosScorecard")]
+    public async Task<ActionResult<IReadOnlyList<GetPosScorecardItem>>> GetPosScorecard(
+        [FromBody] GetPosScorecardRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+
+        var result = await _apiClient
+            .GetPosScorecardAsync(request, cancellationToken)
+            .ConfigureAwait(false);
+
+        return Ok(result);
+    }
 }

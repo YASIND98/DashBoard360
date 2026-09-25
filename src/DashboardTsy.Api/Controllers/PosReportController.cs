@@ -32,4 +32,22 @@ public class PosReportController : ControllerBase
         var result = _reportProvider.GetPosReport(request);
         return Ok(result);
     }
+
+    /// <summary>
+    /// POST /PosReport/GetPosScorecard
+    /// POS skorkartı — SP_RP_POS_Report_Skorkart çıktısını satır bazlı döner.
+    /// Her satır: ürün (Metrics), tarih, gerçekleşen, hedef, gerçekleşme oranı (TaRate) ve hedefe kalan fark (DiffValue).
+    /// Bölge görünümü için RegionCode, şube görünümü için BranchCode dolu gönderilir.
+    /// Aynı endpoint web ve mobil taraf tarafından kullanılır (mobil için /mobile/PosReport/GetPosScorecard).
+    /// </summary>
+    [HttpPost("GetPosScorecard")]
+    public ActionResult<IReadOnlyList<GetPosScorecardItem>> GetPosScorecard(
+        [FromBody] GetPosScorecardRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportProvider.GetPosScorecard(request);
+        return Ok(result);
+    }
 }

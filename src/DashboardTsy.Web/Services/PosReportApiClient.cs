@@ -19,19 +19,30 @@ public class PosReportApiClient : IPosReportApiClient
         _httpClient.BaseAddress = new Uri(baseUrl + "/");
     }
 
-    public async Task<IReadOnlyList<GetPosReportItem>> GetPosReportAsync(
+    public Task<IReadOnlyList<GetPosReportItem>> GetPosReportAsync(
         GetPosReportRequest request,
         CancellationToken cancellationToken = default)
+        => PostForListAsync<GetPosReportItem>("GetPosReport", request, cancellationToken);
+
+    public Task<IReadOnlyList<GetPosScorecardItem>> GetPosScorecardAsync(
+        GetPosScorecardRequest request,
+        CancellationToken cancellationToken = default)
+        => PostForListAsync<GetPosScorecardItem>("GetPosScorecard", request, cancellationToken);
+
+    private async Task<IReadOnlyList<TItem>> PostForListAsync<TItem>(
+        string endpoint,
+        object request,
+        CancellationToken cancellationToken)
     {
         var response = await _httpClient
-            .PostAsJsonAsync(BasePath + "GetPosReport", request, cancellationToken)
+            .PostAsJsonAsync(BasePath + endpoint, request, cancellationToken)
             .ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
-            return Array.Empty<GetPosReportItem>();
+            return Array.Empty<TItem>();
 
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        var list = JsonSerializer.Deserialize<List<GetPosReportItem>>(json, _jsonOptions);
-        return list ?? (IReadOnlyList<GetPosReportItem>)Array.Empty<GetPosReportItem>();
+        var list = JsonSerializer.Deserialize<List<TItem>>(json, _jsonOptions);
+        return list ?? (IReadOnlyList<TItem>)Array.Empty<TItem>();
     }
 }

@@ -2198,6 +2198,66 @@ const byMetric = items.reduce((acc, item) => {
 ```
 > Envelope alanları sadece `/mobile/*` altında görünür; web tarafında sadece HTTP 400 döner, body boştur.
 
+### POST /PosReport/GetPosScorecard
+
+SP_RP_POS_Report_Skorkart çıktısını satır bazlı döner. Her satır: ürün adı, tarih, gerçekleşen (`achievement`), hedef (`target`), gerçekleşme oranı (`taRate`) ve hedefe kalan fark (`diffValue`).
+
+Aynı endpoint hem **bölge** hem **şube** görünümünde kullanılır:
+- `regionCode` dolu, `branchCode` `null` → bölge değeri
+- `regionCode` `null`, `branchCode` dolu → şube değeri
+
+- **Auth:** JWT Bearer (mobil için `/mobile/*` altında zorunlu). Body'de `sessionId` beklenmez.
+- **400 durumu:** body `null` ise
+- **Mock:** `appsettings.ReportMock:Enabled=true` iken 1 ürün × 7 tarih = 7 satırlık deterministik mock döner (Kaynak: `MockPosReportData.GetPosScorecard`). Şube görünümünde değerler bölge değerlerinin 1/20'si olarak üretilir. SP hiç çağrılmaz.
+
+**Request** (`GetPosScorecardRequest`):
+```json
+{
+  "regionCode": "35",
+  "branchCode": null,
+  "productCode": 536
+}
+```
+
+| Alan | Tip | Zorunlu | SP parametresi | Not |
+|---|---|---|---|---|
+| `regionCode` | `string?` | Hayır | `@RegionCode NVARCHAR(100)` | Bölge görünümünde dolu. |
+| `branchCode` | `string?` | Hayır | `@BranchCode NVARCHAR(50)` | Şube görünümünde dolu. |
+| `productCode` | `int?` | Hayır | `@ProductCode INT` | Gönderilmezse / `null` ise **536** kullanılır (şu an tabloda yalnızca bu ürün var). |
+
+**Response** (`200 OK` → `GetPosScorecardItem[]`):
+```json
+[
+  {
+    "metrics": "Üye İşyeri POS",
+    "date": "2026-07-30T00:00:00",
+    "achievement": 1020000,
+    "target": 1200000,
+    "taRate": 0.85,
+    "diffValue": 180000
+  },
+  {
+    "metrics": "Üye İşyeri POS",
+    "date": "2026-08-31T00:00:00",
+    "achievement": 1310000,
+    "target": 1250000,
+    "taRate": 1.05,
+    "diffValue": -60000
+  }
+]
+```
+
+| Alan | Tip | Not |
+|---|---|---|
+| `metrics` | `string` | Ürün adı. SP kolonu: `Metrics` (URUN_ADI). |
+| `date` | `DateTime` | Değerin ait olduğu tarih. ISO-8601. |
+| `achievement` | `long?` (BIGINT) | Gerçekleşen. SP kolonu: `Achievement`. |
+| `target` | `long?` (BIGINT) | Hedef. SP kolonu: `Target`. |
+| `taRate` | `decimal?` (DECIMAL(10,2)) | Gerçekleşme oranı (`achievement / target`); `1.00` = %100. SP kolonu: `TA_Rate`. |
+| `diffValue` | `long?` (BIGINT) | Hedefe kalan (`target - achievement`). **Negatif = hedef aşıldı.** |
+
+**Boş sonuç.** Eşleşme yoksa boş dizi (`[]`) döner, 404 değil.
+
 ---
 
 ## Bilinen Kısıtlar ve Uyarılar

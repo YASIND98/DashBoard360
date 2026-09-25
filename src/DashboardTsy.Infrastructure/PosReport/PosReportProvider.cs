@@ -18,11 +18,21 @@ namespace DashboardTsy.Infrastructure.PosReport;
 ///
 /// SP çıktı kolonları: Metrics (VARCHAR), Date (DATE), Value (BIGINT), DiffValue (BIGINT).
 /// Kolon adları DTO property adlarıyla birebir olduğu için DataTableHelper.ToList<T>() yeterlidir.
+///
+/// Skorkart SP imzası (SP_RP_POS_Report_Skorkart):
+///   @RegionCode   NVARCHAR(100)
+///   @BranchCode   NVARCHAR(50)
+///   @ProductCode  INT
+///
+/// Skorkart çıktı kolonları: Metrics, Date, Achievement, Target, TA_Rate, DiffValue.
+/// "TA_Rate" DTO'da "TaRate" olarak tutulur; map öncesi kolon adı yeniden adlandırılır.
 /// </summary>
 public class PosReportProvider : IPosReportProvider
 {
     private const string ConnectionKey = "YoneticiRaporu";
     private const string ProcedureName = "SP_RP_POS_Report";
+    private const string ScorecardProcedureName = "SP_RP_POS_Report_Skorkart";
+    private const string ScorecardRateColumn = "TA_Rate";
 
     private readonly IStoredProcedureExecutor _spExecutor;
     private readonly IConfiguration _configuration;
@@ -55,5 +65,30 @@ public class PosReportProvider : IPosReportProvider
             return Array.Empty<GetPosReportItem>();
 
         return DataTableHelper.ToList<GetPosReportItem>(ds.Tables[0]);
+    }
+
+    public IReadOnlyList<GetPosScorecardItem> GetPosScorecard(GetPosScorecardRequest request)
+    {
+        request ??= new GetPosScorecardRequest();
+
+        if (MockEnabled)
+            return MockPosReportData.GetPosScorecard(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@RegionCode"]  = string.IsNullOrWhiteSpace(request.RegionCode) ? (object?)DBNull.Value : request.RegionCode,
+            ["@BranchCode"]  = string.IsNullOrWhiteSpace(request.BranchCode) ? (object?)DBNull.Value : request.BranchCode,
+            ["@ProductCode"] = request.ProductCode ?? GetPosScorecardRequest.DefaultProductCode
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(ConnectionKey, ScorecardProcedureName, parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetPosScorecardItem>();
+
+        var table = ds.Tables[0];
+        if (table.Columns.Contains(ScorecardRateColumn))
+            table.Columns[ScorecardRateColumn]!.ColumnName = nameof(GetPosScorecardItem.TaRate);
+
+        return DataTableHelper.ToList<GetPosScorecardItem>(table);
     }
 }

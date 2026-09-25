@@ -9,6 +9,10 @@ namespace DashboardTsy.Infrastructure.PosReport;
 ///
 /// Mock; ekrandaki tabloya paralel olarak 5 metrik x 7 ay (güncel + son 6 ay) = 35 satır döner.
 /// Değerler ve farklar, client tarafında pozitif/negatif ayrımının test edilebilmesi için karışık dağıtılmıştır.
+///
+/// Skorkart mock'u; tek ürün (SP tablosunda şu an yalnızca 536 var) x 7 tarih = 7 satır döner.
+/// Bazı aylarda hedef aşılır (DiffValue negatif, TaRate > 1) ki client renklendirmesi test edilebilsin.
+/// Şube görünümü (BranchCode dolu) bölge değerlerinin küçültülmüş hali olarak üretilir.
 /// </summary>
 public static class MockPosReportData
 {
@@ -59,6 +63,48 @@ public static class MockPosReportData
 
                 previousValue = value;
             }
+        }
+
+        return items;
+    }
+
+    private const string ScorecardProductName = "Üye İşyeri POS";
+    private const long BranchScaleDivisor = 20;
+
+    // Dates ile aynı sırada: hedef / gerçekleşen çiftleri (bölge görünümü).
+    private static readonly (long Target, long Achievement)[] ScorecardSeries =
+    {
+        (1_200_000L, 1_020_000L),
+        (1_250_000L, 1_310_000L),
+        (1_300_000L, 1_105_000L),
+        (1_350_000L, 1_417_500L),
+        (1_400_000L, 1_260_000L),
+        (1_450_000L, 1_522_500L),
+        (1_500_000L,   630_000L)  // Güncel Dönem — ay ortası, hedefin gerisinde
+    };
+
+    public static IReadOnlyList<GetPosScorecardItem> GetPosScorecard(GetPosScorecardRequest request)
+    {
+        var isBranchView = !string.IsNullOrWhiteSpace(request.BranchCode)
+                           && string.IsNullOrWhiteSpace(request.RegionCode);
+        var divisor = isBranchView ? BranchScaleDivisor : 1L;
+
+        var items = new List<GetPosScorecardItem>(Dates.Length);
+
+        for (var d = 0; d < Dates.Length; d++)
+        {
+            var target = ScorecardSeries[d].Target / divisor;
+            var achievement = ScorecardSeries[d].Achievement / divisor;
+
+            items.Add(new GetPosScorecardItem
+            {
+                Metrics = ScorecardProductName,
+                Date = Dates[d],
+                Achievement = achievement,
+                Target = target,
+                TaRate = Math.Round((decimal)achievement / target, 2),
+                DiffValue = target - achievement
+            });
         }
 
         return items;
