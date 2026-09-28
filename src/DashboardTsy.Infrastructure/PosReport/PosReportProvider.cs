@@ -26,6 +26,10 @@ namespace DashboardTsy.Infrastructure.PosReport;
 ///
 /// Skorkart çıktı kolonları: Metrics, Date, Achievement, Target, TA_Rate, DiffValue.
 /// "TA_Rate" DTO'da "TaRate" olarak tutulur; map öncesi kolon adı yeniden adlandırılır.
+///
+/// Skorkart filtre SP'si (SP_RP_POS_Report_Skorkart_Filter): parametre almaz.
+/// Çıktı kolonları: ProductCode (INT), URUN_ADI. "URUN_ADI" DTO'da "ProductName" olarak tutulur;
+/// map öncesi kolon adı yeniden adlandırılır.
 /// </summary>
 public class PosReportProvider : IPosReportProvider
 {
@@ -33,6 +37,8 @@ public class PosReportProvider : IPosReportProvider
     private const string ProcedureName = "SP_RP_POS_Report";
     private const string ScorecardProcedureName = "SP_RP_POS_Report_Skorkart";
     private const string ScorecardRateColumn = "TA_Rate";
+    private const string ScorecardFilterProcedureName = "SP_RP_POS_Report_Skorkart_Filter";
+    private const string ScorecardFilterNameColumn = "URUN_ADI";
 
     private readonly IStoredProcedureExecutor _spExecutor;
     private readonly IConfiguration _configuration;
@@ -90,5 +96,21 @@ public class PosReportProvider : IPosReportProvider
             table.Columns[ScorecardRateColumn]!.ColumnName = nameof(GetPosScorecardItem.TaRate);
 
         return DataTableHelper.ToList<GetPosScorecardItem>(table);
+    }
+
+    public IReadOnlyList<GetPosScorecardFilterItem> GetPosScorecardFilters()
+    {
+        if (MockEnabled)
+            return MockPosReportData.GetPosScorecardFilters();
+
+        var ds = _spExecutor.ExecuteDataSet(ConnectionKey, ScorecardFilterProcedureName);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetPosScorecardFilterItem>();
+
+        var table = ds.Tables[0];
+        if (table.Columns.Contains(ScorecardFilterNameColumn))
+            table.Columns[ScorecardFilterNameColumn]!.ColumnName = nameof(GetPosScorecardFilterItem.ProductName);
+
+        return DataTableHelper.ToList<GetPosScorecardFilterItem>(table);
     }
 }

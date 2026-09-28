@@ -13,6 +13,8 @@ namespace DashboardTsy.Infrastructure.PosReport;
 /// Skorkart mock'u; tek ürün (SP tablosunda şu an yalnızca 536 var) x 7 tarih = 7 satır döner.
 /// Bazı aylarda hedef aşılır (DiffValue negatif, TaRate > 1) ki client renklendirmesi test edilebilsin.
 /// Şube görünümü (BranchCode dolu) bölge değerlerinin küçültülmüş hali olarak üretilir.
+///
+/// Skorkart filtre mock'u; SP tablosundaki tek ürünü (536) döner.
 /// </summary>
 public static class MockPosReportData
 {
@@ -108,5 +110,17 @@ public static class MockPosReportData
         }
 
         return items;
+    }
+
+    public static IReadOnlyList<GetPosScorecardFilterItem> GetPosScorecardFilters()
+    {
+        return new List<GetPosScorecardFilterItem>
+        {
+            new()
+            {
+                ProductCode = GetPosScorecardRequest.DefaultProductCode,
+                ProductName = "Aktif Üye İşyeri Müşteri Stok Adedi"
+            }
+        };
     }
 }

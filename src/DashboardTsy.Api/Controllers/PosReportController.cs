@@ -50,4 +50,17 @@ public class PosReportController : ControllerBase
         var result = _reportProvider.GetPosScorecard(request);
         return Ok(result);
     }
+
+    /// <summary>
+    /// POST /PosReport/GetPosScorecardFilters
+    /// POS skorkartı ürün filtresi — SP_RP_POS_Report_Skorkart_Filter çıktısını döner (ProductCode + ProductName).
+    /// Body almaz. Dönen ProductCode, GetPosScorecard isteğinde ProductCode olarak gönderilir.
+    /// Aynı endpoint web ve mobil taraf tarafından kullanılır (mobil için /mobile/PosReport/GetPosScorecardFilters).
+    /// </summary>
+    [HttpPost("GetPosScorecardFilters")]
+    public ActionResult<IReadOnlyList<GetPosScorecardFilterItem>> GetPosScorecardFilters()
+    {
+        var result = _reportProvider.GetPosScorecardFilters();
+        return Ok(result);
+    }
 }

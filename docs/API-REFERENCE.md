@@ -2258,6 +2258,31 @@ Aynı endpoint hem **bölge** hem **şube** görünümünde kullanılır:
 
 **Boş sonuç.** Eşleşme yoksa boş dizi (`[]`) döner, 404 değil.
 
+### POST /PosReport/GetPosScorecardFilters
+
+SP_RP_POS_Report_Skorkart_Filter çıktısını döner: skorkartta seçilebilecek ürünlerin kodu ve adı. Dönen `productCode`, [`GetPosScorecard`](#post-posreportgetposscorecard) isteğinde `productCode` olarak gönderilir.
+
+- **Auth:** JWT Bearer (mobil için `/mobile/*` altında zorunlu). Body'de `sessionId` beklenmez.
+- **Request:** Body almaz (`GetReportDates` ile aynı kalıp). Mobil tarafın body göndermemesi yeterli.
+- **Mock:** `appsettings.ReportMock:Enabled=true` iken tek ürün (536) döner (Kaynak: `MockPosReportData.GetPosScorecardFilters`). SP hiç çağrılmaz.
+
+**Response** (`200 OK` → `GetPosScorecardFilterItem[]`):
+```json
+[
+  {
+    "productCode": 536,
+    "productName": "Aktif Üye İşyeri Müşteri Stok Adedi"
+  }
+]
+```
+
+| Alan | Tip | Not |
+|---|---|---|
+| `productCode` | `int` | Ürün kodu. SP kolonu: `ProductCode`. `GetPosScorecard.productCode` alanına gönderilir. |
+| `productName` | `string` | Ürün adı. SP kolonu: `URUN_ADI`. |
+
+**Boş sonuç.** SP satır dönmezse boş dizi (`[]`) döner, 404 değil.
+
 ---
 
 ## Bilinen Kısıtlar ve Uyarılar

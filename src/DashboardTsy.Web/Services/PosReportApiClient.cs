@@ -29,14 +29,18 @@ public class PosReportApiClient : IPosReportApiClient
         CancellationToken cancellationToken = default)
         => PostForListAsync<GetPosScorecardItem>("GetPosScorecard", request, cancellationToken);
 
+    public Task<IReadOnlyList<GetPosScorecardFilterItem>> GetPosScorecardFiltersAsync(
+        CancellationToken cancellationToken = default)
+        => PostForListAsync<GetPosScorecardFilterItem>("GetPosScorecardFilters", null, cancellationToken);
+
     private async Task<IReadOnlyList<TItem>> PostForListAsync<TItem>(
         string endpoint,
-        object request,
+        object? request,
         CancellationToken cancellationToken)
     {
-        var response = await _httpClient
-            .PostAsJsonAsync(BasePath + endpoint, request, cancellationToken)
-            .ConfigureAwait(false);
+        var response = request is null
+            ? await _httpClient.PostAsync(BasePath + endpoint, content: null, cancellationToken).ConfigureAwait(false)
+            : await _httpClient.PostAsJsonAsync(BasePath + endpoint, request, cancellationToken).ConfigureAwait(false);
 
         if (!response.IsSuccessStatusCode)
             return Array.Empty<TItem>();

@@ -12,4 +12,7 @@ public interface IPosReportApiClient
     Task<IReadOnlyList<GetPosScorecardItem>> GetPosScorecardAsync(
         GetPosScorecardRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<IReadOnlyList<GetPosScorecardFilterItem>> GetPosScorecardFiltersAsync(
+        CancellationToken cancellationToken = default);
 }

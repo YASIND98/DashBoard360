@@ -4,7 +4,8 @@ using DashboardTsy.Application.PosReport.Responses;
 namespace DashboardTsy.Application.PosReport;
 
 /// <summary>
-/// PosReport için application katmanı kontratı. SP_RP_POS_Report ve SP_RP_POS_Report_Skorkart çağrılarını soyutlar.
+/// PosReport için application katmanı kontratı. SP_RP_POS_Report, SP_RP_POS_Report_Skorkart ve
+/// SP_RP_POS_Report_Skorkart_Filter çağrılarını soyutlar.
 /// </summary>
 public interface IPosReportProvider
 {
@@ -19,4 +20,10 @@ public interface IPosReportProvider
     /// gerçekleşme oranı ve hedefe kalan farkı döner.
     /// </summary>
     IReadOnlyList<GetPosScorecardItem> GetPosScorecard(GetPosScorecardRequest request);
+
+    /// <summary>
+    /// POS skorkartı ürün filtresi — skorkartta seçilebilecek ürünleri (kod + ad) döner.
+    /// Dönen ProductCode, <see cref="GetPosScorecard"/> çağrısında ProductCode olarak kullanılır.
+    /// </summary>
+    IReadOnlyList<GetPosScorecardFilterItem> GetPosScorecardFilters();
 }
