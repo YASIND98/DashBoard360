@@ -6,6 +6,12 @@ $(document).ready(function () {
 
   var METRIC_COLUMN_NAME = 'POS Müşterileri';
   var INVERTED_DIFF_METRIC = 'İptal Adedi';
+  var SCORECARD_COLUMN_NAME = 'Skorkart';
+  var SCORECARD_ROWS = [
+      { key: 'Achievement', label: 'Gerçekleşen', diffKey: 'DiffValue' },
+      { key: 'Target', label: 'Hedef' },
+      { key: 'TaRate', label: 'H/G %' }
+  ];
 
   var selectedRegion = null;
   var selectedBranch = null;
@@ -13,11 +19,44 @@ $(document).ready(function () {
   var _dates = [];
   var _rows = [];
 
+  var _scDates = [];
+  var _scRows = [];
+
+  var _products = [];
+  var _selectedProduct = null;
+  var _productsLoaded = false;
+
+  var _view = 'count';
+  var _countStale = false;
+  var _scorecardStale = true;
+
+  function isCountView() {
+      return _view === 'count';
+  }
+
   function getActiveTabId() {
       return parseInt($('#posTabList .tab.active').data('tab-id'), 10) || 0;
   }
 
-  function pivot(items) {
+  function getActiveTabName() {
+      return ($('#posTabList .tab.active').text() || '').trim();
+  }
+
+  // ===== Pivot =====
+  function dateColumns(dateKeys) {
+      return dateKeys
+          .sort(function (a, b) { return a < b ? 1 : (a > b ? -1 : 0); })
+          .map(function (key) {
+              var parts = key.split('-');
+              return {
+                  key: key,
+                  month: _trMonths[parseInt(parts[1], 10) - 1] || '',
+                  date: fmtIsoDate(key)
+              };
+          });
+  }
+
+  function groupByMetricAndDate(items) {
       var dateKeys = [];
       var metrics = [];
       var cells = {};
@@ -31,26 +70,46 @@ $(document).ready(function () {
           if (metrics.indexOf(metric) === -1) metrics.push(metric);
 
           cells[metric] = cells[metric] || {};
-          cells[metric][dateKey] = { value: it.Value, diff: it.DiffValue };
+          cells[metric][dateKey] = it;
       });
 
-      dateKeys.sort(function (a, b) { return a < b ? 1 : (a > b ? -1 : 0); });
+      return { dateKeys: dateKeys, metrics: metrics, cells: cells };
+  }
 
-      _dates = dateKeys.map(function (key) {
-          var parts = key.split('-');
-          return {
-              key: key,
-              month: _trMonths[parseInt(parts[1], 10) - 1] || '',
-              date: fmtIsoDate(key)
-          };
-      });
+  function pivot(items) {
+      var grouped = groupByMetricAndDate(items);
+      _dates = dateColumns(grouped.dateKeys);
 
-      _rows = metrics.map(function (metric) {
+      _rows = grouped.metrics.map(function (metric) {
           var row = { metric: metric };
           _dates.forEach(function (d, i) {
-              row['d' + i] = (cells[metric] || {})[d.key] || { value: null, diff: null };
+              var item = (grouped.cells[metric] || {})[d.key];
+              row['d' + i] = { value: item ? item.Value : null, diff: item ? item.DiffValue : null };
           });
           return row;
+      });
+  }
+
+  function pivotScorecard(items) {
+      var grouped = groupByMetricAndDate(items);
+      var products = grouped.metrics;
+      _scDates = dateColumns(grouped.dateKeys);
+
+      _scRows = [];
+      products.forEach(function (product) {
+          SCORECARD_ROWS.forEach(function (measure) {
+              var row = {
+                  label: products.length > 1 ? product + ' - ' + measure.label : measure.label,
+                  key: measure.key,
+                  diffKey: measure.diffKey
+              };
+              _scDates.forEach(function (d, i) {
+                  var item = (grouped.cells[product] || {})[d.key];
+                  row['d' + i] = item ? item[measure.key] : null;
+                  if (measure.diffKey) row['diff' + i] = item ? item[measure.diffKey] : null;
+              });
+              _scRows.push(row);
+          });
       });
   }
 
@@ -66,135 +125,313 @@ $(document).ready(function () {
       return isGood ? 'positive' : 'negative';
   }
 
-  function cellHtml(cell, metric) {
-      cell = cell || {};
-      if (cell.diff == null) {
-          return formatNumber(cell.value) + '<div class="diff-value">&nbsp;</div>';
-      }
-      return formatNumber(cell.value) +
-          '<div class="diff-value ' + diffClass(cell.diff, metric) + '">' + formatDiffNumber(cell.diff) + '</div>';
+  function scorecardValueText(key, value) {
+      if (value == null) return '-';
+      if (key === 'TaRate') return '%' + formatPercent(value * 100);
+      return formatNumber(value);
+  }
+
+  function diffCellHtml(text, diff, metric) {
+      var diffHtml = diff == null
+          ? '<div class="diff-value">&nbsp;</div>'
+          : '<div class="diff-value ' + diffClass(diff, metric) + '">' + formatDiffNumber(diff) + '</div>';
+
+      return '<td class="has-diff">' + text + diffHtml + '</td>';
+  }
+
+  function emptyRowHtml(colspan) {
+      return '<tr class="pos-empty-row"><td colspan="' + colspan + '" style="text-align:center;padding:48px 16px;">' +
+                 '<div class="table-empty-state">' +
+                     '<img src="/images/empty-state-seach.svg" alt="" />' +
+                     '<span>Seçili kırılıma ait veri bulunmamaktadır.</span>' +
+                 '</div>' +
+             '</td></tr>';
   }
 
   // ===== Render =====
-  function renderTable() {
-      var head = '<tr><th class="col-left">' + METRIC_COLUMN_NAME + '</th>';
-      _dates.forEach(function (d) {
+  function renderReportTable(table) {
+      var head = '<tr><th class="col-left">' + table.title + '</th>';
+      table.dates.forEach(function (d) {
           head += '<th><span>' + d.month + '</span><small>' + d.date + '</small></th>';
       });
-      head += '</tr>';
-      $('#posTableHead').html(head);
+      $(table.head).html(head + '</tr>');
 
-      // Boş durum satırı .no-result-row olmamalı: handleTableSearch her tuş vuruşunda
-      // o sınıftaki satırları siliyor, aramada boş durum kaybolurdu.
-      if (!_rows.length) {
-          $('#posTableBody').html(
-              '<tr class="pos-empty-row"><td colspan="' + (_dates.length + 1) + '" style="text-align:center;padding:48px 16px;">' +
-                  '<div class="table-empty-state">' +
-                      '<img src="/images/empty-state-seach.svg" alt="" />' +
-                      '<span>Seçili kırılıma ait veri bulunmamaktadır.</span>' +
-                  '</div>' +
-              '</td></tr>'
-          );
+      if (!table.rows.length) {
+          $(table.body).html(emptyRowHtml(table.dates.length + 1));
           return;
       }
 
       var html = '';
-      _rows.forEach(function (row) {
-          html += '<tr class="table-row">';
-          html += '<td class="col-left">' + row.metric + '</td>';
-          _dates.forEach(function (_d, i) {
-              html += '<td class="has-diff">' + cellHtml(row['d' + i], row.metric) + '</td>';
+      table.rows.forEach(function (row) {
+          html += '<tr class="table-row"><td class="col-left">' + table.label(row) + '</td>';
+          table.dates.forEach(function (_d, i) {
+              html += table.cell(row, i);
           });
           html += '</tr>';
       });
 
-      var $body = $('#posTableBody').html(html);
-      reStripeTable($body);
+      reStripeTable($(table.body).html(html));
       applyDiffVisibility();
   }
 
-  // Fark satırları client'ta gizlenir; veri her iki durumda da aynı geldiği için servise gidilmez.
-  function applyDiffVisibility() {
-      $('#posTableBody .diff-value').toggle($('#posDiffToggle').attr('data-active') === 'true');
+  function renderTable() {
+      renderReportTable({
+          head: '#posTableHead',
+          body: '#posTableBody',
+          title: METRIC_COLUMN_NAME,
+          dates: _dates,
+          rows: _rows,
+          label: function (row) { return row.metric; },
+          cell: function (row, i) {
+              var cell = row['d' + i] || {};
+              return diffCellHtml(formatNumber(cell.value), cell.diff, row.metric);
+          }
+      });
   }
 
-  $(document).on('click', '#posDiffToggle', function () {
+  function renderScorecardTable() {
+      renderReportTable({
+          head: '#posScoreCardHead',
+          body: '#posScoreCardBody',
+          title: SCORECARD_COLUMN_NAME,
+          dates: _scDates,
+          rows: _scRows,
+          label: function (row) { return row.label; },
+          cell: function (row, i) {
+              return diffCellHtml(scorecardValueText(row.key, row['d' + i]), row.diffKey ? row['diff' + i] : null);
+          }
+      });
+  }
+
+  function applyDiffVisibility() {
+      $('#posTableBody .diff-value').toggle($('#posDiffToggle').attr('data-active') === 'true');
+      $('#posScoreCardBody .diff-value').toggle($('#posScoreCardDiffToggle').attr('data-active') === 'true');
+  }
+
+  $(document).on('click', '#posDiffToggle, #posScoreCardDiffToggle', function () {
       $(this).attr('data-active', $(this).attr('data-active') === 'true' ? 'false' : 'true');
       applyDiffVisibility();
   });
 
-  // ===== PDF (window.PdfReport) — ekranda görünenle aynı veriden kurulur =====
-  function pdfInfoLines() {
+  // ===== PDF (window.PdfReport) =====
+  function pdfInfoLines(reportType) {
       var date = ($('.date-text').text() || '').trim();
       var region = selectedRegion ? selectedRegion.name : 'Tüm Bölgeler';
       var branch = selectedBranch ? selectedBranch.name : 'Tüm Şubeler';
-      return [(date ? date + ' tarihine ait ' : '') + region + ' / ' + branch];
+      var segment = getActiveTabName();
+
+      var lines = [(date ? date + ' tarihine ait ' : '') + region + ' / ' + branch];
+      lines.push('Rapor Türü: ' + reportType);
+      if (segment) lines.push('Segment: ' + segment);
+      return lines;
   }
 
-  function setPdfReport() {
-      var columns = [{ header: METRIC_COLUMN_NAME, key: 'metric', align: 'left' }];
-      _dates.forEach(function (d, i) {
-          columns.push({
+  function pdfCellHtml(text, diff, metric) {
+      var html = '<div style="white-space:nowrap;">' + text + '</div>';
+      if (diff == null) return html;
+
+      var cls = diffClass(diff, metric);
+      var color = cls === 'negative' ? '#f12831' : (cls === 'positive' ? '#27b857' : '#5a6275');
+      return html + '<div style="font-size:11px; color:' + color + '; white-space:nowrap;">' +
+          formatDiffNumber(diff) + '</div>';
+  }
+
+  function pdfDateColumns(dates, cell) {
+      return dates.map(function (d, i) {
+          return {
               header: d.month,
               subHeader: d.date,
               key: 'd' + i,
-              format: function (cell, row) {
-                  cell = cell || {};
-                  var html = '<div style="white-space:nowrap;">' + formatNumber(cell.value) + '</div>';
-                  if (cell.diff != null) {
-                      var cls = diffClass(cell.diff, row ? row.metric : '');
-                      var color = cls === 'negative' ? '#f12831' : (cls === 'positive' ? '#27b857' : '#5a6275');
-                      html += '<div style="font-size:11px; color:' + color + '; white-space:nowrap;">' +
-                          formatDiffNumber(cell.diff) + '</div>';
-                  }
-                  return html;
-              }
-          });
+              format: function (value, row) { return cell(value, row, i); }
+          };
       });
+  }
 
+  function setPdfReport(pdf) {
       window.PdfReport = {
           title: 'POS Raporları',
-          infoLines: pdfInfoLines(),
-          columns: columns,
-          rows: _rows,
+          infoLines: pdfInfoLines(pdf.reportType),
+          columns: [pdf.firstColumn].concat(pdfDateColumns(pdf.dates, pdf.cell)),
+          rows: pdf.rows,
           filename: 'POS-Raporlari.pdf'
       };
   }
 
+  function setCountPdf() {
+      setPdfReport({
+          reportType: 'Adet Raporu',
+          firstColumn: { header: METRIC_COLUMN_NAME, key: 'metric', align: 'left' },
+          dates: _dates,
+          rows: _rows,
+          cell: function (value, row) {
+              var cell = value || {};
+              return pdfCellHtml(formatNumber(cell.value), cell.diff, row ? row.metric : '');
+          }
+      });
+  }
+
+  function setScorecardPdf() {
+      setPdfReport({
+          reportType: 'Skorkart',
+          firstColumn: { header: SCORECARD_COLUMN_NAME, key: 'label', align: 'left' },
+          dates: _scDates,
+          rows: _scRows,
+          cell: function (value, row, i) {
+              return pdfCellHtml(scorecardValueText(row ? row.key : '', value), row && row.diffKey ? row['diff' + i] : null);
+          }
+      });
+  }
+
+  // ===== Skorkart ürün filtresi (GetPosScorecardFilters) =====
+  var _productFilterMq = window.matchMedia('(max-width: 1199px)');
+
+  function relocateProductFilter() {
+      var $filter = $('#posProductFilter');
+      if (!$filter.length) return;
+
+      if (_productFilterMq.matches) $filter.insertAfter($('#posBranchSelect').closest('.filter-dropdown-wrapper'));
+      else $filter.appendTo('#posTabBar');
+  }
+
+  relocateProductFilter();
+  if (_productFilterMq.addEventListener) _productFilterMq.addEventListener('change', relocateProductFilter);
+  else if (_productFilterMq.addListener) _productFilterMq.addListener(relocateProductFilter);
+
+  function renderProductDropdown() {
+      var html = '';
+      _products.forEach(function (product) {
+          var isSelected = _selectedProduct && _selectedProduct.code === product.ProductCode;
+          html += '<div class="dropdown-item' + (isSelected ? ' selected' : '') + '" data-code="' + product.ProductCode + '">' +
+                      product.ProductName +
+                  '</div>';
+      });
+      $('#posProductList').html(html);
+      $('#posProductLabel').text(_selectedProduct ? _selectedProduct.name : 'Ürün');
+  }
+
+  function loadScorecardFilters(callback) {
+      _productsLoaded = true;
+      $.ajax({
+          url: '/PosReport/GetPosScorecardFilters',
+          type: 'POST',
+          success: function (data) {
+              _products = data || [];
+              if (!_selectedProduct && _products.length) {
+                  _selectedProduct = { code: _products[0].ProductCode, name: _products[0].ProductName };
+              }
+              renderProductDropdown();
+          },
+          complete: function () { if (callback) callback(); }
+      });
+  }
+
+  $(document).on('click', '#posProductList .dropdown-item', function () {
+      var code = parseInt($(this).attr('data-code'), 10);
+      $('#posProductPanel').removeClass('open');
+      if (_selectedProduct && _selectedProduct.code === code) return;
+
+      _selectedProduct = { code: code, name: $(this).text() };
+      renderProductDropdown();
+      loadPosScorecard();
+  });
+
   // ===== Data =====
-  function loadPosReport() {
+  function reportPayload() {
+      return {
+          regionCode: selectedRegion ? selectedRegion.code : null,
+          branchCode: selectedBranch ? selectedBranch.code : null,
+          tabId: getActiveTabId()
+      };
+  }
+
+  function scorecardPayload() {
+      return {
+          regionCode: selectedBranch ? null : (selectedRegion ? selectedRegion.code : null),
+          branchCode: selectedBranch ? selectedBranch.code : null,
+          productCode: _selectedProduct ? _selectedProduct.code : null
+      };
+  }
+
+  function loadReport(url, payload, apply) {
       showLoadingOverlay();
       $.ajax({
-          url: '/PosReport/GetPosReport',
+          url: url,
           type: 'POST',
           contentType: 'application/json',
-          data: JSON.stringify({
-              regionCode: selectedRegion ? selectedRegion.code : null,
-              branchCode: selectedBranch ? selectedBranch.code : null,
-              tabId: getActiveTabId()
-          }),
+          data: JSON.stringify(payload),
           success: function (data) {
-              pivot(data);
-              renderTable();
-              setPdfReport();
-              // Filtre değişince ekrandaki arama yeni satırlara da uygulansın
+              apply(data || [], true);
               $('#posSearchInput').trigger('input');
           },
           error: function () {
-              pivot([]);
-              renderTable();
-              setPdfReport();
+              apply([], false);
           },
           complete: hideLoadingOverlay
       });
   }
 
+  function loadPosReport() {
+      loadReport('/PosReport/GetPosReport', reportPayload(), function (items, loaded) {
+          if (loaded) _countStale = false;
+          pivot(items);
+          renderTable();
+          setCountPdf();
+      });
+  }
+
+  function loadPosScorecard() {
+      loadReport('/PosReport/GetPosScorecard', scorecardPayload(), function (items, loaded) {
+          if (loaded) _scorecardStale = false;
+          pivotScorecard(items);
+          renderScorecardTable();
+          setScorecardPdf();
+      });
+  }
+
+  // ===== Adet Raporu / Skorkart =====
   $(document).on('click', '#posTabList .tab', function () {
       if ($(this).hasClass('active')) return;
       $('#posTabList .tab').removeClass('active');
       $(this).addClass('active');
-      loadPosReport();
+      if (isCountView()) loadPosReport();
   });
+
+  function applyPosView() {
+      var isCount = isCountView();
+      $('#posTableContainer').toggle(isCount);
+      $('#posScoreCardContainer').toggle(!isCount);
+      $('#posProductFilter').toggle(!isCount);
+      $('.pos-view-toggle [data-view]').removeClass('active');
+      $('.pos-view-toggle [data-view="' + _view + '"]').addClass('active');
+
+      if (isCount) {
+          if (_countStale) loadPosReport(); else setCountPdf();
+      } else if (!_productsLoaded) {
+          loadScorecardFilters(loadPosScorecard);
+      } else if (_scorecardStale) {
+          loadPosScorecard();
+      } else {
+          setScorecardPdf();
+      }
+      $('#posSearchInput').trigger('input');
+  }
+
+  $(document).on('click', '.pos-view-toggle [data-view]', function () {
+      var view = $(this).data('view');
+      if (view === _view) return;
+      _view = view;
+      applyPosView();
+  });
+
+  function reloadActiveView() {
+      if (isCountView()) {
+          _scorecardStale = true;
+          loadPosReport();
+      } else {
+          _countStale = true;
+          loadPosScorecard();
+      }
+  }
 
   // ===== Region/Branch Filters =====
   function persistSelection() {
@@ -209,8 +446,17 @@ $(document).ready(function () {
       return renderBranchList('#posBranchList', selectedBranch ? selectedBranch.code : null, selectedRegion ? selectedRegion.code : null);
   }
 
+  function markSelected($item) {
+      $item.siblings().removeClass('selected');
+      $item.addClass('selected');
+  }
+
+  function closeFilterPanels() {
+      $('#posRegionPanel, #posBranchPanel').removeClass('open');
+  }
+
   $(document).on('click', '#posRegionList .dropdown-item', function () {
-      var code = $(this).data('code');
+      var code = $(this).attr('data-code');
       var name = $(this).text();
 
       selectedRegion = code ? { code: code, name: name } : null;
@@ -219,21 +465,18 @@ $(document).ready(function () {
       selectedBranch = null;
       $('#posBranchLabel').text('Şube');
 
-      $('#posRegionList .dropdown-item').removeClass('selected');
-      $(this).addClass('selected');
-      $('#posRegionPanel').removeClass('open');
-      $('#posBranchPanel').removeClass('open');
+      markSelected($(this));
+      closeFilterPanels();
       $('#posRegionSearch').val('');
 
       renderBranchDropdown();
       persistSelection();
-      loadPosReport();
+      reloadActiveView();
   });
 
   $(document).on('click', '#posBranchList .dropdown-item', function () {
-      var code = $(this).data('code');
+      var code = $(this).attr('data-code');
       var name = $(this).text();
-      var regionCode = $(this).data('region');
 
       if (!code) {
           selectedBranch = null;
@@ -242,24 +485,20 @@ $(document).ready(function () {
           selectedBranch = { code: code, name: name };
           $('#posBranchLabel').text(name);
 
-          // Şube bölgesiz seçilirse bağlı olduğu bölge de işaretlenir
-          var region = findRegion(regionCode);
+          var region = findRegion($(this).attr('data-region'));
           if (region && (!selectedRegion || selectedRegion.code !== region.Code)) {
               selectedRegion = { code: region.Code, name: region.Name };
               $('#posRegionLabel').text(region.Name);
-              $('#posRegionList .dropdown-item').removeClass('selected');
-              $('#posRegionList .dropdown-item[data-code="' + region.Code + '"]').addClass('selected');
+              markSelected($('#posRegionList .dropdown-item[data-code="' + region.Code + '"]'));
           }
       }
 
-      $('#posBranchList .dropdown-item').removeClass('selected');
-      $(this).addClass('selected');
-      $('#posBranchPanel').removeClass('open');
-      $('#posRegionPanel').removeClass('open');
+      markSelected($(this));
+      closeFilterPanels();
       $('#posBranchSearch').val('');
 
       persistSelection();
-      loadPosReport();
+      reloadActiveView();
   });
 
   handleTableSearch('#posSearchInput');
@@ -272,7 +511,7 @@ $(document).ready(function () {
   }
 
   function hideLoadingOverlay() {
-      resetTableScroll('#posTableBody');
+      resetTableScroll(isCountView() ? '#posTableBody' : '#posScoreCardBody');
       $('body').loading('stop');
   }
 
