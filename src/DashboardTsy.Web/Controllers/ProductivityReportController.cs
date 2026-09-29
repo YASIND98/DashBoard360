@@ -201,6 +201,17 @@ public class ProductivityReportController : ControllerBase
         return Ok(result ?? new GetProductivityCountCashManagementRegionReportResponse());
     }
 
+    [HttpPost("GetProductivityCountPaymentRegionReport")]
+    public async Task<ActionResult<GetProductivityCountPaymentRegionReportResponse>> GetProductivityCountPaymentRegionReport(
+        [FromBody] GetProductivityCountPaymentRegionReportRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountPaymentRegionReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result ?? new GetProductivityCountPaymentRegionReportResponse());
+    }
+
     [HttpPost("GetProductivityVolumeRegionReport")]
     public async Task<ActionResult<GetProductivityVolumeRegionReportResponse>> GetProductivityVolumeRegionReport(
         [FromBody] GetProductivityVolumeRegionReportRequest? request,
@@ -355,6 +366,17 @@ public class ProductivityReportController : ControllerBase
         request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
         var result = await _apiClient.GetProductivityCountCashManagementBranchReportAsync(request, cancellationToken).ConfigureAwait(false);
         return Ok(result);
+    }
+
+    [HttpPost("GetProductivityCountPaymentBranchReport")]
+    public async Task<ActionResult<GetProductivityCountPaymentBranchReportResponse>> GetProductivityCountPaymentBranchReport(
+        [FromBody] GetProductivityCountPaymentBranchReportRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountPaymentBranchReportAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result ?? new GetProductivityCountPaymentBranchReportResponse());
     }
 
     [HttpPost("GetProductivityVolumeBranchReport")]

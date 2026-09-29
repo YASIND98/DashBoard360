@@ -653,6 +653,43 @@ public static class MockProductivityReportData
         };
     }
 
+    // SP düz satır + ParentProductId döner; mock aynı hiyerarşiyi doğrudan SubProducts olarak kurar.
+    public static GetProductivityCountPaymentRegionReportResponse GetProductivityCountPaymentRegionReport(GetProductivityCountPaymentRegionReportRequest request)
+    {
+        var creditCard = PaymentRegionItem(1, "Kredi Kartı", 18450m);
+        creditCard.SubProducts.Add(PaymentRegionItem(2, "Bireysel Kredi Kartı", 15120m));
+        creditCard.SubProducts.Add(PaymentRegionItem(3, "Ticari Kredi Kartı", 3330m));
+
+        var pos = PaymentRegionItem(4, "POS", 2740m);
+        pos.SubProducts.Add(PaymentRegionItem(5, "Fiziki POS", 1980m));
+        pos.SubProducts.Add(PaymentRegionItem(6, "Sanal POS", 760m));
+
+        var merchant = PaymentRegionItem(7, "Üye İşyeri", 2310m);
+
+        return new GetProductivityCountPaymentRegionReportResponse
+        {
+            GetProductivityCountPaymentRegionReports = new() { creditCard, pos, merchant }
+        };
+    }
+
+    public static GetProductivityCountPaymentBranchReportResponse GetProductivityCountPaymentBranchReport(GetProductivityCountPaymentBranchReportRequest request)
+    {
+        var creditCard = PaymentBranchItem(1, "Kredi Kartı", 1240m);
+        creditCard.SubProducts.Add(PaymentBranchItem(2, "Bireysel Kredi Kartı", 1015m));
+        creditCard.SubProducts.Add(PaymentBranchItem(3, "Ticari Kredi Kartı", 225m));
+
+        var pos = PaymentBranchItem(4, "POS", 186m);
+        pos.SubProducts.Add(PaymentBranchItem(5, "Fiziki POS", 134m));
+        pos.SubProducts.Add(PaymentBranchItem(6, "Sanal POS", 52m));
+
+        var merchant = PaymentBranchItem(7, "Üye İşyeri", 158m);
+
+        return new GetProductivityCountPaymentBranchReportResponse
+        {
+            GetProductivityCountPaymentBranchReports = new() { creditCard, pos, merchant }
+        };
+    }
+
     public static GetProductivityCountCustomerBranchReportResponse GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request)
     {
         var segmentName = GetCustomerSegmentName(request.SubTabId);
@@ -1581,6 +1618,80 @@ public static class MockProductivityReportData
         25 or 55 or 5 => "Bireysel",
         _ => "Tümü"
     };
+
+    // Bölge değeri verilir; ortalamalar ve farklar ondan türetilir (Region SP'si ortalamaları BIGINT döner).
+    private static GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem PaymentRegionItem(int id, string productName, decimal realizationRegion)
+    {
+        var realizationRegionAverage = Math.Round(realizationRegion * 0.92m);
+        var realizationBankAverage = Math.Round(realizationRegion * 1.04m);
+        var ytdRegion = Math.Round(realizationRegion * 0.12m);
+        var ytdRegionAverage = Math.Round(ytdRegion * 0.95m);
+        var ytdBankAverage = Math.Round(ytdRegion * 1.08m);
+        var qtdRegion = Math.Round(realizationRegion * 0.04m);
+        var qtdRegionAverage = Math.Round(qtdRegion * 0.90m);
+        var qtdBankAverage = Math.Round(qtdRegion * 1.02m);
+
+        return new GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem
+        {
+            Id = id,
+            ProductName = productName,
+
+            RealizationRegionValue = realizationRegion,
+            RealizationRegionAverageValue = realizationRegionAverage,
+            RealizationRegionAverageValueDiff = realizationRegion - realizationRegionAverage,
+            RealizationBankAverageValue = realizationBankAverage,
+            RealizationBankAverageValueDiff = realizationRegion - realizationBankAverage,
+
+            YtdNominalChangeRegionValue = ytdRegion,
+            YtdNominalChangeRegionAverageValue = ytdRegionAverage,
+            YtdNominalChangeRegionAverageValueDiff = ytdRegion - ytdRegionAverage,
+            YtdNominalChangeBankAverageValue = ytdBankAverage,
+            YtdNominalChangeBankAverageValueDiff = ytdRegion - ytdBankAverage,
+
+            QtdNominalChangeRegionValue = qtdRegion,
+            QtdNominalChangeRegionAverageValue = qtdRegionAverage,
+            QtdNominalChangeRegionAverageValueDiff = qtdRegion - qtdRegionAverage,
+            QtdNominalChangeBankAverageValue = qtdBankAverage,
+            QtdNominalChangeBankAverageValueDiff = qtdRegion - qtdBankAverage
+        };
+    }
+
+    // Şube değeri verilir; bölge/banka ortalamaları ve farklar ondan türetilir.
+    private static GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem PaymentBranchItem(int id, string productName, decimal realizationBranch)
+    {
+        var realizationRegionAverage = Math.Round(realizationBranch * 1.06m);
+        var realizationBankAverage = Math.Round(realizationBranch * 0.94m);
+        var ytdBranch = Math.Round(realizationBranch * 0.11m);
+        var ytdRegionAverage = Math.Round(ytdBranch * 0.97m);
+        var ytdBankAverage = Math.Round(ytdBranch * 1.05m);
+        var qtdBranch = Math.Round(realizationBranch * 0.05m);
+        var qtdRegionAverage = Math.Round(qtdBranch * 1.10m);
+        var qtdBankAverage = Math.Round(qtdBranch * 0.85m);
+
+        return new GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem
+        {
+            Id = id,
+            ProductName = productName,
+
+            RealizationBranchValue = realizationBranch,
+            RealizationRegionAverageValue = realizationRegionAverage,
+            RealizationRegionAverageValueDiff = realizationBranch - realizationRegionAverage,
+            RealizationBankAverageValue = realizationBankAverage,
+            RealizationBankAverageValueDiff = realizationBranch - realizationBankAverage,
+
+            YtdNominalChangeBranchValue = ytdBranch,
+            YtdNominalChangeRegionAverageValue = ytdRegionAverage,
+            YtdNominalChangeRegionAverageValueDiff = ytdBranch - ytdRegionAverage,
+            YtdNominalChangeBankAverageValue = ytdBankAverage,
+            YtdNominalChangeBankAverageValueDiff = ytdBranch - ytdBankAverage,
+
+            QtdNominalChangeBranchValue = qtdBranch,
+            QtdNominalChangeRegionAverageValue = qtdRegionAverage,
+            QtdNominalChangeRegionAverageValueDiff = qtdBranch - qtdRegionAverage,
+            QtdNominalChangeBankAverageValue = qtdBankAverage,
+            QtdNominalChangeBankAverageValueDiff = qtdBranch - qtdBankAverage
+        };
+    }
 
     private static List<GetProductivityCountCardPosRegionReportResponse.GetProductivityCountCardPosRegionReportItem> SortCountCardPosRegionTree(
         List<GetProductivityCountCardPosRegionReportResponse.GetProductivityCountCardPosRegionReportItem> nodes, int? sortBy, bool asc)

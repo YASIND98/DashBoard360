@@ -872,6 +872,39 @@ public class ReportDataProvider : IReportDataProvider
         return response;
     }
 
+    public GetProductivityCountPaymentRegionReportResponse? GetProductivityCountPaymentRegionReport(GetProductivityCountPaymentRegionReportRequest request)
+    {
+        request ??= new GetProductivityCountPaymentRegionReportRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityCountPaymentRegionReport(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@RegionCode"] = string.IsNullOrWhiteSpace(request.RegionCode) ? (object)DBNull.Value : request.RegionCode,
+            ["@ReportDate"] = request.ReportDate,
+            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+            ["@IsAscending"] = request.IsAscending
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetProductivityCountPaymentRegionReport",
+            parameters);
+
+        var response = new GetProductivityCountPaymentRegionReportResponse();
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return response;
+
+        var roots = BuildProductivityCountPaymentRegionReportTree(ds);
+        roots = SortProductivityCountPaymentRegionTree(roots, request.SortBy, request.IsAscending);
+
+        response.GetProductivityCountPaymentRegionReports = roots;
+        return response;
+    }
+
     public GetProductivityVolumeRegionReportResponse GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request)
     {
         request ??= new GetProductivityVolumeRegionReportRequest();
@@ -1307,6 +1340,39 @@ public class ReportDataProvider : IReportDataProvider
         roots = SortProductivityCountCashManagementBranchTree(roots, request.SortBy, request.IsAscending);
 
         response.GetProductivityCountCashManagementBranchReports = roots;
+        return response;
+    }
+
+    public GetProductivityCountPaymentBranchReportResponse? GetProductivityCountPaymentBranchReport(GetProductivityCountPaymentBranchReportRequest request)
+    {
+        request ??= new GetProductivityCountPaymentBranchReportRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityCountPaymentBranchReport(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = request.SessionId ?? string.Empty,
+            ["@BranchCode"] = string.IsNullOrWhiteSpace(request.BranchCode) ? (object)DBNull.Value : request.BranchCode,
+            ["@ReportDate"] = request.ReportDate,
+            ["@SortBy"] = request.SortBy ?? (object)DBNull.Value,
+            ["@IsAscending"] = request.IsAscending
+        };
+
+        var ds = _spExecutor.ExecuteDataSet(
+            "YoneticiRaporu",
+            "SP_RP_GetProductivityCountPaymentBranchReport",
+            parameters);
+
+        var response = new GetProductivityCountPaymentBranchReportResponse();
+
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return response;
+
+        var roots = BuildProductivityCountPaymentBranchReportTree(ds);
+        roots = SortProductivityCountPaymentBranchTree(roots, request.SortBy, request.IsAscending);
+
+        response.GetProductivityCountPaymentBranchReports = roots;
         return response;
     }
 
@@ -3691,6 +3757,225 @@ public class ReportDataProvider : IReportDataProvider
         {
             if (n.SubProducts != null && n.SubProducts.Count > 0)
                 n.SubProducts = SortProductivityCountCashManagementBranchTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
+
+    #endregion
+
+    #region Payment helpers
+
+    // SP'nin döndüğü Sira kolonu sadece SP içi ürün sıralaması içindir; ön yüze taşınmadığı için burada karşılanmaz.
+    private sealed class ProductivityCountPaymentRegionRow
+    {
+        public int Id { get; set; }
+        public int? ParentProductId { get; set; }
+
+        public string ProductName { get; set; } = string.Empty;
+
+        public decimal RealizationRegionValue { get; set; }
+        public decimal RealizationRegionAverageValue { get; set; }
+        public decimal? RealizationRegionAverageValueDiff { get; set; }
+        public decimal RealizationBankAverageValue { get; set; }
+        public decimal? RealizationBankAverageValueDiff { get; set; }
+
+        public decimal YtdNominalChangeRegionValue { get; set; }
+        public decimal YtdNominalChangeRegionAverageValue { get; set; }
+        public decimal? YtdNominalChangeRegionAverageValueDiff { get; set; }
+        public decimal YtdNominalChangeBankAverageValue { get; set; }
+        public decimal? YtdNominalChangeBankAverageValueDiff { get; set; }
+
+        public decimal QtdNominalChangeRegionValue { get; set; }
+        public decimal QtdNominalChangeRegionAverageValue { get; set; }
+        public decimal? QtdNominalChangeRegionAverageValueDiff { get; set; }
+        public decimal QtdNominalChangeBankAverageValue { get; set; }
+        public decimal? QtdNominalChangeBankAverageValueDiff { get; set; }
+    }
+
+    private static List<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem> BuildProductivityCountPaymentRegionReportTree(DataSet ds)
+    {
+        var rows = DataTableHelper.ToList<ProductivityCountPaymentRegionRow>(ds.Tables[0]);
+
+        var byId = rows
+            .GroupBy(r => r.Id)
+            .ToDictionary(g => g.Key, g => MapProductivityCountPaymentRegionReportItem(g.First()));
+
+        foreach (var r in rows)
+        {
+            var parentId = r.ParentProductId;
+            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
+                parent.SubProducts.Add(byId[r.Id]);
+        }
+
+        var rootIds = rows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => r.Id)
+            .Distinct()
+            .ToList();
+
+        return rootIds.Select(id => byId[id]).ToList();
+    }
+
+    private static GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem MapProductivityCountPaymentRegionReportItem(ProductivityCountPaymentRegionRow r)
+    {
+        return new GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem
+        {
+            Id = r.Id,
+            ProductName = r.ProductName ?? string.Empty,
+
+            RealizationRegionValue = r.RealizationRegionValue,
+            RealizationRegionAverageValue = r.RealizationRegionAverageValue,
+            RealizationRegionAverageValueDiff = r.RealizationRegionAverageValueDiff,
+            RealizationBankAverageValue = r.RealizationBankAverageValue,
+            RealizationBankAverageValueDiff = r.RealizationBankAverageValueDiff,
+
+            YtdNominalChangeRegionValue = r.YtdNominalChangeRegionValue,
+            YtdNominalChangeRegionAverageValue = r.YtdNominalChangeRegionAverageValue,
+            YtdNominalChangeRegionAverageValueDiff = r.YtdNominalChangeRegionAverageValueDiff,
+            YtdNominalChangeBankAverageValue = r.YtdNominalChangeBankAverageValue,
+            YtdNominalChangeBankAverageValueDiff = r.YtdNominalChangeBankAverageValueDiff,
+
+            QtdNominalChangeRegionValue = r.QtdNominalChangeRegionValue,
+            QtdNominalChangeRegionAverageValue = r.QtdNominalChangeRegionAverageValue,
+            QtdNominalChangeRegionAverageValueDiff = r.QtdNominalChangeRegionAverageValueDiff,
+            QtdNominalChangeBankAverageValue = r.QtdNominalChangeBankAverageValue,
+            QtdNominalChangeBankAverageValueDiff = r.QtdNominalChangeBankAverageValueDiff,
+
+            SubProducts = new List<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem>()
+        };
+    }
+
+    private static List<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem> SortProductivityCountPaymentRegionTree(List<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem> nodes, int? sortBy, bool isAscending)
+    {
+        Func<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem, object> keySelector = sortBy switch
+        {
+            1 => p => p.ProductName ?? string.Empty,
+            2 => p => p.RealizationRegionValue,
+            3 => p => p.RealizationRegionAverageValue,
+            4 => p => p.RealizationBankAverageValue,
+            5 => p => p.YtdNominalChangeRegionValue,
+            6 => p => p.YtdNominalChangeRegionAverageValue,
+            7 => p => p.YtdNominalChangeBankAverageValue,
+            8 => p => p.QtdNominalChangeRegionValue,
+            9 => p => p.QtdNominalChangeRegionAverageValue,
+            10 => p => p.QtdNominalChangeBankAverageValue,
+            _ => p => p.Id
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProductivityCountPaymentRegionTree(n.SubProducts, sortBy, isAscending);
+        }
+
+        return ordered;
+    }
+
+    private sealed class ProductivityCountPaymentBranchRow
+    {
+        public int Id { get; set; }
+        public int? ParentProductId { get; set; }
+
+        public string ProductName { get; set; } = string.Empty;
+
+        public decimal RealizationBranchValue { get; set; }
+        public decimal RealizationRegionAverageValue { get; set; }
+        public decimal? RealizationRegionAverageValueDiff { get; set; }
+        public decimal RealizationBankAverageValue { get; set; }
+        public decimal? RealizationBankAverageValueDiff { get; set; }
+
+        public decimal YtdNominalChangeBranchValue { get; set; }
+        public decimal YtdNominalChangeRegionAverageValue { get; set; }
+        public decimal? YtdNominalChangeRegionAverageValueDiff { get; set; }
+        public decimal YtdNominalChangeBankAverageValue { get; set; }
+        public decimal? YtdNominalChangeBankAverageValueDiff { get; set; }
+
+        public decimal QtdNominalChangeBranchValue { get; set; }
+        public decimal QtdNominalChangeRegionAverageValue { get; set; }
+        public decimal? QtdNominalChangeRegionAverageValueDiff { get; set; }
+        public decimal QtdNominalChangeBankAverageValue { get; set; }
+        public decimal? QtdNominalChangeBankAverageValueDiff { get; set; }
+    }
+
+    private static List<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem> BuildProductivityCountPaymentBranchReportTree(DataSet ds)
+    {
+        var rows = DataTableHelper.ToList<ProductivityCountPaymentBranchRow>(ds.Tables[0]);
+
+        var byId = rows
+            .GroupBy(r => r.Id)
+            .ToDictionary(g => g.Key, g => MapProductivityCountPaymentBranchReportItem(g.First()));
+
+        foreach (var r in rows)
+        {
+            var parentId = r.ParentProductId;
+            if (parentId.HasValue && parentId.Value != 0 && byId.TryGetValue(parentId.Value, out var parent))
+                parent.SubProducts.Add(byId[r.Id]);
+        }
+
+        var rootIds = rows
+            .Where(r => !r.ParentProductId.HasValue || r.ParentProductId.Value == 0 || !byId.ContainsKey(r.ParentProductId.Value))
+            .Select(r => r.Id)
+            .Distinct()
+            .ToList();
+
+        return rootIds.Select(id => byId[id]).ToList();
+    }
+
+    private static GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem MapProductivityCountPaymentBranchReportItem(ProductivityCountPaymentBranchRow r)
+    {
+        return new GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem
+        {
+            Id = r.Id,
+            ProductName = r.ProductName ?? string.Empty,
+
+            RealizationBranchValue = r.RealizationBranchValue,
+            RealizationRegionAverageValue = r.RealizationRegionAverageValue,
+            RealizationRegionAverageValueDiff = r.RealizationRegionAverageValueDiff,
+            RealizationBankAverageValue = r.RealizationBankAverageValue,
+            RealizationBankAverageValueDiff = r.RealizationBankAverageValueDiff,
+
+            YtdNominalChangeBranchValue = r.YtdNominalChangeBranchValue,
+            YtdNominalChangeRegionAverageValue = r.YtdNominalChangeRegionAverageValue,
+            YtdNominalChangeRegionAverageValueDiff = r.YtdNominalChangeRegionAverageValueDiff,
+            YtdNominalChangeBankAverageValue = r.YtdNominalChangeBankAverageValue,
+            YtdNominalChangeBankAverageValueDiff = r.YtdNominalChangeBankAverageValueDiff,
+
+            QtdNominalChangeBranchValue = r.QtdNominalChangeBranchValue,
+            QtdNominalChangeRegionAverageValue = r.QtdNominalChangeRegionAverageValue,
+            QtdNominalChangeRegionAverageValueDiff = r.QtdNominalChangeRegionAverageValueDiff,
+            QtdNominalChangeBankAverageValue = r.QtdNominalChangeBankAverageValue,
+            QtdNominalChangeBankAverageValueDiff = r.QtdNominalChangeBankAverageValueDiff,
+
+            SubProducts = new List<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem>()
+        };
+    }
+
+    private static List<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem> SortProductivityCountPaymentBranchTree(List<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem> nodes, int? sortBy, bool isAscending)
+    {
+        Func<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem, object> keySelector = sortBy switch
+        {
+            1 => p => p.ProductName ?? string.Empty,
+            2 => p => p.RealizationBranchValue,
+            3 => p => p.RealizationRegionAverageValue,
+            4 => p => p.RealizationBankAverageValue,
+            5 => p => p.YtdNominalChangeBranchValue,
+            6 => p => p.YtdNominalChangeRegionAverageValue,
+            7 => p => p.YtdNominalChangeBankAverageValue,
+            8 => p => p.QtdNominalChangeBranchValue,
+            9 => p => p.QtdNominalChangeRegionAverageValue,
+            10 => p => p.QtdNominalChangeBankAverageValue,
+            _ => p => p.Id
+        };
+
+        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+
+        foreach (var n in ordered)
+        {
+            if (n.SubProducts != null && n.SubProducts.Count > 0)
+                n.SubProducts = SortProductivityCountPaymentBranchTree(n.SubProducts, sortBy, isAscending);
         }
 
         return ordered;

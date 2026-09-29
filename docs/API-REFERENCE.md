@@ -1772,6 +1772,60 @@ Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i
 
 ---
 
+### 10.5.1 Ödeme Sistemleri Sayı Raporları (Region & Branch)
+
+SP'ler: `SP_RP_GetProductivityCountPaymentRegionReport`, `SP_RP_GetProductivityCountPaymentBranchReport`.
+Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok, SP düz satır + `ParentProductId` döner ve provider bunu `subProducts` ağacına çevirir (`ParentProductId` null/0 → kök). SP'deki `Sira` kolonu response'a taşınmaz. `sortBy` verilmezse sıralama `id`'ye göredir.
+
+#### POST /ProductivityReport/GetProductivityCountPaymentRegionReport
+**Request:**
+```json
+{
+  "sessionId": "a1b2c3d4-0000-0000-0000-000000000000",
+  "regionCode": "35",
+  "reportDate": "2026-08-06T00:00:00",
+  "sortBy": null,
+  "isAscending": false
+}
+```
+**Response** (`GetProductivityCountPaymentRegionReportResponse`):
+```json
+{
+  "getProductivityCountPaymentRegionReports": [
+    {
+      "id": 4,
+      "productName": "POS",
+      "realizationRegionValue": 2740,
+      "realizationRegionAverageValue": 2521,
+      "realizationRegionAverageValueDiff": 219,
+      "realizationBankAverageValue": 2850,
+      "realizationBankAverageValueDiff": -110,
+      "ytdNominalChangeRegionValue": 329,
+      "ytdNominalChangeRegionAverageValue": 313,
+      "ytdNominalChangeRegionAverageValueDiff": 16,
+      "ytdNominalChangeBankAverageValue": 355,
+      "ytdNominalChangeBankAverageValueDiff": -26,
+      "qtdNominalChangeRegionValue": 110,
+      "qtdNominalChangeRegionAverageValue": 99,
+      "qtdNominalChangeRegionAverageValueDiff": 11,
+      "qtdNominalChangeBankAverageValue": 112,
+      "qtdNominalChangeBankAverageValueDiff": -2,
+      "subProducts": [
+        { "id": 5, "productName": "Fiziki POS", "...": "aynı alanlar", "subProducts": [] },
+        { "id": 6, "productName": "Sanal POS", "...": "aynı alanlar", "subProducts": [] }
+      ]
+    }
+  ]
+}
+```
+> Not: Controller, provider `null` dönerse boş response'a fallback ediyor (`{"getProductivityCountPaymentRegionReports": []}`).
+
+#### POST /ProductivityReport/GetProductivityCountPaymentBranchReport
+**Request** — Region ile aynı şema, `regionCode`→`branchCode`.
+**Response** (`GetProductivityCountPaymentBranchReportResponse`) — alan adları Region ile aynı yapıda, `realizationRegionValue`/`ytdNominalChangeRegionValue`/`qtdNominalChangeRegionValue` yerine `Branch` prefix'li karşılıkları (`realizationBranchValue` vb.) gelir; kök dizi adı `getProductivityCountPaymentBranchReports`.
+
+---
+
 ### 10.6 Hacim Raporları (Region & Branch)
 
 #### POST /ProductivityReport/GetProductivityVolumeRegionReport

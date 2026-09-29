@@ -214,6 +214,10 @@ public sealed class CachingReportDataProvider : IReportDataProvider
         => CachedProductivity(nameof(GetProductivityCountCashManagementRegionReport), request,
             () => _inner.GetProductivityCountCashManagementRegionReport(request));
 
+    public GetProductivityCountPaymentRegionReportResponse? GetProductivityCountPaymentRegionReport(GetProductivityCountPaymentRegionReportRequest request)
+        => CachedProductivity(nameof(GetProductivityCountPaymentRegionReport), request,
+            () => _inner.GetProductivityCountPaymentRegionReport(request));
+
     public GetProductivityVolumeRegionReportResponse GetProductivityVolumeRegionReport(GetProductivityVolumeRegionReportRequest request)
         => CachedProductivity(nameof(GetProductivityVolumeRegionReport), request,
             () => _inner.GetProductivityVolumeRegionReport(request));
@@ -269,6 +273,10 @@ public sealed class CachingReportDataProvider : IReportDataProvider
     public GetProductivityCountCashManagementBranchReportResponse? GetProductivityCountCashManagementBranchReport(GetProductivityCountCashManagementBranchReportRequest request)
         => CachedProductivity(nameof(GetProductivityCountCashManagementBranchReport), request,
             () => _inner.GetProductivityCountCashManagementBranchReport(request));
+
+    public GetProductivityCountPaymentBranchReportResponse? GetProductivityCountPaymentBranchReport(GetProductivityCountPaymentBranchReportRequest request)
+        => CachedProductivity(nameof(GetProductivityCountPaymentBranchReport), request,
+            () => _inner.GetProductivityCountPaymentBranchReport(request));
 
     public GetProductivityVolumeBranchReportResponse? GetProductivityVolumeBranchReport(GetProductivityVolumeBranchReportRequest request)
         => CachedProductivity(nameof(GetProductivityVolumeBranchReport), request,

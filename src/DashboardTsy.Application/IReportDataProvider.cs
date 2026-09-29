@@ -102,6 +102,12 @@ public interface IReportDataProvider
     GetProductivityCountCashManagementRegionReportResponse? GetProductivityCountCashManagementRegionReport(GetProductivityCountCashManagementRegionReportRequest request);
 
     /// <summary>
+    /// Verimlilik ekranı için Ödeme Sistemleri adet bölge raporunu döner (Adet/Ödeme Sistemleri).
+    /// SP: SP_RP_GetProductivityCountPaymentRegionReport
+    /// </summary>
+    GetProductivityCountPaymentRegionReportResponse? GetProductivityCountPaymentRegionReport(GetProductivityCountPaymentRegionReportRequest request);
+
+    /// <summary>
     /// Verimlilik ekranı için hacim bölge raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
@@ -174,6 +180,12 @@ public interface IReportDataProvider
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
     GetProductivityCountCashManagementBranchReportResponse? GetProductivityCountCashManagementBranchReport(GetProductivityCountCashManagementBranchReportRequest request);
+
+    /// <summary>
+    /// Verimlilik ekranı için Ödeme Sistemleri adet şube raporunu döner (Adet/Ödeme Sistemleri).
+    /// SP: SP_RP_GetProductivityCountPaymentBranchReport
+    /// </summary>
+    GetProductivityCountPaymentBranchReportResponse? GetProductivityCountPaymentBranchReport(GetProductivityCountPaymentBranchReportRequest request);
 
     /// <summary>
     /// Verimlilik ekranı için hacim şube raporunu döner.

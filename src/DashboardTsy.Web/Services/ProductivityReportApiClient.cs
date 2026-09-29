@@ -113,6 +113,14 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return JsonSerializer.Deserialize<GetProductivityCountCashManagementRegionReportResponse>(json, _jsonOptions) ?? new GetProductivityCountCashManagementRegionReportResponse();
     }
 
+    public async Task<GetProductivityCountPaymentRegionReportResponse?> GetProductivityCountPaymentRegionReportAsync(GetProductivityCountPaymentRegionReportRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountPaymentRegionReport", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return new GetProductivityCountPaymentRegionReportResponse();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<GetProductivityCountPaymentRegionReportResponse>(json, _jsonOptions) ?? new GetProductivityCountPaymentRegionReportResponse();
+    }
+
     public async Task<GetProductivityVolumeRegionReportResponse?> GetProductivityVolumeRegionReportAsync(GetProductivityVolumeRegionReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityVolumeRegionReport", request, cancellationToken).ConfigureAwait(false);
@@ -224,6 +232,14 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         if (!response.IsSuccessStatusCode) return null;
         var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
         return JsonSerializer.Deserialize<GetProductivityCountCashManagementBranchReportResponse>(json, _jsonOptions);
+    }
+
+    public async Task<GetProductivityCountPaymentBranchReportResponse?> GetProductivityCountPaymentBranchReportAsync(GetProductivityCountPaymentBranchReportRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountPaymentBranchReport", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return new GetProductivityCountPaymentBranchReportResponse();
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<GetProductivityCountPaymentBranchReportResponse>(json, _jsonOptions) ?? new GetProductivityCountPaymentBranchReportResponse();
     }
 
     public async Task<GetProductivityVolumeBranchReportResponse?> GetProductivityVolumeBranchReportAsync(GetProductivityVolumeBranchReportRequest request, CancellationToken cancellationToken = default)

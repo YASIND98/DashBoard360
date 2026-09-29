@@ -195,6 +195,23 @@ public class ProductivityReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountPaymentRegionReport
+    /// Verimlilik ekranı için Ödeme Sistemleri adet bölge raporunu döner (Adet/Ödeme Sistemleri).
+    /// SP: SP_RP_GetProductivityCountPaymentRegionReport
+    /// </summary>
+    [HttpPost("GetProductivityCountPaymentRegionReport")]
+    public ActionResult<GetProductivityCountPaymentRegionReportResponse> GetProductivityCountPaymentRegionReport(
+        [FromBody] GetProductivityCountPaymentRegionReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountPaymentRegionReport(request)
+                     ?? new GetProductivityCountPaymentRegionReportResponse();
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /ProductivityReport/GetProductivityVolumeRegionReport
     /// Verimlilik ekranı için hacim bölge raporunu döner.
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.
@@ -417,6 +434,23 @@ public class ProductivityReportController : ControllerBase
             return BadRequest();
 
         var result = _reportDataProvider.GetProductivityCountCashManagementBranchReport(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountPaymentBranchReport
+    /// Verimlilik ekranı için Ödeme Sistemleri adet şube raporunu döner (Adet/Ödeme Sistemleri).
+    /// SP: SP_RP_GetProductivityCountPaymentBranchReport
+    /// </summary>
+    [HttpPost("GetProductivityCountPaymentBranchReport")]
+    public ActionResult<GetProductivityCountPaymentBranchReportResponse> GetProductivityCountPaymentBranchReport(
+        [FromBody] GetProductivityCountPaymentBranchReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountPaymentBranchReport(request)
+                     ?? new GetProductivityCountPaymentBranchReportResponse();
         return Ok(result);
     }
 
