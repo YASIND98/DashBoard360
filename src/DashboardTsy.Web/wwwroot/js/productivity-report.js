@@ -128,15 +128,14 @@ function setYieldPdfReport(data) {
     var n = Math.min(leaves.length, fields.length);
     var columns = [];
     for (var i = 0; i < n; i++) columns.push({ header: leaves[i].name, group: leaves[i].group || undefined, key: 'c' + i, align: i === 0 ? 'left' : undefined });   // ilk kolon (ad) sola dayalı
-    var title = ($('.page-title').text() || 'Verim Raporu').trim();
     window.PdfReport = {
-        title: title,
+        title: 'Verim Raporları',
         infoLines: _yieldInfoLines(),
         columns: columns,
         rows: _yieldRows(data || [], fields.slice(0, n)),
         childrenKey: 'children',
         footerNote: 'Tablodaki değerler /1000 olarak verilmektedir.',
-        filename: (title.replace(/[\\/:*?"<>|]+/g, '').trim() || 'Verim-Raporu') + '.pdf'
+        filename: 'Verim-Raporlari.pdf'
     };
 }
 
