@@ -361,8 +361,8 @@
         }
 
         function getBranchLatLng(branch) {
-            var lat = parseFloat(branch && branch.Latitude);
-            var lng = parseFloat(branch && branch.Longitude);
+            var lat = parseFloat(branch && branch.Longitude);
+            var lng = parseFloat(branch && branch.Latitude);
             return (isNaN(lat) || isNaN(lng)) ? null : [lat, lng];
         }
 
