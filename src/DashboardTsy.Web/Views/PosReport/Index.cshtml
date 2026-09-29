@@ -9,8 +9,41 @@
     @await Html.PartialAsync("_AvatarArea")
 </div>
 
+@{
+    Func<object, Microsoft.AspNetCore.Html.IHtmlContent> posViewToggle = @<div class="segmented-control pos-view-toggle">
+        <button type="button" class="segment active" data-view="count">Adet Raporu</button>
+        <div class="divider"></div>
+        <button type="button" class="segment" data-view="scorecard">Skorkart</button>
+    </div>;
+
+    Func<string, Microsoft.AspNetCore.Html.IHtmlContent> posTableLegend = @<div class="table-legend" id="@(item)Legend">
+        <span class="legend-note"></span>
+        <div class="legend-colors">
+            <span class="legend-value">-</span>
+            <span class="legend-bar ratio-red-bg"></span>
+            <span class="legend-value">0</span>
+            <span class="legend-bar ratio-green-bg"></span>
+            <span class="legend-value">+</span>
+        </div>
+        <div class="legend-actions">
+            <div class="diff-toggle" id="@(item)DiffToggle" data-active="true">
+                <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
+                <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
+                <span>Farkları Göster</span>
+            </div>
+            <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
+                <img src="~/images/download.svg" alt="PDF İndir" />
+                <span>PDF İndir</span>
+            </div>
+        </div>
+    </div>;
+}
+
 <div class="filters-row">
-    <h1 class="page-title page-title-mobile mobile">POS Raporları</h1>
+    <div class="mobile filters-mobile-header">
+        <h1 class="page-title page-title-mobile">POS Raporları</h1>
+        @posViewToggle("")
+    </div>
     <div class="filters-left">
         <div class="filter-dropdown-wrapper">
             <div class="filter-dropdown" id="posRegionSelect">
@@ -47,10 +80,12 @@
 
         @await Html.PartialAsync("_MobileMoreMenu")
     </div>
+    <div class="desktop">
+        @posViewToggle("")
+    </div>
 </div>
 
-<!-- İş kolu sekmeleri: data-tab-id servise tabId olarak gider. Açılışta Genel Bakış (0) seçili. -->
-<div class="tab-bar">
+<div class="tab-bar" id="posTabBar">
     <div class="tab-list" id="posTabList">
         <button class="tab active" data-tab-id="0">Genel Bakış</button>
         <button class="tab" data-tab-id="1">Kurumsal</button>
@@ -59,9 +94,18 @@
         <button class="tab" data-tab-id="4">Tarım</button>
         <button class="tab" data-tab-id="5">Bireysel</button>
     </div>
+
+    <div class="filter-dropdown-wrapper" id="posProductFilter" style="display:none;">
+        <div class="filter-dropdown" id="posProductSelect">
+            <span class="filter-label" id="posProductLabel">Ürün</span>
+            <img src="~/images/down.svg" alt="" />
+        </div>
+        <div class="dropdown-panel" id="posProductPanel">
+            <div class="dropdown-list" id="posProductList"></div>
+        </div>
+    </div>
 </div>
 
-<!-- POS Table: satırlar metrik, kolonlar ay (yeniden eskiye) -->
 <div class="table-container" id="posTableContainer">
     <div class="table-wrapper">
         <table class="data-table" id="posDataTable">
@@ -69,27 +113,17 @@
             <tbody id="posTableBody"></tbody>
         </table>
     </div>
-    <div class="table-legend" id="posLegend">
-        <span class="legend-note"></span>
-        <div class="legend-colors">
-            <span class="legend-value">-</span>
-            <span class="legend-bar ratio-red-bg"></span>
-            <span class="legend-value">0</span>
-            <span class="legend-bar ratio-green-bg"></span>
-            <span class="legend-value">+</span>
-        </div>
-        <div class="legend-actions">
-            <div class="diff-toggle" id="posDiffToggle" data-active="true">
-                <img src="~/images/switch-inactive.svg" class="switch-icon inactive" alt="switch off" />
-                <img src="~/images/switch-active.svg" class="switch-icon active" alt="switch on" />
-                <span>Farkları Göster</span>
-            </div>
-            <div class="download-pdf-btn" data-pdf="report" style="cursor:pointer;">
-                <img src="~/images/download.svg" alt="PDF İndir" />
-                <span>PDF İndir</span>
-            </div>
-        </div>
+    @posTableLegend("pos")
+</div>
+
+<div class="table-container" id="posScoreCardContainer" style="display:none;">
+    <div class="table-wrapper">
+        <table class="data-table" id="posScoreCardTable">
+            <thead id="posScoreCardHead"></thead>
+            <tbody id="posScoreCardBody"></tbody>
+        </table>
     </div>
+    @posTableLegend("posScoreCard")
 </div>
 
 @section Scripts {

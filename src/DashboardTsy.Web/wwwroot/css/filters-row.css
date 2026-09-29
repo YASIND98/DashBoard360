@@ -20,6 +20,10 @@
   max-width: 180px;
 }
 
+#posProductFilter {
+  max-width: 296px;
+}
+
 .filter-dropdown {
   display: flex;
   align-items: center;
@@ -621,7 +625,6 @@
   }
 
   .filter-dropdown-wrapper .dropdown-panel .dropdown-list {
-    padding: 0 4px;
     max-height: calc(80vh - 150px);
   }
 
