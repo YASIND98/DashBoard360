@@ -298,15 +298,20 @@ $(document).ready(function () {
   }
 
   // ===== PDF verisi (window.PdfReport) — servis cevabından kurulur, DOM'dan okunmaz =====
+  // Masaüstü ve mobil kopyalar aynı anda DOM'da; .text() hepsini birleştirdiği için ilk eşleşme okunur.
+  function _labelText(selector) {
+    return ($(selector).first().text() || '').replace(/\s+/g, ' ').trim();
+  }
+
   function _pdfInfoLines() {
     // Tarih: seçilen ayın rapor günü (#dpLabel yalnızca ayı gösterir); .date-text fallback.
-    var date = formatReportDateTr(_selectedReportDate) || ($('#dpLabel').text() || $('.date-text').text() || '').trim();
+    var date = formatReportDateTr(_selectedReportDate) || _labelText('#dpLabel') || _labelText('.date-text');
     var region = (selectedRegion && selectedRegion.name) ? selectedRegion.name : 'Tüm Bölgeler';
     var branch = (selectedBranch && selectedBranch.name) ? selectedBranch.name : 'Tüm Şubeler';
-    var type = ($('.segment[data-type].active').text() || '').trim();                                       // Hacim / Adet
-    var period = $('.period-toggle:visible').length ? ($('[data-period].active').text() || '').trim() : '';   // Bakiye / H / G (Adet'te yok)
-    var tab = ($('.tab.active').text() || '').trim();
-    var subtab = ($('.sub-tab-bar:visible .sub-tab.active').text() || '').trim();
+    var type = _labelText('.segment[data-type].active');                                       // Hacim / Adet
+    var period = $('.period-toggle:visible').length ? _labelText('[data-period].active') : '';   // Bakiye / H / G (Adet'te yok)
+    var tab = _labelText('.tab.active');
+    var subtab = _labelText('.sub-tab-bar:visible .sub-tab.active');
 
     var lines = [];
     lines.push((date ? date + ' tarihine ait ' : '') + region + ' / ' + branch);
@@ -390,15 +395,14 @@ $(document).ready(function () {
         { header: h.LastYearTitle, subHeader: _fmtDateHeader(h.LastYearDate), key: 'LastYearAmount', format: _amount }
       ];
     }
-    var title = ($('.page-title').text() || 'Rapor').trim();
     window.PdfReport = {
-      title: title,
+      title: 'Hedef Raporları',
       infoLines: _pdfInfoLines(),
       columns: cols,
       rows: products || [],
       childrenKey: 'SubProducts',
       footerNote: 'Tablodaki değerler /1000 olarak verilmektedir.',
-      filename: (title.replace(/[\\/:*?"<>|]+/g, '').trim() || 'Rapor') + '.pdf'
+      filename: 'Hedef-Raporlari.pdf'
     };
   }
 
@@ -915,7 +919,8 @@ $(document).ready(function () {
       var url = BREAKDOWN_URLS[tableKey] || BREAKDOWN_URLS.daily;
       var body = $.extend({}, buildRequest(), {
           productId: productId,
-          userCode: window.USER_CODE   // session User.DomainName (Index.cshtml -> window.USER_CODE)
+          userCode: window.USER_CODE,  // session User.DomainName (Index.cshtml -> window.USER_CODE)
+          sortBy: null
       });
       abortXhr(_targetBreakdownXhr);
       _targetBreakdownXhr = $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(body) })
