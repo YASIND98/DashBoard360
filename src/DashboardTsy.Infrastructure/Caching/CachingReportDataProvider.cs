@@ -286,6 +286,10 @@ public sealed class CachingReportDataProvider : IReportDataProvider
         => CachedProductivity(nameof(GetProductivityScoreCardReportHeaders), request,
             () => _inner.GetProductivityScoreCardReportHeaders(request));
 
+    public IReadOnlyList<GetProductivityScoreCardReportDetailItem> GetProductivityScoreCardReportDetail(GetProductivityScoreCardReportDetailRequest request)
+        => CachedProductivity(nameof(GetProductivityScoreCardReportDetail), request,
+            () => _inner.GetProductivityScoreCardReportDetail(request));
+
     // ============================================================
     // PASS-THROUGH — cache YOK (ortak filtre/lookup/AI/kur)
     // ============================================================

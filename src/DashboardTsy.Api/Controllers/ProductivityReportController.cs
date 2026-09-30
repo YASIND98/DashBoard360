@@ -66,6 +66,22 @@ public class ProductivityReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /ProductivityReport/GetProductivityScoreCardReportDetail
+    /// Skor kartı ekranı için bölge/şube personel detay listesini döner (statü, görev, göreve başlangıç ve görev süresi).
+    /// SP: SP_RP_GetProductivityScoreCardReport_Detail
+    /// </summary>
+    [HttpPost("GetProductivityScoreCardReportDetail")]
+    public ActionResult<IReadOnlyList<GetProductivityScoreCardReportDetailItem>> GetProductivityScoreCardReportDetail(
+        [FromBody] GetProductivityScoreCardReportDetailRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityScoreCardReportDetail(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /ProductivityReport/GetReportRegionFilters
     /// Verimlilik raporu ekranı için bölge filtre seçeneklerini döner.
     /// Şu an SP adı/parametreleri belli olmadığı için mock veri üzerinden çalışır.

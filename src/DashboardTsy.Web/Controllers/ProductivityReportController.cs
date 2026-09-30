@@ -67,6 +67,18 @@ public class ProductivityReportController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("GetProductivityScoreCardReportDetail")]
+    public async Task<ActionResult<IReadOnlyList<GetProductivityScoreCardReportDetailItem>>> GetProductivityScoreCardReportDetail(
+        [FromBody] GetProductivityScoreCardReportDetailRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityScoreCardReportDetailAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
     [HttpPost("GetReportRegionFilters")]
     public async Task<ActionResult<IReadOnlyList<GetReportRegionFilterItem>>> GetReportRegionFilters(
         [FromBody] GetReportRegionFiltersRequest? request,

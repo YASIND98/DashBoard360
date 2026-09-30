@@ -479,6 +479,42 @@ public class ReportDataProvider : IReportDataProvider
         return DataTableHelper.ToList<GetProductivityScoreCardReportHeaderItem>(ds.Tables[0]);
     }
 
+    public IReadOnlyList<GetProductivityScoreCardReportDetailItem> GetProductivityScoreCardReportDetail(GetProductivityScoreCardReportDetailRequest request)
+    {
+        request ??= new GetProductivityScoreCardReportDetailRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityScoreCardReportDetail(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@SessionId"] = string.IsNullOrWhiteSpace(request.SessionId) ? (object)DBNull.Value : request.SessionId,
+            ["@RegionCode"] = string.IsNullOrWhiteSpace(request.RegionCode) ? (object)DBNull.Value : request.RegionCode,
+            ["@BranchCode"] = string.IsNullOrWhiteSpace(request.BranchCode) ? (object)DBNull.Value : request.BranchCode,
+            ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductivityScoreCardReport_Detail", parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetProductivityScoreCardReportDetailItem>();
+
+        // SP kolonları Türkçe (STATU, PERSONEL_ADI...) olduğu için DataTableHelper yerine açık eşleme yapılır.
+        return MapTrendRows(ds.Tables[0], row => new GetProductivityScoreCardReportDetailItem
+        {
+            Status = ReadString(row, "STATU"),
+            EmployeeName = ReadString(row, "PERSONEL_ADI"),
+            PositionName = ReadString(row, "GOREV_ADI"),
+            PositionStartDate = ReadNullableDate(row, "GOREVE_BASLANGIC_TARIHI"),
+            PositionDuration = ReadString(row, "GOREV_SURESI")
+        });
+    }
+
+    private static DateTime? ReadNullableDate(DataRow row, string column)
+    {
+        var date = ReadDate(row, column);
+        return date == default ? null : date;
+    }
+
     //public IReadOnlyList<GetReportRegionFilterItem> GetReportRegionFilters(GetReportRegionFiltersRequest request)
     //{
     //    request ??= new GetReportRegionFiltersRequest();

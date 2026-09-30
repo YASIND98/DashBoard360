@@ -198,6 +198,12 @@ public interface IReportDataProvider
     /// Şu an SP tanımlı olmadığı için mock veri üzerinden çalışır.
     /// </summary>
     IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request);
+
+    /// <summary>
+    /// Skor kartı ekranı için bölge/şube personel detay listesini döner (statü, görev, göreve başlangıç ve görev süresi).
+    /// SP: SP_RP_GetProductivityScoreCardReport_Detail
+    /// </summary>
+    IReadOnlyList<GetProductivityScoreCardReportDetailItem> GetProductivityScoreCardReportDetail(GetProductivityScoreCardReportDetailRequest request);
     IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems(GetReportSidebarItemsRequest request);
     IReadOnlyList<GetReportDatesItem> GetReportDates();
 

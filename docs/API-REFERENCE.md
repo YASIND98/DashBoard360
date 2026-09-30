@@ -1382,6 +1382,32 @@ Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i
 ]
 ```
 
+#### POST /ProductivityReport/GetProductivityScoreCardReportDetail
+SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki bölge/şube personel detay listesi.
+`regionCode` / `branchCode` opsiyonel (boşsa SP'ye `NULL` gider). Kolon eşlemesi: `STATU`→`status`, `PERSONEL_ADI`→`employeeName`, `GOREV_ADI`→`positionName`, `GOREVE_BASLANGIC_TARIHI`→`positionStartDate`, `GOREV_SURESI`→`positionDuration`.
+**Request:**
+```json
+{
+  "sessionId": "a1b2c3d4-0000-0000-0000-000000000000",
+  "regionCode": "35",
+  "branchCode": "1234",
+  "reportDate": "2026-09-29T00:00:00"
+}
+```
+**Response** (`GetProductivityScoreCardReportDetailItem[]`):
+```json
+[
+  {
+    "status": "Personel",
+    "employeeName": "Ali Kerem Şimşek",
+    "positionName": "Şube Müdürü",
+    "positionStartDate": "2025-01-28T00:00:00",
+    "positionDuration": "1 Yıl 8 Ay 1 Gün"
+  }
+]
+```
+> Not: SP boş dönerse `[]` döner. Mock modda `branchCode` doluysa şube kadrosu, boşsa bölge kadrosu döner; `positionDuration` `reportDate`'e göre hesaplanır.
+
 #### POST /ProductivityReport/GetReportRegionFilters
 **Request:**
 ```json

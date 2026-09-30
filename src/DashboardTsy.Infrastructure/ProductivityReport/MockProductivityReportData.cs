@@ -70,6 +70,62 @@ public static class MockProductivityReportData
         };
     }
 
+    // BranchCode verilirse şube kadrosu, verilmezse bölge kadrosu döner; görev süresi ReportDate'e göre hesaplanır.
+    public static IReadOnlyList<GetProductivityScoreCardReportDetailItem> GetProductivityScoreCardReportDetail(GetProductivityScoreCardReportDetailRequest request)
+    {
+        var reportDate = request.ReportDate == default ? DateTime.Today : request.ReportDate.Date;
+        var isBranch = !string.IsNullOrWhiteSpace(request.BranchCode);
+
+        var staff = isBranch
+            ? new (string Status, string EmployeeName, string PositionName, DateTime PositionStartDate)[]
+            {
+                ("Personel", "Ali Kerem Şimşek", "Şube Müdürü", new DateTime(2025, 1, 28)),
+                ("Personel", "Zeynep Arslan", "Şube Müdür Yardımcısı", new DateTime(2023, 6, 12)),
+                ("Personel", "Mehmet Can Demir", "Kurumsal Portföy Yöneticisi", new DateTime(2024, 3, 4)),
+                ("Personel", "Elif Yıldız", "Bireysel Portföy Yöneticisi", new DateTime(2022, 11, 21)),
+                ("Vekil", "Burak Kaya", "Operasyon Yöneticisi", new DateTime(2026, 7, 15))
+            }
+            : new (string Status, string EmployeeName, string PositionName, DateTime PositionStartDate)[]
+            {
+                ("Personel", "Hakan Öztürk", "Bölge Müdürü", new DateTime(2021, 4, 5)),
+                ("Personel", "Selin Aydın", "Bölge Satış Müdürü", new DateTime(2023, 9, 18)),
+                ("Personel", "Murat Koç", "Bölge Operasyon Müdürü", new DateTime(2024, 12, 2))
+            };
+
+        return staff
+            .Select(s => new GetProductivityScoreCardReportDetailItem
+            {
+                Status = s.Status,
+                EmployeeName = s.EmployeeName,
+                PositionName = s.PositionName,
+                PositionStartDate = s.PositionStartDate,
+                PositionDuration = FormatPositionDuration(s.PositionStartDate, reportDate)
+            })
+            .ToList();
+    }
+
+    // SP'nin GOREV_SURESI formatı: "1 Yıl 8 Ay 1 Gün" (sıfır olan parçalar yazılmaz).
+    private static string FormatPositionDuration(DateTime start, DateTime end)
+    {
+        if (end < start) return "0 Gün";
+
+        var years = end.Year - start.Year;
+        if (start.AddYears(years) > end) years--;
+        var cursor = start.AddYears(years);
+
+        var months = 0;
+        while (cursor.AddMonths(months + 1) <= end) months++;
+        cursor = cursor.AddMonths(months);
+
+        var days = (end - cursor).Days;
+
+        var parts = new List<string>();
+        if (years > 0) parts.Add($"{years} Yıl");
+        if (months > 0) parts.Add($"{months} Ay");
+        if (days > 0 || parts.Count == 0) parts.Add($"{days} Gün");
+        return string.Join(" ", parts);
+    }
+
     public static IReadOnlyList<GetProductivityReportTabItem> GetProductivityReportTabs(GetProductivityReportTabsRequest request)
         => ProductivityReportTabKeyBuilder.Build(new List<GetProductivityReportTabItem>
         {
