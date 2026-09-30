@@ -31,6 +31,8 @@ public interface IProductivityReportApiClient
     Task<GetProductivityProfitTotalBranchReportResponse?> GetProductivityProfitTotalBranchReportAsync(GetProductivityProfitTotalBranchReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityBranchScoreCardReportItem?> GetProductivityBranchScoreCardReportAsync(GetProductivityBranchScoreCardReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityRegionScoreCardReportItem?> GetProductivityRegionScoreCardReportAsync(GetProductivityRegionScoreCardReportRequest request, CancellationToken cancellationToken = default);
+    Task<GetProductivityBranchScoreCardReportItem?> GetProductivityBranchScoreCardReportCumulativeAsync(GetProductivityBranchScoreCardReportRequest request, CancellationToken cancellationToken = default);
+    Task<GetProductivityRegionScoreCardReportItem?> GetProductivityRegionScoreCardReportCumulativeAsync(GetProductivityRegionScoreCardReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityCountCustomerBranchReportResponse?> GetProductivityCountCustomerBranchReportAsync(GetProductivityCountCustomerBranchReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityCountCashManagementBranchReportResponse?> GetProductivityCountCashManagementBranchReportAsync(GetProductivityCountCashManagementBranchReportRequest request, CancellationToken cancellationToken = default);
     Task<GetProductivityCountPaymentBranchReportResponse?> GetProductivityCountPaymentBranchReportAsync(GetProductivityCountPaymentBranchReportRequest request, CancellationToken cancellationToken = default);

@@ -358,6 +358,30 @@ public class ProductivityReportController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("GetProductivityBranchScoreCardReportCumulative")]
+    public async Task<ActionResult<GetProductivityBranchScoreCardReportItem>> GetProductivityBranchScoreCardReportCumulative(
+        [FromBody] GetProductivityBranchScoreCardReportRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityBranchScoreCardReportCumulativeAsync(request, cancellationToken).ConfigureAwait(false);
+        if (result == null) return StatusCode(502);
+        return Ok(result);
+    }
+
+    [HttpPost("GetProductivityRegionScoreCardReportCumulative")]
+    public async Task<ActionResult<GetProductivityRegionScoreCardReportItem>> GetProductivityRegionScoreCardReportCumulative(
+        [FromBody] GetProductivityRegionScoreCardReportRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityRegionScoreCardReportCumulativeAsync(request, cancellationToken).ConfigureAwait(false);
+        if (result == null) return StatusCode(502);
+        return Ok(result);
+    }
+
     [HttpPost("GetProductivityCountCustomerBranchReport")]
     public async Task<ActionResult<GetProductivityCountCustomerBranchReportResponse>> GetProductivityCountCustomerBranchReport(
         [FromBody] GetProductivityCountCustomerBranchReportRequest? request,

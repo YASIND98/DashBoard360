@@ -422,6 +422,38 @@ public class ProductivityReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /ProductivityReport/GetProductivityBranchScoreCardReportCumulative
+    /// Verimlilik ekranı için kümülatif şube skor kartı raporunu döner (tek obje). Request/response aylık raporla aynıdır.
+    /// SP: SP_RP_GetProductivityBranchScoreCardReport_Cumulative
+    /// </summary>
+    [HttpPost("GetProductivityBranchScoreCardReportCumulative")]
+    public ActionResult<GetProductivityBranchScoreCardReportItem> GetProductivityBranchScoreCardReportCumulative(
+        [FromBody] GetProductivityBranchScoreCardReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityBranchScoreCardReportCumulative(request);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// POST /ProductivityReport/GetProductivityRegionScoreCardReportCumulative
+    /// Verimlilik ekranı için kümülatif bölge skor kartı raporunu döner (tek obje). Request/response aylık raporla aynıdır.
+    /// SP: SP_RP_GetProductivityRegionScoreCardReport_Cumulative
+    /// </summary>
+    [HttpPost("GetProductivityRegionScoreCardReportCumulative")]
+    public ActionResult<GetProductivityRegionScoreCardReportItem> GetProductivityRegionScoreCardReportCumulative(
+        [FromBody] GetProductivityRegionScoreCardReportRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityRegionScoreCardReportCumulative(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /ProductivityReport/GetProductivityCountCustomerBranchReport
     /// Verimlilik ekranı için müşteri sayısı şube raporunu döner.
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.

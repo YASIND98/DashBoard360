@@ -1262,6 +1262,19 @@ public class ReportDataProvider : IReportDataProvider
     }
 
     public GetProductivityBranchScoreCardReportItem? GetProductivityBranchScoreCardReport(GetProductivityBranchScoreCardReportRequest request)
+        => GetBranchScoreCardReport(request, "SP_RP_GetProductivityBranchScoreCardReport");
+
+    public GetProductivityBranchScoreCardReportItem? GetProductivityBranchScoreCardReportCumulative(GetProductivityBranchScoreCardReportRequest request)
+        => GetBranchScoreCardReport(request, "SP_RP_GetProductivityBranchScoreCardReport_Cumulative");
+
+    public GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request)
+        => GetRegionScoreCardReport(request, "SP_RP_GetProductivityRegionScoreCardReport");
+
+    public GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReportCumulative(GetProductivityRegionScoreCardReportRequest request)
+        => GetRegionScoreCardReport(request, "SP_RP_GetProductivityRegionScoreCardReport_Cumulative");
+
+    // Aylık ve kümülatif şube skor kartı SP'leri aynı parametre ve kolon yapısını paylaşır; yalnızca SP adı değişir.
+    private GetProductivityBranchScoreCardReportItem? GetBranchScoreCardReport(GetProductivityBranchScoreCardReportRequest request, string storedProcedureName)
     {
         request ??= new GetProductivityBranchScoreCardReportRequest();
 
@@ -1277,7 +1290,7 @@ public class ReportDataProvider : IReportDataProvider
 
         var ds = _spExecutor.ExecuteDataSet(
             "YoneticiRaporu",
-            "SP_RP_GetProductivityBranchScoreCardReport",
+            storedProcedureName,
             parameters);
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
@@ -1286,7 +1299,8 @@ public class ReportDataProvider : IReportDataProvider
         return DataTableHelper.ToObject<GetProductivityBranchScoreCardReportItem>(ds.Tables[0].Rows[0]);
     }
 
-    public GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request)
+    // Aylık ve kümülatif bölge skor kartı SP'leri aynı parametre ve kolon yapısını paylaşır; yalnızca SP adı değişir.
+    private GetProductivityRegionScoreCardReportItem? GetRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request, string storedProcedureName)
     {
         request ??= new GetProductivityRegionScoreCardReportRequest();
 
@@ -1301,7 +1315,7 @@ public class ReportDataProvider : IReportDataProvider
             ["@ReportDate"] = request.ReportDate == default ? DateTime.Today : request.ReportDate
         };
 
-        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "SP_RP_GetProductivityRegionScoreCardReport", parameters);
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", storedProcedureName, parameters);
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return new GetProductivityRegionScoreCardReportItem();

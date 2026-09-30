@@ -227,6 +227,22 @@ public class ProductivityReportApiClient : IProductivityReportApiClient
         return JsonSerializer.Deserialize<GetProductivityRegionScoreCardReportItem>(json, _jsonOptions);
     }
 
+    public async Task<GetProductivityBranchScoreCardReportItem?> GetProductivityBranchScoreCardReportCumulativeAsync(GetProductivityBranchScoreCardReportRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityBranchScoreCardReportCumulative", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<GetProductivityBranchScoreCardReportItem>(json, _jsonOptions);
+    }
+
+    public async Task<GetProductivityRegionScoreCardReportItem?> GetProductivityRegionScoreCardReportCumulativeAsync(GetProductivityRegionScoreCardReportRequest request, CancellationToken cancellationToken = default)
+    {
+        var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityRegionScoreCardReportCumulative", request, cancellationToken).ConfigureAwait(false);
+        if (!response.IsSuccessStatusCode) return null;
+        var json = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        return JsonSerializer.Deserialize<GetProductivityRegionScoreCardReportItem>(json, _jsonOptions);
+    }
+
     public async Task<GetProductivityCountCustomerBranchReportResponse?> GetProductivityCountCustomerBranchReportAsync(GetProductivityCountCustomerBranchReportRequest request, CancellationToken cancellationToken = default)
     {
         var response = await _httpClient.PostAsJsonAsync(BasePath + "GetProductivityCountCustomerBranchReport", request, cancellationToken).ConfigureAwait(false);

@@ -2186,6 +2186,16 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 }
 ```
 
+#### POST /ProductivityReport/GetProductivityBranchScoreCardReportCumulative
+SP: `SP_RP_GetProductivityBranchScoreCardReport_Cumulative`. Şube skor kartının kümülatif versiyonu.
+**Request / Response** — `GetProductivityBranchScoreCardReport` ile birebir aynı (`GetProductivityBranchScoreCardReportRequest` → `GetProductivityBranchScoreCardReportItem`, tekil obje). Yalnızca SP adı farklı.
+
+#### POST /ProductivityReport/GetProductivityRegionScoreCardReportCumulative
+SP: `SP_RP_GetProductivityRegionScoreCardReport_Cumulative`. Bölge skor kartının kümülatif versiyonu.
+**Request / Response** — `GetProductivityRegionScoreCardReport` ile birebir aynı (`GetProductivityRegionScoreCardReportRequest` → `GetProductivityRegionScoreCardReportItem`, tekil obje). Yalnızca SP adı farklı.
+
+> Not: Mock modda kümülatif endpoint'ler aylık endpoint'lerle aynı mock veriyi döner.
+
 ---
 
 ## 11. PosReport

@@ -266,6 +266,14 @@ public sealed class CachingReportDataProvider : IReportDataProvider
         => CachedProductivity(nameof(GetProductivityRegionScoreCardReport), request,
             () => _inner.GetProductivityRegionScoreCardReport(request));
 
+    public GetProductivityBranchScoreCardReportItem? GetProductivityBranchScoreCardReportCumulative(GetProductivityBranchScoreCardReportRequest request)
+        => CachedProductivity(nameof(GetProductivityBranchScoreCardReportCumulative), request,
+            () => _inner.GetProductivityBranchScoreCardReportCumulative(request));
+
+    public GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReportCumulative(GetProductivityRegionScoreCardReportRequest request)
+        => CachedProductivity(nameof(GetProductivityRegionScoreCardReportCumulative), request,
+            () => _inner.GetProductivityRegionScoreCardReportCumulative(request));
+
     public GetProductivityCountCustomerBranchReportResponse? GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request)
         => CachedProductivity(nameof(GetProductivityCountCustomerBranchReport), request,
             () => _inner.GetProductivityCountCustomerBranchReport(request));

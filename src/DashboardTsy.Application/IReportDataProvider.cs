@@ -170,6 +170,18 @@ public interface IReportDataProvider
     GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReport(GetProductivityRegionScoreCardReportRequest request);
 
     /// <summary>
+    /// Verimlilik ekranı için kümülatif şube skor kartı raporunu döner (tek satır). Request/response aylık raporla aynıdır.
+    /// SP: SP_RP_GetProductivityBranchScoreCardReport_Cumulative
+    /// </summary>
+    GetProductivityBranchScoreCardReportItem? GetProductivityBranchScoreCardReportCumulative(GetProductivityBranchScoreCardReportRequest request);
+
+    /// <summary>
+    /// Verimlilik ekranı için kümülatif bölge skor kartı raporunu döner (tek satır). Request/response aylık raporla aynıdır.
+    /// SP: SP_RP_GetProductivityRegionScoreCardReport_Cumulative
+    /// </summary>
+    GetProductivityRegionScoreCardReportItem? GetProductivityRegionScoreCardReportCumulative(GetProductivityRegionScoreCardReportRequest request);
+
+    /// <summary>
     /// Verimlilik ekranı için müşteri sayısı şube raporunu döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>
