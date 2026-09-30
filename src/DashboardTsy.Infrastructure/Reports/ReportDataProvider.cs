@@ -1296,7 +1296,11 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return new GetProductivityBranchScoreCardReportItem();
 
-        return DataTableHelper.ToObject<GetProductivityBranchScoreCardReportItem>(ds.Tables[0].Rows[0]);
+        var row = ds.Tables[0].Rows[0];
+        var item = DataTableHelper.ToObject<GetProductivityBranchScoreCardReportItem>(row) ?? new GetProductivityBranchScoreCardReportItem();
+        // RAPOR_TARIHI Türkçe kolon adı olduğu için DataTableHelper eşleyemez; açıkça okunur.
+        item.ReportMonth = ReportMonthFormatter.Format(ReadNullableDate(row, "RAPOR_TARIHI"));
+        return item;
     }
 
     // Aylık ve kümülatif bölge skor kartı SP'leri aynı parametre ve kolon yapısını paylaşır; yalnızca SP adı değişir.
@@ -1320,7 +1324,11 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return new GetProductivityRegionScoreCardReportItem();
 
-        return DataTableHelper.ToObject<GetProductivityRegionScoreCardReportItem>(ds.Tables[0].Rows[0]);
+        var row = ds.Tables[0].Rows[0];
+        var item = DataTableHelper.ToObject<GetProductivityRegionScoreCardReportItem>(row) ?? new GetProductivityRegionScoreCardReportItem();
+        // RAPOR_TARIHI Türkçe kolon adı olduğu için DataTableHelper eşleyemez; açıkça okunur.
+        item.ReportMonth = ReportMonthFormatter.Format(ReadNullableDate(row, "RAPOR_TARIHI"));
+        return item;
     }
 
     public GetProductivityCountCustomerBranchReportResponse? GetProductivityCountCustomerBranchReport(GetProductivityCountCustomerBranchReportRequest request)

@@ -18,4 +18,7 @@ public class GetProductivityRegionScoreCardReportItem
     public decimal BankNpsScore { get; set; }
 
     public string? RegionManagerPhoto { get; set; }
+
+    /// <summary>Örn. "Ağustos 2026"</summary>
+    public string? ReportMonth { get; set; }
 }

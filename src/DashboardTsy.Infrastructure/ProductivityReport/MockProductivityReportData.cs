@@ -4,6 +4,7 @@ using DashboardTsy.Application.ExchangeRate.Responses;
 using DashboardTsy.Application.ProductivityReport;
 using DashboardTsy.Application.ProductivityReport.Requests;
 using DashboardTsy.Application.ProductivityReport.Responses;
+using DashboardTsy.Infrastructure.Reports;
 
 namespace DashboardTsy.Infrastructure.ProductivityReport;
 
@@ -1466,7 +1467,8 @@ public static class MockProductivityReportData
             BankNpsScore = 68.0m,
             PhoneGreetingScore = 91m,
             BranchManagerPhoto = "/images/mock/branch-manager.jpg",
-            BranchPhoto = "/images/mock/branch.jpg"
+            BranchPhoto = "/images/mock/branch.jpg",
+            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate)
         };
     }
 
@@ -1488,9 +1490,13 @@ public static class MockProductivityReportData
             PrivateBankingScore = 91m,
             RegionNpsScore = 75.0m,
             BankNpsScore = 68.0m,
-            RegionManagerPhoto = "/images/mock/region-manager.jpg"
+            RegionManagerPhoto = "/images/mock/region-manager.jpg",
+            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate)
         };
     }
+
+    // Skor kartı SP'lerinin RAPOR_TARIHI örnek değeri.
+    private static readonly DateTime MockScoreCardReportDate = new(2026, 8, 31);
 
     public static IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)
     {

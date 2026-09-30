@@ -21,4 +21,7 @@ public class GetProductivityBranchScoreCardReportItem
 
     public string? BranchManagerPhoto { get; set; }
     public string? BranchPhoto { get; set; }
+
+    /// <summary>Örn. "Ağustos 2026"</summary>
+    public string? ReportMonth { get; set; }
 }

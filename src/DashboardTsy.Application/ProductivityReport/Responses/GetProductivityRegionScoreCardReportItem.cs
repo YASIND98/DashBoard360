@@ -18,4 +18,7 @@ public class GetProductivityRegionScoreCardReportItem
     public decimal BankNpsScore { get; set; }
 
     public string? RegionManagerPhoto { get; set; }
+
+    /// <summary>SP: RAPOR_TARIHI, "Ağustos 2026" formatında. SP boş dönerse null.</summary>
+    public string? ReportMonth { get; set; }
 }
