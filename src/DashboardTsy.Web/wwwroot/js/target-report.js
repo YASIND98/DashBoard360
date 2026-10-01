@@ -281,6 +281,7 @@ $(document).ready(function () {
       products.forEach(function (p, i) {
           var indexLabel = parentIndex ? parentIndex + '.' + (i + 1) : String(i + 1);
           html += buildRowStart(p, depth, isSub, indexLabel);
+          html += '<td>' + formatNumber(p.PreviousYear) + '</td>';
           html += '<td class="col-selected col-selected-first">' + formatNumber(p.MonthActualAmount) + '</td>';
           html += '<td class="col-selected col-selected-mid">' + formatNumber(p.MonthTargetAmount) + '</td>';
           html += '<td class="col-selected col-selected-last ' + percentColor(p.MonthRatio) + '">' + formatPercent(p.MonthRatio) + '</td>';
@@ -354,6 +355,7 @@ $(document).ready(function () {
       var yg = h.YearGroupTitle;
       cols = [
         { header: h.ProductNameTitle, key: 'ProductName', align: 'left' },
+        { group: h.PreviousYearTitle, header: h.PreviousYearActualTitle, key: 'PreviousYear', format: formatNumber },
         { group: mg, header: h.MonthActualTitle, key: 'MonthActualAmount', format: formatNumber },
         { group: mg, header: h.MonthTargetTitle, key: 'MonthTargetAmount', format: formatNumber },
         { group: mg, header: h.MonthHGTitle, key: 'MonthRatio', format: formatPercent },
