@@ -1551,6 +1551,8 @@ public class ReportDataProvider : IReportDataProvider
         public double YearActualAmount { get; set; }
         public double YearTargetAmount { get; set; }
         public double YearRatio { get; set; }
+
+        public double PreviousYear { get; set; }
     }
 
     private static List<GetMonthlyTargetReportResponse.Product> BuildMonthlyProductTree(DataSet ds)
@@ -1619,6 +1621,7 @@ public class ReportDataProvider : IReportDataProvider
             YearActualAmount = r.YearActualAmount,
             YearTargetAmount = r.YearTargetAmount,
             YearRatio = r.YearRatio,
+            PreviousYear = r.PreviousYear,
             SubProducts = new List<GetMonthlyTargetReportResponse.Product>()
         };
     }

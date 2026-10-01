@@ -332,7 +332,8 @@ public static class MockTargetReportData
             MonthRatio = 0.85,
             YearActualAmount = 4200,
             YearTargetAmount = 5000,
-            YearRatio = 0.84
+            YearRatio = 0.84,
+            PreviousYear = 3900
         };
         root1.SubProducts.Add(new GetMonthlyTargetReportResponse.Product
         {
@@ -343,7 +344,8 @@ public static class MockTargetReportData
             MonthRatio = 0.857,
             YearActualAmount = 1400,
             YearTargetAmount = 1700,
-            YearRatio = 0.823
+            YearRatio = 0.823,
+            PreviousYear = 1250
         });
         root1.SubProducts.Add(new GetMonthlyTargetReportResponse.Product
         {
@@ -354,7 +356,8 @@ public static class MockTargetReportData
             MonthRatio = 0.846,
             YearActualAmount = 2800,
             YearTargetAmount = 3300,
-            YearRatio = 0.848
+            YearRatio = 0.848,
+            PreviousYear = 2650
         });
 
         var root2 = new GetMonthlyTargetReportResponse.Product
@@ -366,7 +369,8 @@ public static class MockTargetReportData
             MonthRatio = 1.10,
             YearActualAmount = 5100,
             YearTargetAmount = 4800,
-            YearRatio = 1.0625
+            YearRatio = 1.0625,
+            PreviousYear = 4700
         };
 
         var roots = new List<GetMonthlyTargetReportResponse.Product> { root1, root2 };

@@ -20,6 +20,8 @@ public class GetMonthlyTargetReportResponse
         public double YearTargetAmount { get; set; }
         public double YearRatio { get; set; }
 
+        public double PreviousYear { get; set; }
+
         public List<Product> SubProducts { get; set; } = new();
     }
 }

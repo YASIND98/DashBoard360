@@ -1216,6 +1216,7 @@ Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i
       "yearActualAmount": 14500000.00,
       "yearTargetAmount": 16000000.00,
       "yearRatio": 90.63,
+      "previousYear": 13200000.00,
       "subProducts": []
     }
   ]
