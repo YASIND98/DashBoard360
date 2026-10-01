@@ -80,17 +80,35 @@ public static class MockProductivityReportData
         var staff = isBranch
             ? new (string Status, string EmployeeName, string PositionName, DateTime PositionStartDate)[]
             {
+                ("Personel", "Hakan Öztürk", "Bölge Müdürü", new DateTime(2021, 4, 5)),
+                ("Personel", "Selin Aydın", "Bölge Satış Müdürü", new DateTime(2023, 9, 18)),
+                ("Personel", "Murat Koç", "Bölge Operasyon Müdürü", new DateTime(2024, 12, 2)),
                 ("Personel", "Ali Kerem Şimşek", "Şube Müdürü", new DateTime(2025, 1, 28)),
                 ("Personel", "Zeynep Arslan", "Şube Müdür Yardımcısı", new DateTime(2023, 6, 12)),
                 ("Personel", "Mehmet Can Demir", "Kurumsal Portföy Yöneticisi", new DateTime(2024, 3, 4)),
                 ("Personel", "Elif Yıldız", "Bireysel Portföy Yöneticisi", new DateTime(2022, 11, 21)),
-                ("Vekil", "Burak Kaya", "Operasyon Yöneticisi", new DateTime(2026, 7, 15))
+                ("Vekil", "Burak Kaya", "Operasyon Yöneticisi", new DateTime(2026, 7, 15)),
+                ("Personel", "Ali Şimşek", "Şube Müdürü", new DateTime(2025, 1, 28)),
+                ("Personel", "Kerem Arslan", "Şube Müdür Yardımcısı", new DateTime(2023, 6, 12)),
+                ("Personel", "Can Demir", "Kurumsal Portföy Yöneticisi", new DateTime(2024, 3, 4)),
+                ("Personel", "Elif Kaya", "Bireysel Portföy Yöneticisi", new DateTime(2022, 11, 21)),
+                ("Vekil", "Burak Yıldız", "Operasyon Yöneticisi", new DateTime(2026, 7, 15))
             }
             : new (string Status, string EmployeeName, string PositionName, DateTime PositionStartDate)[]
             {
                 ("Personel", "Hakan Öztürk", "Bölge Müdürü", new DateTime(2021, 4, 5)),
                 ("Personel", "Selin Aydın", "Bölge Satış Müdürü", new DateTime(2023, 9, 18)),
-                ("Personel", "Murat Koç", "Bölge Operasyon Müdürü", new DateTime(2024, 12, 2))
+                ("Personel", "Murat Koç", "Bölge Operasyon Müdürü", new DateTime(2024, 12, 2)),
+                ("Personel", "Ali Kerem Şimşek", "Şube Müdürü", new DateTime(2025, 1, 28)),
+                ("Personel", "Zeynep Arslan", "Şube Müdür Yardımcısı", new DateTime(2023, 6, 12)),
+                ("Personel", "Mehmet Can Demir", "Kurumsal Portföy Yöneticisi", new DateTime(2024, 3, 4)),
+                ("Personel", "Elif Yıldız", "Bireysel Portföy Yöneticisi", new DateTime(2022, 11, 21)),
+                ("Vekil", "Burak Kaya", "Operasyon Yöneticisi", new DateTime(2026, 7, 15)),
+                ("Personel", "Ali Şimşek", "Şube Müdürü", new DateTime(2025, 1, 28)),
+                ("Personel", "Kerem Arslan", "Şube Müdür Yardımcısı", new DateTime(2023, 6, 12)),
+                ("Personel", "Can Demir", "Kurumsal Portföy Yöneticisi", new DateTime(2024, 3, 4)),
+                ("Personel", "Elif Kaya", "Bireysel Portföy Yöneticisi", new DateTime(2022, 11, 21)),
+                ("Vekil", "Burak Yıldız", "Operasyon Yöneticisi", new DateTime(2026, 7, 15))
             };
 
         return staff
