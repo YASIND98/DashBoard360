@@ -14,5 +14,8 @@ public class GetMonthlyTargetReportTableHeadersResponse
     public string YearActualTitle { get; set; } = string.Empty;
     public string YearTargetTitle { get; set; } = string.Empty;
     public string YearHGTitle { get; set; } = string.Empty;
+
+    public string PreviousYearTitle { get; set; } = string.Empty;
+    public string PreviousYearActualTitle { get; set; } = string.Empty;
 }
 

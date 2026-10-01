@@ -317,7 +317,9 @@ public static class MockTargetReportData
             MonthHGTitle = "H/G",
             YearActualTitle = "Gerçekleşen",
             YearTargetTitle = "Hedef",
-            YearHGTitle = "H/G"
+            YearHGTitle = "H/G",
+            PreviousYearTitle = "Geçen Yıl",
+            PreviousYearActualTitle = "Gerçekleşen"
         };
     }
 
