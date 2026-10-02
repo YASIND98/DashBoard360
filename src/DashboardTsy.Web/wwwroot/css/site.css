@@ -515,6 +515,31 @@ body:has(.scorecard-panel.open)::before {
   color: var(--text-light);
 }
 
+.sc-period-toggle {
+  margin-bottom: 10px;
+}
+
+.sc-period-toggle .segment {
+  flex: 1;
+  text-align: center;
+}
+
+.sc-manager-tenure {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin-left: auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.sc-manager-start-date,
+.sc-manager-duration {
+  font-size: 14px;
+  color: #F6F7F9;
+}
+
 /* ────────────────────────────────────────────────
   Score Card Zoom Button
 ──────────────────────────────────────────────── */
@@ -716,6 +741,91 @@ body:has(.scorecard-panel.open)::before {
   border-radius: 50%;
 }
 
+.branch-card {
+  --bc-bg: #0f1630;
+  --bc-header: #3b4360;
+  --bc-border: #4a526d;
+  --bc-text: #cfd6f0;
+  --bc-accent: #7c3aed;
+
+  background: var(--bc-bg);
+  border: 1px solid var(--bc-border);
+  border-radius: 22px;
+  margin-bottom: 10px;
+  font-family: 'Inter', system-ui, sans-serif;
+  color: var(--bc-text);
+}
+
+.branch-card__header {
+  padding: 14px 18px;
+  background: var(--bc-header);
+  font-size: 16px;
+  color: #dfe4f7;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+}
+
+.branch-card__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid var(--bc-border);
+}
+
+.branch-card__row.is-extra { display: none; }
+.branch-card.is-expanded .branch-card__row.is-extra { display: grid; }
+
+.branch-card__name,
+.branch-card__role {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+}
+
+.branch-card__name {
+  font-size: 14px;
+  border-right: 2px dotted #cfd6f0;
+}
+
+.branch-card__name span {
+  text-decoration: underline transparent;
+  text-decoration-color: transparent;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color .15s;
+}
+
+.branch-card__row:hover .branch-card__name span {
+  text-decoration-line: underline;
+  text-decoration-color: var(--bc-accent);
+}
+
+.branch-card__role {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  text-align: center;
+}
+
+.branch-card__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 0;
+  border-top: 1px solid var(--bc-border);
+  color: var(--bc-text);
+  font: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.branch-card__toggle:hover { background: rgba(255, 255, 255, .04); }
+
+.branch-card__chevron { transition: transform .2s; }
+.branch-card.is-expanded .branch-card__chevron { transform: rotate(180deg); }
 
 /* =========================================
    RESPONSIVE
@@ -733,6 +843,60 @@ body:has(.scorecard-panel.open)::before {
 }
 
 /* ────────────────────────────────────────────────
+  Branch Card Light Theme
+──────────────────────────────────────────────── */
+[data-theme="light"] .branch-card {
+  --bc-bg: #fff;
+  --bc-header: #e8eefa;
+  --bc-border: #c5d3e8;
+  --bc-text: #0d1b3e;
+  --bc-accent: #7c3aed;
+
+  background: #fff;
+  border-color: #c5d3e8;
+  color: #0d1b3e;
+}
+
+[data-theme="light"] .branch-card__header {
+  background: var(--text-gray);
+  color: #262A33;
+}
+
+[data-theme="light"] .branch-card__row {
+  border-top-color: #c5d3e8;
+}
+
+[data-theme="light"] .branch-card__name {
+  color: #0d1b3e;
+  border-right-color: #8a9bb8;
+}
+
+/* Dark temada beyaz olan görev yazısı, açık zeminde okunmaz */
+[data-theme="light"] .branch-card__role {
+  color: #0d1b3e;
+}
+
+[data-theme="light"] .branch-card__toggle {
+  color: #0d1b3e;
+  border-top-color: #c5d3e8;
+}
+
+[data-theme="light"] .branch-card__toggle:hover {
+  background: rgba(13, 27, 62, .05);
+}
+
+@media (max-width: 768px) {
+  [data-theme="light"] .branch-card {
+    border-color: #536076;
+  }
+
+  [data-theme="light"] .branch-card__row,
+  [data-theme="light"] .branch-card__toggle {
+    border-top-color: #536076;
+  }
+}
+
+/* ────────────────────────────────────────────────
   Score Card Light Theme
 ──────────────────────────────────────────────── */
 [data-theme="light"] .sc-manager-card {
@@ -740,7 +904,9 @@ body:has(.scorecard-panel.open)::before {
   border-color: #c5d3e8;
 }
 
-[data-theme="light"] .sc-manager-name {
+[data-theme="light"] .sc-manager-name,
+[data-theme="light"] .sc-manager-start-date,
+[data-theme="light"] .sc-manager-duration {
   color: #0d1b3e;
 }
 
