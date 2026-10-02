@@ -195,6 +195,7 @@
         var _currentBranch = null;
         var _mapReqId = 0;        // /BranchMap isteği için
         var _scorecardReqId = 0;  // scorecard isteği için
+        var _scorecardPeriod = 'monthly'; // Skor kartı tab'ı: 'monthly' (Aylık) | 'cumulative' (Kümüle)
         var _scorecardMaps = [];  // [{ map, ro }]
         var _popupMap = null;     // { map, ro }
 
@@ -625,9 +626,11 @@
         });
 
         // ===== Scorecard =====
+        // Personel detayındaki STATU = "Müdür" satırı; manager card'daki ad, başlangıç tarihi ve görev süresi buradan basılır.
+        var _detailManager = null;
+
         function updateScorecard() {
             var isBranch = selectedBranch !== null;
-            var filterType = isBranch ? 2 : 1;
             var label = isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
             $('.scorecard-btn-label').text(label);
             $('.scorecard-title').text(label);
@@ -635,20 +638,36 @@
             var reqId = ++_scorecardReqId;
             _mapReqId++; // Fazladan çalıştırırsa Destroy etmesi için kontrol
 
+            // Önceki seçimin personel/müdür bilgisi yeni panelde kalmasın.
+            _detailManager = null;
+            $('.sc-personnel').html('');
+            $('.sc-manager-card .sc-manager-tenure').hide();
+
             if (!selectedRegion && !selectedBranch) {
                 destroyScorecardMaps();
                 _currentBranch = null;
+                $('.sc-period-toggle').hide();
                 $('.scorecard-content').html('');
                 return;
             }
 
-            var url = isBranch
-                ? '/ProductivityReport/GetProductivityBranchScoreCardReport'
-                : '/ProductivityReport/GetProductivityRegionScoreCardReport';
+            $('.sc-period-toggle').show();
+            loadPersonnelDetails(isBranch, reqId);
+            loadScorecardData(isBranch, reqId);
+        }
 
-            var payload = isBranch
+        function getScorecardPayload(isBranch) {
+            return isBranch
                 ? { sessionId: '1', branchCode: selectedBranch.code, reportDate: _selectedDate }
                 : { sessionId: '1', regionCode: selectedRegion.code, reportDate: _selectedDate };
+        }
+
+        // Aylık > GetScoreCardReport, Kümüle > GetScoreCardReportCumulative.
+        function loadScorecardData(isBranch, reqId) {
+            var filterType = isBranch ? 2 : 1;
+            var url = '/ProductivityReport/' + (isBranch
+                ? 'GetProductivityBranchScoreCardReport'
+                : 'GetProductivityRegionScoreCardReport') + (_scorecardPeriod === 'cumulative' ? 'Cumulative' : '');
 
             loadScoreCardHeaders(filterType, function (headers) {
                 if (reqId !== _scorecardReqId) return;
@@ -657,17 +676,125 @@
                     url: url,
                     type: 'POST',
                     contentType: 'application/json',
-                    data: JSON.stringify(payload),
+                    data: JSON.stringify(getScorecardPayload(isBranch)),
                     success: function (d) {
                         if (reqId !== _scorecardReqId) return;
                         renderScorecardHtml(headers, d, isBranch);
                         updateManagerCard(d, isBranch);
-                        console.log(selectedRegion);
-                        console.log(selectedBranch);
                         loadBranchMapInfo(selectedRegion ? selectedRegion.code : 0, selectedBranch ? selectedBranch.code : 0);
                     }
                 });
             });
+        }
+
+        // Aylık / Kümüle tab'ı: personel listesi değişmez, yalnızca skor kartı verisi yeniden çekilir.
+        $(document).on('click', '.sc-period-toggle .segment', function () {
+            var period = $(this).data('period');
+            if (period === _scorecardPeriod || (!selectedRegion && !selectedBranch)) return;
+
+            _scorecardPeriod = period;
+            $('.sc-period-toggle .segment').each(function () {
+                $(this).toggleClass('active', $(this).data('period') === period);
+            });
+
+            var reqId = ++_scorecardReqId;
+            _mapReqId++;
+            loadScorecardData(selectedBranch !== null, reqId);
+        });
+
+        // GetProductivityScoreCardReport_Detail: STATU "Müdür" > manager card, "Personel" > Şube/Bölge Bilgileri.
+        function loadPersonnelDetails(isBranch, reqId) {
+            $.ajax({
+                url: '/ProductivityReport/GetProductivityScoreCardReportDetail',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(getScorecardPayload(isBranch)),
+                success: function (data) {
+                    if (reqId !== _scorecardReqId) return;
+                    var list = Array.isArray(data) ? data : [];
+                    var isManager = function (p) { return $.trim(p.Status || '').toLocaleLowerCase('tr-TR') === 'müdür'; };
+
+                    _detailManager = list.find(isManager) || null;
+                    updateManagerTenure();
+                    renderPersonnelDetails(list.filter(function (p) { return !isManager(p); }), isBranch);
+                },
+                error: function () {
+                    console.error('Personel detayları yüklenirken hata oluştu.');
+                }
+            });
+        }
+
+        function renderPersonnelDetails(personnel, isBranch) {
+            var VISIBLE_COUNT = 3;
+
+            if (!personnel.length) {
+                $('.sc-personnel').html('');
+                return;
+            }
+
+            function esc(s) {
+                return $('<div>').text(s == null ? '' : s).html();
+            }
+
+            var html = '<div class="branch-card">';
+            html += '<div class="branch-card__header">' + (isBranch ? 'Şube Bilgileri' : 'Bölge Bilgileri') + '</div>';
+            html += '<div class="branch-card__body">';
+
+            personnel.forEach(function (person, i) {
+                html +=
+                    '<div class="branch-card__row' + (i >= VISIBLE_COUNT ? ' is-extra' : '') + '">' +
+                        '<div class="branch-card__name"><span>' + esc(person.EmployeeName) + '</span></div>' +
+                        '<div class="branch-card__role">' + esc(person.PositionName) + '</div>' +
+                    '</div>';
+            });
+
+            html += '</div>';
+
+            if (personnel.length > VISIBLE_COUNT) {
+                html +=
+                    '<button type="button" class="branch-card__toggle" aria-expanded="false">' +
+                        '<span class="branch-card__toggle-text">Tümünü gör</span>' +
+                        '<svg class="branch-card__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" ' +
+                            'stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">' +
+                            '<polyline points="6 9 12 15 18 9"></polyline></svg>' +
+                    '</button>';
+            }
+
+            html += '</div>';
+
+            // Partial desktop ve mobile için iki kez render edildiğinden HTML string olarak iki alana da basılır.
+            $('.sc-personnel').html(html);
+        }
+
+        // Fazla satırların gösterimi toggle işlemi CSS'te: .branch-card.is-expanded .is-extra
+        $(document).on('click', '.branch-card__toggle', function () {
+            var expanded = $(this).closest('.branch-card').toggleClass('is-expanded').hasClass('is-expanded');
+            $(this).attr('aria-expanded', expanded);
+            $(this).find('.branch-card__toggle-text').text(expanded ? 'Daha az göster' : 'Tümünü gör');
+        });
+
+        // Müdür satırının adı, göreve başlangıç tarihi (12.03.2023) ve GOREV_SURESI değeri manager card'a basılır.
+        function updateManagerTenure() {
+            var $card = $('.sc-manager-card');
+            var $tenure = $card.find('.sc-manager-tenure');
+            var manager = _detailManager;
+            if (!manager) {
+                $tenure.hide();
+                return;
+            }
+
+            if (manager.EmployeeName) $card.find('.sc-manager-name').text(manager.EmployeeName);
+
+            var startDate = manager.PositionStartDate ? new Date(manager.PositionStartDate) : null;
+            $tenure.find('.sc-manager-start-date').text(startDate && !isNaN(startDate) ? formatShortDate(startDate) : '');
+            $tenure.find('.sc-manager-duration').text(manager.PositionDuration || '');
+            $tenure.toggle(!!(startDate || manager.PositionDuration));
+        }
+
+        // 2023-03-12 > "12.03.2023"
+        function formatShortDate(date) {
+            var pad = function (n) { return (n < 10 ? '0' : '') + n; };
+            return pad(date.getDate()) + '.' + pad(date.getMonth() + 1) + '.' + date.getFullYear();
         }
 
         function loadBranchMapInfo(regionCode, branchCode) {
@@ -712,7 +839,9 @@
                     : getNpsFields(isBranch);
 
                 html += '<div class="scorecard-section">';
-                html += '<div class="scorecard-section-title">' + section.HeaderName + '</div>';
+                var reportMonth = d.ReportMonth || d.reportMonth;
+                var monthSuffix = sIdx < 2 && reportMonth ? ' (' + reportMonth + ')' : '';
+                html += '<div class="scorecard-section-title">' + section.HeaderName + monthSuffix + '</div>';
                 html += '<table class="scorecard-table">';
 
                 children.forEach(function (child, cIdx) {
@@ -777,7 +906,8 @@
             var $info  = $card.find('.sc-manager-info');
 
             // 1. Doğrudan değerleri oku (PascalCase / camelCase fallback)
-            var managerName        = data.ManagerName        || data.managerName        || '-';
+            // Personel detayında STATU = "Müdür" satırı geldiyse ad oradan alınır (istekler hangi sırayla dönerse dönsün).
+            var managerName        = (_detailManager && _detailManager.EmployeeName) || data.ManagerName || data.managerName || '-';
             var branchPhoto        = data.BranchPhoto        || data.branchPhoto        || null;
             var branchManagerPhoto = data.BranchManagerPhoto || data.branchManagerPhoto || null;
             var regionManagerPhoto = data.RegionManagerPhoto || data.regionManagerPhoto || null;
