@@ -2,6 +2,9 @@ namespace DashboardTsy.Application.ProductivityReport.Responses;
 
 public class GetProductivityProfitRatioRegionReportResponse
 {
+    /// <summary>SP: ReportDate — raporun ait olduğu tarih. SP veri dönmezse null.</summary>
+    public DateTime? ReportDate { get; set; }
+
     public List<GetProductivityProfitRatioRegionReportItem> GetProductivityProfitRatioRegionReports { get; set; } = new();
 
     public class GetProductivityProfitRatioRegionReportItem

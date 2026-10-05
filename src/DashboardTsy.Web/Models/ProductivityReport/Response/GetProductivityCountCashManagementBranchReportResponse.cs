@@ -2,6 +2,9 @@ namespace DashboardTsy.Web.Models.ProductivityReport.Response;
 
 public class GetProductivityCountCashManagementBranchReportResponse
 {
+    /// <summary>SP: ReportDate — raporun ait olduğu tarih. SP veri dönmezse null.</summary>
+    public DateTime? ReportDate { get; set; }
+
     public List<GetProductivityCountCashManagementBranchReportItem> GetProductivityCountCashManagementBranchReports { get; set; } = new();
 
     public class GetProductivityCountCashManagementBranchReportItem

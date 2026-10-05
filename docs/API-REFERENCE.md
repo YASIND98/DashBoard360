@@ -1315,6 +1315,8 @@ Mobil istemciler için eklendi — web tarafı hâlâ GetTargetReportMenuTexts'i
 
 > ⚠️ Bu grubun **çoğu endpoint'i şu an mock data dönüyor** (backend henüz gerçek veri kaynağına bağlanmamış). Şemalar kesindir, değerler örnek amaçlıdır. Tüm endpoint'ler `POST`, body `null` ise `400` (istisna: `GetReportDates`, body almaz).
 
+> **`reportDate` (response):** Genel, Hacim, Adet (Müşteri / Ödeme / Kredi Kartı-POS / Nakit Yönetimi) ve Karlılık (Toplam / Oran / Spread Yönetimi) bölge ve şube raporlarının response'u kök seviyede `reportDate` (DATE, örn. `"2026-06-30T00:00:00"`) döner. Değer SP'nin `ReportDate` kolonundan okunur ve ekranın üstündeki tarih bu değerle güncellenir. SP veri dönmezse `null`.
+
 ### 10.1 Tab / Header / Filter / Sidebar (genel ekran iskeleti)
 
 #### POST /ProductivityReport/GetProductivityReportTabs
@@ -1467,6 +1469,7 @@ SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki böl
 **Response** (`GetProductivityGeneralRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityGeneralRegionReports": [
     {
       "urun": "Vadesiz Mevduat",
@@ -1507,6 +1510,7 @@ SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki böl
 **Response** (`GetProductivityCountCardPosRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityCountCardPosRegionReports": [
     {
       "id": 1,
@@ -1540,6 +1544,7 @@ SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki böl
 **Response** (`GetProductivityCountCardPosBranchReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityCountCardPosBranchReports": [
     {
       "id": 1,
@@ -1658,6 +1663,7 @@ SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki böl
 **Response** (`GetProductivityCountCustomerRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityCountCustomerRegionReports": [
     {
       "id": 1,
@@ -1697,6 +1703,7 @@ SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki böl
 **Response** (`GetProductivityCountCustomerBranchReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityCountCustomerBranchReports": [
     {
       "id": 1,
@@ -1741,6 +1748,7 @@ SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki böl
 **Response** (`GetProductivityCountCashManagementRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityCountCashManagementRegionReports": [
     {
       "id": 1,
@@ -1772,6 +1780,7 @@ SP: `SP_RP_GetProductivityScoreCardReport_Detail`. Skor kartı ekranındaki böl
 **Response** (`GetProductivityCountCashManagementBranchReportResponse`) — alan adları Region ile aynı yapıda, `Branch` prefix'i ile:
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityCountCashManagementBranchReports": [
     {
       "id": 1,
@@ -1818,6 +1827,7 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 **Response** (`GetProductivityCountPaymentRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityCountPaymentRegionReports": [
     {
       "id": 4,
@@ -1872,6 +1882,7 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 **Response** (`GetProductivityVolumeRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityVolumeRegionReports": [
     {
       "id": 1,
@@ -1910,6 +1921,7 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 **Response** (`GetProductivityVolumeBranchReportResponse`) — Region'a benzer, ek olarak `realizationBranchLastYearValue`, `netGrowthBranchValue` gibi branch-özel alanlar:
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityVolumeBranchReports": [
     {
       "id": 1,
@@ -1996,6 +2008,7 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 **Response** (`GetProductivityProfitTotalRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityProfitTotalRegionReports": [
     {
       "id": 1,
@@ -2029,6 +2042,7 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 **Response** (`GetProductivityProfitTotalBranchReportResponse`) — ek olarak `branchBudgetValue`, `regionBudgetValue` alanları:
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityProfitTotalBranchReports": [
     {
       "id": 1,
@@ -2075,6 +2089,7 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 **Response** (`GetProductivityProfitSpreadManagementRegionReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityProfitSpreadManagementRegionReports": [
     {
       "id": 1,
@@ -2103,6 +2118,7 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
 **Response** (`GetProductivityProfitSpreadManagementBranchReportResponse`):
 ```json
 {
+  "reportDate": "2026-06-30T00:00:00",
   "getProductivityProfitSpreadManagementBranchReports": [
     {
       "id": 1,

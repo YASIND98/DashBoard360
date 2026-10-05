@@ -2,6 +2,9 @@ namespace DashboardTsy.Application.ProductivityReport.Responses;
 
 public class GetProductivityCountCardPosBranchReportResponse
 {
+    /// <summary>SP: ReportDate — raporun ait olduğu tarih. SP veri dönmezse null.</summary>
+    public DateTime? ReportDate { get; set; }
+
     public List<GetProductivityCountCardPosBranchReportItem> GetProductivityCountCardPosBranchReports { get; set; } = new();
 
     public class GetProductivityCountCardPosBranchReportItem

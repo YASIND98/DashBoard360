@@ -515,6 +515,10 @@ public class ReportDataProvider : IReportDataProvider
         return date == default ? null : date;
     }
 
+    // Verim raporu SP'leri raporun ait olduğu tarihi her satırda ReportDate kolonunda döner; ilk satırdan okunur.
+    private static DateTime? ReadReportDate(DataTable table)
+        => ReadNullableDate(table.Rows[0], "ReportDate");
+
     //public IReadOnlyList<GetReportRegionFilterItem> GetReportRegionFilters(GetReportRegionFiltersRequest request)
     //{
     //    request ??= new GetReportRegionFiltersRequest();
@@ -636,6 +640,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         response.GetProductivityGeneralRegionReports = BuildProductivityGeneralRegionReportTree(ds.Tables[0]);
         return response;
@@ -780,6 +786,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityCountCardPosRegionReportTree(ds, request.ReportDate);
         roots = SortProductivityCountCardPosRegionTree(roots, request.SortBy, request.IsAscending);
 
@@ -867,6 +875,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityCountCustomerRegionReportTree(ds, request.ReportDate);
         roots = SortProductivityCountCustomerRegionTree(roots, request.SortBy, request.IsAscending);
 
@@ -901,6 +911,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityCountCashManagementRegionReportTree(ds, request.ReportDate);
         roots = SortProductivityCountCashManagementRegionTree(roots, request.SortBy, request.IsAscending);
 
@@ -933,6 +945,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityCountPaymentRegionReportTree(ds);
         roots = SortProductivityCountPaymentRegionTree(roots, request.SortBy, request.IsAscending);
@@ -970,6 +984,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityVolumeRegionReportTree(ds, request.ReportDate);
         roots = SortProductivityVolumeRegionTree(roots, request.SortBy, request.IsAscending);
 
@@ -1002,6 +1018,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityProfitRatioRegionReportTree(ds, request.ReportDate);
         roots = SortProductivityProfitRatioRegionTree(roots, request.SortBy, request.IsAscending);
@@ -1038,6 +1056,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityProfitTotalRegionReportTree(ds, request.ReportDate);
         roots = SortProductivityProfitTotalRegionTree(roots, request.SortBy, request.IsAscending);
 
@@ -1067,6 +1087,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var items = BuildProductivityProfitSpreadManagementRegionReportList(ds.Tables[0]);
         items = SortProductivityProfitSpreadManagementRegionList(items, request.SortBy, request.IsAscending);
@@ -1098,6 +1120,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var items = BuildProductivityProfitSpreadManagementBranchReportList(ds.Tables[0]);
         items = SortProductivityProfitSpreadManagementBranchList(items, request.SortBy, request.IsAscending);
@@ -1134,6 +1158,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityCountCardPosBranchReportTree(ds, request.ReportDate);
         roots = SortProductivityCountCardPosBranchTree(roots, request.SortBy, request.IsAscending);
@@ -1219,6 +1245,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityProfitRatioBranchReportTree(ds, request.ReportDate);
         roots = SortProductivityProfitRatioBranchTree(roots, request.SortBy, request.IsAscending);
 
@@ -1253,6 +1281,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityProfitTotalBranchReportTree(ds, request.ReportDate);
         roots = SortProductivityProfitTotalBranchTree(roots, request.SortBy, request.IsAscending);
@@ -1360,6 +1390,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityCountCustomerBranchReportTree(ds, request.ReportDate);
         roots = SortProductivityCountCustomerBranchTree(roots, request.SortBy, request.IsAscending);
 
@@ -1394,6 +1426,8 @@ public class ReportDataProvider : IReportDataProvider
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
 
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
+
         var roots = BuildProductivityCountCashManagementBranchReportTree(ds, request.ReportDate);
         roots = SortProductivityCountCashManagementBranchTree(roots, request.SortBy, request.IsAscending);
 
@@ -1426,6 +1460,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityCountPaymentBranchReportTree(ds);
         roots = SortProductivityCountPaymentBranchTree(roots, request.SortBy, request.IsAscending);
@@ -1462,6 +1498,8 @@ public class ReportDataProvider : IReportDataProvider
 
         if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
             return response;
+
+        response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityVolumeBranchReportTree(ds, request.ReportDate);
         roots = SortProductivityVolumeBranchTree(roots, request.SortBy, request.IsAscending);

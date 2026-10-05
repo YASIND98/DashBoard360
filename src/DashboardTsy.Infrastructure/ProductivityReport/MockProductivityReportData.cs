@@ -313,6 +313,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityGeneralRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityGeneralRegionReports = roots
         };
     }
@@ -364,6 +365,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountCardPosRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountCardPosRegionReports = roots
         };
     }
@@ -491,6 +493,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountCardPosBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountCardPosBranchReports = roots
         };
     }
@@ -632,6 +635,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountCustomerRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountCustomerRegionReports = roots
         };
     }
@@ -678,6 +682,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountCashManagementRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountCashManagementRegionReports = items
         };
     }
@@ -724,6 +729,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountCashManagementBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountCashManagementBranchReports = items
         };
     }
@@ -743,6 +749,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountPaymentRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountPaymentRegionReports = new() { creditCard, pos, merchant }
         };
     }
@@ -761,6 +768,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountPaymentBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountPaymentBranchReports = new() { creditCard, pos, merchant }
         };
     }
@@ -837,6 +845,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityCountCustomerBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityCountCustomerBranchReports = roots
         };
     }
@@ -937,6 +946,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityVolumeRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityVolumeRegionReports = roots
         };
     }
@@ -1055,6 +1065,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityVolumeBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityVolumeBranchReports = roots
         };
     }
@@ -1117,6 +1128,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityProfitRatioRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityProfitRatioRegionReports = roots
         };
     }
@@ -1185,6 +1197,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityProfitRatioBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityProfitRatioBranchReports = roots
         };
     }
@@ -1268,6 +1281,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityProfitTotalRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityProfitTotalRegionReports = roots
         };
     }
@@ -1369,6 +1383,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityProfitTotalBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityProfitTotalBranchReports = roots
         };
     }
@@ -1413,6 +1428,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityProfitSpreadManagementRegionReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityProfitSpreadManagementRegionReports = items
         };
     }
@@ -1461,6 +1477,7 @@ public static class MockProductivityReportData
 
         return new GetProductivityProfitSpreadManagementBranchReportResponse
         {
+            ReportDate = MockProductivityReportDate,
             GetProductivityProfitSpreadManagementBranchReports = items
         };
     }
@@ -1515,6 +1532,9 @@ public static class MockProductivityReportData
 
     // Skor kartı SP'lerinin RAPOR_TARIHI örnek değeri.
     private static readonly DateTime MockScoreCardReportDate = new(2026, 8, 31);
+
+    // Verim raporu SP'lerinin ReportDate örnek değeri.
+    private static readonly DateTime MockProductivityReportDate = new(2026, 6, 30);
 
     public static IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request)
     {
