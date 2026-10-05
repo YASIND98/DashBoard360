@@ -1092,87 +1092,78 @@ function renderCountCardPosRegionTable(items) {
 
 // ===== Count Card/POS Ratio Region Report (Adet — Oran Tablosu — Bölge) =====
 // Ödeme Sistemleri tek tablo gösterir; oran tablosu ana konteynere (#dynamicTable) render edilir.
-function loadCountCardPosRatioRegionReport(regionCode, tabId) {
-    // Load headers first, then data
+function loadCountPaymentRegionReport(regionCode) {
+    loadCountPaymentReport(false, regionCode);
+}
+
+function loadCountPaymentBranchReport(branchCode) {
+    loadCountPaymentReport(true, branchCode);
+}
+
+function loadCountPaymentReport(isBranch, code) {
+    var scope = isBranch ? 'Branch' : 'Region';
+
     abortXhr(_yieldTableXhr);
     _yieldTableXhr = $.ajax({
-        url: '/ProductivityReport/GetProductivityCountCardPosRatioRegionReportTableHeaders',
+        url: '/ProductivityReport/GetProductivityCountPaymentReportHeaders',
         type: 'POST',
         contentType: 'application/json',
         data: JSON.stringify({
-            sessionId: '1',
-            tabId: tabId,
-            reportDate: _selectedDate
+            filterType: isBranch ? 2 : 1
         }),
         success: function (headers) {
-            renderCountCardPosRatioRegionHeaders(headers);
+            // SessionId'yi Web katmanı session'dan dolduruyor; sıralama seçilmediyse sortBy null gider (servis Id'ye göre sıralar).
+            var payload = {
+                reportDate: _selectedDate,
+                sortBy: _yieldSortBy !== null ? _yieldSortBy : null,
+                isAscending: _yieldSortBy !== null ? _yieldSortAsc : false
+            };
+            payload[isBranch ? 'branchCode' : 'regionCode'] = code;
 
             _yieldTableXhr = $.ajax({
-                url: '/ProductivityReport/GetProductivityCountCardPosRatioRegionReport',
+                url: '/ProductivityReport/GetProductivityCountPayment' + scope + 'Report',
                 type: 'POST',
                 contentType: 'application/json',
-                data: JSON.stringify({
-                    sessionId: '1',
-                    regionCode: regionCode,
-                    tabId: tabId,
-                    reportDate: _selectedDate
-                }),
+                data: JSON.stringify(payload),
                 success: function (response) {
-                    var data = extractResponseData(response);
-                    renderCountCardPosRatioRegionTable(data);
+                    var items = flattenRows(extractResponseData(response), 0);
+                    var hasExpandable = items.some(function (item) { return item._hasChildren; });
+                    _cachedHeaders = headers;
+                    _lastHeaderParams = null;
+                    // Sıra no ve ayrı expand kolonu yok; genişletme oku ürün hücresinin içinde gösterilir.
+                    renderDynamicHeaders(headers, false, true);
+                    renderCountPaymentTable(items, isBranch);
                 }
             });
         }
     });
 }
 
-
-function setRatioCachedHeaders(names) {
-    _cachedHeaders = names.map(function (name, i) {
-        return { Id: i + 1, HeaderName: name, ParentId: 0, OrderNo: i + 1, Sortable: false };
-    });
-    _lastHeaderParams = null;
-}
-
-function renderCountCardPosRatioRegionHeaders(h) {
-    var $thead = $('#dynamicTableHead');
-    $thead.empty();
-
-    setRatioCachedHeaders([
-        h.RowNumberTitle,
-        h.RatioNameTitle,
-        h.PreviousQuarterRegionTitle,
-        h.CurrentRegionTitle,
-        h.CurrentBankAverageTitle
-    ]);
-
-    var row = '<tr>';
-    row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
-    row += '<th class="col-left">' + h.RatioNameTitle + '</th>';
-    row += '<th>' + h.PreviousQuarterRegionTitle + '</th>';
-    row += '<th>' + h.CurrentRegionTitle + '</th>';
-    row += '<th>' + h.CurrentBankAverageTitle + '</th>';
-    // Detay kolonu şimdilik kapalı
-    // row += '<th class="col-detail"></th>';
-    row += '</tr>';
-
-    $thead.append(row);
-}
-
-function renderCountCardPosRatioRegionTable(items) {
+function renderCountPaymentTable(items, isBranch) {
+    var scope = isBranch ? 'Branch' : 'Region';
     var html = '';
 
     items.forEach(function (item, i) {
-        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? v : formatNumber(v)};
+        var isPercent = (item.ProductName || '').indexOf('%') !== -1;
+        var fmt = function (v) { return isPercent ? v : formatNumber(v); };
 
-        html += '<tr class="table-row ' + cls + '">';
-        html += '<td class="col-index">' + (i + 1) + '</td>';
-        html += '<td class="col-left">' + item.RatioName + '</td>';
-        html += '<td>' + fmt(item.PreviousQuarterRegionValue) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CurrentRegionValue) + formatDiff(item.CurrentRegionDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CurrentBankAverageValue) + formatDiff(item.CurrentBankAverageDiff, !isPercent) + '</td>';
+        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
+        var depthClass = item._depth > 0 ? ' sub-row depth-' + item._depth : '';
+        var expandClass = item._hasChildren ? ' expandable' : '';
+
+        html += '<tr class="table-row ' + cls + depthClass + expandClass + '">';
+
+        var expandIcon = item._hasChildren ? '<span class="expand-icon" style="display:inline-flex;vertical-align:middle;margin-right:8px"><img src="/images/expand.svg" alt="expand" /></span>' : '';
+        var name = expandIcon + item.ProductName;
+        var indent = item._depth > 0 ? '<span style="padding-left:' + (item._depth * 16) + 'px">' + name + '</span>' : name;
+        html += '<td class="col-left">' + indent + '</td>';
+
+        ['Realization', 'YtdNominalChange', 'QtdNominalChange'].forEach(function (metric) {
+            html += '<td>' + fmt(item[metric + scope + 'Value']) + '</td>';
+            html += '<td class="has-diff">' + fmt(item[metric + 'RegionAverageValue']) + formatDiff(item[metric + 'RegionAverageValueDiff'], !isPercent) + '</td>';
+            html += '<td class="has-diff">' + fmt(item[metric + 'BankAverageValue']) + formatDiff(item[metric + 'BankAverageValueDiff'], !isPercent) + '</td>';
+        });
+
         html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
@@ -1181,89 +1172,6 @@ function renderCountCardPosRatioRegionTable(items) {
     updateProductivityStripes();
 }
 
-// ===== Count Card/POS Ratio Branch Report (Adet — Oran Tablosu — Şube) =====
-function loadCountCardPosRatioBranchReport(branchCode, tabId) {
-    abortXhr(_yieldTableXhr);
-    _yieldTableXhr = $.ajax({
-        url: '/ProductivityReport/GetProductivityCountCardPosRatioBranchReportTableHeaders',
-        type: 'POST',
-        contentType: 'application/json',
-        data: JSON.stringify({
-            sessionId: '1',
-            tabId: tabId,
-            reportDate: _selectedDate
-        }),
-        success: function (headers) {
-            renderCountCardPosRatioBranchHeaders(headers);
-
-            _yieldTableXhr = $.ajax({
-                url: '/ProductivityReport/GetProductivityCountCardPosRatioBranchReport',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({
-                    sessionId: '1',
-                    branchCode: branchCode,
-                    tabId: tabId,
-                    reportDate: _selectedDate
-                }),
-                success: function (response) {
-                    var data = extractResponseData(response);
-                    renderCountCardPosRatioBranchTable(data);
-                }
-            });
-        }
-    });
-}
-
-function renderCountCardPosRatioBranchHeaders(h) {
-    var $thead = $('#dynamicTableHead');
-    $thead.empty();
-
-    setRatioCachedHeaders([
-        h.RowNumberTitle,
-        h.RatioNameTitle,
-        h.PreviousQuarterBranchTitle,
-        h.CurrentBranchTitle,
-        h.CurrentRegionAverageTitle,
-        h.CurrentBankAverageTitle
-    ]);
-
-    var row = '<tr>';
-    row += '<th class="col-index">' + h.RowNumberTitle + '</th>';
-    row += '<th class="col-left">' + h.RatioNameTitle + '</th>';
-    row += '<th>' + h.PreviousQuarterBranchTitle + '</th>';
-    row += '<th>' + h.CurrentBranchTitle + '</th>';
-    row += '<th>' + h.CurrentRegionAverageTitle + '</th>';
-    row += '<th>' + h.CurrentBankAverageTitle + '</th>';
-    // Detay kolonu şimdilik kapalı
-    // row += '<th class="col-detail"></th>';
-    row += '</tr>';
-
-    $thead.append(row);
-}
-
-function renderCountCardPosRatioBranchTable(items) {
-    var html = '';
-
-    items.forEach(function (item, i) {
-        var cls = (i % 2 === 0) ? 'stripe-odd' : 'stripe-even';
-        var isPercent = item.RatioName.indexOf('%') !== -1;
-        var fmt = function (v) { return isPercent ? v : formatNumber(v)};
-
-        html += '<tr class="table-row ' + cls + '">';
-        html += '<td class="col-index">' + (i + 1) + '</td>';
-        html += '<td class="col-left">' + item.RatioName + '</td>';
-        html += '<td>' + fmt(item.PreviousQuarterBranchValue) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CurrentBranchValue) + formatDiff(item.CurrentBranchValueDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CurrentRegionAverageValue) + formatDiff(item.CurrentRegionAverageValueDiff, !isPercent) + '</td>';
-        html += '<td class="has-diff">' + fmt(item.CurrentBankAverageValue) + formatDiff(item.CurrentBankAverageValueDiff, !isPercent) + '</td>';
-        html += buildProductivityDetailCell(item);
-        html += '</tr>';
-    });
-
-    $('#dynamicTableBody').html(html);
-    updateProductivityStripes();
-}
 
 // ===== Profit Total Region Report (Karlılık — Üst Tablo — Bölge) =====
 // Header'ları loadTableHeaders'dan alır, body dynamicTableBody'ye render eder
@@ -1688,11 +1596,14 @@ function applyProductivityStripes($table) {
             $tr.find('td.col-left .sub-index').remove();
         } else {
             subCounters[mainIndex] = (subCounters[mainIndex] || 0) + 1;
-            var subLabel = mainIndex + '.' + subCounters[mainIndex];
-            $tr.find('td.col-index').text('');
             var $colText = $tr.find('td.col-left');
             $colText.find('.sub-index').remove();
-            $colText.prepend('<span class="sub-index">' + subLabel + '</span>  ');
+            // Sıra no kolonu olmayan tablolarda (ör. Ödeme Sistemleri) alt satır numarası (4.1 vb.) basılmaz.
+            var $index = $tr.find('td.col-index');
+            if ($index.length) {
+                $index.text('');
+                $colText.prepend('<span class="sub-index">' + mainIndex + '.' + subCounters[mainIndex] + '</span>  ');
+            }
         }
         $tr.addClass(stripeIndex % 2 === 1 ? 'stripe-odd' : 'stripe-even');
         $lastVisible = $tr;
