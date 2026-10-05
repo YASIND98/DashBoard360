@@ -317,7 +317,7 @@ $(function () {
 
   $(document).on('reportBreakdown:loaded', function (e, info) {
       if (info && info.table) _currentTable = info.table;
-      $('#reportDetailDiffToggle').attr('data-active', 'true');
+      $('#reportDetailDiffToggle').attr('data-active', 'false');
       renderBreakdown(_currentTable);
   });
 
