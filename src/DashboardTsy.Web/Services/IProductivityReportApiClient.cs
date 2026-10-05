@@ -8,6 +8,7 @@ public interface IProductivityReportApiClient
 {
     Task<IReadOnlyList<GetProductivityReportTabItem>> GetProductivityReportTabsAsync(GetProductivityReportTabsRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<GetProductivityReportTableHeaderItem>> GetProductivityReportTableHeadersAsync(GetProductivityReportTableHeadersRequest request, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<GetProductivityReportTableHeaderItem>> GetProductivityCountPaymentReportHeadersAsync(GetProductivityCountPaymentReportHeadersRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<GetProductivityScoreCardReportHeaderItem>> GetProductivityScoreCardReportHeadersAsync(GetProductivityScoreCardReportHeadersRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<GetProductivityScoreCardReportDetailItem>> GetProductivityScoreCardReportDetailAsync(GetProductivityScoreCardReportDetailRequest request, CancellationToken cancellationToken = default);
     Task<IReadOnlyList<GetReportRegionFilterItem>> GetReportRegionFiltersAsync(GetReportRegionFiltersRequest request, CancellationToken cancellationToken = default);

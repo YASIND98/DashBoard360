@@ -55,6 +55,18 @@ public class ProductivityReportController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("GetProductivityCountPaymentReportHeaders")]
+    public async Task<ActionResult<IReadOnlyList<GetProductivityReportTableHeaderItem>>> GetProductivityCountPaymentReportHeaders(
+        [FromBody] GetProductivityCountPaymentReportHeadersRequest? request,
+        CancellationToken cancellationToken)
+    {
+        if (request == null) return BadRequest();
+        if (!HasSession()) return Unauthorized();
+        request.SessionId = GetSessionId(request.SessionId, HttpContext.Session);
+        var result = await _apiClient.GetProductivityCountPaymentReportHeadersAsync(request, cancellationToken).ConfigureAwait(false);
+        return Ok(result);
+    }
+
     [HttpPost("GetProductivityScoreCardReportHeaders")]
     public async Task<ActionResult<IReadOnlyList<GetProductivityScoreCardReportHeaderItem>>> GetProductivityScoreCardReportHeaders(
         [FromBody] GetProductivityScoreCardReportHeadersRequest? request,

@@ -1614,6 +1614,35 @@ public static class MockProductivityReportData
         };
     }
 
+    // GetProductivityCountPaymentReportHeaders SP çıktısı; FilterType: 1=Bölge, 2=Şube.
+    public static IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityCountPaymentReportHeaders(GetProductivityCountPaymentReportHeadersRequest request)
+    {
+        if (request.FilterType != 1 && request.FilterType != 2)
+            return Array.Empty<GetProductivityReportTableHeaderItem>();
+
+        var scopeLabel = request.FilterType == 2 ? "Şube" : "Bölge";
+
+        return new List<GetProductivityReportTableHeaderItem>
+        {
+            new() { Id = 1, HeaderName = "Ödeme Sistemleri Ürün", ParentId = 0, OrderNo = 1, Sortable = true },
+
+            new() { Id = 100, HeaderName = "Gerçekleşen", ParentId = 0, OrderNo = 2, Sortable = false },
+            new() { Id = 2, HeaderName = scopeLabel, ParentId = 100, OrderNo = 1, Sortable = true },
+            new() { Id = 3, HeaderName = "Bölge - Şube Ort.", ParentId = 100, OrderNo = 2, Sortable = true },
+            new() { Id = 4, HeaderName = "Banka - Şube Ort.", ParentId = 100, OrderNo = 3, Sortable = true },
+
+            new() { Id = 101, HeaderName = "YTD Nominal Değişim", ParentId = 0, OrderNo = 3, Sortable = false },
+            new() { Id = 5, HeaderName = scopeLabel, ParentId = 101, OrderNo = 1, Sortable = true },
+            new() { Id = 6, HeaderName = "Bölge - Şube Ort.", ParentId = 101, OrderNo = 2, Sortable = true },
+            new() { Id = 7, HeaderName = "Banka - Şube Ort.", ParentId = 101, OrderNo = 3, Sortable = true },
+
+            new() { Id = 102, HeaderName = "QTD Nominal Değişim", ParentId = 0, OrderNo = 4, Sortable = false },
+            new() { Id = 8, HeaderName = scopeLabel, ParentId = 102, OrderNo = 1, Sortable = true },
+            new() { Id = 9, HeaderName = "Bölge - Şube Ort.", ParentId = 102, OrderNo = 2, Sortable = true },
+            new() { Id = 10, HeaderName = "Banka - Şube Ort.", ParentId = 102, OrderNo = 3, Sortable = true }
+        };
+    }
+
     public static IReadOnlyList<GetReportSidebarItem> GetReportSidebarItems(GetReportSidebarItemsRequest request)
     {
         return new List<GetReportSidebarItem>

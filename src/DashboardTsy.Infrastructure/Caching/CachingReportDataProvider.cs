@@ -190,6 +190,10 @@ public sealed class CachingReportDataProvider : IReportDataProvider
         => CachedProductivity(nameof(GetProductivityReportTableHeaders), request,
             () => _inner.GetProductivityReportTableHeaders(request));
 
+    public IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityCountPaymentReportHeaders(GetProductivityCountPaymentReportHeadersRequest request)
+        => CachedProductivity(nameof(GetProductivityCountPaymentReportHeaders), request,
+            () => _inner.GetProductivityCountPaymentReportHeaders(request));
+
     public GetProductivityGeneralRegionReportResponse? GetProductivityGeneralRegionReport(GetProductivityGeneralRegionReportRequest request)
         => CachedProductivity(nameof(GetProductivityGeneralRegionReport), request,
             () => _inner.GetProductivityGeneralRegionReport(request));

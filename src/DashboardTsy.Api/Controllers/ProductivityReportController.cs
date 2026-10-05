@@ -50,6 +50,22 @@ public class ProductivityReportController : ControllerBase
     }
 
     /// <summary>
+    /// POST /ProductivityReport/GetProductivityCountPaymentReportHeaders
+    /// Adet > Ödeme Sistemleri raporu tablo kolon başlıklarını döner (FilterType: 1=Bölge, 2=Şube).
+    /// SP: GetProductivityCountPaymentReportHeaders
+    /// </summary>
+    [HttpPost("GetProductivityCountPaymentReportHeaders")]
+    public ActionResult<IReadOnlyList<GetProductivityReportTableHeaderItem>> GetProductivityCountPaymentReportHeaders(
+        [FromBody] GetProductivityCountPaymentReportHeadersRequest request)
+    {
+        if (request == null)
+            return BadRequest();
+
+        var result = _reportDataProvider.GetProductivityCountPaymentReportHeaders(request);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// POST /ProductivityReport/GetProductivityScoreCardReportHeaders
     /// Skor kartı ekranı için header hiyerarşisini döner (bölge/şube, roller, NPS).
     /// Şu an SP tanımlanmadığı için mock veri üzerinden çalışır.

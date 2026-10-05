@@ -64,6 +64,12 @@ public interface IReportDataProvider
     IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityReportTableHeaders(GetProductivityReportTableHeadersRequest request);
 
     /// <summary>
+    /// Adet > Ödeme Sistemleri raporu tablo başlıklarını döner (FilterType: 1=Bölge, 2=Şube).
+    /// SP: GetProductivityCountPaymentReportHeaders
+    /// </summary>
+    IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityCountPaymentReportHeaders(GetProductivityCountPaymentReportHeadersRequest request);
+
+    /// <summary>
     /// Verimlilik raporu için bölge filtre seçeneklerini döner.
     /// Şu an SP adı belli olmadığı için mock veri + SP taslağı ile çalışır.
     /// </summary>

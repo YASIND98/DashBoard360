@@ -458,6 +458,25 @@ public class ReportDataProvider : IReportDataProvider
         return DataTableHelper.ToList<GetProductivityReportTableHeaderItem>(ds.Tables[0]);
     }
 
+    public IReadOnlyList<GetProductivityReportTableHeaderItem> GetProductivityCountPaymentReportHeaders(GetProductivityCountPaymentReportHeadersRequest request)
+    {
+        request ??= new GetProductivityCountPaymentReportHeadersRequest();
+
+        if (MockEnabled)
+            return MockProductivityReportData.GetProductivityCountPaymentReportHeaders(request);
+
+        var parameters = new Dictionary<string, object?>
+        {
+            ["@FilterType"] = request.FilterType
+        };
+
+        var ds = _spExecutor.ExecuteDataSet("YoneticiRaporu", "GetProductivityCountPaymentReportHeaders", parameters);
+        if (ds.Tables.Count == 0 || ds.Tables[0].Rows.Count == 0)
+            return Array.Empty<GetProductivityReportTableHeaderItem>();
+
+        return DataTableHelper.ToList<GetProductivityReportTableHeaderItem>(ds.Tables[0]);
+    }
+
     public IReadOnlyList<GetProductivityScoreCardReportHeaderItem> GetProductivityScoreCardReportHeaders(GetProductivityScoreCardReportHeadersRequest request)
     {
         request ??= new GetProductivityScoreCardReportHeadersRequest();
