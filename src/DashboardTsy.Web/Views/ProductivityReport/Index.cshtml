@@ -368,10 +368,8 @@
         }
 
         function getBranchLatLng(branch) {
-            @* var lat = parseFloat(branch && branch.Longitude);
-            var lng = parseFloat(branch && branch.Latitude); *@
-              var lat = parseFloat(branch && branch.Latitude);
-            var lng = parseFloat(branch && branch.Longitude);
+            var lat = parseFloat(branch && branch.Longitude);
+            var lng = parseFloat(branch && branch.Latitude);
             return (isNaN(lat) || isNaN(lng)) ? null : [lat, lng];
         }
 
@@ -821,8 +819,8 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    RegionCode: 20,
-                    BranchCode: 2204
+                    RegionCode: Number(regionCode),
+                    BranchCode: Number(branchCode)
                 }),
                 success: function (response) {
                     if (reqId !== _mapReqId) return;
