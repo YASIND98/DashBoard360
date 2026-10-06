@@ -180,7 +180,7 @@
 
 @section Scripts {
     <script src="~/assets/lib/leaflet/leaflet.js" asp-append-version="true"></script>
-    <script src="~/assets/lib/leaflet/turkiye-tiles-zoom7.js"></script>
+    <script src="~/assets/lib/leaflet/tiles/index.js" asp-append-version="true"></script>
     <script src="~/assets/lib/html2canvas/html2canvas.min.js" asp-append-version="true"></script>
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/report-detail.js" asp-append-version="true"></script>
@@ -199,7 +199,12 @@
         var _scorecardMaps = [];  // [{ map, ro }]
         var _popupMap = null;     // { map, ro }
 
-        var MAP_ZOOM = 6;
+        // Şubeye sokak seviyesinde açılır; o zoom'da karo yoksa (ör. yeni şube) indirilmiş en yakın alt zoom'a düşer.
+        var MAP_ZOOM = 15;
+        var MAP_MIN_ZOOM = 5;
+        var MAP_MAX_ZOOM = 15;
+        var TILE_BASE_URL = '@Url.Content("~/assets/lib/leaflet/tiles/")';
+        var TILE_INDEX = new Set(window.HaritaKaroIndeksi || []);
         var GOOGLE_TILES = 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}';
         var OSM_TILES = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
@@ -371,11 +376,9 @@
             var ÇevrimdışıKatman = L.TileLayer.extend({
                 getTileUrl: function(coords) {
                     var karoAnahtari = coords.z + '/' + coords.x + '/' + coords.y;
-                    
-                    if (window.TurkiyeHaritaKarolari && window.TurkiyeHaritaKarolari[karoAnahtari]) {
-                        return window.TurkiyeHaritaKarolari[karoAnahtari];
+                    if (TILE_INDEX.has(karoAnahtari)) {
+                        return TILE_BASE_URL + karoAnahtari + '.png';
                     }
-                    
                     // Eğer kullanıcı haritayı Türkiye dışına kaydırırsa gri kalmasın diye boş piksel dön
                     return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
                 }
@@ -383,8 +386,8 @@
 
             // Katmanı haritaya ekle ve zoom sınırlarını indirdiğimiz paket sınırına kilitle
             new ÇevrimdışıKatman({
-                minZoom: 5,
-                maxZoom: 7,
+                minZoom: MAP_MIN_ZOOM,
+                maxZoom: MAP_MAX_ZOOM,
                 attribution: 'Banka Çevrimdışı Harita Servisi'
             }).addTo(map);
 
@@ -398,10 +401,20 @@
             [43.0, 45.0]    // kuzeydoğu köşe (lat, lng)
         );
 
+        // Şubenin bulunduğu karo indirilmiş olan en yüksek zoom (MAP_ZOOM'u geçmeden)
+        function getBranchZoom(latlng) {
+            for (var z = MAP_ZOOM; z > MAP_MIN_ZOOM; z--) {
+                var t = L.CRS.EPSG3857.latLngToPoint(L.latLng(latlng), z).divideBy(256).floor();
+                if (TILE_INDEX.has(z + '/' + t.x + '/' + t.y)) return z;
+            }
+            return MAP_MIN_ZOOM;
+        }
+
         function createBranchMap(container, latlng, interactive) {
+            var zoom = getBranchZoom(latlng);
             var baseOptions = {
-                minZoom: 5,
-                maxZoom: 7,
+                minZoom: MAP_MIN_ZOOM,
+                maxZoom: MAP_MAX_ZOOM,
                 maxBounds: TR_BOUNDS,
                 maxBoundsViscosity: 1.0
             };
@@ -416,7 +429,7 @@
                 keyboard: false,
             });
 
-            var map = L.map(container, options).setView(latlng, MAP_ZOOM);
+            var map = L.map(container, options).setView(latlng, zoom);
             addBaseLayer(map);
             L.marker(latlng, { icon: PIN_ICON }).addTo(map);
 
@@ -427,7 +440,7 @@
                 if (!w || !h || (w === lastW && h === lastH)) return;
                 lastW = w; lastH = h;
                 map.invalidateSize({ animate: false, pan: false });
-                map.setView(latlng, MAP_ZOOM, { animate: false, reset: true });
+                map.setView(latlng, zoom, { animate: false, reset: true });
             });
             ro.observe(container);
 
