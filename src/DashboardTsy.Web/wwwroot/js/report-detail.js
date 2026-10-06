@@ -99,7 +99,8 @@ $(function () {
   function leafDescriptors(tableKey) {
       if (tableKey === 'monthly') {
           return [
-              { key: 'MonthActualAmount', fmt: function (n) { return formatNumber(n.MonthActualAmount); } },
+              { key: 'PreviousYear', fmt: function (n) { return formatNumber(n.PreviousYear); } },
+              { key: 'MonthActualAmount',fmt: function (n) { return formatNumber(n.MonthActualAmount); } },
               { key: 'MonthTargetAmount', fmt: function (n) { return formatNumber(n.MonthTargetAmount); } },
               { key: 'MonthRatio', fmt: function (n) { return formatPercent(n.MonthRatio); }, color: function (n) { return percentColor(n.MonthRatio); } },
               { key: 'YearActualAmount', fmt: function (n) { return formatNumber(n.YearActualAmount); } },
