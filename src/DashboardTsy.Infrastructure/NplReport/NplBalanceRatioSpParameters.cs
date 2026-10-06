@@ -72,7 +72,7 @@ public static class NplBalanceRatioSpParameters
                     if (je.ValueKind == JsonValueKind.True) return true;
                     if (je.ValueKind == JsonValueKind.False) return false;
                     if (je.ValueKind == JsonValueKind.Number && je.TryGetInt32(out var bn)) return bn != 0;
-                    if (je.ValueKind == JsonValueKind.String && bool.TryParse(je.GetString(), out var bs)) return bs;
+                    if (je.ValueKind == JsonValueKind.String) return ParseBitString(je.GetString());
                     return null;
 
                 case SqlDbType.Int:
@@ -96,4 +96,12 @@ public static class NplBalanceRatioSpParameters
 
         return value;
     }
+
+    private static bool? ParseBitString(string? raw) => raw?.Trim() switch
+    {
+        "1" => true,
+        "0" => false,
+        var s when bool.TryParse(s, out var b) => b,
+        _ => null
+    };
 }
