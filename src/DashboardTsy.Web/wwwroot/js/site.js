@@ -414,7 +414,7 @@ function initFilterSelection() {
 }
 
 // ===== Scorecard Headers (cached per filterType in sessionStorage) =====
-function loadScoreCardHeaders(filterType, callback) {
+function loadScoreCardHeaders(filterType, callback, onError) {
   var key = '_scoreCardHeaders_' + filterType;
   var cached = sessionStorage.getItem(key);
   if (cached) {
@@ -429,6 +429,9 @@ function loadScoreCardHeaders(filterType, callback) {
       success: function (data) {
           sessionStorage.setItem(key, JSON.stringify(data));
           if (callback) callback(data);
+      },
+      error: function (xhr, status, error) {
+          if (onError) onError(error || status);
       }
   });
 }

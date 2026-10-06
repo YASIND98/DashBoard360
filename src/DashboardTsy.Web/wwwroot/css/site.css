@@ -316,6 +316,7 @@ body:has(.scorecard-panel.open)::before {
 }
 
 .scorecard-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -324,6 +325,15 @@ body:has(.scorecard-panel.open)::before {
   font-size: 14px;
   font-weight: 500;
   color: var(--text-blue-light);
+}
+
+/* Başlık ortada kalsın diye PDF butonu panelin en soluna sabitlenir */
+.sc-pdf-btn {
+  position: absolute;
+  left: 20px;
+  background: none;
+  border: none;
+  padding: 0;
 }
 
 .scorecard-close {
@@ -1193,6 +1203,16 @@ body:has(.scorecard-panel.open)::before {
     filter: brightness(0) invert(1);
   }
 
+  /* Genel kural tablet/mobilde PDF butonlarını gizler; skor kartı panelindeki görünür kalır */
+  .scorecard-nps-wrapper .scorecard-header .sc-pdf-btn {
+    display: flex;
+  }
+
+  /* Mobil başlık space-between: buton akışa döner, sırası solda kalır */
+  .scorecard-nps-wrapper.mobile .scorecard-header .sc-pdf-btn {
+    position: static;
+  }
+
   .scorecard-nps-wrapper.mobile .scorecard-content {
     padding: 12px 16px 24px;
     overflow-y: auto;
@@ -1260,6 +1280,10 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-header {
     color: #262A33;
+  }
+
+  [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-header .sc-pdf-btn img {
+    filter: brightness(0) saturate(100%) invert(37%) sepia(11%) saturate(718%) hue-rotate(177deg) brightness(91%);
   }
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-section-title {

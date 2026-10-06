@@ -629,9 +629,19 @@
         // Personel detayındaki STATU = "Müdür" satırı; manager card'daki ad, başlangıç tarihi ve görev süresi buradan basılır.
         var _detailManager = null;
 
+        function scorecardTitle(isBranch) {
+            return isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
+        }
+
+        function scorecardManagerRole(isBranch) {
+            return isBranch
+                ? ((selectedBranch ? selectedBranch.name + ' ' : '') + 'Şube Müdürü')
+                : ((selectedRegion ? selectedRegion.name + ' ' : '') + 'Bölge Müdürü');
+        }
+
         function updateScorecard() {
             var isBranch = selectedBranch !== null;
-            var label = isBranch ? 'Şube Skor Kartı & NPS' : 'Bölge Skor Kartı & NPS';
+            var label = scorecardTitle(isBranch);
             $('.scorecard-btn-label').text(label);
             $('.scorecard-title').text(label);
 
@@ -646,12 +656,12 @@
             if (!selectedRegion && !selectedBranch) {
                 destroyScorecardMaps();
                 _currentBranch = null;
-                $('.sc-period-toggle').hide();
+                $('.sc-period-toggle, .sc-pdf-btn').hide();
                 $('.scorecard-content').html('');
                 return;
             }
 
-            $('.sc-period-toggle').show();
+            $('.sc-period-toggle, .sc-pdf-btn').show();
             loadPersonnelDetails(isBranch, reqId);
             loadScorecardData(isBranch, reqId);
         }
@@ -663,11 +673,19 @@
         }
 
         // Aylık > GetScoreCardReport, Kümüle > GetScoreCardReportCumulative.
+        function scorecardReportUrl(isBranch, period) {
+            return '/ProductivityReport/' + (isBranch
+                ? 'GetProductivityBranchScoreCardReport'
+                : 'GetProductivityRegionScoreCardReport') + (period === 'cumulative' ? 'Cumulative' : '');
+        }
+
+        function isManagerRow(person) {
+            return $.trim(person.Status || '').toLocaleLowerCase('tr-TR') === 'müdür';
+        }
+
         function loadScorecardData(isBranch, reqId) {
             var filterType = isBranch ? 2 : 1;
-            var url = '/ProductivityReport/' + (isBranch
-                ? 'GetProductivityBranchScoreCardReport'
-                : 'GetProductivityRegionScoreCardReport') + (_scorecardPeriod === 'cumulative' ? 'Cumulative' : '');
+            var url = scorecardReportUrl(isBranch, _scorecardPeriod);
 
             loadScoreCardHeaders(filterType, function (headers) {
                 if (reqId !== _scorecardReqId) return;
@@ -712,11 +730,10 @@
                 success: function (data) {
                     if (reqId !== _scorecardReqId) return;
                     var list = Array.isArray(data) ? data : [];
-                    var isManager = function (p) { return $.trim(p.Status || '').toLocaleLowerCase('tr-TR') === 'müdür'; };
 
-                    _detailManager = list.find(isManager) || null;
+                    _detailManager = list.find(isManagerRow) || null;
                     updateManagerTenure();
-                    renderPersonnelDetails(list.filter(function (p) { return !isManager(p); }), isBranch);
+                    renderPersonnelDetails(list.filter(function (p) { return !isManagerRow(p); }), isBranch);
                 },
                 error: function () {
                     console.error('Personel detayları yüklenirken hata oluştu.');
@@ -820,41 +837,56 @@
             });
         }
 
-        function renderScorecardHtml(headers, d, isBranch) {
-            // Group: sections (ParentId=0) and their children
-            var sections = headers
-                .filter(function (h) { return h.ParentId === 0; })
-                .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
-
+        // Header ağacı (ParentId=0 bölüm, altı kriter) + servis cevabı > [{ title, monthSuffix, rows: [{ label, value, isScore }] }].
+        // Ekran ve PDF aynı modeli kullanır.
+        function buildScorecardSections(headers, d, isBranch) {
             var sectionFields = isBranch ? _sectionFieldsBranch : _sectionFieldsRegion;
+            var reportMonth = d.ReportMonth || d.reportMonth;
+
+            return headers
+                .filter(function (h) { return h.ParentId === 0; })
+                .sort(function (a, b) { return a.OrderNo - b.OrderNo; })
+                .map(function (section, sIdx) {
+                    var fields = (sIdx < sectionFields.length && sectionFields[sIdx])
+                        ? sectionFields[sIdx]
+                        : getNpsFields(isBranch);
+
+                    var rows = headers
+                        .filter(function (h) { return h.ParentId === section.Id; })
+                        .sort(function (a, b) { return a.OrderNo - b.OrderNo; })
+                        .map(function (child, cIdx) {
+                            var fieldName = cIdx < fields.length ? fields[cIdx] : null;
+                            return {
+                                label: child.HeaderName,
+                                value: fieldName ? d[fieldName] : null,
+                                isScore: fieldName !== 'ManagerName'
+                            };
+                        });
+
+                    return {
+                        title: section.HeaderName,
+                        monthSuffix: sIdx < 2 && reportMonth ? ' (' + reportMonth + ')' : '',
+                        rows: rows
+                    };
+                });
+        }
+
+        function formatScorecardValue(row) {
+            if (!row.isScore) return row.value || '-';
+            return row.value != null ? formatPercent(row.value) : '-';
+        }
+
+        function renderScorecardHtml(headers, d, isBranch) {
             var html = '';
 
-            sections.forEach(function (section, sIdx) {
-                var children = headers
-                    .filter(function (h) { return h.ParentId === section.Id; })
-                    .sort(function (a, b) { return a.OrderNo - b.OrderNo; });
-
-                var fields = (sIdx < sectionFields.length && sectionFields[sIdx])
-                    ? sectionFields[sIdx]
-                    : getNpsFields(isBranch);
-
+            buildScorecardSections(headers, d, isBranch).forEach(function (section) {
                 html += '<div class="scorecard-section">';
-                var reportMonth = d.ReportMonth || d.reportMonth;
-                var monthSuffix = sIdx < 2 && reportMonth ? ' (' + reportMonth + ')' : '';
-                html += '<div class="scorecard-section-title">' + section.HeaderName + monthSuffix + '</div>';
+                html += '<div class="scorecard-section-title">' + section.title + section.monthSuffix + '</div>';
                 html += '<table class="scorecard-table">';
 
-                children.forEach(function (child, cIdx) {
-                    var fieldName = cIdx < fields.length ? fields[cIdx] : null;
-                    var value = fieldName ? d[fieldName] : null;
-
-                    if (fieldName === 'ManagerName') {
-                        html += '<tr><td>' + child.HeaderName + ':</td><td>' + (value || '-') + '</td></tr>';
-                    } else {
-                        var score = value != null ? formatPercent(value) : '-';
-                        var cls = value != null ? ' ' + percentColor(value) : '';
-                        html += '<tr><td>' + child.HeaderName + ':</td><td class="' + cls.trim() + '">' + score + '</td></tr>';
-                    }
+                section.rows.forEach(function (row) {
+                    var cls = row.isScore && row.value != null ? percentColor(row.value) : '';
+                    html += '<tr><td>' + row.label + ':</td><td class="' + cls + '">' + formatScorecardValue(row) + '</td></tr>';
                 });
 
                 html += '</table></div>';
@@ -863,6 +895,97 @@
             destroyScorecardMaps();
             $('.scorecard-content').html(html);
         }
+
+        // ===== Skor Kartı & NPS PDF =====
+        // Panelde gizli kalanlar dahil (tüm personel, Aylık + Kümüle) her şey indirme anında çekilir;
+        // her bölüm tek tabloda Aylık ve Kümüle değerleri yan yana gösterir.
+        function postScorecardRequest(url, isBranch) {
+            return Promise.resolve($.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(getScorecardPayload(isBranch))
+            }));
+        }
+
+        function loadScoreCardHeadersAsync(filterType) {
+            return new Promise(function (resolve, reject) {
+                loadScoreCardHeaders(filterType, resolve, reject);
+            });
+        }
+
+        function scorecardPersonnelSection(personnel, isBranch) {
+            return {
+                heading: isBranch ? 'Şube Bilgileri' : 'Bölge Bilgileri',
+                columns: [
+                    { header: 'Ad Soyad', key: 'EmployeeName', align: 'left' },
+                    { header: 'Görev', key: 'PositionName', align: 'left' }
+                ],
+                rows: personnel
+            };
+        }
+
+        function scorecardComparisonSections(monthlySections, cumulativeSections) {
+            return monthlySections.map(function (monthly, sIdx) {
+                var cumulative = cumulativeSections[sIdx] || { monthSuffix: '', rows: [] };
+                return {
+                    heading: monthly.title,
+                    columns: [
+                        { header: 'Kriter', key: 'label', align: 'left' },
+                        { header: 'Aylık', subHeader: $.trim(monthly.monthSuffix), key: 'monthly' },
+                        { header: 'Kümüle', subHeader: $.trim(cumulative.monthSuffix), key: 'cumulative' }
+                    ],
+                    rows: monthly.rows.map(function (row, rIdx) {
+                        var cumulativeRow = cumulative.rows[rIdx];
+                        return {
+                            label: row.label,
+                            monthly: formatScorecardValue(row),
+                            cumulative: cumulativeRow ? formatScorecardValue(cumulativeRow) : '-'
+                        };
+                    })
+                };
+            });
+        }
+
+        function scorecardManagerInfoLines(manager, monthly, isBranch) {
+            var lines = [scorecardManagerRole(isBranch) + ': ' + ((manager && manager.EmployeeName) || monthly.ManagerName || '-')];
+            var startDate = manager && manager.PositionStartDate ? new Date(manager.PositionStartDate) : null;
+            if (startDate && !isNaN(startDate)) lines.push('Göreve Başlangıç: ' + formatShortDate(startDate));
+            if (manager && manager.PositionDuration) lines.push('Görev Süresi: ' + manager.PositionDuration);
+            lines.push('Rapor Tarihi: ' + formatReportDateTr(_selectedDate));
+            return lines;
+        }
+
+        function buildScorecardPdf() {
+            if (!selectedRegion && !selectedBranch) return null;
+            var isBranch = selectedBranch !== null;
+
+            return Promise.all([
+                loadScoreCardHeadersAsync(isBranch ? 2 : 1),
+                postScorecardRequest(scorecardReportUrl(isBranch, 'monthly'), isBranch),
+                postScorecardRequest(scorecardReportUrl(isBranch, 'cumulative'), isBranch),
+                postScorecardRequest('/ProductivityReport/GetProductivityScoreCardReportDetail', isBranch)
+            ]).then(function (results) {
+                var headers = results[0], monthly = results[1] || {}, cumulative = results[2] || {};
+                var details = Array.isArray(results[3]) ? results[3] : [];
+                var personnel = details.filter(function (p) { return !isManagerRow(p); });
+
+                var sections = scorecardComparisonSections(
+                    buildScorecardSections(headers, monthly, isBranch),
+                    buildScorecardSections(headers, cumulative, isBranch));
+                if (personnel.length) sections.unshift(scorecardPersonnelSection(personnel, isBranch));
+
+                return {
+                    title: scorecardTitle(isBranch),
+                    infoLines: scorecardManagerInfoLines(details.find(isManagerRow), monthly, isBranch),
+                    sections: sections,
+                    filename: isBranch ? 'Sube-Skor-Karti-NPS.pdf' : 'Bolge-Skor-Karti-NPS.pdf'
+                };
+            });
+        }
+
+        window.PdfSources = window.PdfSources || {};
+        window.PdfSources.scorecardNps = buildScorecardPdf;
 
         // ===== Scorecard Panel Toggle =====
         // Harita boyutunu ResizeObserver hallediyor, burada sadece aç/kapat var
@@ -913,9 +1036,7 @@
             var regionManagerPhoto = data.RegionManagerPhoto || data.regionManagerPhoto || null;
 
             // 2. Rol metnini belirle
-            var roleText = isBranch 
-                ? ((selectedBranch ? selectedBranch.name + ' ' : '') + 'Şube Müdürü')
-                : ((selectedRegion ? selectedRegion.name + ' ' : '') + 'Bölge Müdürü');
+            var roleText = scorecardManagerRole(isBranch);
 
             // 3. Ekrana basma işlemini şartlardan bağımsız en başta yap (HER İKİ ALANA DA YAZ)
             $photo.find('.sc-manager-name').text(managerName);
