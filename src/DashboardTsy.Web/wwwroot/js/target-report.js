@@ -924,6 +924,10 @@ $(document).ready(function () {
           userCode: window.USER_CODE,  // session User.DomainName (Index.cshtml -> window.USER_CODE)
           sortBy: null
       });
+      if (url === BREAKDOWN_URLS.daily) {
+          body.sortBy = 5;
+          body.isAscending = false;
+      }
       abortXhr(_targetBreakdownXhr);
       _targetBreakdownXhr = $.ajax({ url: url, type: 'POST', contentType: 'application/json', data: JSON.stringify(body) })
           .done(function (data) { window.ReportBreakdownData = (data && data.Products) || []; })
