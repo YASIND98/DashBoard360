@@ -1,5 +1,7 @@
 using DashboardTsy.Api.Services;
+using DashboardTsy.Application.ScoreCard;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -11,12 +13,18 @@ public class ScoreCardController : ControllerBase
 {
     private readonly HttpClient _pupaClient;
     private readonly IScoreCardTokenService _tokenService;
+    private readonly IScoreCardRequestLogQueue _requestLogQueue;
     private readonly ILogger<ScoreCardController> _logger;
 
-    public ScoreCardController(IHttpClientFactory httpClientFactory, IScoreCardTokenService tokenService, ILogger<ScoreCardController> logger)
+    public ScoreCardController(
+        IHttpClientFactory httpClientFactory,
+        IScoreCardTokenService tokenService,
+        IScoreCardRequestLogQueue requestLogQueue,
+        ILogger<ScoreCardController> logger)
     {
         _pupaClient = httpClientFactory.CreateClient("PupaApi");
         _tokenService = tokenService;
+        _requestLogQueue = requestLogQueue;
         _logger = logger;
     }
 
@@ -79,74 +87,74 @@ public class ScoreCardController : ControllerBase
     private string? ReadExternalContextHeader()
         => Request.Headers.TryGetValue("ExternalContext", out var v) ? v.ToString() : null;
 
-    private async Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
+    private Task<IActionResult> ProxyPost(string path, JsonElement body, CancellationToken ct)
+        => ProxyToPupa(HttpMethod.Post, path, body.GetRawText(), ct);
+
+    private Task<IActionResult> ProxyGet(string pathAndQuery, CancellationToken ct)
+        => ProxyToPupa(HttpMethod.Get, pathAndQuery, null, ct);
+
+    // Her istek (başarılı, hatalı ya da exception) ScoreCardRequestLogs tablosuna yazılmak üzere kuyruğa atılır.
+    // DurationMs yalnızca skor kart (Pupa) servisinin yanıt süresidir; token alma süresi dahil değildir.
+    private async Task<IActionResult> ProxyToPupa(HttpMethod method, string pathAndQuery, string? body, CancellationToken ct)
     {
-        _logger.LogWarning("[ScoreCard] POST {Path} -> token alınıyor", path);
-        string token;
+        var externalContext = ReadExternalContextHeader();
+        var requestLog = ScoreCardRequestLogFactory.Create(method.Method, pathAndQuery, body, externalContext);
+        Stopwatch? pupaCall = null;
+
         try
         {
-            token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
-            _logger.LogWarning("[ScoreCard] Token alındı");
+            _logger.LogWarning("[ScoreCard] {Method} {PathAndQuery} -> token alınıyor", method.Method, pathAndQuery);
+            string token;
+            try
+            {
+                token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
+                _logger.LogWarning("[ScoreCard] Token alındı");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ScoreCard] Token alınamadı");
+                requestLog.StatusCode = 502;
+                requestLog.ErrorMessage = "Token alınamadı: " + ex.Message;
+                return StatusCode(502, requestLog.ErrorMessage);
+            }
+
+            using var request = new HttpRequestMessage(method, pathAndQuery);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            if (!string.IsNullOrEmpty(externalContext))
+                request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
+            if (body != null)
+                request.Content = new StringContent(body, System.Text.Encoding.UTF8, "application/json");
+
+            _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery} | Body: {Body} | ExternalContext: {ExternalContext}", _pupaClient.BaseAddress, pathAndQuery, body ?? "(yok)", externalContext ?? "(yok)");
+            pupaCall = Stopwatch.StartNew();
+            using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
+            var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
+            requestLog.DurationMs = pupaCall.ElapsedMilliseconds;
+            _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode} | Body: {Body}", (int)upstream.StatusCode, content);
+
+            requestLog.StatusCode = (int)upstream.StatusCode;
+            requestLog.ResponseBody = content;
+            requestLog.IsSuccess = upstream.IsSuccessStatusCode;
+
+            if (!upstream.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("[ScoreCard] Pupa hata döndü: {StatusCode} {Body}", (int)upstream.StatusCode, content);
+                requestLog.ErrorMessage = string.IsNullOrEmpty(content) ? upstream.ReasonPhrase : content;
+                return StatusCode((int)upstream.StatusCode, content);
+            }
+
+            return Content(content, "application/json");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "[ScoreCard] Token alınamadı");
-            return StatusCode(502, "Token alınamadı: " + ex.Message);
+            // Bağlantı hatası, timeout, iptal: kayıt hata mesajıyla yazılır, mevcut davranış (exception) korunur.
+            requestLog.DurationMs ??= pupaCall?.ElapsedMilliseconds;
+            requestLog.ErrorMessage = ex.Message;
+            throw;
         }
-
-        using var request = new HttpRequestMessage(HttpMethod.Post, path);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var externalContext = ReadExternalContextHeader();
-        if (!string.IsNullOrEmpty(externalContext))
-            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
-        request.Content = new StringContent(body.GetRawText(), System.Text.Encoding.UTF8, "application/json");
-
-        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{Path} | Body: {Body} | ExternalContext: {ExternalContext}", _pupaClient.BaseAddress, path, body.GetRawText(), externalContext ?? "(yok)");
-        using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
-        var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode} | Body: {Body}", (int)upstream.StatusCode, content);
-
-        if (!upstream.IsSuccessStatusCode)
+        finally
         {
-            _logger.LogWarning("[ScoreCard] Pupa hata döndü: {StatusCode} {Body}", (int)upstream.StatusCode, content);
-            return StatusCode((int)upstream.StatusCode, content);
+            _requestLogQueue.Enqueue(requestLog);
         }
-
-        return Content(content, "application/json");
-    }
-
-    private async Task<IActionResult> ProxyGet(string pathAndQuery, CancellationToken ct)
-    {
-        _logger.LogWarning("[ScoreCard] GET {PathAndQuery} -> token alınıyor", pathAndQuery);
-        string token;
-        try
-        {
-            token = await _tokenService.GetAccessTokenAsync(ct).ConfigureAwait(false);
-            _logger.LogWarning("[ScoreCard] Token alındı");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "[ScoreCard] Token alınamadı");
-            return StatusCode(502, "Token alınamadı: " + ex.Message);
-        }
-
-        using var request = new HttpRequestMessage(HttpMethod.Get, pathAndQuery);
-        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        var externalContext = ReadExternalContextHeader();
-        if (!string.IsNullOrEmpty(externalContext))
-            request.Headers.TryAddWithoutValidation("ExternalContext", externalContext);
-
-        _logger.LogWarning("[ScoreCard] Pupa isteği gönderiliyor: {BaseAddress}{PathAndQuery} | ExternalContext: {ExternalContext}", _pupaClient.BaseAddress, pathAndQuery, externalContext ?? "(yok)");
-        using var upstream = await _pupaClient.SendAsync(request, ct).ConfigureAwait(false);
-        var content = await upstream.Content.ReadAsStringAsync(ct).ConfigureAwait(false);
-        _logger.LogWarning("[ScoreCard] Pupa yanıtı: {StatusCode} | Body: {Body}", (int)upstream.StatusCode, content);
-
-        if (!upstream.IsSuccessStatusCode)
-        {
-            _logger.LogWarning("[ScoreCard] Pupa hata döndü: {StatusCode} {Body}", (int)upstream.StatusCode, content);
-            return StatusCode((int)upstream.StatusCode, content);
-        }
-
-        return Content(content, "application/json");
     }
 }

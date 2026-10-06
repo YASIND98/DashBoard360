@@ -96,6 +96,13 @@ builder.Services.AddHttpClient("PupaApi", client =>
     client.BaseAddress = new Uri(pupaBaseUrl + "/");
 });
 
+// ScoreCard istek logları: controller her isteği kuyruğa atar, arka plan servisi dbo.ScoreCardRequestLogs'a yazar
+// (tablo: Scripts/ScoreCardRequestLogs.sql). Log yazımı skor kart isteğini bekletmez.
+builder.Services.AddSingleton<DashboardTsy.Application.ScoreCard.IScoreCardRequestLogRepository, DashboardTsy.Infrastructure.ScoreCard.ScoreCardRequestLogRepository>();
+builder.Services.AddSingleton<ScoreCardRequestLogQueue>();
+builder.Services.AddSingleton<DashboardTsy.Application.ScoreCard.IScoreCardRequestLogQueue>(sp => sp.GetRequiredService<ScoreCardRequestLogQueue>());
+builder.Services.AddHostedService<ScoreCardRequestLogWriter>();
+
 // --- Mobile Auth (iOS) — KutupYıldızı pass-through proxy + AuthMock ---
 // iOS client'ın Login/OTP akışı iki modda çalışır:
 //   AuthMock:Enabled=false → KutupYıldızı'nın mevcut endpoint'lerine forward edilir (default).
