@@ -3,8 +3,10 @@
 //
 // Config: { title, infoLines[], columns[{header,key,format?,extra?,align?}], rows[], childrenKey?, footerNote?, filename }
 //   col.align: 'left' | 'center' (varsayılan center) — th + td hizası; metin (col-text) kolonları 'left'.
+//   sections[{ heading, columns, rows, childrenKey? }]: tek tablo yerine başlıklı tablolar alt alta çizilir.
 //   1) Sayfa render ederken window.PdfReport'u set eder (varsayılan).
 //   2) Buton data-pdf="<kaynak>" taşırsa window.PdfSources[<kaynak>]() çağrılır (ör. grafik ekranları).
+//      Kaynak, veriyi indirme anında çekmesi gerekiyorsa config yerine config'e çözülen Promise dönebilir.
 $(function () {
 
   // Başlık + alt info satırları (beyaz zemin, siyah metin)
@@ -142,22 +144,28 @@ $(function () {
     }).append($table);
   }
 
-  // Config'ten beyaz temalı sayfa kurup PDF olarak indirir.
-  function exportTablePdf(config) {
-    config = config || {};
-    var $btn = config.$btn;
-    var originalHtml = $btn ? $btn.html() : null;
-    if ($btn) {
-      $btn.css('pointer-events', 'none');
-      $btn.html('<div class="pdf-spinner"></div> <span>PDF Yükleniyor...</span>');
-    }
+  function buildSectionHeading(text) {
+    return $('<div></div>').text(text || '').css({
+      margin: '8px 20px 10px', color: '#000000', 'font-size': '16px', 'font-weight': '600', 'font-family': 'Inter, sans-serif'
+    });
+  }
 
+  // Config'ten beyaz temalı sayfa kurar: başlık, tek tablo ya da başlıklı bölümler, tablo altı not.
+  function buildReportWrapper(config) {
     var $wrapper = $('<div></div>').css({
       'position': 'absolute', 'left': '-9999px', 'top': '0',
       'min-width': '700px', 'background-color': '#ffffff', 'color': '#000000', 'font-family': 'Inter, sans-serif'
     });
     $wrapper.append(buildTitleHeader(config.title, config.infoLines));
-    $wrapper.append(buildDataTable(config.columns, config.rows, config));
+
+    if (Array.isArray(config.sections)) {
+      config.sections.forEach(function (section) {
+        if (section.heading) $wrapper.append(buildSectionHeading(section.heading));
+        $wrapper.append(buildDataTable(section.columns, section.rows, section));
+      });
+    } else {
+      $wrapper.append(buildDataTable(config.columns, config.rows, config));
+    }
 
     // Tablo altı not (ör. "tutarlar /1000"): ekrandaki legend-note karşılığı
     if (config.footerNote) {
@@ -165,8 +173,7 @@ $(function () {
         margin: '0 20px 24px', 'font-size': '12px', 'font-style': 'italic', color: '#8a93a3', 'font-family': 'Inter, sans-serif'
       }));
     }
-
-    renderWrapperToPdf($wrapper, config.filename || 'rapor.pdf', $btn, originalHtml);
+    return $wrapper;
   }
 
   // Hazır $wrapper'ı görüntüye çevirip PDF olarak indirir.
@@ -207,16 +214,30 @@ $(function () {
   }
 
   // Buton tıklanınca: data-pdf="<kaynak>" varsa PdfSources[<kaynak>](), yoksa window.PdfReport.
+  // Kaynak Promise dönerse veri gelene kadar buton yükleniyor durumunda kalır.
   $(document).on('click', '.download-pdf-btn', function () {
     if (document.documentElement.getAttribute('data-pdf-allowed') !== 'true') {
       alert('PDF indirme özelliği yalnızca Chrome ve Edge tarayıcılarında kullanılabilir.');
       return;
     }
     var $btn = $(this);
+    var originalHtml = $btn.html();
+    $btn.css('pointer-events', 'none');
+    $btn.html('<div class="pdf-spinner"></div> <span>PDF Yükleniyor...</span>');
+
     var pdfSource = $btn.data('pdf');
     var hasProvider = pdfSource && window.PdfSources && typeof window.PdfSources[pdfSource] === 'function';
-    var cfg = hasProvider ? (window.PdfSources[pdfSource]() || {}) : (window.PdfReport || {});
-    cfg.$btn = $btn;
-    exportTablePdf(cfg);
+
+    Promise.resolve()
+      .then(function () { return hasProvider ? window.PdfSources[pdfSource]() : window.PdfReport; })
+      .then(function (cfg) {
+        cfg = cfg || {};
+        renderWrapperToPdf(buildReportWrapper(cfg), cfg.filename || 'rapor.pdf', $btn, originalHtml);
+      })
+      .catch(function (err) {
+        console.error('PDF oluşturma hatası:', err);
+        $btn.html(originalHtml);
+        $btn.css('pointer-events', '');
+      });
   });
 });
