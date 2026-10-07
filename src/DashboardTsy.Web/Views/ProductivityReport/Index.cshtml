@@ -199,10 +199,12 @@
         var _scorecardMaps = [];  // [{ map, ro }]
         var _popupMap = null;     // { map, ro }
 
-        // Şubeye sokak seviyesinde açılır; o zoom'da karo yoksa (ör. yeni şube) indirilmiş en yakın alt zoom'a düşer.
+        // Şubeye sokak seviyesinde açılır; o zoom'da karo yoksa (ör. paket sınırındaki şube) eksik karolar
+        // indirilmiş en yakın alt zoom karosundan büyütülerek doldurulur.
         var MAP_ZOOM = 15;
         var MAP_MIN_ZOOM = 5;
         var MAP_MAX_ZOOM = 15;
+        var MAX_OVERZOOM = 3; // Açılışta en fazla kaç seviye büyütülmüş karo gösterilir (fazlası çok bulanık)
         var TILE_BASE_URL = '@Url.Content("~/assets/lib/leaflet/tiles/")';
         var TILE_INDEX = new Set(window.HaritaKaroIndeksi || []);
         var GOOGLE_TILES = 'https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}';
@@ -372,20 +374,57 @@
             return (isNaN(lat) || isNaN(lng)) ? null : [lat, lng];
         }
 
+        // İstenen karo yoksa indirilmiş en yakın üst (alt zoom) karoyu ve içinden kırpılacak bölgeyi döner.
+        // startD: aramaya kaç seviye yukarıdan başlanacağı (yüklenemeyen karodan sonra bir üstüne geçmek için)
+        function findTileSource(coords, startD) {
+            for (var d = startD || 0; coords.z - d >= MAP_MIN_ZOOM; d++) {
+                var z = coords.z - d, x = coords.x >> d, y = coords.y >> d;
+                var key = z + '/' + x + '/' + y;
+                if (TILE_INDEX.has(key)) {
+                    var size = 256 / (1 << d);
+                    return {
+                        d: d,
+                        url: TILE_BASE_URL + key + '.png',
+                        sx: (coords.x - (x << d)) * size,
+                        sy: (coords.y - (y << d)) * size,
+                        size: size
+                    };
+                }
+            }
+            return null;
+        }
+
         function addBaseLayer(map) {
-            var ÇevrimdışıKatman = L.TileLayer.extend({
-                getTileUrl: function(coords) {
-                    var karoAnahtari = coords.z + '/' + coords.x + '/' + coords.y;
-                    if (TILE_INDEX.has(karoAnahtari)) {
-                        return TILE_BASE_URL + karoAnahtari + '.png';
+            var offlineLayer = L.GridLayer.extend({
+                createTile: function (coords, done) {
+                    var tile = document.createElement('canvas');
+                    tile.width = tile.height = 256;
+
+                    // İndekste olup diskte olmayan (404) karoda bir üst seviyeyle tekrar dener.
+                    // Türkiye dışı gibi hiç karo olmayan yerler boş (arka plan rengi) kalır.
+                    function loadLayers(startD) {
+                        var src = findTileSource(coords, startD);
+                        if (!src) {
+                            setTimeout(function () { done(null, tile); }, 0);
+                            return;
+                        }
+
+                        var img = new Image();
+                        img.onload = function () {
+                            tile.getContext('2d').drawImage(img, src.sx, src.sy, src.size, src.size, 0, 0, 256, 256);
+                            done(null, tile);
+                        };
+                        img.onerror = function () { loadLayers(src.d + 1); };
+                        img.src = src.url;
                     }
-                    // Eğer kullanıcı haritayı Türkiye dışına kaydırırsa gri kalmasın diye boş piksel dön
-                    return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=';
+
+                    loadLayers(0);
+                    return tile;
                 }
             });
 
             // Katmanı haritaya ekle ve zoom sınırlarını indirdiğimiz paket sınırına kilitle
-            new ÇevrimdışıKatman({
+            new offlineLayer({
                 minZoom: MAP_MIN_ZOOM,
                 maxZoom: MAP_MAX_ZOOM,
                 attribution: 'Banka Çevrimdışı Harita Servisi'
@@ -401,13 +440,13 @@
             [43.0, 45.0]    // kuzeydoğu köşe (lat, lng)
         );
 
-        // Şubenin bulunduğu karo indirilmiş olan en yüksek zoom (MAP_ZOOM'u geçmeden)
+        // Şubenin karosu indirilmiş en yüksek zoom + MAX_OVERZOOM (MAP_ZOOM'u geçmeden)
         function getBranchZoom(latlng) {
             for (var z = MAP_ZOOM; z > MAP_MIN_ZOOM; z--) {
                 var t = L.CRS.EPSG3857.latLngToPoint(L.latLng(latlng), z).divideBy(256).floor();
-                if (TILE_INDEX.has(z + '/' + t.x + '/' + t.y)) return z;
+                if (TILE_INDEX.has(z + '/' + t.x + '/' + t.y)) return Math.min(MAP_ZOOM, z + MAX_OVERZOOM);
             }
-            return MAP_MIN_ZOOM;
+            return Math.min(MAP_ZOOM, MAP_MIN_ZOOM + MAX_OVERZOOM);
         }
 
         function createBranchMap(container, latlng, interactive) {
