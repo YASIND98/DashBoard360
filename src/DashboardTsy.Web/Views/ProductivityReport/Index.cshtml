@@ -395,14 +395,14 @@
         }
 
         function addBaseLayer(map) {
-            var ÇevrimdışıKatman = L.GridLayer.extend({
+            var offlineLayer = L.GridLayer.extend({
                 createTile: function (coords, done) {
                     var tile = document.createElement('canvas');
                     tile.width = tile.height = 256;
 
                     // İndekste olup diskte olmayan (404) karoda bir üst seviyeyle tekrar dener.
                     // Türkiye dışı gibi hiç karo olmayan yerler boş (arka plan rengi) kalır.
-                    function yukle(startD) {
+                    function loadLayers(startD) {
                         var src = findTileSource(coords, startD);
                         if (!src) {
                             setTimeout(function () { done(null, tile); }, 0);
@@ -414,17 +414,17 @@
                             tile.getContext('2d').drawImage(img, src.sx, src.sy, src.size, src.size, 0, 0, 256, 256);
                             done(null, tile);
                         };
-                        img.onerror = function () { yukle(src.d + 1); };
+                        img.onerror = function () { loadLayers(src.d + 1); };
                         img.src = src.url;
                     }
 
-                    yukle(0);
+                    loadLayers(0);
                     return tile;
                 }
             });
 
             // Katmanı haritaya ekle ve zoom sınırlarını indirdiğimiz paket sınırına kilitle
-            new ÇevrimdışıKatman({
+            new offlineLayer({
                 minZoom: MAP_MIN_ZOOM,
                 maxZoom: MAP_MAX_ZOOM,
                 attribution: 'Banka Çevrimdışı Harita Servisi'
