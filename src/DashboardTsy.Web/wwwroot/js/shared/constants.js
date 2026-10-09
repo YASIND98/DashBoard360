@@ -55,6 +55,9 @@ var PUPA_TYPE_MANAGEMENT_KEY = -1;
 // "Özel Bankacılık" (Key 4): bu pupa tipinde skor kart sekmelerine "Genel Bakış" eklenmez.
 var PUPA_TYPE_PRIVATE_BANKING_KEY = 4;
 
+// Özel Bankacılık + bu skor kartında branches/registers servislerine sicil, auth.userInfo.registerId'den gider.
+var USER_INFO_REGISTER_SCORE_CARD_ID = 20;
+
 // dashboard/score-cards Key -> ön yüzde gösterilecek skor kart etiketi
 var SCORE_CARD_LABELS = {
   "-1": "Genel Bakış",
