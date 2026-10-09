@@ -34,6 +34,7 @@ $(function () {
     let _initialRegionCode;
     let _initialBranchCode;
     let _initialRegisterId;
+    let _userInfoRegisterId;   // auth.userInfo.registerId
     var _regionDisabled = false, _branchDisabled = false, _registerDisabled = false;
     var _tabModel = [];
     var _overview = null;
@@ -58,6 +59,7 @@ $(function () {
         if (!auth) return;
         if (auth.userInfo) {
             _userRoleCode = auth.userInfo.userRoleCode;
+            _userInfoRegisterId = auth.userInfo.registerId;
         }
         if (auth.userDashboard) {
             var ud = auth.userDashboard;
@@ -1207,6 +1209,11 @@ $(function () {
         get initialRegionCode() { return _initialRegionCode; },
         get initialBranchCode() { return _initialBranchCode; },
         get initialRegisterId() { return _initialRegisterId; },
+        // branches/registers servislerine giden sicil: Özel Bankacılık + skor kart 20'de userInfo.registerId, aksi halde başlangıç sicili.
+        get serviceRegisterId() {
+            var useUserInfo = activePupaType() === PUPA_TYPE_PRIVATE_BANKING_KEY && _scoreCardId === USER_INFO_REGISTER_SCORE_CARD_ID;
+            return useUserInfo ? _userInfoRegisterId : _initialRegisterId;
+        },
         get branchCode()  { return _branchCode; },
         set branchCode(v) { _branchCode = v; },
         get registerId()  { return _registerId; },

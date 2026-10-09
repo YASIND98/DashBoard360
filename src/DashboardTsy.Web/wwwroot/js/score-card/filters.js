@@ -74,7 +74,7 @@ $(function () {
                 pupaType: R().activePupaType(),
                 branchCode: R().initialBranchCode,
                 dateNumber: R().dateNumber,
-                registerId: R().initialRegisterId,
+                registerId: R().serviceRegisterId,
                 scoreCardTypeId: (R().scoreCardTypeId ? R().scoreCardTypeId : -1),
                 regionCode: R().regionCode,
                 scoreCardId: R().scoreCardId
@@ -164,7 +164,7 @@ $(function () {
             data: JSON.stringify({
                 regionCode: R().regionCode,
                 branchCode: R().branchCode,
-                registerId: R().initialRegisterId,
+                registerId: R().serviceRegisterId,
                 scoreCardId: R().scoreCardId,
                 dateNumber: R().dateNumber,
                 pupaTypeId: R().activePupaType(),
