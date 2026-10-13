@@ -289,34 +289,31 @@ html[data-pdf-allowed="false"] #mobilePdfBtn {
   border-radius: 40px;
   z-index: 1000;
   padding: 12px;
+  /* Panel ekrandan taşmasın; müdür kartı, personel ve skor kartı birlikte panel içinde kayar */
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 230, 252, 0.35) transparent;
 }
 
 .scorecard-panel.open {
   display: block;
 }
 
-/* Scorecard açıkken arka planda blurlu backdrop */
-body:has(.scorecard-panel.open)::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background: rgba(8, 10, 34, 0.6);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  z-index: 999;
-  pointer-events: none;
-}
-
 .scorecard-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
 }
 
 .scorecard-header {
-  position: relative;
+  position: sticky;
+  top: -12px;
+  z-index: 1;
+  padding-top: 12px;
+  padding-bottom: 8px;
+  background: rgb(6, 11, 40);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -342,20 +339,37 @@ body:has(.scorecard-panel.open)::before {
   color: var(--text-blue-light);
   font-size: 18px;
   cursor: pointer;
+  /* İkon başlıkla dikeyde ortalansın: inline img'nin baseline boşluğu ve varsayılan buton padding'i kaldırılır */
+  padding: 0;
+  line-height: 0;
+}
+
+.scorecard-close img {
+  display: block;
+}
+
+.scorecard-title {
+  line-height: 1;
 }
 
 .scorecard-section {
-  border: 1px solid var(--border-row);
+  --sc-section-bg: #0e1e5f;
+  --sc-section-header: #3d4878;
+  --sc-section-border: #4a526d;
+  --sc-section-text: #dfe4f7;
+
+  background: var(--sc-section-bg);
+  border: 1px solid var(--sc-section-border);
   border-radius: 20px;
+  overflow: hidden;
 }
 
 .scorecard-section-title {
-  background: var(--text-gray);
-  padding: 10px 14px;
+  background: var(--sc-section-header);
+  padding: 10px 10px;
   font-size: 16px;
-  font-weight: 600;
-  color: var(--text-light);
-  border-radius: 18px 18px 0 0;
+  font-weight: 500;
+  color: var(--sc-section-text);
 }
 
 .scorecard-table {
@@ -366,23 +380,21 @@ body:has(.scorecard-panel.open)::before {
 .scorecard-table td {
   padding: 10px;
   font-size: 14px;
-  color: var(--text-blue-light);
-  border-bottom: 1px solid var(--border-row);
+  color: var(--sc-section-text);
+  border-top: 1px solid var(--sc-section-border);
 }
 
 .scorecard-table td:first-child {
-  border-right: 1px dashed var(--bg-period);
-  width: 120px;
+  border-right: 1px solid var(--sc-section-border);
+  width: 50%;
 }
 
 .scorecard-table td:last-child {
   text-align: center;
+  font-weight: 600;
   color: var(--text-body);
 }
 
-.scorecard-table tr:last-child td {
-  border-bottom: none;
-}
 
 .mobile {
   display: none; 
@@ -752,10 +764,10 @@ body:has(.scorecard-panel.open)::before {
 }
 
 .branch-card {
-  --bc-bg: #0f1630;
-  --bc-header: #3b4360;
+  --bc-bg: #202233;
+  --bc-header: #464857;
   --bc-border: #4a526d;
-  --bc-text: #cfd6f0;
+  --bc-text: #fff;
   --bc-accent: #7c3aed;
 
   background: var(--bc-bg);
@@ -767,7 +779,7 @@ body:has(.scorecard-panel.open)::before {
 }
 
 .branch-card__header {
-  padding: 14px 18px;
+  padding: 14px 10px;
   background: var(--bc-header);
   font-size: 16px;
   color: #dfe4f7;
@@ -792,7 +804,7 @@ body:has(.scorecard-panel.open)::before {
 }
 
 .branch-card__name {
-  font-size: 14px;
+  font-size: 13px;
   border-right: 2px dotted #cfd6f0;
 }
 
@@ -804,14 +816,9 @@ body:has(.scorecard-panel.open)::before {
   transition: text-decoration-color .15s;
 }
 
-.branch-card__row:hover .branch-card__name span {
-  text-decoration-line: underline;
-  text-decoration-color: var(--bc-accent);
-}
-
 .branch-card__role {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 600;
   color: #fff;
   text-align: center;
 }
@@ -869,7 +876,7 @@ body:has(.scorecard-panel.open)::before {
 
 [data-theme="light"] .branch-card__header {
   background: var(--text-gray);
-  color: #262A33;
+  color: #fff;
 }
 
 [data-theme="light"] .branch-card__row {
@@ -1036,10 +1043,11 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper .scorecard-section {
     border-color: #262A33;
+    background: transparent;
   }
 
   [data-theme="light"] .scorecard-nps-wrapper .scorecard-table td {
-    border-bottom-color: #262A33;
+    border-top-color: #262A33;
     color: #262A33;
   }
 
@@ -1049,11 +1057,11 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper .scorecard-header {
     color: #262A33;
+    background: #ffffff;
   }
 
   [data-theme="light"] .scorecard-nps-wrapper .scorecard-section-title {
-    color: #262A33;
-    border-bottom: 1px solid #262A33;
+    color: #fff;
   }
 }
 
@@ -1167,7 +1175,7 @@ body:has(.scorecard-panel.open)::before {
     max-height: 85vh;
     border-radius: 24px 24px 0 0;
     padding: 0;
-    overflow: hidden;
+    overflow-y: auto;
     display: none;
     flex-direction: column;
     z-index: 1001;
@@ -1191,12 +1199,15 @@ body:has(.scorecard-panel.open)::before {
 
   .scorecard-nps-wrapper.mobile .scorecard-header {
     justify-content: space-between;
+    top: 0;
+    margin-top: 0;
     padding: 12px 16px 8px;
     margin-bottom: 0;
     font-size: 16px;
     font-weight: 600;
     flex-shrink: 0;
     color: #ffffff;
+    background: #12375C;
   }
 
   .scorecard-nps-wrapper.mobile .scorecard-header .scorecard-close img {
@@ -1215,8 +1226,6 @@ body:has(.scorecard-panel.open)::before {
 
   .scorecard-nps-wrapper.mobile .scorecard-content {
     padding: 12px 16px 24px;
-    overflow-y: auto;
-    flex: 1;
   }
 
   .scorecard-nps-wrapper.mobile .scorecard-section {
@@ -1232,11 +1241,15 @@ body:has(.scorecard-panel.open)::before {
 
   .scorecard-nps-wrapper.mobile .scorecard-table td {
     color: #c8daf2;
-    border-bottom-color: #ffffff;
+    border-top-color: #ffffff;
   }
 
   .scorecard-nps-wrapper.mobile .scorecard-table td:first-child {
     border-right-color: rgba(255, 255, 255, 0.12);
+  }
+
+  .scorecard-nps-wrapper.mobile .sc-period-toggle {
+    padding: 12px
   }
 
   /* Light tema */
@@ -1267,10 +1280,11 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-section {
     border-color: #262A33;
+    background: transparent;
   }
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-table td {
-    border-bottom-color: #262A33;
+    border-top-color: #262A33;
     color: #262A33;
   }
 
@@ -1280,6 +1294,7 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-header {
     color: #262A33;
+    background: #ffffff;
   }
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-header .sc-pdf-btn img {
@@ -1288,7 +1303,6 @@ body:has(.scorecard-panel.open)::before {
 
   [data-theme="light"] .scorecard-nps-wrapper.mobile .scorecard-section-title {
     color: #262A33;
-    border-bottom: 1px solid #262A33;
   }
 }
 
