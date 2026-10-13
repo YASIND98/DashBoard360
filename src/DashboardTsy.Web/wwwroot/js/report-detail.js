@@ -165,8 +165,8 @@ $(function () {
       } else {
           chevron = '<span class="bd-chevron"></span>';
       }
-      var portfolioType = v.node.PortfoyTipi
-          ? '<span class="bd-portfolio-type">' + v.node.PortfoyTipi + '</span>'
+      var portfolioType = v.node.PortfolioType
+          ? '<span class="bd-portfolio-type">' + v.node.PortfolioType + '</span>'
           : '';
       return '<td class="col-left"><span class="bd-tree' + (portfolioType ? ' bd-has-portfolio' : '') + '">' + guides + chevron +
           '<span class="bd-name"><span>' + nameOf(v.node) + '</span>' + portfolioType + '</span></span></td>';

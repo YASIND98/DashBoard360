@@ -895,6 +895,8 @@
         function buildScorecardSections(headers, d, isBranch) {
             var sectionFields = isBranch ? _sectionFieldsBranch : _sectionFieldsRegion;
             var reportMonth = d.ReportMonth || d.reportMonth;
+            // Bölüm sırası: müdür, roller (RAPOR_TARIHI), NPS (NpsReportDate), Telefonla Karşılama (TelReportDate).
+            var sectionMonths = [reportMonth, reportMonth, formatMonthYearTr(d.NpsReportDate), formatMonthYearTr(d.TelReportDate)];
 
             return headers
                 .filter(function (h) { return h.ParentId === 0; })
@@ -918,12 +920,19 @@
 
                     return {
                         title: section.HeaderName,
-                        monthSuffix: sIdx < 2 && reportMonth ? ' (' + reportMonth + ')' : '',
+                        monthSuffix: sectionMonths[sIdx] ? ' (' + sectionMonths[sIdx] + ')' : '',
                         rows: rows
                     };
                 })
                 // Bölge skor kartında ilk bölüm (Bölge Müdürü Skor Kartı) gösterilmez.
                 .filter(function (_section, sIdx) { return isBranch || sIdx !== 0; });
+        }
+
+        // ISO tarih > "Eylül 2026"
+        function formatMonthYearTr(iso) {
+            if (!iso) return '';
+            var date = new Date(iso);
+            return isNaN(date) ? '' : _trMonths[date.getMonth()] + ' ' + date.getFullYear();
         }
 
         function formatScorecardValue(row) {

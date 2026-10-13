@@ -74,6 +74,13 @@ public static class MockProductivityReportData
         if (request.FilterType == 1)
             headers.RemoveAll(h => h.Id is 3 or 4 or 5);
 
+        // Telefonla Karşılama Oranı (PhoneGreetingScore) yalnızca şube skor kartında döner.
+        if (isBranch)
+        {
+            headers.Add(new() { Id = 18, HeaderName = "Telefonla Karşılama Oranı", ParentId = 0,  OrderNo = 18 });
+            headers.Add(new() { Id = 19, HeaderName = "Şube",                      ParentId = 18, OrderNo = 19 });
+        }
+
         return headers;
     }
 
@@ -1509,7 +1516,9 @@ public static class MockProductivityReportData
             PhoneGreetingScore = 91m,
             BranchManagerPhoto = "/images/mock/branch-manager.jpg",
             BranchPhoto = "/images/mock/branch.jpg",
-            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate)
+            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate),
+            NpsReportDate = MockNpsReportDate,
+            TelReportDate = MockTelReportDate
         };
     }
 
@@ -1532,12 +1541,15 @@ public static class MockProductivityReportData
             RegionNpsScore = 75.0m,
             BankNpsScore = 68.0m,
             RegionManagerPhoto = "/images/mock/region-manager.jpg",
-            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate)
+            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate),
+            NpsReportDate = MockNpsReportDate
         };
     }
 
     // Skor kartı SP'lerinin RAPOR_TARIHI örnek değeri.
     private static readonly DateTime MockScoreCardReportDate = new(2026, 8, 31);
+    private static readonly DateTime MockNpsReportDate = new(2026, 7, 31);
+    private static readonly DateTime MockTelReportDate = new(2026, 6, 30);
 
     // Verim raporu SP'lerinin ReportDate örnek değeri.
     private static readonly DateTime MockProductivityReportDate = new(2026, 6, 30);
