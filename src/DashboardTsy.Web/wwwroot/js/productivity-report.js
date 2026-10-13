@@ -148,7 +148,13 @@ function extractResponseData(response) {
         }
     }
     try { setYieldPdfReport(Array.isArray(data) ? data : []); } catch (e) { /* PDF verisi opsiyonel */ }
+    renderYieldReportDate(response && response.ReportDate);
     return data;
+}
+
+function renderYieldReportDate(reportDate) {
+    var text = reportDate ? formatReportDateTr(reportDate) : '';
+    if (text && window.DatePicker && DatePicker.setLabel) DatePicker.setLabel(text);
 }
 
 // ===== Tab State =====
