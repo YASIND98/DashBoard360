@@ -8,6 +8,7 @@ public class GetMonthlyTargetReportResponse
     {
         public long ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
+        public string? PortfoyTipi { get; set; }
 
         /// <summary>SP'den gelen parent id; null/0 ise root ürün.</summary>
         public long? ParentProductId { get; set; }
