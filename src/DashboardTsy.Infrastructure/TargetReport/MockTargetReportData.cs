@@ -92,6 +92,7 @@ public static class MockTargetReportData
         {
             ProductId = 11,
             ProductName = "İhtiyaç Kredisi",
+            PortfolioType = "Bireysel Portföy",
             LastYearAmount = 40,
             LastYearDate = t.AddYears(-1),
             LastWeekAmount = 45,
@@ -106,6 +107,7 @@ public static class MockTargetReportData
         {
             ProductId = 12,
             ProductName = "Konut Kredisi",
+            PortfolioType = "Affluent Portföy",
             LastYearAmount = 80,
             LastYearDate = t.AddYears(-1),
             LastWeekAmount = 85,
@@ -178,6 +180,7 @@ public static class MockTargetReportData
         {
             ProductId = 11,
             ProductName = "Ihtiyac Kredisi",
+            PortfolioType = "Bireysel Portföy",
             ParentProductId = 10,
             LastYearAmount = 40,
             LastYearDate = t.AddYears(-1),
@@ -192,6 +195,7 @@ public static class MockTargetReportData
         {
             ProductId = 12,
             ProductName = "Konut Kredisi",
+            PortfolioType = "Affluent Portföy",
             ParentProductId = 10,
             LastYearAmount = 80,
             LastYearDate = t.AddYears(-1),
@@ -341,6 +345,7 @@ public static class MockTargetReportData
         {
             ProductId = 101,
             ProductName = "İhtiyaç Kredisi",
+            PortfolioType = "Bireysel Portföy",
             MonthActualAmount = 300,
             MonthTargetAmount = 350,
             MonthRatio = 0.857,
@@ -353,6 +358,7 @@ public static class MockTargetReportData
         {
             ProductId = 102,
             ProductName = "Konut Kredisi",
+            PortfolioType = "Affluent Portföy",
             MonthActualAmount = 550,
             MonthTargetAmount = 650,
             MonthRatio = 0.846,

@@ -165,8 +165,11 @@ $(function () {
       } else {
           chevron = '<span class="bd-chevron"></span>';
       }
-      return '<td class="col-left"><span class="bd-tree">' + guides + chevron +
-          '<span class="bd-name">' + nameOf(v.node) + '</span></span></td>';
+      var portfolioType = v.node.PortfoyTipi
+          ? '<span class="bd-portfolio-type">' + v.node.PortfoyTipi + '</span>'
+          : '';
+      return '<td class="col-left"><span class="bd-tree' + (portfolioType ? ' bd-has-portfolio' : '') + '">' + guides + chevron +
+          '<span class="bd-name"><span>' + nameOf(v.node) + '</span>' + portfolioType + '</span></span></td>';
   }
 
   function applyDiffVisibility() {
