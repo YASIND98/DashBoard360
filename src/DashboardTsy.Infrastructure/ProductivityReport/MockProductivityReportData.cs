@@ -47,7 +47,7 @@ public static class MockProductivityReportData
         var mainTitle = isBranch ? "Şube Müdürü Skor Kartı" : "Bölge Müdürü Skor Kartı";
         var rolesTitle = isBranch ? "Şube Rolleri Skor Kartı" : "Bölge Rolleri Skor Kartı";
 
-        return new List<GetProductivityScoreCardReportHeaderItem>
+        var headers = new List<GetProductivityScoreCardReportHeaderItem>
         {
             new() { Id = 1,  HeaderName = mainTitle,      ParentId = 0,  OrderNo = 1 },
             new() { Id = 2,  HeaderName = "Adı Soyadı",   ParentId = 1,  OrderNo = 2 },
@@ -69,6 +69,12 @@ public static class MockProductivityReportData
             new() { Id = 16, HeaderName = isBranch ? "Şube" : "Bölge", ParentId = 15, OrderNo = 16 },
             new() { Id = 17, HeaderName = "Banka",        ParentId = 15, OrderNo = 17 }
         };
+
+        // Bölge (FilterType = 1) için ay başlıkları dönmez.
+        if (request.FilterType == 1)
+            headers.RemoveAll(h => h.Id is 3 or 4 or 5);
+
+        return headers;
     }
 
     // BranchCode verilirse şube kadrosu, verilmezse bölge kadrosu döner; görev süresi ReportDate'e göre hesaplanır.
