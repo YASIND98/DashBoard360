@@ -216,6 +216,10 @@ $(function () {
             staticLabel = opts.label || null;    // sabit etiket (ör. "Haziran 2026")
             $root.toggleClass('dp-readonly', readOnly);
             setSelected(toDate(opts.initial) || today(), false);
+        },
+        setLabel: function (label) {
+            staticLabel = label || null;
+            refreshHeader();
         }
     };
 
