@@ -1600,7 +1600,7 @@ public class ReportDataProvider : IReportDataProvider
         public long ProductId { get; set; }
         public long? ParentProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
-        public string? PortfoyTipi { get; set; }
+        public string? PortfolioType { get; set; }
 
         public double MonthActualAmount { get; set; }
         public double MonthTargetAmount { get; set; }
@@ -1672,7 +1672,7 @@ public class ReportDataProvider : IReportDataProvider
         {
             ProductId = r.ProductId,
             ProductName = r.ProductName ?? string.Empty,
-            PortfoyTipi = r.PortfoyTipi,
+            PortfolioType = r.PortfolioType,
             ParentProductId = r.ParentProductId,
             MonthActualAmount = r.MonthActualAmount,
             MonthTargetAmount = r.MonthTargetAmount,
@@ -1690,7 +1690,7 @@ public class ReportDataProvider : IReportDataProvider
         public long ProductId { get; set; }
         public long? ParentProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
-        public string? PortfoyTipi { get; set; }
+        public string? PortfolioType { get; set; }
 
         public double LastYearAmount { get; set; }
         public DateTime LastYearDate { get; set; }
@@ -1777,7 +1777,7 @@ public class ReportDataProvider : IReportDataProvider
         {
             ProductId = r.ProductId,
             ProductName = r.ProductName ?? string.Empty,
-            PortfoyTipi = r.PortfoyTipi,
+            PortfolioType = r.PortfolioType,
             ParentProductId = r.ParentProductId,
             LastYearAmount = r.LastYearAmount,
             LastYearDate = r.LastYearDate,
@@ -1907,7 +1907,7 @@ public class ReportDataProvider : IReportDataProvider
         public long ProductId { get; set; }
         public long? ParentProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
-        public string? PortfoyTipi { get; set; }
+        public string? PortfolioType { get; set; }
 
         public double LastYearAmount { get; set; }
         public DateTime LastYearDate { get; set; }
@@ -1993,7 +1993,7 @@ public class ReportDataProvider : IReportDataProvider
         {
             ProductId = r.ProductId,
             ProductName = r.ProductName ?? string.Empty,
-            PortfoyTipi = r.PortfoyTipi,
+            PortfolioType = r.PortfolioType,
             ParentProductId = r.ParentProductId,
             LastYearAmount = r.LastYearAmount,
             LastYearDate = r.LastYearDate,

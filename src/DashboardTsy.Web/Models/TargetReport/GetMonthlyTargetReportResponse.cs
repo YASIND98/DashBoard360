@@ -8,7 +8,7 @@ public class GetMonthlyTargetReportResponse
     {
         public long ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
-        public string? PortfoyTipi { get; set; }
+        public string? PortfolioType { get; set; }
 
         public long? ParentProductId { get; set; }
 
