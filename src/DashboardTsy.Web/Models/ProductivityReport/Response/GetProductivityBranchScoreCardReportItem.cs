@@ -24,4 +24,10 @@ public class GetProductivityBranchScoreCardReportItem
 
     /// <summary>Örn. "Ağustos 2026"</summary>
     public string? ReportMonth { get; set; }
+
+    /// <summary>SP: NpsReportDate — NPS skorunun ait olduğu tarih.</summary>
+    public DateTime? NpsReportDate { get; set; }
+
+    /// <summary>SP: TelReportDate — Telefonla Karşılama Oranı skorunun ait olduğu tarih.</summary>
+    public DateTime? TelReportDate { get; set; }
 }
