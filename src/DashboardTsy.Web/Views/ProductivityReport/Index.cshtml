@@ -796,7 +796,8 @@
         function renderPersonnelDetails(personnel, isBranch) {
             var VISIBLE_COUNT = 3;
 
-            if (!personnel.length) {
+            // Bölge skor kartında "Bölge Bilgileri" gösterilmez.
+            if (!isBranch || !personnel.length) {
                 $('.sc-personnel').html('');
                 return;
             }
@@ -920,7 +921,9 @@
                         monthSuffix: sIdx < 2 && reportMonth ? ' (' + reportMonth + ')' : '',
                         rows: rows
                     };
-                });
+                })
+                // Bölge skor kartında ilk bölüm (Bölge Müdürü Skor Kartı) gösterilmez.
+                .filter(function (_section, sIdx) { return isBranch || sIdx !== 0; });
         }
 
         function formatScorecardValue(row) {
@@ -1025,7 +1028,7 @@
                 var sections = scorecardComparisonSections(
                     buildScorecardSections(headers, monthly, isBranch),
                     buildScorecardSections(headers, cumulative, isBranch));
-                if (personnel.length) sections.unshift(scorecardPersonnelSection(personnel, isBranch));
+                if (isBranch && personnel.length) sections.unshift(scorecardPersonnelSection(personnel, isBranch));
 
                 return {
                     title: scorecardTitle(isBranch),
