@@ -678,6 +678,12 @@
     min-width: 140px;
   }
 
+  @media (min-width: 1200px) {
+    .page-posreport .data-table thead th.col-left {
+      border-right: none;
+    }
+  }
+
   /* Header sticky → z-index thead'den yüksek olmalı (thead th zaten z-index:3) */
   .page-home .data-table thead th.col-index,
   .page-home .data-table thead th.col-expand,

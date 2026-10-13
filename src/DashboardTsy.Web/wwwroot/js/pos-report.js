@@ -309,6 +309,10 @@ $(document).ready(function () {
       $('#posProductLabel').text(_selectedProduct ? _selectedProduct.name : 'Ürün');
   }
 
+  function hasProductChoice() {
+      return _products.length > 1;
+  }
+
   function loadScorecardFilters(callback) {
       _productsLoaded = true;
       $.ajax({
@@ -320,6 +324,7 @@ $(document).ready(function () {
                   _selectedProduct = { code: _products[0].ProductCode, name: _products[0].ProductName };
               }
               renderProductDropdown();
+              $('#posProductFilter').toggle(!isCountView() && hasProductChoice());
           },
           complete: function () { if (callback) callback(); }
       });
@@ -400,7 +405,7 @@ $(document).ready(function () {
       var isCount = isCountView();
       $('#posTableContainer').toggle(isCount);
       $('#posScoreCardContainer').toggle(!isCount);
-      $('#posProductFilter').toggle(!isCount);
+      $('#posProductFilter').toggle(!isCount && hasProductChoice());
       $('.pos-view-toggle [data-view]').removeClass('active');
       $('.pos-view-toggle [data-view="' + _view + '"]').addClass('active');
 
