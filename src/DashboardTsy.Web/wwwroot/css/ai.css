@@ -78,7 +78,16 @@
     height: 100%;
     width: 440px;
     max-width: 80vw;
-    background: white;
+    background: radial-gradient(ellipse 90% 45% at 0% 0%,
+    rgb(255 255 255 / 90%) 0%,
+    rgba(232, 230, 250, 0) 70%),
+    radial-gradient(ellipse 110% 35% at 25% 100%,
+    rgba(222, 240, 248, 0.95) 0%,
+    rgba(222, 240, 248, 0) 75%),
+    linear-gradient(180deg, #F7F6FD 0%, #FFFFFF 30%,
+    #FFFFFF 65%, #EEF6FB 100%);
+    border-top-left-radius: 48px;
+    border-bottom-left-radius: 48px;
     box-shadow: -8px 0 30px rgba(0, 0, 0, 0.18);
     transform: translateX(100%);
     transition: transform 0.3s ease;
@@ -197,6 +206,15 @@
 
 .ai-drawer.has-result .ai-drawer-desc {
     display: none;
+}
+
+.ai-drawer-title--result,
+.ai-drawer.has-result .ai-drawer-title--initial {
+    display: none;
+}
+
+.ai-drawer.has-result .ai-drawer-title--result {
+    display: inline;
 }
 
 .ai-drawer.has-result .ai-filter-bar {
@@ -340,7 +358,7 @@
 .ai-result-content h2,
 .ai-result-content h3,
 .ai-result-content h4 {
-    color: #104570;
+    color: #089cdd;
     font-weight: 600;
     margin: 16px 0 8px;
 }
