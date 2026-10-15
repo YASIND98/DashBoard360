@@ -10,6 +10,10 @@ public class GetProductivityCountPaymentBranchReportResponse
     public class GetProductivityCountPaymentBranchReportItem
     {
         public int Id { get; set; }
+
+        /// <summary>SP: Sira — SortBy gelmediğinde varsayılan sıralama anahtarı.</summary>
+        public int Sira { get; set; }
+
         public string ProductName { get; set; } = string.Empty;
 
         public decimal RealizationBranchValue { get; set; }

@@ -1781,6 +1781,7 @@ public static class MockProductivityReportData
         return new GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem
         {
             Id = id,
+            Sira = id,
             ProductName = productName,
 
             RealizationRegionValue = realizationRegion,
@@ -1818,6 +1819,7 @@ public static class MockProductivityReportData
         return new GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem
         {
             Id = id,
+            Sira = id,
             ProductName = productName,
 
             RealizationBranchValue = realizationBranch,

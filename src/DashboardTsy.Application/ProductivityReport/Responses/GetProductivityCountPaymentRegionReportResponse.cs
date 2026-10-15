@@ -10,6 +10,10 @@ public class GetProductivityCountPaymentRegionReportResponse
     public class GetProductivityCountPaymentRegionReportItem
     {
         public int Id { get; set; }
+
+        /// <summary>SP: Sira — SortBy gelmediğinde varsayılan sıralama anahtarı.</summary>
+        public int Sira { get; set; }
+
         public string ProductName { get; set; } = string.Empty;
 
         public decimal RealizationRegionValue { get; set; }

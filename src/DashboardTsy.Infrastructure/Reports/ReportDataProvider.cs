@@ -3890,11 +3890,11 @@ public class ReportDataProvider : IReportDataProvider
 
     #region Payment helpers
 
-    // SP'nin döndüğü Sira kolonu sadece SP içi ürün sıralaması içindir; ön yüze taşınmadığı için burada karşılanmaz.
     private sealed class ProductivityCountPaymentRegionRow
     {
         public int Id { get; set; }
         public int? ParentProductId { get; set; }
+        public int Sira { get; set; }
 
         public string ProductName { get; set; } = string.Empty;
 
@@ -3946,6 +3946,7 @@ public class ReportDataProvider : IReportDataProvider
         return new GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem
         {
             Id = r.Id,
+            Sira = r.Sira,
             ProductName = r.ProductName ?? string.Empty,
 
             RealizationRegionValue = r.RealizationRegionValue,
@@ -3984,7 +3985,7 @@ public class ReportDataProvider : IReportDataProvider
             8 => p => p.QtdNominalChangeRegionValue,
             9 => p => p.QtdNominalChangeRegionAverageValue,
             10 => p => p.QtdNominalChangeBankAverageValue,
-            _ => p => p.Id
+            _ => p => p.Sira
         };
 
         var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
@@ -4002,6 +4003,7 @@ public class ReportDataProvider : IReportDataProvider
     {
         public int Id { get; set; }
         public int? ParentProductId { get; set; }
+        public int Sira { get; set; }
 
         public string ProductName { get; set; } = string.Empty;
 
@@ -4053,6 +4055,7 @@ public class ReportDataProvider : IReportDataProvider
         return new GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem
         {
             Id = r.Id,
+            Sira = r.Sira,
             ProductName = r.ProductName ?? string.Empty,
 
             RealizationBranchValue = r.RealizationBranchValue,
@@ -4091,7 +4094,7 @@ public class ReportDataProvider : IReportDataProvider
             8 => p => p.QtdNominalChangeBranchValue,
             9 => p => p.QtdNominalChangeRegionAverageValue,
             10 => p => p.QtdNominalChangeBankAverageValue,
-            _ => p => p.Id
+            _ => p => p.Sira
         };
 
         var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
