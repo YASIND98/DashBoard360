@@ -3973,7 +3973,7 @@ public class ReportDataProvider : IReportDataProvider
 
     private static List<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem> SortProductivityCountPaymentRegionTree(List<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem> nodes, int? sortBy, bool isAscending)
     {
-        Func<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem, object> keySelector = sortBy switch
+        Func<GetProductivityCountPaymentRegionReportResponse.GetProductivityCountPaymentRegionReportItem, object>? keySelector = sortBy switch
         {
             1 => p => p.ProductName ?? string.Empty,
             2 => p => p.RealizationRegionValue,
@@ -3985,10 +3985,13 @@ public class ReportDataProvider : IReportDataProvider
             8 => p => p.QtdNominalChangeRegionValue,
             9 => p => p.QtdNominalChangeRegionAverageValue,
             10 => p => p.QtdNominalChangeBankAverageValue,
-            _ => p => p.Sira
+            _ => null
         };
 
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+        // Kolon seçilmediyse SP'nin verdiği Sira her zaman 1'den büyüğe uygulanır; IsAscending yalnızca kolon sıralamasını etkiler.
+        var ordered = keySelector is null
+            ? nodes.OrderBy(p => p.Sira).ToList()
+            : (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
 
         foreach (var n in ordered)
         {
@@ -4082,7 +4085,7 @@ public class ReportDataProvider : IReportDataProvider
 
     private static List<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem> SortProductivityCountPaymentBranchTree(List<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem> nodes, int? sortBy, bool isAscending)
     {
-        Func<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem, object> keySelector = sortBy switch
+        Func<GetProductivityCountPaymentBranchReportResponse.GetProductivityCountPaymentBranchReportItem, object>? keySelector = sortBy switch
         {
             1 => p => p.ProductName ?? string.Empty,
             2 => p => p.RealizationBranchValue,
@@ -4094,10 +4097,13 @@ public class ReportDataProvider : IReportDataProvider
             8 => p => p.QtdNominalChangeBranchValue,
             9 => p => p.QtdNominalChangeRegionAverageValue,
             10 => p => p.QtdNominalChangeBankAverageValue,
-            _ => p => p.Sira
+            _ => null
         };
 
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
+        // Kolon seçilmediyse SP'nin verdiği Sira her zaman 1'den büyüğe uygulanır; IsAscending yalnızca kolon sıralamasını etkiler.
+        var ordered = keySelector is null
+            ? nodes.OrderBy(p => p.Sira).ToList()
+            : (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
 
         foreach (var n in ordered)
         {
