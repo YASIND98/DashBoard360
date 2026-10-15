@@ -7,6 +7,10 @@ public class GetDailyTargetReportResponse
     public class Product
     {
         public long ProductId { get; set; }
+
+        /// <summary>SP: RowNo — SortBy=0 (#) geldiğinde sıralama anahtarı.</summary>
+        public int RowNo { get; set; }
+
         public string ProductName { get; set; } = string.Empty;
         public string? PortfolioType { get; set; }
 

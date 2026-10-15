@@ -26,23 +26,28 @@ Mobil uygulama artık DashboardTsy host'una **doğrudan istek atmaz**. Tek muhat
 ## 1. Mimari
 
 ```
-                       ┌─────────────────────────── KutupYıldızı ───────────────────────────┐
-                       │                                                                     │
- iOS ── /api/Token ───▶│  LoginController / CustomerSearchController  (JWT üretir)           │
-     ── /api/Login2 ──▶│                                                                     │
-     ── /api/SendSmsCode                                                                      │
-     ── /api/GetAuth ─▶│                                                                     │
-                       │                                                                     │
-     ── /yntc/... ────▶│  RequestForwardingMiddleware ──(öneki siler, aynen iletir)──────────┼──▶ DashboardTsy.Api
-                       └─────────────────────────────────────────────────────────────────────┘      /mobile/...
-                                                                                                    (JWT doğrular,
-                                                                                                     envelope'a sarar)
+                                  ┌──────────────────────── KutupYıldızı ────────────────────────┐
+ iOS ── /mobile/api/Token ───────▶│  MobileEnvelopeMiddleware ──(öneki siler)──▶ LoginController │
+     ── /mobile/api/Login2 ──────▶│  (response'u envelope'a sarar)               CustomerSearch  │
+     ── /mobile/api/SendSmsCode ─▶│                                              (JWT üretir)    │
+     ── /mobile/api/GetAuth ─────▶│                                                              │
+                                  │                                                              │
+     ── /yntc/mobile/... ────────▶│  RequestForwardingMiddleware ──(/yntc'yi siler, aynen iletir)┼──▶ DashboardTsy.Api
+                                  └──────────────────────────────────────────────────────────────┘    /mobile/...
+                                                                                                      (JWT doğrular,
+                                                                                                       envelope'a sarar)
 ```
 
 | İstek tipi | Mobilin çağırdığı adres | Kim cevaplar | Response formatı |
 |---|---|---|---|
-| Login (Token, Login2, SendSmsCode, GetAuth) | `https://<kutup-host>/api/<Action>` | KutupYıldızı | Kutup'un ham JSON'u (**envelope yok**) |
+| Login (Token, Login2, SendSmsCode, GetAuth) | `https://<kutup-host>/mobile/api/<Action>` | KutupYıldızı | `{ status, message, data }` envelope |
 | Dashboard raporları | `https://<kutup-host>/yntc/mobile/<Controller>/<Action>` | DashboardTsy (Kutup aracılığıyla) | `{ status, message, data }` envelope |
+
+Her iki durumda da response aynı zarfla gelir. Mobil tek kurala güvenir: **`status` false ise hata.**
+
+> `/mobile` öneki Kutup'ta **yalnızca bu 4 login endpoint'i** için tanımlıdır. Kutup'un diğer
+> endpoint'leri `/mobile` ile çağrılırsa 404 döner. Önek'siz `/api/...` path'leri mevcut
+> KutupYıldızı uygulaması için olduğu gibi (envelope'suz) çalışmaya devam eder.
 
 **Token ortaktır:** KutupYıldızı'nın ürettiği JWT, DashboardTsy'de de aynı imza anahtarıyla
 doğrulanır. Login sonunda alınan `AccessToken` hem Kutup'un korumalı endpoint'lerinde hem de
@@ -52,8 +57,9 @@ doğrulanır. Login sonunda alınan `AccessToken` hem Kutup'un korumalı endpoin
 
 ## 2. Login Akışı (KutupYıldızı)
 
-Login endpoint'leri mobil uygulamanın mevcut KutupYıldızı entegrasyonuyla **aynıdır**. Request
-body'leri, şifreleme ve `X-Checksum` kuralları değişmedi.
+Login endpoint'leri KutupYıldızı'nın mevcut endpoint'leridir; `/mobile` öneki yalnızca
+response'un envelope'a sarılmasını sağlar. Request body'leri, şifreleme ve `X-Checksum`
+kuralları önek'siz çağrıyla birebir aynıdır.
 
 ### Ortak header'lar
 
@@ -67,41 +73,65 @@ body'leri, şifreleme ve `X-Checksum` kuralları değişmedi.
 
 | # | Endpoint | Authorization | Dönen değer |
 |---|---|---|---|
-| 1 | `POST /api/Token` | Yok | `Token` — **anonim** JWT (rol: `Anonymous`) |
-| 2 | `POST /api/Login2` | `Bearer <Token>` | `SmsGuid`, `Key`, `EncryptData` — OTP gönderildi |
-| 3 | `POST /api/SendSmsCode` | `Bearer <Token>` | `AccessToken` — **kullanıcı** JWT'si (rol: `User`) |
-| 4 | `POST /api/GetAuth` | `Bearer <AccessToken>` | Personel/oturum bilgisi (`SessionId`, `IsAdmin`, `EmergencyToken`…) |
+| 1 | `POST /mobile/api/Token` | Yok | `data.Token` — **anonim** JWT (rol: `Anonymous`) |
+| 2 | `POST /mobile/api/Login2` | `Bearer <Token>` | `data.SmsGuid`, `data.Key`, `data.EncryptData` — OTP gönderildi |
+| 3 | `POST /mobile/api/SendSmsCode` | `Bearer <Token>` | `data.AccessToken` — **kullanıcı** JWT'si (rol: `User`) |
+| 4 | `POST /mobile/api/GetAuth` | `Bearer <AccessToken>` | Personel/oturum bilgisi (`data.SessionId`, `data.IsAdmin`, `data.EmergencyToken`…) |
 
-Request/response alanlarının ayrıntısı [mobile-auth-endpoints.md](mobile-auth-endpoints.md)
-Bölüm 2–5'te. Oradaki şemalar geçerlidir; **tek fark**, artık response'lar `{ status, message,
-data }` zarfı içinde gelmez. Kutup'un JSON'u doğrudan döner (alan adları PascalCase).
+Request body'lerinin ve `data` içindeki alanların ayrıntısı
+[mobile-auth-endpoints.md](mobile-auth-endpoints.md) Bölüm 2–5'te. `data` içindeki alan adları
+Kutup'tan geldiği gibi PascalCase'dir; envelope alanları (`status`, `message`, `data`) camelCase'dir.
 
-**Örnek — SendSmsCode başarılı yanıtı (yeni model, envelope yok):**
+### Envelope kuralları
+
+Kutup iş hatalarını HTTP 200 + `IsError` ile döner. Middleware bunu tanır ve `status: false`
+yapar; mobilin `data.IsError`'a bakmasına gerek kalmaz.
+
+| Kutup'un döndüğü | `status` | `message` | `data` |
+|---|---|---|---|
+| HTTP 2xx, `IsError` yok / `false` / `0` | `true` | `"OK"` | Kutup'un body'si |
+| HTTP 2xx, `IsError: 1` veya `true` | `false` | Body'deki `Error` ya da `ErrorMessage` (yoksa `"Hata"`) | Kutup'un body'si (örn. `RemainingTryCount` okunabilsin diye) |
+| HTTP 4xx/5xx | `false` | Body'deki `Message` / `Error` / `ErrorMessage`, yoksa duruma göre: `"Geçersiz istek"`, `"Yetkisiz"`, `"Erişim yok"`, `"Bulunamadı"`, `"Sunucu hatası"` | `null` |
+
+HTTP status kodu değiştirilmez: iş hatası 200, checksum/JWT hatası 401 olarak gelir.
+
+**Örnek — SendSmsCode başarılı:**
 
 ```json
 {
-  "Type": "ServiceResponseMessage",
-  "State": "Success",
-  "CustomerNo": "<request'teki customerNo>",
-  "CustomerIdentity": "9000000001",
-  "AccessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "status": true,
+  "message": "OK",
+  "data": {
+    "Type": "ServiceResponseMessage",
+    "State": "Success",
+    "CustomerNo": "<request'teki customerNo>",
+    "CustomerIdentity": "9000000001",
+    "AccessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  }
 }
 ```
 
-**Örnek — hatalı OTP:**
+**Örnek — hatalı OTP (HTTP 200):**
 
 ```json
 {
-  "Type": "ServiceResponseMessage",
-  "IsError": 1,
-  "Error": "OTP doğrulaması başarısız.",
-  "CustomerNo": "<request'teki customerNo>",
-  "RemainingTryCount": 2
+  "status": false,
+  "message": "OTP doğrulaması başarısız.",
+  "data": {
+    "Type": "ServiceResponseMessage",
+    "IsError": 1,
+    "Error": "OTP doğrulaması başarısız.",
+    "CustomerNo": "<request'teki customerNo>",
+    "RemainingTryCount": 2
+  }
 }
 ```
 
-> Kutup'un legacy davranışı: iş hataları da **HTTP 200** ile döner. Başarıyı HTTP koduna göre
-> değil, body'deki `IsError` / `State` / `Result` alanlarına göre değerlendirin.
+**Örnek — checksum eksik/yanlış (HTTP 401):**
+
+```json
+{ "status": false, "message": "Yetkisiz", "data": null }
+```
 
 ### Hangi token nerede?
 
@@ -193,8 +223,9 @@ ayırt edin:
 | **502** | **Boş** | **KutupYıldızı** | Kutup, Dashboard'a ulaşamadı. Genel "servis şu an kullanılamıyor" hatası gösterin. |
 | **504** | **Boş** | **KutupYıldızı** | Dashboard 100 sn içinde cevap vermedi (timeout) |
 
-Login endpoint'lerinde (Bölüm 2) envelope yoktur. Kutup'un kendi hata davranışı geçerlidir:
-iş hataları HTTP 200 + `IsError`, checksum/JWT hataları HTTP 401.
+Login endpoint'lerinde (Bölüm 2) de response her zaman envelope'ludur. İş hataları (yanlış OTP
+gibi) **HTTP 200 + `status: false`**, checksum/JWT hataları **HTTP 401 + `status: false`** olarak
+gelir. Ayrıntı: [Envelope kuralları](#envelope-kuralları).
 
 ---
 
@@ -202,8 +233,8 @@ iş hataları HTTP 200 + `IsError`, checksum/JWT hataları HTTP 401.
 
 | Konu | Eski | Yeni |
 |---|---|---|
-| Login host'u | `<dashboard-host>/mobile/api/...` | `<kutup-host>/api/...` |
-| Login response'u | `{ status, message, data: {...} }` envelope'u | Kutup'un ham JSON'u (envelope **yok**). `data.AccessToken` → `AccessToken` |
+| Login host'u | `<dashboard-host>/mobile/api/...` | `<kutup-host>/mobile/api/...` (yalnızca host değişir) |
+| Login response'u | Envelope; iş hatası `status: true` + `data.IsError` | Envelope; iş hatası artık **`status: false`**. `data.IsError` kontrolüne gerek yok |
 | Login'de `X-Checksum` | Gerekmiyordu | **Gerekli** (Development dışında) |
 | Rapor host'u | `<dashboard-host>/mobile/...` | `<kutup-host>/yntc/mobile/...` |
 | Rapor response'u | Envelope | Envelope (değişmedi) |
@@ -228,6 +259,10 @@ Mobil ekibin bilmesi gerekmez. Ortam kurulumu yapan backend/DevOps için:
 - `TargetBaseUrl` her ortam (dev/UAT/prod) için DashboardTsy.Api'nin Kutup sunucusundan erişilebilen
   adresi olmalıdır. Repodaki değer (`http://localhost:5219`) yalnızca local geliştirme içindir.
 - `PathPrefix` boş bırakılırsa forwarding tamamen kapanır.
+- Login envelope'u `MobileEnvelopeMiddleware` ile sağlanır; config gerektirmez. `/mobile` önekli
+  4 endpoint listesi middleware içinde sabittir. Path rewrite'ın route eşleşmesine yansıması için
+  `UseRouting()`'den önce, `/yntc` isteklerini iki kez sarmamak için `UseRequestForwarding()`'den
+  sonra çalışır.
 - Forwarding, Kutup pipeline'ında authentication, checksum, CORS ve request-log middleware'lerinden
   **önce** çalışır. `/yntc` istekleri Kutup'ta doğrulanmaz ve loglanmaz; JWT doğrulaması
   DashboardTsy'de yapılır. İstek/hata logları Dashboard tarafında aranmalıdır. Kutup yalnızca

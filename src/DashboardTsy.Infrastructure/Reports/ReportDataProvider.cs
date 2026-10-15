@@ -1599,6 +1599,7 @@ public class ReportDataProvider : IReportDataProvider
     {
         public long ProductId { get; set; }
         public long? ParentProductId { get; set; }
+        public int RowNo { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public string? PortfolioType { get; set; }
 
@@ -1671,6 +1672,7 @@ public class ReportDataProvider : IReportDataProvider
         return new GetMonthlyTargetReportResponse.Product
         {
             ProductId = r.ProductId,
+            RowNo = r.RowNo,
             ProductName = r.ProductName ?? string.Empty,
             PortfolioType = r.PortfolioType,
             ParentProductId = r.ParentProductId,
@@ -1689,6 +1691,7 @@ public class ReportDataProvider : IReportDataProvider
     {
         public long ProductId { get; set; }
         public long? ParentProductId { get; set; }
+        public int RowNo { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public string? PortfolioType { get; set; }
 
@@ -1776,6 +1779,7 @@ public class ReportDataProvider : IReportDataProvider
         return new GetDailyTargetReportResponse.Product
         {
             ProductId = r.ProductId,
+            RowNo = r.RowNo,
             ProductName = r.ProductName ?? string.Empty,
             PortfolioType = r.PortfolioType,
             ParentProductId = r.ParentProductId,
@@ -1835,6 +1839,7 @@ public class ReportDataProvider : IReportDataProvider
     {
         Func<GetDailyTargetReportResponse.Product, object> keySelector = sortBy switch
         {
+            0 => p => p.RowNo,
             1 => p => p.ProductName ?? string.Empty,
             2 => p => p.LastYearAmount,
             3 => p => p.LastWeekAmount,
@@ -1881,6 +1886,7 @@ public class ReportDataProvider : IReportDataProvider
     {
         Func<GetMonthlyTargetReportResponse.Product, object> keySelector = sortBy switch
         {
+            0 => p => p.RowNo,
             1 => p => p.ProductName ?? string.Empty,
             2 => p => p.MonthActualAmount,
             3 => p => p.MonthTargetAmount,

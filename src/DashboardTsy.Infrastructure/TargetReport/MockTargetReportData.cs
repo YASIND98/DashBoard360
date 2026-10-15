@@ -77,6 +77,7 @@ public static class MockTargetReportData
         var root1 = new GetDailyTargetReportResponse.Product
         {
             ProductId = 10,
+            RowNo = 1,
             ProductName = "Kredi",
             LastYearAmount = 120,
             LastYearDate = t.AddYears(-1),
@@ -91,6 +92,7 @@ public static class MockTargetReportData
         var sub11 = new GetDailyTargetReportResponse.Product
         {
             ProductId = 11,
+            RowNo = 2,
             ProductName = "İhtiyaç Kredisi",
             PortfolioType = "Bireysel Portföy",
             LastYearAmount = 40,
@@ -106,6 +108,7 @@ public static class MockTargetReportData
         var sub12 = new GetDailyTargetReportResponse.Product
         {
             ProductId = 12,
+            RowNo = 3,
             ProductName = "Konut Kredisi",
             PortfolioType = "Affluent Portföy",
             LastYearAmount = 80,
@@ -124,6 +127,7 @@ public static class MockTargetReportData
         var root2 = new GetDailyTargetReportResponse.Product
         {
             ProductId = 20,
+            RowNo = 4,
             ProductName = "Mevduat",
             LastYearAmount = 200,
             LastYearDate = t.AddYears(-1),
@@ -332,6 +336,7 @@ public static class MockTargetReportData
         var root1 = new GetMonthlyTargetReportResponse.Product
         {
             ProductId = 100,
+            RowNo = 1,
             ProductName = "Kredi",
             MonthActualAmount = 850,
             MonthTargetAmount = 1000,
@@ -344,6 +349,7 @@ public static class MockTargetReportData
         root1.SubProducts.Add(new GetMonthlyTargetReportResponse.Product
         {
             ProductId = 101,
+            RowNo = 2,
             ProductName = "İhtiyaç Kredisi",
             PortfolioType = "Bireysel Portföy",
             MonthActualAmount = 300,
@@ -357,6 +363,7 @@ public static class MockTargetReportData
         root1.SubProducts.Add(new GetMonthlyTargetReportResponse.Product
         {
             ProductId = 102,
+            RowNo = 3,
             ProductName = "Konut Kredisi",
             PortfolioType = "Affluent Portföy",
             MonthActualAmount = 550,
@@ -371,6 +378,7 @@ public static class MockTargetReportData
         var root2 = new GetMonthlyTargetReportResponse.Product
         {
             ProductId = 200,
+            RowNo = 4,
             ProductName = "Mevduat",
             MonthActualAmount = 1100,
             MonthTargetAmount = 1000,
@@ -440,6 +448,7 @@ public static class MockTargetReportData
     {
         Func<GetDailyTargetReportResponse.Product, object> key = sortBy switch
         {
+            0 => p => p.RowNo,
             1 => p => p.ProductName ?? string.Empty,
             2 => p => p.LastYearAmount,
             3 => p => p.LastWeekAmount,
@@ -482,6 +491,7 @@ public static class MockTargetReportData
     {
         Func<GetMonthlyTargetReportResponse.Product, object> key = sortBy switch
         {
+            0 => p => p.RowNo,
             1 => p => p.ProductName ?? string.Empty,
             2 => p => p.MonthActualAmount,
             3 => p => p.MonthTargetAmount,
