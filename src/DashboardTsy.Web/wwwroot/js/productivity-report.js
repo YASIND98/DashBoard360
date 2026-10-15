@@ -486,9 +486,7 @@ function renderDynamicHeaders(headers, hasExpandable, withDetail, selectedGroupC
     var hasGroupHeaders = Object.keys(childMap).length > 0;
     var rowspan = hasGroupHeaders ? 2 : 1;
     var expandTh = hasExpandable ? '<th rowspan="' + rowspan + '" class="col-expand"></th>' : '';
-    // Detay (kırılım) kolonu şimdilik kapalı; geri açmak için alttaki satırı yorumdan çıkarın.
-    // var detailTh = withDetail ? '<th rowspan="' + rowspan + '" class="col-detail"></th>' : '';
-    var detailTh = '';
+    var detailTh = withDetail ? '<th rowspan="' + rowspan + '" class="col-detail"></th>' : '';
 
     var INFO_ICON = '<span class="info-icon" data-tooltip="Ürünler konsolide değil solo kalemleri içermektedir." tabindex="0"><img src="/images/info.svg" alt="" /></span>';
 
@@ -734,7 +732,7 @@ function loadCountCustomerRegionReport(regionCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderCountCustomerRegionTable(items);
         }
     });
@@ -771,7 +769,6 @@ function renderCountCustomerRegionTable(items) {
         html += '<td class="has-diff">' + fmt(item.YtdChangeBankAverage) + formatDiff(item.YtdChangeBankAverageDiff, true) + '</td>';
         html += '<td>' + fmt(item.QtdChangeRegion) + '</td>';
         html += '<td class="has-diff">' + fmt(item.QtdChangeBankAverage) + formatDiff(item.QtdChangeBankAverageDiff, true) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -798,7 +795,7 @@ function loadCountCustomerBranchReport(branchCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderCountCustomerBranchTable(items);
         }
     });
@@ -836,7 +833,6 @@ function renderCountCustomerBranchTable(items) {
         html += '<td>' + formatNumber(item.QtdNominalChangeBranchValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -863,7 +859,7 @@ function loadCountCashManagementRegionReport(regionCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderCountCashManagementRegionTable(items);
         }
     });
@@ -901,7 +897,6 @@ function renderCountCashManagementRegionTable(items) {
         html += '<td>' + formatNumber(item.QtdNominalChangeRegionValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -928,7 +923,7 @@ function loadCountCashManagementBranchReport(branchCode, subTabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderCountCashManagementBranchTable(items);
         }
     });
@@ -966,7 +961,6 @@ function renderCountCashManagementBranchTable(items) {
         html += '<td>' + formatNumber(item.QtdNominalChangeBranchValue) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeRegionAverageValue) + formatDiff(item.QtdNominalChangeRegionAverageValueDiff, true) + '</td>';
         html += '<td class="has-diff">' + formatNumber(item.QtdNominalChangeBankAverageValue) + formatDiff(item.QtdNominalChangeBankAverageValueDiff, true) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -993,7 +987,7 @@ function loadCountCardPosBranchReport(branchCode, tabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderCountCardPosBranchTable(items);
         }
     });
@@ -1028,7 +1022,6 @@ function renderCountCardPosBranchTable(items) {
         html += '<td>' + item.ThreeMonthHgBranchValue + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgRegionAverageValue + formatDiff(item.ThreeMonthHgRegionAverageValueDiff) + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgBankAverageValue + formatDiff(item.ThreeMonthHgBankAverageValueDiff) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1055,7 +1048,7 @@ function loadCountCardPosRegionReport(regionCode, tabId) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderCountCardPosRegionTable(items);
         }
     });
@@ -1088,7 +1081,6 @@ function renderCountCardPosRegionTable(items) {
         html += '<td class="has-diff">' + formatNumber(item.CurrentMonthBankAverage) + formatDiff(item.CurrentMonthBankAverageDiff, true) + '</td>';
         html += '<td>' + item.ThreeMonthHgRegion + '</td>';
         html += '<td class="has-diff">' + item.ThreeMonthHgBankAverage + formatDiff(item.ThreeMonthHgBankAverageDiff) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1137,7 +1129,7 @@ function loadCountPaymentReport(isBranch, code) {
                     _cachedHeaders = headers;
                     _lastHeaderParams = null;
                     // Sıra no ve ayrı expand kolonu yok; genişletme oku ürün hücresinin içinde gösterilir.
-                    renderDynamicHeaders(headers, false, true);
+                    renderDynamicHeaders(headers, false);
                     renderCountPaymentTable(items, isBranch);
                 }
             });
@@ -1170,7 +1162,6 @@ function renderCountPaymentTable(items, isBranch) {
             html += '<td class="has-diff">' + fmt(item[metric + 'BankAverageValue']) + formatDiff(item[metric + 'BankAverageValueDiff'], !isPercent) + '</td>';
         });
 
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1198,7 +1189,7 @@ function loadProfitTotalRegionReport(regionCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderProfitTotalRegionTable(items);
         }
     });
@@ -1245,7 +1236,6 @@ function renderProfitTotalRegionTable(items) {
         html += '<td>' + formatNumber(item.KobiValue) + '</td>';
         html += '<td>' + formatNumber(item.AgricultureValue) + '</td>';
         html += '<td>' + (item.CommercialValue == 0 ? '-' : formatNumber(item.CommercialValue)) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1333,7 +1323,6 @@ function renderProfitRatioRegionTable(items) {
         html += '<td>' + fmt(item.KobiValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent, true) + '</td>';
         html += '<td>' + (item.CommercialValue == 0 ? '-' : fmt(item.CommercialValue)) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1397,7 +1386,6 @@ function renderProfitRatioBranchTable(items) {
         html += '<td>' + fmt(item.KobiValue) + '</td>';
         html += '<td class="has-diff">' + fmt(item.AgricultureValue) + formatDiff(item.AgricultureValueDiff, !isPercent, true) + '</td>';
         html += '<td>' + (item.CommercialValue == 0 ? '-' : fmt(item.CommercialValue)) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1423,7 +1411,7 @@ function loadProfitTotalBranchReport(branchCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable);
             renderProfitTotalBranchTable(items);
         }
     });
@@ -1473,7 +1461,6 @@ function renderProfitTotalBranchTable(items) {
         html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.KobiValue)) + '</td>';
         html += '<td>' + (isProfitBeforeTaxes ? '-' : formatNumber(item.AgricultureValue)) + '</td>';
         html += '<td>' + (item.CommercialValue == 0 ? '-' : formatNumber(item.CommercialValue)) + '</td>';
-        html += buildProductivityDetailCell(item);
         html += '</tr>';
     });
 
@@ -1499,7 +1486,7 @@ function loadProfitSpreadManagementRegionReport(regionCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true, 2);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, false, 2);
             renderSpreadTable(items, SPREAD_FIELDS.region);
         }
     });
@@ -1550,7 +1537,7 @@ function renderSpreadTable(items, fields) {
         return spreadRowStart(item, i, hasExpandable) +
             fields.amounts.map(function (f) { return '<td>' + formatNumber(item[f]) + '</td>'; }).join('') +
             fields.rates.map(function (f) { return '<td>' + formatPercent(item[f]) + '</td>'; }).join('') +
-            buildProductivityDetailCell(item) + '</tr>';
+            '</tr>';
     }).join('');
 
     $('#dynamicTableBody').html(html);
@@ -1576,7 +1563,7 @@ function loadProfitSpreadManagementBranchReport(branchCode) {
             var data = extractResponseData(response);
             var items = flattenRows(data, 0);
             var hasExpandable = items.some(function (item) { return item._hasChildren; });
-            renderDynamicHeaders(_cachedHeaders, hasExpandable, true, 2);
+            renderDynamicHeaders(_cachedHeaders, hasExpandable, false, 2);
             renderSpreadTable(items, SPREAD_FIELDS.branch);
         }
     });
@@ -1697,19 +1684,15 @@ $(function () {
 // ===== Detay (kırılım) — verim raporu ↔ ortak modal (report-detail.js 'productivity' provider) =====
 // Hedef raporundaki akışın aynısı: satırdaki detay ikonu, aynı endpoint'i productId (=item.Id) +
 // userCode ile yeniden çağırır; dönen kırılımı ortak modal 'productivity' provider ile render eder.
-// GetProductivityGeneralRegionReport hariç tüm tablolarda detay ikonu vardır. Top-10 asla gösterilmez.
-
-// Detay (kırılım) şimdilik kapalı: satırlarda detay ikonu basılmaz, kolon da çizilmez
-// (renderDynamicHeaders içindeki detailTh ve statik tablolardaki th.col-detail satırları da yorumda).
-// Geri açmak için aşağıdaki gövdeyi yorumdan çıkarıp `return '';` satırını silmek yeterli.
+// Detay ikonu şimdilik yalnız Hacim (Bölge/Şube) tablolarında açık: kolonu bu tablolar
+// renderDynamicHeaders(..., withDetail=true) ile çizer, satırları bu hücreyi basar. Top-10 asla gösterilmez.
 function buildProductivityDetailCell(item) {
-    return '';
-    // var name = (item.ProductName || item.Description || item.RatioName || '').replace(/"/g, '&quot;');
-    // return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +
-    //     ' data-table="productivity"' +
-    //     ' data-product-id="' + (item.Id != null ? item.Id : '') + '"' +
-    //     ' data-product-name="' + name + '"' +
-    //     ' data-top10="0" /></td>';
+    var name = (item.ProductName || item.Description || item.RatioName || '').replace(/"/g, '&quot;');
+    return '<td class="col-detail"><img src="/images/expand.svg" alt="Detay" class="detail-icon"' +
+        ' data-table="productivity"' +
+        ' data-product-id="' + (item.Id != null ? item.Id : '') + '"' +
+        ' data-product-name="' + name + '"' +
+        ' data-top10="0" /></td>';
 }
 
 var _yieldBreakdownCtx = {};
