@@ -222,28 +222,28 @@
   margin-bottom: 16px;
 }
 
-#reportDetailBdBody { --bd-line: #FBFBFD; }
+#reportDetailBdBody { --bd-line: #FBFBFD; --bd-line-w: 1px; }
 #reportDetailBdBody td.col-left { padding-top: 0; padding-bottom: 0; height: 1px; }
 #reportDetailBdBody .bd-tree { display: flex; align-items: stretch; height: 100%; min-height: 52px; }
 
 #reportDetailBdBody .bd-guide { position: relative; flex: 0 0 32px; align-self: stretch; }
 #reportDetailBdBody .bd-guide.bd-trunk::before {
-  content: ''; position: absolute; left: 50%; top: -12px; bottom: -12px; width: 2px;
+  content: ''; position: absolute; left: 50%; top: -12px; bottom: -12px; width: var(--bd-line-w);
   transform: translateX(-50%); background: var(--bd-line);
 }
 /* Düz dikey gövde: satır üstünün 12px ötesinden başlar (komşuyla köprü). Son çocukta köşe
    başlangıcına (orta - r) kadar; sonraki kardeş varsa satır altının 12px ötesine kadar sürer. */
 #reportDetailBdBody .bd-connector::before {
-  content: ''; position: absolute; left: 50%; top: -12px; height: 50%; width: 2px;
+  content: ''; position: absolute; left: 50%; top: -12px; height: 50%; width: var(--bd-line-w);
   transform: translateX(-50%); background: var(--bd-line);
 }
 #reportDetailBdBody .bd-connector.bd-continue::before { height: calc(100% + 24px); }
 /* Yuvarlak dal: (orta - r) noktasından sağa kıvrılır, chevron kutusuna uzanır. */
 #reportDetailBdBody .bd-connector::after {
   content: ''; position: absolute;
-  left: calc(50% - 1px); top: calc(50% - 12px); height: 12px; right: -8px;
-  border-left: 2px solid var(--bd-line);
-  border-bottom: 2px solid var(--bd-line);
+  left: calc(50% - (var(--bd-line-w) / 2)); top: calc(50% - 12px); height: 12px; right: -8px;
+  border-left: var(--bd-line-w) solid var(--bd-line);
+  border-bottom: var(--bd-line-w) solid var(--bd-line);
   border-bottom-left-radius: 12px;
 }
 
@@ -258,8 +258,38 @@
 #reportDetailBdBody .bd-chevron.bd-open .expand-icon img { transform: rotate(0deg); }
 /* Açık ebeveyn: ikon altından satır altının 12px ötesine gövde (ilk çocuğun gövdesiyle köprü). */
 #reportDetailBdBody .bd-chevron.bd-open::after {
-  content: ''; position: absolute; left: 50%; top: calc(50% + 8px); bottom: -12px; width: 2px;
+  content: ''; position: absolute; left: 50%; top: calc(50% + 8px); bottom: -12px; width: var(--bd-line-w);
   transform: translateX(-50%); background: var(--bd-line);
+}
+
+/* Hover yalnız tıklanabilir satırlarda: table.css'teki genel .table-row:hover kuralı her satırı
+   vurguluyor, oysa kırılımda sadece alt kırılımı olan (.hr-expandable) satırlar tıklanabilir.
+   Yaprak satırlarda stripe arkaplanı geri yazılır; `inherit` kullanılamaz çünkü stripe-even
+   tr'si transparent ve sticky col-left kendi opak değerini taşıyor (table.css). */
+@media (min-width: 1199px) {
+  #reportDetailBdBody tr.stripe-odd:not(.hr-expandable):hover td {
+    background: var(--bg-stripe);
+  }
+
+  #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td {
+    background: transparent;
+  }
+
+  #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td.col-left {
+    background: rgb(21, 32, 88);
+  }
+
+  [data-theme="light"] #reportDetailBdBody tr.stripe-odd:not(.hr-expandable):hover td {
+    background: #F0F6FE;
+  }
+
+  [data-theme="light"] #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td {
+    background: #e8f2fd;
+  }
+
+  [data-theme="light"] #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td.col-left {
+    background: #E9F3FE;
+  }
 }
 
 #reportDetailBdBody .bd-name { position: relative; display: flex; align-items: center; padding-left: 10px; white-space: nowrap; }
@@ -436,6 +466,18 @@
   --bd-line: #12375C;
 }
 
+/* Kırılım adları light modda mavi: satırın sayısal hücreleri koyu lacivert (#262A33) kalır,
+   Bölge/Şube/Portföy sütunu tasarımdaki vurgulu mavi ile ayrışır. PortfolioType alt metni
+   dark tema grisini (--text-muted) beyaz zeminde okunaksız bıraktığı için ayrıca override edilir. */
+[data-theme="light"] #reportDetailBdBody .bd-name {
+  color: #0D5B9C;
+  font-weight: 400;
+}
+
+[data-theme="light"] #reportDetailBdBody .bd-portfolio-type {
+  color: #536076;
+}
+
 /* Yaprak (açılamayan) satır ikonu light modda koyu (expand ikonuyla aynı filtre). */
 [data-theme="light"] #reportDetailBdBody .bd-noexpand {
   filter: brightness(0) saturate(100%) invert(13%) sepia(10%) saturate(400%) hue-rotate(185deg) brightness(100%);
@@ -482,4 +524,11 @@
 
 [data-theme="light"] .report-detail-trend-empty {
   color: #6b7688;
+}
+/* Kırılım tablosunda Bölge/Şube/Portföy sütununu ayıran dikey çizgi tasarımda
+   title alanında yok → sticky col-left kenarlığı yalnız gövdede kalır, başlıkta kalkar.
+   Renk override'ı (light tema) da başlıkta anlamsız olduğundan birlikte sıfırlanır. */
+#reportDetailBdHead th.col-left,
+[data-theme="light"] #reportDetailBdHead th.col-left {
+  border-right: none;
 }
