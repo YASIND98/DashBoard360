@@ -19,9 +19,11 @@ $(function () {
     function persistSelection() {
         var region = _scRegions.filter(function (r) { return r.regionCode === R().regionCode; })[0];
         var branch = _scBranches.filter(function (b) { return b.branchCode === R().branchCode; })[0];
+        var branchSel = branch ? { code: branch.branchCode, name: branchLabel(branch) }
+            : (R().branchCode !== -1 ? { code: R().branchCode, name: $('#scBranchLabel').text() } : null);
         saveFilterSelection(
             region ? { code: region.regionCode, name: region.regionName } : null,
-            branch ? { code: branch.branchCode, name: branchLabel(branch) } : null
+            branchSel
         );
     }
 
@@ -142,8 +144,10 @@ $(function () {
                 R().branchCode = _scBranches[0].branchCode;
                 $('#scBranchLabel').text(branchLabel(_scBranches[0]));
             } else {
+                // Özel Bankacılık'ta seçili şube cevapta dönmese de korunur.
+                var keepSelected = R().activePupaType() === PUPA_TYPE_PRIVATE_BANKING_KEY;
                 var stillExists = _scBranches.some(function (b) { return b.branchCode === R().branchCode; });
-                if (!stillExists) {
+                if (!stillExists && !keepSelected) {
                     R().branchCode = -1;
                     $('#scBranchLabel').text('Şube');
                 }
