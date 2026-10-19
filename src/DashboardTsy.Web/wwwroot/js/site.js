@@ -570,7 +570,9 @@ $(document).ready(function () {
   $('.filter-dropdown-wrapper').each(function () {
       var $panel = $(this).children('.dropdown-panel');
       if (!$panel.length || $panel.children('.dropdown-sheet-header').length) return;
-      var title = $(this).find('.filter-label').first().text().trim();
+      // Yazılabilir (combobox) filtrede etiket bir input'tur; başlık placeholder'dan alınır.
+      var $label = $(this).find('.filter-label').first();
+      var title = ($label.is('input') ? $label.attr('placeholder') : $label.text()).trim();
       $panel.prepend(
           '<div class="dropdown-sheet-header">' +
               '<span class="dropdown-sheet-title">' + title + '</span>' +

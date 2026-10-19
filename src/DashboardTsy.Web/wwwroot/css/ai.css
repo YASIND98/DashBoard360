@@ -3,7 +3,7 @@
 .ai-insights {
     position: fixed;
     right: 0;
-    bottom: 30%;
+    bottom: 26%;
     transform: translateY(-50%);
     z-index: 1000;
 }
@@ -34,7 +34,7 @@
 
 .ai-insights-label {
     display: none;
-    font-weight: 500;
+    font-weight: 400;
     margin-left: 4px;
     background: linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%);
     -webkit-background-clip: text;
@@ -111,8 +111,34 @@
 
 .ai-drawer-title {
     color: #104570;
-    font-weight: 600;
+    font-weight: 500;
     text-align: center;
+}
+
+/* Başlık + ikon tek satırda; display:inline-flex çünkü --initial/--result geçişi
+   display ile yapılıyor (aşağıda .has-result kuralları) ve ikon başlıkla birlikte gizlenmeli. */
+.ai-drawer-title--initial,
+.ai-drawer-title--result {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.ai-drawer-title-icon {
+    width: 24px;
+    height: 24px;
+    flex: 0 0 auto;
+}
+
+/* Marka degradesi floating button'daki .ai-insights-label ile aynı; clip yalnız metinde
+   olmalı — wrapper'a uygulanırsa transparent text-fill ikonu da görünmez yapar. */
+.ai-drawer-title-text {
+    background: linear-gradient(90deg, #00BBA7 0%, #008CEB 47%, #5647F0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
 }
 
 .ai-drawer-close {
@@ -214,7 +240,7 @@
 }
 
 .ai-drawer.has-result .ai-drawer-title--result {
-    display: inline;
+    display: inline-flex;
 }
 
 .ai-drawer.has-result .ai-filter-bar {
@@ -260,14 +286,34 @@
     border-color: #B1BAC8;
 }
 
+/* Yazılabilir bölge kutusu: input, etiket gibi görünür; kutunun rengini devralır */
+.ai-drawer .ai-combo-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    cursor: text;
+}
+
+.ai-drawer .ai-combo-input::placeholder {
+    color: #8795A9;
+}
+
+.ai-drawer .filter-dropdown.disabled .ai-combo-input {
+    cursor: default;
+}
+
 /* Focus / açık durum: tasarıma uygun mavi border + soft ring */
 .ai-drawer .filter-dropdown-wrapper:has(.dropdown-panel.open) .filter-dropdown {
     border-color: #4B91F7;
     box-shadow: 0 0 0 4px rgba(75, 145, 247, 0.18);
 }
 
-.ai-drawer .filter-dropdown img,
-.ai-drawer .dropdown-search img {
+.ai-drawer .filter-dropdown img {
     filter: brightness(0) opacity(0.6);
 }
 
@@ -278,11 +324,6 @@
     box-shadow: 0 8px 24px rgba(16, 69, 112, 0.12);
     margin-top: 6px;
     width: 100%;
-}
-
-/* Tasarımda arama alanı yok — gizle */
-.ai-drawer .dropdown-search {
-    display: none;
 }
 
 .ai-drawer .dropdown-item {
@@ -513,6 +554,12 @@
 
 .ai-result-content .ai-reveal {
     animation: ai-block-in 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.ai-result-content p.ai-reveal,
+.ai-result-content .ai-collapse .ai-collapse-body {
+    color: #68788F;
+    font-weight: 400;
 }
 
 @keyframes ai-block-in {

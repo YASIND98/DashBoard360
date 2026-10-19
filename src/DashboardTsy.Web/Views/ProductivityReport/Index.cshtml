@@ -127,8 +127,14 @@
 <aside class="ai-drawer" id="aiDrawer">
     <div class="ai-drawer-header">
       <img id="aiDrawerClose" class="ai-drawer-close" src="~/images/close-circle-dark.svg" alt="Kapat" />
-      <span class="ai-drawer-title ai-drawer-title--initial">AI İçgörüleri</span>
-      <span class="ai-drawer-title ai-drawer-title--result">Tablo Özeti</span>
+      <span class="ai-drawer-title ai-drawer-title--initial">
+        <img class="ai-drawer-title-icon" src="~/images/ai-logo.svg" alt="" />
+        <span class="ai-drawer-title-text">AI İçgörüleri</span>
+      </span>
+      <span class="ai-drawer-title ai-drawer-title--result">
+        <img class="ai-drawer-title-icon" src="~/images/ai-logo.svg" alt="" />
+        <span class="ai-drawer-title-text">Tablo Özeti</span>
+      </span>
     </div>
     <div class="ai-drawer-body">
         <p class="ai-drawer-desc">
@@ -142,28 +148,20 @@
 
             <div class="filter-dropdown-wrapper">
                 <div class="filter-dropdown" id="aiBolgeSelect">
-                    <span class="filter-label" id="aiBolgeLabel">Bölge Seçiniz</span>
+                    <input type="text" class="filter-label ai-combo-input" id="aiBolgeInput" placeholder="Bölge Seçiniz" autocomplete="off" />
                     <img src="~/images/down.svg" alt="" />
                 </div>
                 <div class="dropdown-panel" id="aiBolgePanel">
-                    <div class="dropdown-search">
-                        <img src="~/images/search.svg" alt="" />
-                        <input type="text" placeholder="Ara" class="dropdown-search-input" id="aiBolgeSearch" />
-                    </div>
                     <div class="dropdown-list" id="aiBolgeList"></div>
                 </div>
             </div>
 
             <div class="filter-dropdown-wrapper">
                 <div class="filter-dropdown" id="aiSubeSelect">
-                    <span class="filter-label" id="aiSubeLabel">Şube Seçiniz</span>
+                    <input type="text" class="filter-label ai-combo-input" id="aiSubeInput" placeholder="Şube Seçiniz" autocomplete="off" />
                     <img src="~/images/down.svg" alt="" />
                 </div>
                 <div class="dropdown-panel" id="aiSubePanel">
-                    <div class="dropdown-search">
-                        <img src="~/images/search.svg" alt="" />
-                        <input type="text" placeholder="Ara" class="dropdown-search-input" id="aiSubeSearch" />
-                    </div>
                     <div class="dropdown-list" id="aiSubeList"></div>
                 </div>
             </div>
