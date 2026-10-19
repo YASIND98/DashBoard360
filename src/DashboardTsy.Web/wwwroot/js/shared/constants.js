@@ -52,6 +52,9 @@ var PUPA_TYPE_LABELS = {
 // "Yönetim" (Key -1) pupa-types servisinden dönmez; ön yüzde statik olarak en sona eklenir.
 var PUPA_TYPE_MANAGEMENT_KEY = -1;
 
+// "Pazarlama" (Key 1): Skor Kart Genel Bakış'ta Kolon Seçimi yalnızca bu pupa tipinde.
+var PUPA_TYPE_MARKETING_KEY = 1;
+
 // "Özel Bankacılık" (Key 4): bu pupa tipinde skor kart sekmelerine "Genel Bakış" eklenmez.
 var PUPA_TYPE_PRIVATE_BANKING_KEY = 4;
 
