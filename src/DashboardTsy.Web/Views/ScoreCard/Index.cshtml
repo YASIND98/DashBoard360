@@ -80,6 +80,8 @@
             <img src="~/images/search.svg" alt="" />
             <input type="text" placeholder="Ara" id="scSearchInput" />
         </div>
+
+        @await Html.PartialAsync("_MobileMoreMenu")
     </div>
 
     <!-- Pupa tipi segmentleri sales-target-monitoring/pupa-types servisinden gelir (renderPupaChannels) -->
@@ -234,6 +236,7 @@
     <script src="~/assets/lib/jspdf/jspdf.umd.min.js" asp-append-version="true"></script>
     <script src="~/js/download-pdf.js" asp-append-version="true"></script>
     <script src="~/js/shared/mock.js" asp-append-version="true"></script>
+    <script src="~/js/score-card/column-picker.js" asp-append-version="true"></script>
     <script src="~/js/score-card/index.js" asp-append-version="true"></script>
     <script src="~/js/score-card/date-picker.js" asp-append-version="true"></script>
     <script src="~/js/score-card/filters.js" asp-append-version="true"></script>

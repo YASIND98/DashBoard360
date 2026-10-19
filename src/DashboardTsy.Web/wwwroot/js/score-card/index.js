@@ -790,10 +790,36 @@ $(function () {
         return pctCell(value, col.cellClass);
     }
 
-    // Genel Bakış başlığı (bölge + şube tek path): ad kolonu sola yaslı + sıralanabilir; gruplu kolonlar
-    // (ör. "3 Aylık Gerçekleşen %") iki satırlı başlık olur; diğer kolonlar ortalı (CSS varsayılanı).
+    // Kolon Seçimi birimleri: ad kolonu kilitli; aynı gruptaki ay kolonları tek birim.
+    function overviewColumnUnits() {
+        var units = [];
+        ((_overview && _overview.columns) || []).forEach(function (c, i) {
+            var last = units[units.length - 1];
+            if (c.group && last && last.group === c.group) { last.columns.push(c); return; }
+            units.push({
+                id: c.group ? ('group:' + c.group) : String(c.key).trim(),
+                label: c.group || c.label,
+                group: c.group || null,
+                locked: i === 0,
+                columns: [c]
+            });
+        });
+        return units;
+    }
+
+    // Kolon Seçimi yalnızca Genel Bakış özetinde ve Pazarlama pupa tipinde.
+    function isColumnPickerEnabled() {
+        return !!_overview && activePupaType() === PUPA_TYPE_MARKETING_KEY;
+    }
+
+    function displayedOverviewColumns() {
+        if (!isColumnPickerEnabled()) return (_overview && _overview.columns) || [];
+        return ScoreCardColumnPicker.visibleUnits(overviewColumnUnits())
+            .reduce(function (cols, u) { return cols.concat(u.columns); }, []);
+    }
+
     function renderOverviewHead() {
-        var cols = (_overview && _overview.columns) || [];
+        var cols = displayedOverviewColumns();
         var hasGroups = cols.some(function (c) { return !!c.group; });
         var top = '<tr>', sub = '<tr>';
         for (var i = 0; i < cols.length; i++) {
@@ -821,7 +847,7 @@ $(function () {
 
     // Genel Bakış gövdesi (bölge + şube tek path): dinamik kolonlar + en altta "Toplam" satırı
     function renderOverviewBody() {
-        var cols = (_overview && _overview.columns) || [];
+        var cols = displayedOverviewColumns();
         var rows = visibleOverviewRows();
 
         if (!rows.length) {
@@ -969,7 +995,8 @@ $(function () {
         var cols, rows;
         if (_overview) {
             // Genel Bakış (bölge + şube tek path): ilk kolon sola yaslı metin; gruplu (ay) ve HG kolonları yüzde.
-            cols = (_overview.columns || []).map(function (c, i) {
+            var shownCols = displayedOverviewColumns();
+            cols = shownCols.map(function (c, i) {
                 if (i === 0) return { header: c.label, key: c.key, align: 'left', format: function (v) { return String(v == null ? '' : v).trim(); } };
                 var def = { header: c.label, key: c.key, format: formatPercent };
                 if (c.group) def.group = c.group;
@@ -978,7 +1005,7 @@ $(function () {
             rows = visibleOverviewRows().slice();
             // Ekrandaki gibi "Toplam" satırını da PDF'e ekle (summaryMainSum); "Toplam:" ilk kolonda
             var totalRow = {};
-            (_overview.columns || []).forEach(function (c, i) {
+            shownCols.forEach(function (c, i) {
                 if (i === 0) { totalRow[c.key] = 'Toplam:'; return; }
                 var v = (_overview.totals || {})[String(c.key).trim()];
                 if (v != null) totalRow[c.key] = v;
@@ -1103,6 +1130,14 @@ $(function () {
             ? 'Son Güncelleme Tarihi: ' + formatReportDateTr(_lastUpdatedDate)
             : '';
         renderTableLegend('#scReportLegend', { note: note });
+        if (isColumnPickerEnabled() && _overview.rows.length) {
+            ScoreCardColumnPicker.attach('#scReportLegend', {
+                units: overviewColumnUnits(),
+                onApply: renderReportBody
+            });
+        } else {
+            ScoreCardColumnPicker.detach();
+        }
     }
 
     // Skor kart tipi sekmeleri
