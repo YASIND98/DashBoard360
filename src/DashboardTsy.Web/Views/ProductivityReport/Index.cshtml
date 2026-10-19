@@ -590,11 +590,6 @@
             _popupMap = createBranchMap($map[0], latlng, true);
         }
 
-        $(document).on('click', '.sc-zoom-btn', function () {
-            var title = $(this).closest('.sc-branch-photo-block').find('.sc-manager-role').text();
-            openLightbox(title, $(this).siblings('.sc-branch-photo').attr('src'));
-        });
-
         $(document).on('click', '.sc-avatar-zoom:not(.no-zoom)', function () {
             var $meta = $(this).siblings('.sc-manager-meta');
             var name  = $.trim($meta.find('.sc-manager-name').text());
@@ -1078,55 +1073,35 @@
         };
 
         var _fallbackAvatar = '/images/icon-profile.png';
+        var _fallbackCardBackground = '/images/region_and_branch.png';
 
-        function setImgWithFallback($img, src) {
-            $img.attr('src', src || _fallbackAvatar)
+        function setImgWithFallback($img, src, fallbackSrc) {
+            var fallback = fallbackSrc || _fallbackAvatar;
+            $img.attr('src', src || fallback)
                 .off('error')
                 .on('error', function () {
-                    $(this).off('error').attr('src', _fallbackAvatar);
+                    $(this).off('error').attr('src', fallback);
                 });
         }
         
         // ─── Manager Row / append & hide  ─────────────────────────────────────────────────────────
         function updateManagerCard(data, isBranch) {
             if (!data) return;
-            var $card  = $('.sc-manager-card');
-            var $photo = $card.find('.sc-branch-photo-block');
-            var $info  = $card.find('.sc-manager-info');
+            var $card = $('.sc-manager-card');
 
-            // 1. Doğrudan değerleri oku (PascalCase / camelCase fallback)
             // Personel detayında STATU = "Müdür" satırı geldiyse ad oradan alınır (istekler hangi sırayla dönerse dönsün).
-            var managerName        = (_detailManager && _detailManager.EmployeeName) || data.ManagerName || data.managerName || '-';
-            var branchPhoto        = data.BranchPhoto        || data.branchPhoto        || null;
-            var branchManagerPhoto = data.BranchManagerPhoto || data.branchManagerPhoto || null;
-            var regionManagerPhoto = data.RegionManagerPhoto || data.regionManagerPhoto || null;
+            var managerName  = (_detailManager && _detailManager.EmployeeName) || data.ManagerName || data.managerName || '-';
+            var cardBackground = data.BranchPhoto || data.branchPhoto || null;
+            var managerPhoto = isBranch
+                ? (data.BranchManagerPhoto || data.branchManagerPhoto || null)
+                : (data.RegionManagerPhoto || data.regionManagerPhoto || null);
 
-            // 2. Rol metnini belirle
-            var roleText = scorecardManagerRole(isBranch);
-
-            // 3. Ekrana basma işlemini şartlardan bağımsız en başta yap (HER İKİ ALANA DA YAZ)
-            $photo.find('.sc-manager-name').text(managerName);
-            $photo.find('.sc-manager-role').text(roleText);
-            $info.find('.sc-manager-name').text(managerName);
-            $info.find('.sc-manager-role').text(roleText);
-
+            $card.find('.sc-manager-name').text(managerName);
+            $card.find('.sc-manager-role').text(scorecardManagerRole(isBranch));
+            setImgWithFallback($card.find('.sc-branch-photo'), cardBackground, _fallbackCardBackground);
+            setImgWithFallback($card.find('.sc-manager-avatar'), managerPhoto);
+            $card.find('.sc-avatar-zoom').toggleClass('no-zoom', !managerPhoto);
             $card.show();
-            // 4. Sadece görünürlük ve resim atamalarını koşula bağla
-            if (branchPhoto) {
-                setImgWithFallback($photo.find('.sc-branch-photo'), branchPhoto);
-                setImgWithFallback($photo.find('.sc-manager-avatar'), branchManagerPhoto);
-                $photo.find('.sc-avatar-zoom').toggleClass('no-zoom', !branchManagerPhoto);
-                $photo.show().addClass('with-bg');
-                $card.removeClass('area');
-                $info.hide();
-            } else {
-                var avatarPhoto = isBranch ? branchManagerPhoto : regionManagerPhoto;
-                setImgWithFallback($info.find('.sc-manager-avatar'), avatarPhoto);
-                $info.find('.sc-avatar-zoom').toggleClass('no-zoom', !avatarPhoto);
-                $photo.hide().removeClass('with-bg');
-                $card.addClass('area');
-                $info.show();
-            }
         }
         // ===== Table Update =====
         function updateYieldTable() {
