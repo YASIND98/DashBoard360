@@ -23,12 +23,17 @@ $(document).ready(function () {
     }
 
     // ===== Filter Lists (filtreleme ile aynı logic) =====
+    // AI'da "Tümü" seçeneği yok: içgörü belirli bir bölge/şube için üretilir.
     function aiRenderRegionDropdown() {
-        return renderRegionList('#aiBolgeList', aiSelectedRegion ? aiSelectedRegion.code : null);
+        var single = renderRegionList('#aiBolgeList', aiSelectedRegion ? aiSelectedRegion.code : null);
+        $('#aiBolgeList .tumu-item').remove();
+        return single;
     }
 
     function aiRenderBranchDropdown() {
-        return renderBranchList('#aiSubeList', aiSelectedBranch ? aiSelectedBranch.code : null, aiSelectedRegion ? aiSelectedRegion.code : null);
+        var single = renderBranchList('#aiSubeList', aiSelectedBranch ? aiSelectedBranch.code : null, aiSelectedRegion ? aiSelectedRegion.code : null);
+        $('#aiSubeList .tumu-item').remove();
+        return single;
     }
 
     function aiUpdateSubmitState() {
@@ -47,13 +52,46 @@ $(document).ready(function () {
     }
 
     function aiSyncRegionLabel() {
-        $('#aiBolgeLabel').text(aiSelectedRegion ? aiSelectedRegion.name : 'Bölge Seçiniz');
+        $('#aiBolgeInput').val(aiSelectedRegion ? aiSelectedRegion.name : '');
         $('#aiBolgeSelect').toggleClass('ai-has-value', !!aiSelectedRegion);
     }
 
+    function aiSelectRegion(region) {
+        aiSelectedRegion = region;
+        aiSyncRegionLabel();
+
+        aiSelectedBranch = null;
+        aiSyncBranchLabel();
+
+        $('#aiBolgeList .dropdown-item').removeClass('selected');
+        if (region) $('#aiBolgeList .dropdown-item[data-code="' + region.code + '"]').addClass('selected');
+
+        aiRenderBranchDropdown();
+        aiUpdateSubmitState();
+    }
+
     function aiSyncBranchLabel() {
-        $('#aiSubeLabel').text(aiSelectedBranch ? aiSelectedBranch.name : 'Şube Seçiniz');
+        $('#aiSubeInput').val(aiSelectedBranch ? aiSelectedBranch.name : '');
         $('#aiSubeSelect').toggleClass('ai-has-value', !!aiSelectedBranch);
+    }
+
+    function aiSelectBranch(branch, regionCode) {
+        aiSelectedBranch = branch;
+        aiSyncBranchLabel();
+
+        $('#aiSubeList .dropdown-item').removeClass('selected');
+        if (branch) $('#aiSubeList .dropdown-item[data-code="' + branch.code + '"]').addClass('selected');
+
+        // Şube seçilince bölgesi de seçili hale gelir (filtreleme ile aynı)
+        var region = branch ? findRegion(regionCode) : null;
+        if (region) {
+            aiSelectedRegion = { code: region.Code, name: region.Name };
+            aiSyncRegionLabel();
+            $('#aiBolgeList .dropdown-item').removeClass('selected');
+            $('#aiBolgeList .dropdown-item[data-code="' + region.Code + '"]').addClass('selected');
+        }
+
+        aiUpdateSubmitState();
     }
 
     // ===== Open / Close =====
@@ -69,6 +107,8 @@ $(document).ready(function () {
             }
             aiSyncRegionLabel();
             aiRenderRegionDropdown();
+            // Tek bölgeli kullanıcıda site.js kutuyu 'disabled' yapar; yazma da kapanmalı.
+            $('#aiBolgeInput').prop('readonly', $('#aiBolgeSelect').hasClass('disabled'));
 
             loadBranchFilters(function () {
                 if (!keepSelection) aiSelectedBranch = pre.branch;
@@ -80,6 +120,7 @@ $(document).ready(function () {
                 }
                 aiSyncBranchLabel();
                 aiRenderBranchDropdown();
+                $('#aiSubeInput').prop('readonly', $('#aiSubeSelect').hasClass('disabled'));
                 aiUpdateSubmitState();
 
                 if (!aiRequestPending && aiResultKey !== selectionKey(aiSelectedRegion, aiSelectedBranch)) aiClearResult();
@@ -103,59 +144,75 @@ $(document).ready(function () {
 
     $('#aiDrawerClose').on('click', closeAiDrawer);
     $('#aiDrawerOverlay').on('click', closeAiDrawer);
-    // ===== Region Selection (filtreleme ile aynı) =====
-    $(document).on('click', '#aiBolgeList .dropdown-item', function () {
-        var code = $(this).attr('data-code');
-        var name = $(this).text();
+    // ===== Yazarak filtrelenebilir seçim kutusu (bölge & şube) =====
+    // Kutunun içindeki input hem seçili değeri gösterir hem arama alanıdır.
+    // Seçim yapmadan kapatılırsa: kutu boşaltıldıysa seçim kalkar, değilse seçili değer geri yazılır.
+    function aiBindCombobox(c) {
+        var $select = $(c.select), $input = $(c.input), $panel = $(c.panel), $list = $(c.list);
 
-        aiSelectedRegion = code ? { code: code, name: name } : null;
-        $('#aiBolgeLabel').text(code ? name : 'Bölge Seçiniz');
-        $('#aiBolgeSelect').toggleClass('ai-has-value', !!code);
-
-        aiSelectedBranch = null;
-        $('#aiSubeLabel').text('Şube Seçiniz');
-        $('#aiSubeSelect').removeClass('ai-has-value');
-
-        $('#aiBolgeList .dropdown-item').removeClass('selected');
-        $(this).addClass('selected');
-        $('#aiBolgePanel').removeClass('open');
-        $('#aiBolgeSearch').val('');
-
-        aiRenderBranchDropdown();
-        aiUpdateSubmitState();
-    });
-
-    // ===== Branch Selection (filtreleme ile aynı) =====
-    $(document).on('click', '#aiSubeList .dropdown-item', function () {
-        var code = $(this).attr('data-code');
-        var name = $(this).text();
-
-        if (!code) {
-            aiSelectedBranch = null;
-            $('#aiSubeLabel').text('Şube Seçiniz');
-            $('#aiSubeSelect').removeClass('ai-has-value');
-        } else {
-            var regionCode = $(this).attr('data-region');
-            aiSelectedBranch = { code: code, name: name };
-            $('#aiSubeLabel').text(name);
-            $('#aiSubeSelect').addClass('ai-has-value');
-
-            var region = findRegion(regionCode);
-            if (region) {
-                aiSelectedRegion = { code: region.Code, name: region.Name };
-                $('#aiBolgeLabel').text(region.Name);
-                $('#aiBolgeSelect').addClass('ai-has-value');
-                $('#aiBolgeList .dropdown-item').removeClass('selected');
-                $('#aiBolgeList .dropdown-item[data-code="' + region.Code + '"]').addClass('selected');
-            }
+        function filter(query) {
+            var q = normalizeTurkish(query.trim());
+            $list.find('.dropdown-item').each(function () {
+                $(this).toggle(normalizeTurkish($(this).text()).indexOf(q) > -1);
+            });
         }
 
-        $('#aiSubeList .dropdown-item').removeClass('selected');
-        $(this).addClass('selected');
-        $('#aiSubePanel').removeClass('open');
-        $('#aiSubeSearch').val('');
+        function open() {
+            if ($select.hasClass('disabled')) return;
+            $('.dropdown-panel').not($panel).removeClass('open');
+            filter('');
+            $panel.addClass('open');
+        }
 
-        aiUpdateSubmitState();
+        // Input'a tıklamak site.js'teki aç/kapa toggle'ına gitmesin; panel açık kalmalı.
+        $input.on('click', function (e) {
+            e.stopPropagation();
+            open();
+            this.select();
+        });
+
+        $input.on('input', function () {
+            if (!$panel.hasClass('open')) open();
+            filter($(this).val());
+        });
+
+        $input.on('keydown', function (e) {
+            if (e.key === 'Escape') {
+                c.sync();   // Esc vazgeçmedir: boşaltılmış kutu seçimi kaldırmasın
+                $panel.removeClass('open');
+                this.blur();
+            }
+        });
+
+        // Panel nasıl kapanırsa kapansın (dışarı tıklama, Esc, seçim) input tutarlı hale getirilir.
+        new MutationObserver(function () {
+            if ($panel.hasClass('open')) return;
+            if (!$input.val().trim() && c.hasValue()) c.clear();
+            else c.sync();
+        }).observe($panel[0], { attributes: true, attributeFilter: ['class'] });
+
+        $list.on('click', '.dropdown-item', function () {
+            c.choose($(this));
+            $panel.removeClass('open');
+        });
+    }
+
+    aiBindCombobox({
+        select: '#aiBolgeSelect', input: '#aiBolgeInput', panel: '#aiBolgePanel', list: '#aiBolgeList',
+        hasValue: function () { return !!aiSelectedRegion; },
+        clear: function () { aiSelectRegion(null); },
+        sync: aiSyncRegionLabel,
+        choose: function ($item) { aiSelectRegion({ code: $item.attr('data-code'), name: $item.text() }); }
+    });
+
+    aiBindCombobox({
+        select: '#aiSubeSelect', input: '#aiSubeInput', panel: '#aiSubePanel', list: '#aiSubeList',
+        hasValue: function () { return !!aiSelectedBranch; },
+        clear: function () { aiSelectBranch(null); },
+        sync: aiSyncBranchLabel,
+        choose: function ($item) {
+            aiSelectBranch({ code: $item.attr('data-code'), name: $item.text() }, $item.attr('data-region'));
+        }
     });
 
     // ===== Submit =====
@@ -387,7 +444,13 @@ $(document).ready(function () {
     var SECTION_NO_RE = /^(\d+(?:\.\d+)*)\.\s+/;
 
     // Servis şimdilik OpenSections göndermiyor; boş geldiğinde bu liste kullanılır.
-    var DEFAULT_OPEN_SECTIONS = ['1', '2.1', '3.1', '4.1', '5', '6.1', '7', '8', '8.1', '8.2'];
+    // var DEFAULT_OPEN_SECTIONS = ['1', '2.1', '3.1', '4.1', '5', '6.1', '7', '8', '8.1', '8.2'];
+    
+    // Servis OpenSections göndermezse varsayılan kural: tüm ana bölümler açık,
+    // alt bölümlerden yalnız her ana bölümün ilki açık; daha derin seviyeler kapalı.
+    function isOpenByDefaultRule(depth, isFirstChild) {
+        return depth === 1 || (depth === 2 && isFirstChild);
+    }
 
     $(document).on('click', '.ai-collapse-head', function () {
         var isClosed = $(this).closest('.ai-collapse').toggleClass('is-closed').hasClass('is-closed');
@@ -414,7 +477,8 @@ $(document).ready(function () {
 
     function renderMarkdown(md, openSections) {
         if (!md) return '';
-        var open = (openSections && openSections.length ? openSections : DEFAULT_OPEN_SECTIONS).map(String);
+        var open = (openSections || []).map(String);
+        var parentsWithChild = {};
         var lines = md.replace(/\r\n/g, '\n').split('\n');
         var html = [];
         var i = 0;
@@ -436,8 +500,14 @@ $(document).ready(function () {
             return closed;
         }
 
-        // Anahtar listede varsa ya da listedeki bir anahtarın atasıysa ("2.3" -> "2") açık gelir
-        function isSectionOpen(key) {
+        // Servis listesi varsa: anahtar listedeyse ya da listedeki bir anahtarın atasıysa ("2.3" -> "2") açık gelir.
+        // Yoksa varsayılan kural uygulanır.
+        function isSectionOpen(key, depth) {
+            var parent = key.split('.').slice(0, -1).join('.');
+            var isFirstChild = !parentsWithChild[parent];
+            parentsWithChild[parent] = true;
+
+            if (!open.length) return isOpenByDefaultRule(depth, isFirstChild);
             return open.some(function (k) { return k === key || k.indexOf(key + '.') === 0; });
         }
 
@@ -465,7 +535,7 @@ $(document).ready(function () {
                     var key = no[1];
                     var depth = key.split('.').length;
                     closeCollapses(depth);
-                    var isOpen = isSectionOpen(key);
+                    var isOpen = isSectionOpen(key, depth);
                     var tag = 'h' + Math.min(depth + 1, 6);
                     // Baştan kapalı basılır; animasyon atladığı için "açılıp sonra kapanma" olmaz
                     html.push('<section class="ai-collapse' + (isOpen ? '' : ' is-closed') + '">');
