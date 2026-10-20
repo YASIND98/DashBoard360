@@ -1499,14 +1499,23 @@ var SPREAD_FIELDS = {
         amounts: ['RegionTargetAverageVolumeCumulativeCurrentYear', 'RegionAverageVolumeCumulativeCurrentYear', 'RegionAverageVolumeCumulativeLastYear',
                   'RegionTargetReturnCumulativeCurrentYear', 'RegionReturnCumulativeCurrentYear', 'RegionReturnCumulativeLastYear'],
         rates:   ['RegionSpreadTargetCurrentYear', 'RegionSpreadReturnCurrentYear', 'RegionSpreadReturnLastYear',
-                  'BankSpreadTargetCurrentYear', 'BankSpreadReturnCurrentYear']
+                  'BankSpreadTargetCurrentYear', 'BankSpreadReturnCurrentYear'],
+        targets: {
+            RegionSpreadReturnCurrentYear: 'RegionSpreadTargetCurrentYear',
+            BankSpreadReturnCurrentYear:   'BankSpreadTargetCurrentYear'
+        }
     },
     branch: {
         amounts: ['BranchTargetAverageVolumeCumulativeCurrentYear', 'BranchAverageVolumeCumulativeCurrentYear', 'BranchAverageVolumeCumulativeLastYear',
                   'BranchTargetReturnCumulativeCurrentYear', 'BranchReturnCumulativeCurrentYear', 'BranchReturnCumulativeLastYear'],
         rates:   ['BranchSpreadTargetCurrentYear', 'BranchSpreadReturnCurrentYear', 'BranchSpreadReturnLastYear',
                   'RegionSpreadTargetCurrentYear', 'RegionSpreadReturnCurrentYear',
-                  'BankSpreadTargetCurrentYear', 'BankSpreadReturnCurrentYear']
+                  'BankSpreadTargetCurrentYear', 'BankSpreadReturnCurrentYear'],
+        targets: {
+            BranchSpreadReturnCurrentYear: 'BranchSpreadTargetCurrentYear',
+            RegionSpreadReturnCurrentYear: 'RegionSpreadTargetCurrentYear',
+            BankSpreadReturnCurrentYear:   'BankSpreadTargetCurrentYear'
+        }
     }
 };
 
@@ -1529,6 +1538,14 @@ function spreadRowStart(item, i, hasExpandable) {
     return html + '<td class="col-left">' + indent + '</td>';
 }
 
+// Spread "Bu Yıl" kolonları solundaki "Hedef" ile kıyaslanır (targets eşlemesi).
+// Değerlerden biri yoksa (formatPercent "-" basıyor) renk verilmez.
+function spreadTargetColor(item, field, targets) {
+    var targetField = targets[field];
+    if (!targetField || !item[field] || !item[targetField]) return '';
+    return compareColor(item[field], item[targetField]);
+}
+
 // mn TL kolonları düz sayı, spread kolonları yüzde basar.
 function renderSpreadTable(items, fields) {
     var hasExpandable = items.some(function (item) { return item._hasChildren; });
@@ -1536,7 +1553,9 @@ function renderSpreadTable(items, fields) {
     var html = items.map(function (item, i) {
         return spreadRowStart(item, i, hasExpandable) +
             fields.amounts.map(function (f) { return '<td>' + formatNumber(item[f]) + '</td>'; }).join('') +
-            fields.rates.map(function (f) { return '<td>' + formatPercent(item[f]) + '</td>'; }).join('') +
+            fields.rates.map(function (f) {
+                return '<td class="' + spreadTargetColor(item, f, fields.targets) + '">' + formatPercent(item[f]) + '</td>';
+            }).join('') +
             '</tr>';
     }).join('');
 
