@@ -116,8 +116,6 @@ public class ReportDataProvider : IReportDataProvider
         if (!request.ShowDifferences)
             ClearDiffs(roots);
 
-        roots = SortTree(roots, request.SortBy, request.IsAscending);
-
         response.Products = roots;
         return response;
     }
@@ -274,8 +272,6 @@ public class ReportDataProvider : IReportDataProvider
 
         if (!string.IsNullOrWhiteSpace(request.SearchText))
             roots = FilterMonthlyTreeByName(roots, request.SearchText.Trim());
-
-        roots = SortMonthlyTree(roots, request.SortBy, request.IsAscending);
 
         response.Products = roots;
         return response;
@@ -1835,30 +1831,6 @@ public class ReportDataProvider : IReportDataProvider
         }
     }
 
-    private static List<GetDailyTargetReportResponse.Product> SortTree(List<GetDailyTargetReportResponse.Product> nodes, int? sortBy, bool isAscending)
-    {
-        Func<GetDailyTargetReportResponse.Product, object> keySelector = sortBy switch
-        {
-            0 => p => p.RowNo,
-            1 => p => p.ProductName ?? string.Empty,
-            2 => p => p.LastYearAmount,
-            3 => p => p.LastWeekAmount,
-            4 => p => p.PrevDayAmount,
-            5 => p => p.YesterdayAmount,
-            _ => p => p.ProductId
-        };
-
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
-
-        foreach (var n in ordered)
-        {
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortTree(n.SubProducts, sortBy, isAscending);
-        }
-
-        return ordered;
-    }
-
     private static List<GetMonthlyTargetReportResponse.Product> FilterMonthlyTreeByName(List<GetMonthlyTargetReportResponse.Product> nodes, string searchText)
     {
         bool Matches(GetMonthlyTargetReportResponse.Product p)
@@ -1880,32 +1852,6 @@ public class ReportDataProvider : IReportDataProvider
         }
 
         return Recurse(nodes);
-    }
-
-    private static List<GetMonthlyTargetReportResponse.Product> SortMonthlyTree(List<GetMonthlyTargetReportResponse.Product> nodes, int? sortBy, bool isAscending)
-    {
-        Func<GetMonthlyTargetReportResponse.Product, object> keySelector = sortBy switch
-        {
-            0 => p => p.RowNo,
-            1 => p => p.ProductName ?? string.Empty,
-            2 => p => p.MonthActualAmount,
-            3 => p => p.MonthTargetAmount,
-            4 => p => p.MonthRatio,
-            5 => p => p.YearActualAmount,
-            6 => p => p.YearTargetAmount,
-            7 => p => p.YearRatio,
-            _ => p => p.ProductId
-        };
-
-        var ordered = (isAscending ? nodes.OrderBy(keySelector) : nodes.OrderByDescending(keySelector)).ToList();
-
-        foreach (var n in ordered)
-        {
-            if (n.SubProducts != null && n.SubProducts.Count > 0)
-                n.SubProducts = SortMonthlyTree(n.SubProducts, sortBy, isAscending);
-        }
-
-        return ordered;
     }
 
     private sealed class DailyQuantityTargetRow
