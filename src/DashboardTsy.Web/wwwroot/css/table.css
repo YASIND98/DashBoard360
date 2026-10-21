@@ -510,6 +510,16 @@
   transform: rotate(0deg);
 }
 
+/* Satırları etkileşimsiz tablolar: tıklama ve hover yalnız ok ikonunda. */
+.data-table--static-rows .expand-icon img {
+  cursor: pointer;
+}
+
+.data-table--static-rows .expand-icon img:hover {
+  content: url('/images/expand-hover.svg');
+  filter: none;
+}
+
 .sub-row {
   display: none;
 }
@@ -527,6 +537,12 @@
   height: 24px;
   cursor: pointer;
   transform: rotate(90deg);
+}
+
+.detail-icon:hover,
+[data-theme="light"] .detail-icon:hover {
+  content: url('/images/expand-hover.svg');
+  filter: none;
 }
 
 [data-theme="light"] .table-empty-state img {
@@ -748,7 +764,7 @@
 
 /* ===== Responsive ===== */
 @media (min-width: 1199px) {
-  .table-row:hover td {
+  :where(.data-table:not(.data-table--static-rows)) .table-row:hover td {
     background: var(--bg-hover);
   }
 
@@ -775,7 +791,7 @@
     background: #e8f2fd;
   }
 
-  [data-theme="light"] .table-row:hover td {
+  [data-theme="light"] :where(.data-table:not(.data-table--static-rows)) .table-row:hover td {
     background: #d4e9fb;
   }
 

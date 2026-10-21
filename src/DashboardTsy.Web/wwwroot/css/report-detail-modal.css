@@ -262,36 +262,6 @@
   transform: translateX(-50%); background: var(--bd-line);
 }
 
-/* Hover yalnız tıklanabilir satırlarda: table.css'teki genel .table-row:hover kuralı her satırı
-   vurguluyor, oysa kırılımda sadece alt kırılımı olan (.hr-expandable) satırlar tıklanabilir.
-   Yaprak satırlarda stripe arkaplanı geri yazılır; `inherit` kullanılamaz çünkü stripe-even
-   tr'si transparent ve sticky col-left kendi opak değerini taşıyor (table.css). */
-@media (min-width: 1199px) {
-  #reportDetailBdBody tr.stripe-odd:not(.hr-expandable):hover td {
-    background: var(--bg-stripe);
-  }
-
-  #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td {
-    background: transparent;
-  }
-
-  #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td.col-left {
-    background: rgb(21, 32, 88);
-  }
-
-  [data-theme="light"] #reportDetailBdBody tr.stripe-odd:not(.hr-expandable):hover td {
-    background: #F0F6FE;
-  }
-
-  [data-theme="light"] #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td {
-    background: #e8f2fd;
-  }
-
-  [data-theme="light"] #reportDetailBdBody tr.stripe-even:not(.hr-expandable):hover td.col-left {
-    background: #E9F3FE;
-  }
-}
-
 #reportDetailBdBody .bd-name { position: relative; display: flex; align-items: center; padding-left: 10px; white-space: nowrap; }
 #reportDetailBdBody .bd-tree.bd-has-portfolio { min-height: 84px; }
 #reportDetailBdBody .bd-portfolio-type {
