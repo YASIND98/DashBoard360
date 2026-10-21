@@ -188,8 +188,7 @@ $(function () {
       var body = visible.map(function (v, k) {
           var stripe = (k % 2 === 0 ? 'stripe-odd' : 'stripe-even') + (k === visible.length - 1 ? ' last-visible-row' : '');
           var cls = 'table-row ' + stripe + (v.hasKids ? ' hr-expandable' : '');
-          var cursor = v.hasKids ? ' style="cursor:pointer"' : '';
-          return '<tr class="' + cls + '"' + cursor + ' data-path="' + v.path + '">' +
+          return '<tr class="' + cls + '" data-path="' + v.path + '">' +
               nameCell(v) + prov.valueCells(v.node, tableKey, _ctx) + '</tr>';
       }).join('');
       $('#reportDetailBdHead').html(head.html);
@@ -274,8 +273,8 @@ $(function () {
       pdf: function () { return defaultBreakdownPdf(); }
   };
 
-  $('#reportDetailBdBody').on('click', '.hr-expandable', function () {
-      var p = $(this).attr('data-path');
+  $('#reportDetailBdBody').on('click', '.hr-expandable .expand-icon', function () {
+      var p = $(this).closest('tr').attr('data-path');
       _open[p] = !_open[p];
       renderBreakdown(_currentTable);
   });
