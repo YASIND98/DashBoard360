@@ -832,6 +832,21 @@
     color: #0f4570;
   }
 
+#scTabList {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(212, 230, 252, 0.35) transparent;
+}
+
+#scTabList .tab {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
 @media (max-width: 1199px) {
   .sc-ranking-bar {
    flex-wrap: wrap;
@@ -1225,6 +1240,16 @@
 
 [data-theme="light"] .sc-colpick-link {
   color: #12375C;
+}
+
+[data-theme="light"] .sc-colpick-primary,
+[data-theme="light"] .sc-colpick-coach-badge {
+  background: #12375C;
+  color: #fff;
+}
+
+[data-theme="light"] .sc-colpick-primary:hover {
+  background: #0f2d5c;
 }
 
 @media (max-width: 767px) {
