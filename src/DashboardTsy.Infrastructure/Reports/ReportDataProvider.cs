@@ -1002,7 +1002,7 @@ public class ReportDataProvider : IReportDataProvider
         response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityVolumeRegionReportTree(ds, request.ReportDate);
-        roots = SortProductivityVolumeRegionTree(roots, request.SortBy, request.IsAscending);
+        //roots = SortProductivityVolumeRegionTree(roots, request.SortBy, request.IsAscending);
 
         response.GetProductivityVolumeRegionReports = roots;
         return response;
@@ -1517,7 +1517,7 @@ public class ReportDataProvider : IReportDataProvider
         response.ReportDate = ReadReportDate(ds.Tables[0]);
 
         var roots = BuildProductivityVolumeBranchReportTree(ds, request.ReportDate);
-        roots = SortProductivityVolumeBranchTree(roots, request.SortBy, request.IsAscending);
+        //roots = SortProductivityVolumeBranchTree(roots, request.SortBy, request.IsAscending);
 
         response.GetProductivityVolumeBranchReports = roots;
         return response;
