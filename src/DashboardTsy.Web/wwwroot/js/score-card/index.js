@@ -14,6 +14,19 @@ $(function () {
     var SC_SELECTABLE_COLS = ['Hedef', 'Gerçekleşen', 'H/G %', 'Ağırlık %', 'Ağırlıklı H/G %', 'Bekleyen'];
     var selectedCol = 'Ağırlıklı H/G %';
 
+    // HACİM / GELİR ürünlerinde Hedef ve Gerçekleşen küsuratsız (yuvarlanmış) gösterilir.
+    var SC_ROUNDED_PRODUCT_TYPES = ['HACİM', 'GELİR'];
+
+    function isRoundedProductType(row) {
+        var type = String((row && row.productType) || '').trim().toLocaleUpperCase('tr-TR');
+        return SC_ROUNDED_PRODUCT_TYPES.indexOf(type) !== -1;
+    }
+
+    // Hedef / Gerçekleşen gösterim değeri: HACİM / GELİR ise yuvarlanır, diğerlerinde değer aynen kalır.
+    function scAmount(value, row) {
+        return isRoundedProductType(row) ? roundHalfUp(value) : value;
+    }
+
     // Tablo toplam satırı HER ZAMAN "Ağırlıklı H/G %" kolonu içindir (seçili kolondan bağımsız, sabit).
     var SC_TOTAL_COL = 'Ağırlıklı H/G %';
 
@@ -1034,12 +1047,17 @@ $(function () {
                 var base = row && row.targetRealizationPercentageBase;
                 return formatPercent(v) + (base ? (' (' + formatPercent(base) + ')') : '');
             };
+            // Hedef / Gerçekleşen: HACİM / GELİR'de yuvarlanmış değer; toplam satırında ve boş değerde boş.
+            var pdfAmount = function (v, row) {
+                if (v == null) return '';
+                return scAmount(v, row);
+            };
             cols = [{ header: 'Ürün / Hedef Adı', key: 'productName', align: 'left' }];
             // Şube Müdürü (21): ürün adının hemen sağında çalışan sayısı (norm).
             if (_scoreCardId === 21) cols.push({ header: 'Çalışan Sayısı', key: 'norm' });
             cols = cols.concat([
                 { header: 'Ürün Tipi', key: 'productType' },
-                { header: 'Hedef', key: 'targetValue' }, { header: 'Gerçekleşen', key: 'realizedValue' },
+                { header: 'Hedef', key: 'targetValue', format: pdfAmount }, { header: 'Gerçekleşen', key: 'realizedValue', format: pdfAmount },
                 { header: 'H/G %', key: 'targetRealizationPercentage', format: hgPct }, { header: 'Ağırlık %', key: 'productWeight', format: pctOrTotal('label') },
                 { header: 'Ağırlıklı H/G %', key: 'weightedPercentage', format: formatPercent }, { header: 'Bekleyen', key: 'pending' }
             ]);
@@ -1107,8 +1125,8 @@ $(function () {
             // Şube Müdürü (21): ürünün hemen yanında çalışan sayısı (servisten norm).
             if (_scoreCardId === 21) html += '<td class="sc-norm">' + (r.norm != null ? r.norm : '') + '</td>';
             html += '<td>' + r.productType + '</td>';
-            html += '<td class="' + _selCol('Hedef') + '">' + formatNumber(r.targetValue) + '</td>';
-            html += '<td class="' + _selCol('Gerçekleşen') + '">' + formatNumber(r.realizedValue) + '</td>';
+            html += '<td class="' + _selCol('Hedef') + '">' + formatNumber(scAmount(r.targetValue, r)) + '</td>';
+            html += '<td class="' + _selCol('Gerçekleşen') + '">' + formatNumber(scAmount(r.realizedValue, r)) + '</td>';
             var hgBase = (r.targetRealizationPercentageBase && r.targetRealizationPercentageBase !== r.targetRealizationPercentage)
                 ? ' <span class="' + percentColor(r.targetRealizationPercentageBase) + '">(' + formatPercent(r.targetRealizationPercentageBase) + ')</span>'
                 : '';
