@@ -884,14 +884,20 @@ html[data-pdf-allowed="false"] #mobilePdfBtn {
   border-color: #c5d3e8;
 }
 
+/* Bilgi şeridi (overlay) light modda da koyu lacivert kalır; metinler beyaz olmalı. */
 [data-theme="light"] .sc-manager-name,
 [data-theme="light"] .sc-manager-start-date,
-[data-theme="light"] .sc-manager-duration {
-  color: #0d1b3e;
-}
-
+[data-theme="light"] .sc-manager-duration,
 [data-theme="light"] .sc-manager-role {
   color: #fff;
+}
+
+[data-theme="light"] .scorecard-section--neutral {
+  --sc-section-header: #EAF0F8;
+}
+
+[data-theme="light"] .scorecard-nps-wrapper .scorecard-section--neutral .scorecard-section-title {
+  color: #262A33;
 }
 
 @media (max-width: 768px) {
