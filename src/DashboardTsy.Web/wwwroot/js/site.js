@@ -643,6 +643,9 @@ $(document).ready(function () {
       if (!$infoTooltip) {
           $infoTooltip = $('<div class="info-tooltip" role="tooltip"></div>').appendTo('body');
       }
+      if ($infoTooltip.data('extraClass')) $infoTooltip.removeClass($infoTooltip.data('extraClass'));
+      var extraClass = $icon.attr('data-tooltip-class') || '';
+      $infoTooltip.data('extraClass', extraClass).addClass(extraClass);
       $infoTooltip.text(text).addClass('below');
       var rect = $icon[0].getBoundingClientRect();
       $infoTooltip.css({ visibility: 'hidden', left: 0, top: 0 }).addClass('visible');
@@ -655,7 +658,8 @@ $(document).ready(function () {
       if (left + tw > window.innerWidth - pad) left = window.innerWidth - tw - pad;
       // Tasarımdaki gibi varsayılan altta; altta yer yoksa üste dön
       var top = rect.bottom + 10;
-      if (top + th > window.innerHeight - pad) {
+      var preferTop = $icon.attr('data-tooltip-placement') === 'top' && rect.top - th - 10 >= pad;
+      if (preferTop || top + th > window.innerHeight - pad) {
           top = rect.top - th - 10;
           $infoTooltip.removeClass('below');
       }

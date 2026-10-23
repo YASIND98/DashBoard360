@@ -480,6 +480,15 @@ $(function () {
         });
     }
 
+    function renderTargetPrim() {
+        var monthly = ($('#scPeriod .period-btn.active').data('period') || 'aylik') === 'aylik';
+        var show = monthly && _registerId != null && _registerId !== -1;
+        $('.sc-target-prim').toggle(show);
+        if (!show) return;
+        var value = ROWS[0] ? ROWS[0].turnOverRate : null;
+        $('#scTargetPrim').text(value != null ? formatNumber(value) + ' TL' : '-');
+    }
+
     // Ağırlıklı H/G % (weightedPercentage) değerlerinin toplamı. Hem "Toplam Skor" kartı hem
     // tablo toplam satırı aynı hesabı kullanır.
     function sumWeightedPercentage(rows) {
@@ -616,6 +625,7 @@ $(function () {
             ROWS = (res && res.mainTableData) ? res.mainTableData : [];
             _lastUpdatedDate = (res && res.lastUpdatedDate) || null;
             renderTotalScore();                         // Toplam Skor = weightedPercentage toplamı
+            renderTargetPrim();
             renderReportBody();
             renderLegend();
             resetTableScroll('#scReportBody');
