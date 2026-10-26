@@ -2174,10 +2174,10 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
   "phoneGreetingScore": 95.0,
   "branchManagerPhoto": "https://cdn.denizbank.com/photos/managers/42.jpg",
   "branchPhoto": "https://cdn.denizbank.com/photos/branches/1234.jpg",
-  "reportMonth": "Ağustos 2026"
+  "reportMonth": "Ocak - Ekim 2026"
 }
 ```
-> `reportMonth`: SP'nin `RAPOR_TARIHI` (DATE, örn. `2026-08-31`) kolonu tr-TR `MMMM yyyy` formatında döner. SP boş dönerse `null`.
+> `reportMonth`: SP'nin `RAPOR_TARIHI` kolonu metin olarak gelir ve olduğu gibi döner (örn. `"Ocak - Ekim 2026"`); ön yüzde biçimlendirilmez. SP boş dönerse `null`.
 
 #### POST /ProductivityReport/GetProductivityRegionScoreCardReport
 **Request** (`GetProductivityRegionScoreCardReportRequest`):
@@ -2202,10 +2202,10 @@ Nakit Yönetimi ile aynı kolon yapısı; farkları: `subTabId` parametresi yok,
   "regionNpsScore": 72.8,
   "bankNpsScore": 71.2,
   "regionManagerPhoto": "https://cdn.denizbank.com/photos/managers/17.jpg",
-  "reportMonth": "Ağustos 2026"
+  "reportMonth": "Ocak - Ekim 2026"
 }
 ```
-> `reportMonth`: Şube skor kartındaki ile aynı (`RAPOR_TARIHI` → `"Ağustos 2026"`).
+> `reportMonth`: Şube skor kartındaki ile aynı (`RAPOR_TARIHI` metni olduğu gibi döner).
 
 #### POST /ProductivityReport/GetProductivityBranchScoreCardReportCumulative
 SP: `SP_RP_GetProductivityBranchScoreCardReport_Cumulative`. Şube skor kartının kümülatif versiyonu.

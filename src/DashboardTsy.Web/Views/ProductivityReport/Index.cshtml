@@ -241,6 +241,9 @@
             ['PhoneGreetingScore']
         ];
 
+        // NPS hedefi: altı kırmızı, hedef ve üstü yeşil (Banka/Bölge/Şube).
+        var NPS_TARGET = 60;
+
         function getNpsFields(isBranch) {
             return isBranch ? ['BranchNpsScore', 'BankNpsScore'] : ['RegionNpsScore', 'BankNpsScore'];
         }
@@ -702,12 +705,12 @@
             if (!selectedRegion && !selectedBranch) {
                 destroyScorecardMaps();
                 _currentBranch = null;
-                $('.sc-period-toggle, .sc-pdf-btn').hide();
+                $('.sc-period-toggle').hide();
                 $('.scorecard-content').html('');
                 return;
             }
 
-            $('.sc-period-toggle, .sc-pdf-btn').show();
+            $('.sc-period-toggle').show();
             loadPersonnelDetails(isBranch, reqId);
             loadScorecardData(isBranch, reqId);
         }
@@ -908,7 +911,8 @@
                             return {
                                 label: child.HeaderName,
                                 value: fieldName ? d[fieldName] : null,
-                                isScore: fieldName !== 'ManagerName'
+                                isScore: fieldName !== 'ManagerName',
+                                isNps: /NpsScore$/.test(fieldName || '')
                             };
                         });
 
@@ -930,6 +934,12 @@
             return isNaN(date) ? '' : _trMonths[date.getMonth()] + ' ' + date.getFullYear();
         }
 
+        function scorecardValueColor(row) {
+            if (!row.isScore || row.value == null) return '';
+            if (row.isNps) return row.value < NPS_TARGET ? 'ratio-red' : 'ratio-green';
+            return percentColor(row.value);
+        }
+
         function formatScorecardValue(row) {
             if (!row.isScore) return row.value || '-';
             return row.value != null ? formatPercent(row.value) : '-';
@@ -944,12 +954,16 @@
                 html += '<table class="scorecard-table">';
 
                 section.rows.forEach(function (row) {
-                    var cls = row.isScore && row.value != null ? percentColor(row.value) : '';
+                    var cls = scorecardValueColor(row);
                     html += '<tr><td>' + row.label + ':</td><td class="' + cls + '">' + formatScorecardValue(row) + '</td></tr>';
                 });
 
                 html += '</table></div>';
             });
+
+            html += '<button type="button" class="download-pdf-btn sc-pdf-btn" data-pdf="scorecardNps">' +
+                        '<img src="/images/scorecard-download.svg" alt="" /><span>PDF İndir</span>' +
+                    '</button>';
 
             destroyScorecardMaps();
             $('.scorecard-content').html(html);

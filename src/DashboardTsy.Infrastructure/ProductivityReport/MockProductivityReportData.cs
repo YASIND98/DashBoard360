@@ -1516,7 +1516,7 @@ public static class MockProductivityReportData
             PhoneGreetingScore = 91m,
             BranchManagerPhoto = "/images/mock/branch-manager.jpg",
             BranchPhoto = "/images/mock/branch.jpg",
-            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate),
+            ReportMonth = MockScoreCardReportMonth,
             NpsReportDate = MockNpsReportDate,
             TelReportDate = MockTelReportDate
         };
@@ -1541,13 +1541,13 @@ public static class MockProductivityReportData
             RegionNpsScore = 75.0m,
             BankNpsScore = 68.0m,
             RegionManagerPhoto = "/images/mock/region-manager.jpg",
-            ReportMonth = ReportMonthFormatter.Format(MockScoreCardReportDate),
+            ReportMonth = MockScoreCardReportMonth,
             NpsReportDate = MockNpsReportDate
         };
     }
 
-    // Skor kartı SP'lerinin RAPOR_TARIHI örnek değeri.
-    private static readonly DateTime MockScoreCardReportDate = new(2026, 8, 31);
+    // Skor kartı ReportMonth örnek değeri; ön yüzde olduğu gibi gösterilir.
+    private const string MockScoreCardReportMonth = "Ocak - Ekim 2026";
     private static readonly DateTime MockNpsReportDate = new(2026, 7, 31);
     private static readonly DateTime MockTelReportDate = new(2026, 6, 30);
 

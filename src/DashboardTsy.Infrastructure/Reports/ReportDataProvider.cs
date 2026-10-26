@@ -530,6 +530,14 @@ public class ReportDataProvider : IReportDataProvider
         return date == default ? null : date;
     }
 
+    // Skor kartı SP'leri RAPOR_TARIHI'ni gösterime hazır metin olarak döner (örn. "Ocak - Ekim 2026").
+    // Türkçe kolon adı olduğu için DataTableHelper eşleyemez; açıkça okunur.
+    private static string? ReadReportMonth(DataRow row)
+    {
+        var text = ReadString(row, "RAPOR_TARIHI").Trim();
+        return text.Length > 0 ? text : null;
+    }
+
     // Verim raporu SP'leri raporun ait olduğu tarihi her satırda ReportDate kolonunda döner; ilk satırdan okunur.
     private static DateTime? ReadReportDate(DataTable table)
         => ReadNullableDate(table.Rows[0], "ReportDate");
@@ -1343,8 +1351,7 @@ public class ReportDataProvider : IReportDataProvider
 
         var row = ds.Tables[0].Rows[0];
         var item = DataTableHelper.ToObject<GetProductivityBranchScoreCardReportItem>(row) ?? new GetProductivityBranchScoreCardReportItem();
-        // RAPOR_TARIHI Türkçe kolon adı olduğu için DataTableHelper eşleyemez; açıkça okunur.
-        item.ReportMonth = ReportMonthFormatter.Format(ReadNullableDate(row, "RAPOR_TARIHI"));
+        item.ReportMonth = ReadReportMonth(row);
         return item;
     }
 
@@ -1371,8 +1378,7 @@ public class ReportDataProvider : IReportDataProvider
 
         var row = ds.Tables[0].Rows[0];
         var item = DataTableHelper.ToObject<GetProductivityRegionScoreCardReportItem>(row) ?? new GetProductivityRegionScoreCardReportItem();
-        // RAPOR_TARIHI Türkçe kolon adı olduğu için DataTableHelper eşleyemez; açıkça okunur.
-        item.ReportMonth = ReportMonthFormatter.Format(ReadNullableDate(row, "RAPOR_TARIHI"));
+        item.ReportMonth = ReadReportMonth(row);
         return item;
     }
 
