@@ -19,6 +19,13 @@ function formatNumber(value) {
     return new Intl.NumberFormat('tr-TR', { maximumFractionDigits: 2 }).format(value);
 }
 
+// Küsuratı tam sayıya yuvarlar: ,50 ve üzeri yukarı (25,50 -> 26), altı aşağı (25,49 -> 25). Negatiflerde simetrik.
+function roundHalfUp(value) {
+    if (value == null || isNaN(value)) return value;
+    var n = Number(value);
+    return Math.sign(n) * Math.round(Math.abs(n));
+}
+
 // Türkçe ay adları (formatReportDateTr için)
 var _trMonths = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
 
