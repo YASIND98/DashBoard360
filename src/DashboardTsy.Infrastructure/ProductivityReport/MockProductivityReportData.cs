@@ -50,7 +50,6 @@ public static class MockProductivityReportData
         var headers = new List<GetProductivityScoreCardReportHeaderItem>
         {
             new() { Id = 1,  HeaderName = mainTitle,      ParentId = 0,  OrderNo = 1 },
-            new() { Id = 2,  HeaderName = "Adı Soyadı",   ParentId = 1,  OrderNo = 2 },
             new() { Id = 3,  HeaderName = month1,         ParentId = 1,  OrderNo = 3 },
             new() { Id = 4,  HeaderName = month2,         ParentId = 1,  OrderNo = 4 },
             new() { Id = 5,  HeaderName = month3,         ParentId = 1,  OrderNo = 5 },

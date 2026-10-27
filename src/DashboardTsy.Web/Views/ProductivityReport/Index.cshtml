@@ -226,16 +226,16 @@
         });
 
         // Data field mapping per section (by section index in OrderNo)
-        // Her iki tip de 4 bölüm döner: manager+aylar, roller, NPS, Telefonla Karşılama Oranı.
+        // Her iki tip de 4 bölüm döner: aylar, roller, NPS, Telefonla Karşılama Oranı.
         var _sectionFieldsRegion = [
-            ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
+            ['FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
             ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
             null, // NPS via getNpsFields
             ['PhoneGreetingScore']
         ];
 
         var _sectionFieldsBranch = [
-            ['ManagerName', 'FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
+            ['FirstMonthScore', 'SecondMonthScore', 'ThirdMonthScore'],
             ['CorporateScore', 'CommercialScore', 'KobiScore', 'ObiScore', 'AgricultureScore', 'MassScore', 'AffluentScore', 'PrivateBankingScore'],
             null, // NPS via getNpsFields
             ['PhoneGreetingScore']
@@ -705,12 +705,12 @@
             if (!selectedRegion && !selectedBranch) {
                 destroyScorecardMaps();
                 _currentBranch = null;
-                $('.sc-period-toggle').hide();
-                $('.scorecard-content').html('');
+                $('.sc-period-area').hide();
+                $('.sc-period-sections, .scorecard-content').html('');
                 return;
             }
 
-            $('.sc-period-toggle').show();
+            $('.sc-period-area').show();
             loadPersonnelDetails(isBranch, reqId);
             loadScorecardData(isBranch, reqId);
         }
@@ -887,7 +887,7 @@
             });
         }
 
-        // Header ağacı (ParentId=0 bölüm, altı kriter) + servis cevabı > [{ title, monthSuffix, rows: [{ label, value, isScore }] }].
+        // Header ağacı (ParentId=0 bölüm, altı kriter) + servis cevabı > [{ title, monthSuffix, rows: [{ label, value, isNps }] }].
         // Ekran ve PDF aynı modeli kullanır.
         function buildScorecardSections(headers, d, isBranch) {
             var sectionFields = isBranch ? _sectionFieldsBranch : _sectionFieldsRegion;
@@ -911,7 +911,6 @@
                             return {
                                 label: child.HeaderName,
                                 value: fieldName ? d[fieldName] : null,
-                                isScore: fieldName !== 'ManagerName',
                                 isNps: /NpsScore$/.test(fieldName || '')
                             };
                         });
@@ -935,30 +934,33 @@
         }
 
         function scorecardValueColor(row) {
-            if (!row.isScore || row.value == null) return '';
+            if (row.value == null) return '';
             if (row.isNps) return row.value < NPS_TARGET ? 'ratio-red' : 'ratio-green';
             return percentColor(row.value);
         }
 
         function formatScorecardValue(row) {
-            if (!row.isScore) return row.value || '-';
             return row.value != null ? formatPercent(row.value) : '-';
         }
 
+        function scorecardSectionHtml(section) {
+            var html = '<div class="scorecard-section' + (section.neutral ? ' scorecard-section--neutral' : '') + '">';
+            html += '<div class="scorecard-section-title">' + section.title + section.monthSuffix + '</div>';
+            html += '<table class="scorecard-table">';
+            section.rows.forEach(function (row) {
+                html += '<tr><td>' + row.label + ':</td><td class="' + scorecardValueColor(row) + '">' + formatScorecardValue(row) + '</td></tr>';
+            });
+            return html + '</table></div>';
+        }
+
+        // Aylık/Kümüle'ye bağlı bölümler (müdür ve roller) toggle ile aynı kapsayıcıda; NPS ve Telefonla Karşılama altta.
         function renderScorecardHtml(headers, d, isBranch) {
+            var periodHtml = '';
             var html = '';
 
             buildScorecardSections(headers, d, isBranch).forEach(function (section) {
-                html += '<div class="scorecard-section' + (section.neutral ? ' scorecard-section--neutral' : '') + '">';
-                html += '<div class="scorecard-section-title">' + section.title + section.monthSuffix + '</div>';
-                html += '<table class="scorecard-table">';
-
-                section.rows.forEach(function (row) {
-                    var cls = scorecardValueColor(row);
-                    html += '<tr><td>' + row.label + ':</td><td class="' + cls + '">' + formatScorecardValue(row) + '</td></tr>';
-                });
-
-                html += '</table></div>';
+                if (section.neutral) html += scorecardSectionHtml(section);
+                else periodHtml += scorecardSectionHtml(section);
             });
 
             html += '<button type="button" class="download-pdf-btn sc-pdf-btn" data-pdf="scorecardNps">' +
@@ -966,6 +968,7 @@
                     '</button>';
 
             destroyScorecardMaps();
+            $('.sc-period-sections').html(periodHtml);
             $('.scorecard-content').html(html);
         }
 
