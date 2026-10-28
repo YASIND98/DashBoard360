@@ -291,6 +291,7 @@ html[data-pdf-allowed="false"] #mobilePdfBtn {
   padding: 12px;
   /* Panel ekrandan taşmasın; müdür kartı, personel ve skor kartı birlikte panel içinde kayar */
   max-height: calc(100vh - 140px);
+  overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;

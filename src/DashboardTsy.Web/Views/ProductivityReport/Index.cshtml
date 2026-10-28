@@ -241,8 +241,8 @@
             ['PhoneGreetingScore']
         ];
 
-        // NPS hedefi: altı kırmızı, hedef ve üstü yeşil (Banka/Bölge/Şube).
-        var NPS_TARGET = 60;
+        // NPS ve Telefonla Karşılama Oranı hedefi: altı kırmızı, hedef ve üstü yeşil.
+        var TARGET_SCORE = 60;
 
         function getNpsFields(isBranch) {
             return isBranch ? ['BranchNpsScore', 'BankNpsScore'] : ['RegionNpsScore', 'BankNpsScore'];
@@ -887,7 +887,7 @@
             });
         }
 
-        // Header ağacı (ParentId=0 bölüm, altı kriter) + servis cevabı > [{ title, monthSuffix, rows: [{ label, value, isNps }] }].
+        // Header ağacı (ParentId=0 bölüm, altı kriter) + servis cevabı > [{ title, monthSuffix, rows: [{ label, value, isTargetScore }] }].
         // Ekran ve PDF aynı modeli kullanır.
         function buildScorecardSections(headers, d, isBranch) {
             var sectionFields = isBranch ? _sectionFieldsBranch : _sectionFieldsRegion;
@@ -911,7 +911,7 @@
                             return {
                                 label: child.HeaderName,
                                 value: fieldName ? d[fieldName] : null,
-                                isNps: /NpsScore$/.test(fieldName || '')
+                                isTargetScore: /NpsScore$|^PhoneGreetingScore$/.test(fieldName || '')
                             };
                         });
 
@@ -935,7 +935,7 @@
 
         function scorecardValueColor(row) {
             if (row.value == null) return '';
-            if (row.isNps) return row.value < NPS_TARGET ? 'ratio-red' : 'ratio-green';
+            if (row.isTargetScore) return row.value < TARGET_SCORE ? 'ratio-red' : 'ratio-green';
             return percentColor(row.value);
         }
 
