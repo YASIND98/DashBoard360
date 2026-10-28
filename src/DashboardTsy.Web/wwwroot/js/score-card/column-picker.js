@@ -73,8 +73,8 @@ window.ScoreCardColumnPicker = (function () {
                 '<div class="sc-colpick-coach" id="scColPickCoach" role="tooltip">' +
                     '<div class="sc-colpick-coach-body">' +
                         '<span class="sc-colpick-coach-badge">Yeni Özellik</span>' +
-                        '<div class="sc-colpick-coach-title">Notlarınızı tabloyla birlikte tutun</div>' +
-                        '<div class="sc-colpick-coach-text">Not ekleyin, ekip arkadaşlarınızla paylaşın ve ihtiyaç duyduğunuzda tekrar görüntüleyin.</div>' +
+                        '<div class="sc-colpick-coach-title">Genel bakış tablosundaki sütunları esnek şekilde izleyebilirsiniz.</div>' +
+                        '<div class="sc-colpick-coach-text">İstenilen sütunları çıkarılabilir, sütun sıralamasını tercihinize göre düzenleyebilirsiniz.</div>' +
                     '</div>' +
                     '<span class="sc-colpick-coach-arrow"></span>' +
                 '</div>'
