@@ -2,6 +2,7 @@ using System.Net;
 using System.Text.Json;
 using DashboardTsy.Web.Models;
 using DashboardTsy.Web.Models.Activity;
+using DashboardTsy.Web.Security;
 using DashboardTsy.Web.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,10 @@ public class MobileAuthController : Controller
     private readonly IConfiguration _configuration;
     private readonly IUserActivityLogService _activityLog;
     private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+    // Fixed identity for AuthMock mode; must stay in sync with
+    // DashboardTsy.Api/Services/MockMobileAuthScenario.BuildCurrentUserResponse.
+    private const string MockUserName = "mock-session-user";
 
     public MobileAuthController(
         IHttpClientFactory httpClientFactory,
@@ -44,10 +49,21 @@ public class MobileAuthController : Controller
     [HttpPost]
     public async Task<JsonResult> LoginUser([FromForm] LoginModel model, CancellationToken cancellationToken)
     {
+        // Fortify (Cross-Site Scripting: Reflected): reject anything outside the
+        // allow-list before the identifier reaches the upstream URL, the session
+        // or the JSON response.
+        if (!LoginIdentifier.IsWellFormed(model.Email))
+            return Json(new ApiResponse<UsersDto>
+            {
+                Result = new UsersDto(),
+                Message = new MessageResult { message = "Hata", message2 = "Gecersiz kullanici adi formati." }
+            });
+
         if (AuthMockEnabled)
         {
-            var mock = BuildMockUser(model.Email);
-            SetSession(mock, model.Email);
+            // Mock identity is constant: client input is never echoed back.
+            var mock = BuildMockUser();
+            SetSession(mock, mock.DomainName);
             await LogLoginSuccessAsync("MobileForm(Mock)", mock, cancellationToken).ConfigureAwait(false);
             return Json(new ApiResponse<UsersDto>
             {
@@ -102,7 +118,7 @@ public class MobileAuthController : Controller
 
         if (AuthMockEnabled)
         {
-            var mock = BuildMockUser("mock-session-user");
+            var mock = BuildMockUser();
             SetSession(mock, mock.DomainName);
             await LogLoginSuccessAsync("MobileSession(Mock)", mock, cancellationToken).ConfigureAwait(false);
             return Redirect("/");
@@ -159,12 +175,12 @@ public class MobileAuthController : Controller
         return RedirectToAction(nameof(Login));
     }
 
-    private static UsersDto BuildMockUser(string? userNameOrEmail) => new()
+    private static UsersDto BuildMockUser() => new()
     {
         UserId = 999,
         NameSurname = "Mock Kullanici",
-        Email = userNameOrEmail,
-        DomainName = userNameOrEmail,
+        Email = MockUserName,
+        DomainName = MockUserName,
         Department = "Mock Departman",
         BranchCode = 1001,
         BranchName = "Mock Sube",
